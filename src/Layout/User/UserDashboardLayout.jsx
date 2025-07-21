@@ -37,6 +37,7 @@ export default function UserDashboardLayout() {
   const navigate = useNavigate();
   const { data: profileData, isLoading: isProfileLoading } = useGetTuristProfileQuery();
   let ws = useRef(null);
+  console.log(profileData)
 
   // WebSocket for notifications
   useEffect(() => {
@@ -203,7 +204,7 @@ export default function UserDashboardLayout() {
                   }`}
                 >
                   <img
-                    src={profileData.profile_picture_url || UserAvatar}
+                    src={profileData.profile_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                     alt="User"
                     className="w-16 rounded-full"
                   />
@@ -218,7 +219,7 @@ export default function UserDashboardLayout() {
                 <h3 className="text-2xl text-center font-normal text-[#343E4B]">
                   {profileData.first_name + " " + profileData.last_name}
                 </h3>
-                <span className="text-center text-md text-[#8C8C8C]">
+                <span className="text-center text-lg font-bold text-[#343E4B">
                   {profileData.profession || "User"}
                 </span>
               </div>

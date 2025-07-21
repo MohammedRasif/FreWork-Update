@@ -38,9 +38,9 @@ function UserProfile() {
             <img
               src={
                 user.profile_picture_url ||
-                "https://res.cloudinary.com/dpi0t9wfn/image/upload/v1741443124/samples/smile.jpg"
+                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
               }
-              className=""
+              className=" pt-[2px]"
               alt="User profile"
             />
           </div>

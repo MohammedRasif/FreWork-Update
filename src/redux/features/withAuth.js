@@ -20,6 +20,8 @@ export const sqQuery = createApi({
       return headers;
     },
   }),
+
+tagTypes: ["TourPlan"],
   endpoints: (builder) => ({
     newPassword: builder.mutation({
       query: (data) => ({
@@ -38,10 +40,27 @@ export const sqQuery = createApi({
         body: data,
       }),
     }),
+
+
+
+
     // plans
     getPlans: builder.query({
       query: () => "/tour-plans/",
+      providesTags: ["TourPlan"],
     }),
+
+    // showSubscription data
+    showSubscriptionData: builder.query({
+      query:() =>"subscriptions/plans/"
+    }),
+
+
+
+
+
+
+
     createPlanOne: builder.mutation({
       query: (data) => ({
         url: "/tour-plans/",
@@ -121,7 +140,7 @@ export const sqQuery = createApi({
       }),
     }),
     getOfferedPlan: builder.query({
-      query: () => `/offers/`,
+      query:() => "/offers/"
     }),
     getOneTourPlan: builder.query({
       query: (id) => `/tour-plans/${id}/`,
@@ -138,6 +157,20 @@ export const sqQuery = createApi({
         body: data,
       }),
     }),
+
+    // subscription 
+    subscription: builder.mutation({
+      query: (data) => ({
+        url: "subscriptions/create-checkout-session/",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+
+
+
+
     getChatList: builder.query({
       query: () => "/chat/conversations/",
     }),
@@ -174,6 +207,12 @@ export const {
   useAllFavoritAgencyQuery,
   //review
   useGiveReviewMutation,
+  // show subscrition data
+  useShowSubscriptionDataQuery,
+  // Subscription
+  useSubscriptionMutation,
+
+
   useGetOfferedPlanQuery,
   useGetOneTourPlanQuery,
   // notifications

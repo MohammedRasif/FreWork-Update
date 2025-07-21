@@ -7,6 +7,7 @@ import AgencyCard from "@/components/ui/AgencyCard";
 
 const Agencies = () => {
   const { data: topAgency = [], isLoading, isError } = useGetTopAgencyQuery();
+  console.log(topAgency,"tttttttt")
 
   // Slider settings
   const sliderSettings = {
@@ -96,16 +97,13 @@ const Agencies = () => {
           </Slider>
         )}
       </div>
-      {
-        topAgency.length === 0 ? (
-         null
-        ) : <NavLink to="/membership" className={"flex justify-center"}>
+      {topAgency.length === 0 ? null : (
+        <NavLink to="/membership" className={"flex justify-center"}>
           <h1 className="w-full md:w-auto h-[48px] bg-gray-300 md:bg-transparent rounded-2xl py-2 mt-6 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
-    see more...
-  </h1>
+            see more...
+          </h1>
         </NavLink>
-      }
-
+      )}
     </div>
   );
 };

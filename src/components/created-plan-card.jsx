@@ -198,11 +198,11 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         Interested Tourist Points: <span className="text-[#343E4B] font-medium">{plan.tourist_spots || 'Location, Location, Location, Location, Location'}</span>
                       </p>
                     </div>
-                     <div className="w-full h-[300px] rounded-md overflow-hidden">
+                     <div className="w-full h-[350px] rounded-md overflow-hidden">
                       <img
                         src={plan.spot_picture_url || PlanImage1}
                         alt="Plan Image"
-                        className="w-full h-full object-cover object-center"
+                        className="w-full h-full  object-center"
                       />
                     </div>
 

@@ -25,6 +25,7 @@ function Messages() {
 
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
+  console.log(plansData,"aaaaaaaaaaaaaaa")
 
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);

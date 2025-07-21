@@ -129,74 +129,72 @@ const TourPlanWithPopup = () => {
     }));
   };
 
-  const handleSubmitOffer = async (tourId, budget, comment) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
+const handleSubmitOffer = async (tourId, budget, comment) => {
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
 
-    if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
-      return;
-    }
+  if (!budget || !comment.trim()) {
+    toast.error("Please provide both a budget and a comment");
+    return;
+  }
 
-    try {
-      // Send offer to backend
-      await offerBudgetToBack({
-        id: tourId,
-        data: { offered_budget: parseFloat(budget), message: comment },
-      }).unwrap();
+  try {
+    // Send offer to backend
+    const response = await offerBudgetToBack({
+      id: tourId,
+      data: { offered_budget: parseFloat(budget), message: comment },
+    }).unwrap();
 
-      // Update local state
-      const newOffer = {
-        id: localStorage.getItem("user_id"), // Temporary ID, ideally provided by backend
-        offered_budget: parseFloat(budget),
-        message: comment,
-        agency: {
-          agency_name: localStorage.getItem("name"), // Replace with actual agency data from current user
-          logo_url: localStorage.getItem("user_image"), // Replace with actual agency logo
-          is_verified: false, // Replace with actual verification status
-        },
-      };
+    // Construct new offer object based on backend response or local data
+    const newOffer = {
+      id: response?.id || `temp-${Date.now()}`, // Use backend ID if available, else temporary ID
+      budget: parseFloat(budget),
+      message: comment,
+      company: localStorage.getItem("name") || "Unknown Agency", // Fallback for agency name
+      image: localStorage.getItem("user_image") || "/placeholder.svg", // Fallback for image
+      verified: false, // Adjust based on actual verification status if available
+    };
 
-      setTours((prevTours) =>
-        prevTours.map((tour) =>
-          tour.id === tourId
-            ? {
-                ...tour,
-                offers: [...tour.offers, newOffer],
-                offer_count: tour.offer_count + 1,
-              }
-            : tour
-        )
-      );
+    // Update local posts state
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === tourId
+          ? {
+              ...post,
+              offers: [...(post.offers || []), newOffer],
+            }
+          : post
+      )
+    );
 
-      if (selectedTour && selectedTour.id === tourId) {
-        setSelectedTour((prev) =>
-          prev
-            ? {
-                ...prev,
-                offers: [...prev.offers, newOffer],
-                offer_count: prev.offer_count + 1,
-              }
-            : prev
-        );
-      }
-
-      // Reset form
-      setOfferBudget(0);
-      setOfferComment("");
-      toast.success("Offer submitted successfully");
-    } catch (error) {
-      console.error("Failed to submit offer:", error.data.detail);
-      toast.error(
-        error.data.detail
-          ? error.data.detail + " Only agency can do this."
-          : "Sumthing going wrong"
+    // Update selectedTour if it matches the tourId
+    if (selectedTour && selectedTour.id === tourId) {
+      setSelectedTour((prev) =>
+        prev
+          ? {
+              ...prev,
+              offers: [...(prev.offers || []), newOffer],
+            }
+          : prev
       );
     }
-  };
+
+    // Reset form
+    setOfferBudget("");
+    setOfferComment("");
+    toast.success("Offer submitted successfully");
+  } catch (error) {
+    console.error("Failed to submit offer:", error);
+    toast.error(
+      error?.data?.error
+        ? `${error.data.error} Only agency can do this.`
+        : "Something went wrong"
+    );
+  }
+};
 
   // Handle like/unlike action
   const handleLike = async (tourId) => {
@@ -552,6 +550,20 @@ const TourPlanWithPopup = () => {
                           />
                         </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+                      
+
                         {/* Social Stats */}
                         <div className="flex items-center justify-between py-3">
                           <div className="flex items-center gap-2">
@@ -573,6 +585,12 @@ const TourPlanWithPopup = () => {
                           </div>
                         </div>
 
+
+
+
+
+                        
+
                         {/* Social Actions */}
                         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                           <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
@@ -582,7 +600,7 @@ const TourPlanWithPopup = () => {
                               className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
                                 isLiked[tour.id]
                                   ? "text-blue-600"
-                                  : "text-gray-600"
+                                  : "text-gray-600"         
                               } hover:text-blue-600 transition-colors hover:cursor-pointer`}
                             >
                               <ThumbsUp
@@ -621,6 +639,61 @@ const TourPlanWithPopup = () => {
                             </button>
                           </div>
                         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                         {/* Offers Section */}
                         <div className="mt-4 space-y-4">
@@ -974,6 +1047,21 @@ const TourPlanWithPopup = () => {
                         </button>
                       </div>
                     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
                     <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
                       <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
                         <img
@@ -1012,7 +1100,7 @@ const TourPlanWithPopup = () => {
                                 offerComment
                               )
                             }
-                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
+                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center cursor-pointer ${
                               offerBudget && offerComment.trim()
                                 ? "bg-blue-600 text-white hover:bg-blue-700"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"

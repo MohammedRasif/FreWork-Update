@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useShowUserInpormationQuery } from "@/redux/features/withAuth";
-
+import img from "../../assets/img/1000062305-removebg-preview.png";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -103,7 +103,9 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between relative">
       {/* Logo/Brand */}
-      <div className="font-bold text-[20px] text-gray-800">VacnzaMyCost.It</div>
+      <div className="font-bold lg:h-11 h-8 text-gray-800">
+        <img src={img} className="h-full" alt="" />
+      </div>
 
       {/* Hamburger Icon for Mobile */}
       <div className="lg:hidden">

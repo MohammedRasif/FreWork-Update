@@ -7,6 +7,7 @@ import { HiDotsVertical } from "react-icons/hi";
 import { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import {
+ 
   useGetOfferedPlanQuery,
   useLikePostMutation,
 } from "@/redux/features/withAuth";
@@ -17,7 +18,9 @@ function AdminOfferPlan() {
   const [isLiked, setIsLiked] = useState({}); // Track like state per tour plan
   const [isDropdownOpen, setIsDropdownOpen] = useState({}); // Track dropdown state per tour plan
   const dropdownRefs = useRef({}); // Refs for dropdowns per tour plan
-  const { data: offeredPlans, isLoading, isError } = useGetOfferedPlanQuery();
+  // const { data: offeredPlans, isLoading, isError } = useGetOfferedPlanQuery();
+  // console.log(offeredPlans,"dhello")
+  const {data: offeredPlans , isLoading, isError } = useGetOfferedPlanQuery()
   console.log(offeredPlans)
 
   // Close dropdown when clicking outside

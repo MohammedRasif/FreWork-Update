@@ -172,10 +172,10 @@ export default function AdminDashboardLayout() {
               <img
                 src={
                   isLoading
-                    ? UserAvatar
+                    ? "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     : agencyData?.profile_handler_image ||
                       agencyData?.agency_logo_url ||
-                      UserAvatar
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.pngs"
                 }
                 alt={agencyData?.profile_handler_name || "User"}
                 className="w-16 h-16 rounded-full"

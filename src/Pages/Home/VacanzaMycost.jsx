@@ -1,7 +1,7 @@
 import img from "../../assets/img/Group.png";
-import img1 from "../../assets/img/hello.svg";
-import img2 from "../../assets/img/discount 1.svg";
-import img3 from "../../assets/img/booking 1.svg";
+import img1 from "../../assets/img/hello.png";
+import img2 from "../../assets/img/discount 1.png";
+import img3 from "../../assets/img/booking.png";
 
 const VacanzaMycost = () => {
   return (
@@ -38,7 +38,7 @@ const VacanzaMycost = () => {
                   <img
                     src={img1}
                     alt="Publish Request"
-                    className="h-12 md:h-24"
+                    className="h-10 md:h-[80px]"
                   />
                 </div>
               </div>
@@ -58,7 +58,7 @@ const VacanzaMycost = () => {
                   <img
                     src={img2}
                     alt="Personalized Offers"
-                    className="h-12 md:h-24"
+                    className="h-8 md:h-[80px]"
                   />
                 </div>
               </div>
@@ -74,11 +74,11 @@ const VacanzaMycost = () => {
             {/* Step 3 */}
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white">
               <div className="relative">
-                <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
+                <div className="w-14 h-14 md:w-28 md:h-28 flex items-center justify-center">
                   <img
                     src={img3}
                     alt="Free Booking"
-                    className="h-12 md:h-24"
+                    className="h-10 md:h-[90px]"
                   />
                 </div>
               </div>

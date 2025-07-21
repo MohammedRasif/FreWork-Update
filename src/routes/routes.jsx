@@ -32,6 +32,7 @@ import UserAccepte from "@/Layout/User/UserAccepte";
 import SinglePost from "@/Pages/SinglePost/SinglePost";
 import ViewAllPost from "@/Pages/ViewAllPost/ViewAllPost";
 import PrivateRoute from "./PrivetRoute";
+import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
 
   { path: "/register", element: <Registration /> },
   { path: "/login", element: <Login /> },
+  { path: "/Successfully", element: <SubscriptionSuccess /> },
   { path: "/verify", element: <EmailVerification /> },
   { path: "/otp_verify", element: <OTP_Verification /> },
   { path: "/reset_password", element: <ResetPassword /> },
