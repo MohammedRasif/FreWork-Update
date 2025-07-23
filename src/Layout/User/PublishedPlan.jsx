@@ -10,6 +10,7 @@ import { IoIosSend } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   useGetPlansQuery,
+  useGetPublicisResponseQuery,
   useLikePostMutation,
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
@@ -23,7 +24,6 @@ const currentUserId = localStorage.getItem("user_id");
 
 function PublishedPlan() {
   const { data: posts, isLoading, isError } = useGetPlansQuery();
-  console.log(posts," posts");
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudget, setOfferBudget] = useState("");
   const [offerComment, setOfferComment] = useState("");
@@ -32,14 +32,40 @@ function PublishedPlan() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showAgencyModal, setShowAgencyModal] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null); // New state for user ID
   const [showReviews, setShowReviews] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState(null);
+  const [expandedOfferMessages, setExpandedOfferMessages] = useState({}); // State for offer message truncation
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] = useOfferBudgetMutation();
+  const { data: showResponseData, isLoading: isResponseLoading } = useGetPublicisResponseQuery(selectedUserId, {
+    skip: !selectedUserId, // Skip query until selectedUserId is set
+  });
+
+  // Utility function to truncate text to a specified word limit
+  const truncateText = (text, wordLimit = 30) => {
+    if (!text) return { truncated: "", isTruncated: false };
+    const words = text.split(/\s+/);
+    if (words.length <= wordLimit) {
+      return { truncated: text, isTruncated: false };
+    }
+    return {
+      truncated: words.slice(0, wordLimit).join(" ") + "...",
+      isTruncated: true,
+    };
+  };
+
+  // Toggle offer message expansion
+  const toggleOfferMessage = (offerId) => {
+    setExpandedOfferMessages((prev) => ({
+      ...prev,
+      [offerId]: !prev[offerId],
+    }));
+  };
 
   // Initialize likes and shares
   useEffect(() => {
@@ -62,8 +88,6 @@ function PublishedPlan() {
       setIsShared(initialShares);
     }
   }, [posts, currentUserId]);
-
-  
 
   // Handle like/unlike action
   const handleLike = async (tourId) => {
@@ -144,7 +168,7 @@ function PublishedPlan() {
     }
 
     try {
-      await offerBudgetToBack({
+      const response = await offerBudgetToBack({
         id: tourId,
         data: { offered_budget: parseFloat(budget), message: comment },
       }).unwrap();
@@ -182,8 +206,10 @@ function PublishedPlan() {
     };
   }, []);
 
-  const handleResponseClick = (offer) => {
+  // Handle response click to fetch agency details
+  const handleResponseClick = (offer, userId) => {
     setSelectedAgency(offer);
+    setSelectedUserId(userId); // Set the user ID to trigger the query
     setShowAgencyModal(true);
     setShowReviews(false);
   };
@@ -280,15 +306,9 @@ function PublishedPlan() {
                         {isDropdownOpen && (
                           <div
                             ref={dropdownRef}
-                            className="absolute right-0 top-8 bg-white shadow-lg rounded-md py-2 w-40 z-10"
+                            className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10"
                           >
-                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                              Edit Plan
-                            </button>
-                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                              Share Plan
-                            </button>
-                            <button className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                            <button className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white">
                               Delete Plan
                             </button>
                           </div>
@@ -335,17 +355,6 @@ function PublishedPlan() {
                         className="w-full h-96 object-cover"
                       />
                     </div>
-
-
-
-
-
-
-
-
-
-
-
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
@@ -365,15 +374,6 @@ function PublishedPlan() {
                         <span>{shareCount} Shares</span>
                       </div>
                     </div>
-
-
-
-
-
-
-
-
-                    
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
                         <button
@@ -428,65 +428,76 @@ function PublishedPlan() {
                         <div className="text-sm text-gray-600">
                           Offered Budget
                         </div>
-                        {/* <div className="text-sm text-gray-600">
-                          <h3 className="text-xl font-semibold text-gray-600 flex items-center space-x-2">
-                            <GoArrowLeft />
-                            <p>Back</p>
-                          </h3>
-                        </div> */}
                       </div>
                     </div>
                   </div>
                   <div className="px-6 pb-6 space-y-4 py-6">
                     {plan.offers && plan.offers.length > 0 ? (
-                      plan.offers.map((offer) => (
-                        <div
-                          key={offer.id}
-                          className="flex items-center justify-between px-4 rounded-lg"
-                        >
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={offer.image || "/placeholder.svg"}
-                              alt={`${offer.company} avatar`}
-                              className="w-11 h-11 rounded-full object-cover"
-                            />
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">
-                                  {offer.company}
-                                </span>
-                                {offer.verified && (
-                                  <div className="flex space-x-1">
-                                    <div className="rounded-full flex items-center justify-center">
+                      plan.offers.map((offer) => {
+                        const { truncated, isTruncated } = truncateText(offer.message, 30);
+                        return (
+                          <div
+                            key={offer.id}
+                            className="flex items-center justify-between px-4 rounded-lg"
+                          >
+                            <div className="flex items-center gap-4">
+                              <img
+                                src={offer.image || "/placeholder.svg"}
+                                alt={`${offer.company} avatar`}
+                                className="w-11 h-11 rounded-full object-cover"
+                              />
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-gray-900">
+                                    {expandedOfferMessages[offer.id]
+                                      ? offer.message
+                                      : truncated}
+                                    {isTruncated && !expandedOfferMessages[offer.id] && (
+                                      <button
+                                        onClick={() => toggleOfferMessage(offer.id)}
+                                        className="text-blue-600 hover:underline text-sm ml-1"
+                                      >
+                                        See More
+                                      </button>
+                                    )}
+                                    {isTruncated && expandedOfferMessages[offer.id] && (
+                                      <button
+                                        onClick={() => toggleOfferMessage(offer.id)}
+                                        className="text-blue-600 hover:underline text-sm ml-1"
+                                      >
+                                        Show Less
+                                      </button>
+                                    )}
+                                  </span>
+                                  {offer.verified && (
+                                    <div className="flex space-x-1">
                                       <span className="text-blue-500">
                                         <MdVerified size={24} />
                                       </span>
-                                    </div>
-                                    <div className="rounded-full flex items-center justify-center">
                                       <span className="text-green-500">
                                         <MdVerified size={24} />
                                       </span>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-xl">
-                                💰 {offer.offered_budgets}
-                              </span>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xl">
+                                  💰 {offer.offered_budget}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => handleResponseClick(offer, plan.user)}
+                                className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                              >
+                                Response
+                              </button>
                             </div>
-                            <button
-                              onClick={() => handleResponseClick(offer)}
-                              className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
-                            >
-                              Response
-                            </button>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="text-gray-600 text-sm">
                         No offers available
@@ -718,6 +729,79 @@ function PublishedPlan() {
                         </div>
                       </div>
                     </div>
+                    <div className="px-6 pb-6 space-y-4 py-6">
+                      {selectedTour.offers && selectedTour.offers.length > 0 ? (
+                        selectedTour.offers.map((offer) => {
+                          const { truncated, isTruncated } = truncateText(offer.message, 30);
+                          return (
+                            <div
+                              key={offer.id}
+                              className="flex items-center justify-between px-4 rounded-lg"
+                            >
+                              <div className="flex items-center gap-4">
+                                <img
+                                  src={offer.image || "/placeholder.svg"}
+                                  alt={`${offer.company} avatar`}
+                                  className="w-11 h-11 rounded-full object-cover"
+                                />
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-gray-900">
+                                      {expandedOfferMessages[offer.id]
+                                        ? offer.message
+                                        : truncated}
+                                      {isTruncated && !expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() => toggleOfferMessage(offer.id)}
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          See More
+                                        </button>
+                                      )}
+                                      {isTruncated && expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() => toggleOfferMessage(offer.id)}
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          Show Less
+                                        </button>
+                                      )}
+                                    </span>
+                                    {offer.verified && (
+                                      <div className="flex space-x-1">
+                                        <span className="text-blue-500">
+                                          <MdVerified size={24} />
+                                        </span>
+                                        <span className="text-green-500">
+                                          <MdVerified size={24} />
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-xl">
+                                    💰 {offer.offered_budget}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => handleResponseClick(offer, selectedTour.user)}
+                                  className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                                >
+                                  Response
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="text-gray-600 text-sm">
+                          No offers available
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -727,139 +811,143 @@ function PublishedPlan() {
       )}
 
       {showAgencyModal && selectedAgency && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-[63vw] max-h-[80vh] overflow-hidden">
-            <div className="flex h-[450px]">
-              <div className="w-1/2 relative">
-                <button
-                  onClick={() => setShowAgencyModal(false)}
-                  className="absolute top-4 bg-gray-500 text-white px-4 py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
-                >
-                  <GoArrowLeft className="w-4 h-4" />
-                  Back
-                </button>
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg max-w-[63vw] max-h-[80vh] overflow-hidden">
+      <div className="flex h-[450px]">
+        {/* Left Image & Close Button */}
+        <div className="w-1/2 relative">
+          <button
+            onClick={() => {
+              setShowAgencyModal(false);
+              setSelectedUserId(null);
+            }}
+            className="absolute top-4 bg-gray-500 text-white px-4 py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
+          >
+            <GoArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <img
+            src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
+            alt="Agency"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Right Content */}
+        <div className="w-1/2 p-6 flex flex-col">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
                 <img
-                  src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
-                  alt="Agency"
-                  className="w-full h-full object-cover"
+                  src={showResponseData?.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"}
+                  className="rounded-full w-16 h-16 object-cover"
+                  alt="Agency Logo"
                 />
               </div>
-              <div className="w-1/2 p-6 flex flex-col">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-                      <img
-                        src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"
-                        className="rounded-full w-16 h-16 object-cover"
-                        alt="Agency Logo"
-                      />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-semibold text-gray-800">
-                        {selectedAgency.company}
-                      </h2>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-yellow-500">★</span>
-                        <span className="text-sm text-gray-600">4.5 (355 </span>
-                        <button
-                          onClick={handleReviewsClick}
-                          className="text-sm text-blue-600 hover:underline cursor-pointer"
-                        >
-                          Reviews
-                        </button>
-                        <span className="text-sm text-gray-600">)</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    Response
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {showResponseData?.company_name || selectedAgency.company}
+                </h2>
+                <div className="flex items-center gap-1 mt-1">
+                  {renderStars(showResponseData?.rating || 4.5)}
+                  <span className="text-sm text-gray-600">({showResponseData?.review_count || 355} </span>
+                  <button
+                    onClick={handleReviewsClick}
+                    className="text-sm text-blue-600 hover:underline cursor-pointer"
+                  >
+                    Reviews
                   </button>
-                </div>
-                <div className="mb-6 flex-1">
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Aspen is as close as one can get to a storybook alpine town
-                    in America. The choose-your-own-adventure
-                    possibilities—skiing, hiking, dining shopping and ....Aspen
-                    is as close as one can get to a storybook alpine town in
-                    America.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                    Facilities
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        Dinner
-                      </span>
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        Breakfast
-                      </span>
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        Lunch
-                      </span>
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        Snacks(3/day)
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        24/7 Support during tour
-                      </span>
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                        Local Guides and Language Support
-                      </span>
-                    </div>
-                  </div>
+                  <span className="text-sm text-gray-600">)</span>
                 </div>
               </div>
             </div>
-            <AnimatePresence>
-              {showReviews && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0, y: -20 }}
-                  animate={{ height: "auto", opacity: 1, y: 0 }}
-                  exit={{ height: 0, opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="border-t border-gray-200 overflow-hidden"
-                  style={{ transformOrigin: "top" }}
-                >
-                  <motion.div
-                    initial={{ y: -30, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -30, opacity: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 }}
-                    className="p-6 space-y-6"
-                  >
-                    <motion.div
-                      initial={{ y: -20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.3 }}
-                    >
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4 -mt-5">
-                        Recent Reviews
-                      </h3>
-                      <div className="space-y-4 max-h-56 overflow-y-auto">
-                        <div className="text-gray-600 text-sm">
-                          No reviews available
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" />
+              Response
+            </button>
+          </div>
+
+          {/* Description */}
+          <div className="mb-6 flex-1">
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {showResponseData?.description ||
+                "Aspen is as close as one can get to a storybook alpine town in America..."}
+            </p>
+          </div>
+
+          {/* Facilities */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Facilities</h3>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {["Dinner", "Breakfast", "Lunch", "Snacks(3/day)"].map((item, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    <FaCheckCircle className="w-3 h-3 text-blue-500" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["24/7 Support during tour", "Local Guides and Language Support"].map((item, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    <FaCheckCircle className="w-3 h-3 text-blue-500" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* AnimatePresence block MUST be outside of motion.div */}
+      <AnimatePresence>
+        {showReviews && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, y: -20 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="border-t border-gray-200 overflow-hidden"
+            style={{ transformOrigin: "top" }}
+          >
+            <motion.div
+              initial={{ y: -30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -30, opacity: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="p-6 space-y-6"
+            >
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 -mt-5">Recent Reviews</h3>
+                <div className="space-y-4 max-h-56 overflow-y-auto">
+                  <div className="text-gray-600 text-sm">
+                    {showResponseData?.reviews?.length
+                      ? showResponseData.reviews.map((review, index) => (
+                          <div key={index} className="mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{review.user_name}</span>
+                              {renderStars(review.rating)}
+                            </div>
+                            <p className="text-sm text-gray-600">{review.comment}</p>
+                          </div>
+                        ))
+                      : "No reviews available"}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

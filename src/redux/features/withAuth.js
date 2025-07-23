@@ -167,6 +167,11 @@ tagTypes: ["TourPlan"],
       }),
     }),
 
+    //publicis response
+    getPublicisResponse: builder.query({
+      query: (id) => `/agency_details/${id}/`,
+    }),
+
 
 
 
@@ -214,6 +219,8 @@ export const {
   useShowSubscriptionDataQuery,
   // Subscription
   useSubscriptionMutation,
+  // publicis response
+  useGetPublicisResponseQuery,
 
 
   useGetOfferedPlanQuery,
