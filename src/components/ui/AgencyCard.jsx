@@ -9,12 +9,12 @@ export default function AgencyCard({ agency }) {
           <img
             src={agency.cover_photo_url || "/images/placeholder.png"}
             alt={`${agency.agency_name} cover`}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 p-1 rounded-lg"
           />
         </div>
 
         {/* Agency Logo */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ">
           <img
             src={agency.logo_url || "/images/placeholder.png"}
             alt={`${agency.agency_name} logo`}

@@ -30,6 +30,7 @@ export default function AdminDashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); // Changed default to null
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false); // New state for popup
   const location = useLocation();
   const navigate = useNavigate();
   const { data: agencyData, isLoading } = useGetAgencyProfileQuery();
@@ -136,6 +137,8 @@ export default function AdminDashboardLayout() {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       navigate(path);
+    } else if (itemName === "Change password") {
+      setIsChangePasswordOpen(true);
     } else {
       setSelectedItem(itemName);
       navigate(path);
@@ -145,6 +148,10 @@ export default function AdminDashboardLayout() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleClosePopup = () => {
+    setIsChangePasswordOpen(false);
   };
 
   return (
@@ -175,7 +182,7 @@ export default function AdminDashboardLayout() {
                     ? "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     : agencyData?.profile_handler_image ||
                       agencyData?.agency_logo_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.pngs"
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                 }
                 alt={agencyData?.profile_handler_name || "User"}
                 className="w-16 h-16 rounded-full"
@@ -392,15 +399,13 @@ export default function AdminDashboardLayout() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem>
-                      <CircleArrowUp size={20} />
-                      Upgrade package
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Mail size={20} />
-                      Contact support
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <NavLink to="/contact">
+                      <DropdownMenuItem onClick={() => handleItemClick("Upgrade package", "/contact")}>
+                        <CircleArrowUp size={20} />
+                        Upgrade package
+                      </DropdownMenuItem>
+                    </NavLink>
+                    <DropdownMenuItem onClick={() => handleItemClick("Change password", "")}>
                       <Lock size={20} />
                       Change password
                     </DropdownMenuItem>
@@ -415,15 +420,11 @@ export default function AdminDashboardLayout() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Upgrade package", "/contact")}>
                       <CircleArrowUp size={20} />
                       Upgrade package
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Mail size={20} />
-                      Contact support
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Change password", "")}>
                       <Lock size={20} />
                       Change password
                     </DropdownMenuItem>
@@ -437,6 +438,47 @@ export default function AdminDashboardLayout() {
         <main className="flex-1 overflow-auto bg-[#F5F5F6] p-4 sm:p-6">
           <Outlet />
         </main>
+
+        {/* Change Password Popup */}
+        {isChangePasswordOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Change Password</h2>
+                <button onClick={handleClosePopup} className="text-gray-500 hover:text-gray-700">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Old password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">New password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <button className="w-full bg-blue-600 text-white py-2 rounded-md">Confirm</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

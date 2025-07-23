@@ -1,48 +1,46 @@
 "use client";
 
 import { motion } from "framer-motion";
-import img from "../../assets/img/maldives-island.png";
+import img from "../../assets/img/background.jpg";
 import img1 from "../../assets/img/banner.png";
 
 const Banner = () => {
   return (
-    <div className="relative w-full h-[30vh] sm:h-[60vh] md:h-[80vh] lg:h-screen overflow-hidden">
-      {/* Background Image - Full width */}
+    <div className="relative w-full h-auto pb-3 md:h-[120vh] lg:h-screen overflow-hidden">
+      {/* Background Image */}
       <div className="absolute inset-0">
         <img
           src={img}
-          alt="Maldives Island"
-          className="object-cover w-full h-full backdrop-blur-sm sm:backdrop-blur-none"
-          sizes="100vw"
+          alt="Background"
+          className="object-cover w-full h-full"
         />
+        <div className="absolute inset-0 bg-black/10" /> {/* Light overlay */}
       </div>
 
-      {/* Content Container */}
-      <div className="absolute inset-0 w-full h-full flex items-center justify-center sm:justify-center">
-  <div className="relative w-full px-2 sm:px-6 md:px-8 lg:px-12 ">
-    <motion.div
-      className="backdrop-blur-[1px] sm:backdrop-blur-[1px] bg-white/40 rounded-xl sm:shadow-lg max-w-[300px] sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto sm:mx-8 md:mx-8 lg:ml-16 xl:ml-24 text-center sm:text-left"
-      initial={{ opacity: 0, x: -100 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
-      <div className="px-4 py-2 sm:px-8 sm:py-10 md:px-10 md:py-12 ">
-        <div className=" flex items-center justify-center lg:mb-10">
-          <img src={img1} className="lg:h-28 h-[50px] flex ite" alt="" />
-        </div>
-        <p className="mt-2 text-xs font-medium sm:text-base md:text-lg lg:text-xl text-gray-800 text-center">
-          Post your request and receive personalized offers from agencies
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center">
+        {/* Logo */}
+        <img
+          src={img1}
+          alt="Logo"
+          className="w-[220px] md:w-[500px] lg:w-[600px] mt-3 md:mt-16"
+        />
+
+        {/* Main Slogan */}
+        <p className="mt-2 text-[24px] md:text-[40px] lg:text-[42px] font-bold leading-[32px] md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
+          Pubblica la tua richiesta e ricevi offerte personalizzate dalle agenzie
         </p>
-        <div className="flex items-center justify-center">
-          <button className=" mt-4 sm:mt-8 bg-[#3C76DC] hover:bg-blue-600 text-white font-medium py-3 sm:py-3 px-8 sm:px-12 rounded-md transition-colors text-[12px] sm:text-base md:text-lg">
-            Create Request
-          </button>
-        </div>
+
+        {/* Secondary Slogan */}
+        <p className="mt-2 text-[16px] md:text-[22px] leading-[24px] md:leading-[30px] font-normal text-white">
+          La mia vacanza al mio prezzo
+        </p>
+
+        {/* CTA Button */}
+        <button className="mt-3 md:mt-10 bg-[#FF6600] hover:bg-[#e55600] text-white text-[20px] md:text-[24px] font-medium py-[14px] md:py-[16px] px-[28px] md:px-[36px] rounded-[10px] md:rounded-[12px] max-w-[80%] md:w-[300px] lg:w-[350px] mx-auto">
+          Crea richiesta
+        </button>
       </div>
-    </motion.div>
-  </div>
-</div>
-      
     </div>
   );
 };

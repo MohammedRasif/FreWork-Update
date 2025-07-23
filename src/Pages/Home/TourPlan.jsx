@@ -32,6 +32,8 @@ const TourPlanWithPopup = () => {
   const [selectedTour, setSelectedTour] = useState(null);
   const [expandedOffers, setExpandedOffers] = useState({});
   const [tours, setTours] = useState([]);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [expandedOfferMessages, setExpandedOfferMessages] = useState({}); // New state for offer messages
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const [filters, setFilters] = useState({
@@ -42,6 +44,35 @@ const TourPlanWithPopup = () => {
     category: "",
   });
   const [offerComment, setOfferComment] = useState("");
+
+  // Utility function to truncate text to a specified word limit
+  const truncateText = (text, wordLimit = 100) => {
+    if (!text) return { truncated: "", isTruncated: false };
+    const words = text.split(/\s+/);
+    if (words.length <= wordLimit) {
+      return { truncated: text, isTruncated: false };
+    }
+    return {
+      truncated: words.slice(0, wordLimit).join(" ") + "...",
+      isTruncated: true,
+    };
+  };
+
+  // Toggle description expansion
+  const toggleDescription = (tourId) => {
+    setExpandedDescriptions((prev) => ({
+      ...prev,
+      [tourId]: !prev[tourId],
+    }));
+  };
+
+  // Toggle offer message expansion
+  const toggleOfferMessage = (offerId) => {
+    setExpandedOfferMessages((prev) => ({
+      ...prev,
+      [offerId]: !prev[offerId],
+    }));
+  };
 
   // RTK Queries
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
@@ -129,74 +160,72 @@ const TourPlanWithPopup = () => {
     }));
   };
 
-const handleSubmitOffer = async (tourId, budget, comment) => {
-  if (!token) {
-    navigate("/login");
-    toast.error("Please log in to submit an offer");
-    return;
-  }
-
-  if (!budget || !comment.trim()) {
-    toast.error("Please provide both a budget and a comment");
-    return;
-  }
-
-  try {
-    // Send offer to backend
-    const response = await offerBudgetToBack({
-      id: tourId,
-      data: { offered_budget: parseFloat(budget), message: comment },
-    }).unwrap();
-
-    // Construct new offer object based on backend response or local data
-    const newOffer = {
-      id: response?.id || `temp-${Date.now()}`, // Use backend ID if available, else temporary ID
-      budget: parseFloat(budget),
-      message: comment,
-      company: localStorage.getItem("name") || "Unknown Agency", // Fallback for agency name
-      image: localStorage.getItem("user_image") || "/placeholder.svg", // Fallback for image
-      verified: false, // Adjust based on actual verification status if available
-    };
-
-    // Update local posts state
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === tourId
-          ? {
-              ...post,
-              offers: [...(post.offers || []), newOffer],
-            }
-          : post
-      )
-    );
-
-    // Update selectedTour if it matches the tourId
-    if (selectedTour && selectedTour.id === tourId) {
-      setSelectedTour((prev) =>
-        prev
-          ? {
-              ...prev,
-              offers: [...(prev.offers || []), newOffer],
-            }
-          : prev
-      );
+  const handleSubmitOffer = async (tourId, budget, comment) => {
+    if (!token) {
+      navigate("/login");
+      toast.error("Please log in to submit an offer");
+      return;
     }
 
-    // Reset form
-    setOfferBudget("");
-    setOfferComment("");
-    toast.success("Offer submitted successfully");
-  } catch (error) {
-    console.error("Failed to submit offer:", error);
-    toast.error(
-      error?.data?.error
-        ? `${error.data.error} Only agency can do this.`
-        : "Something went wrong"
-    );
-  }
-};
+    if (!budget || !comment.trim()) {
+      toast.error("Please provide both a budget and a comment");
+      return;
+    }
 
-  // Handle like/unlike action
+    try {
+      const response = await offerBudgetToBack({
+        id: tourId,
+        data: { offered_budget: parseFloat(budget), message: comment },
+      }).unwrap();
+
+      const newOffer = {
+        id: response?.id || `temp-${Date.now()}`,
+        offered_budget: parseFloat(budget),
+        message: comment,
+        agency: {
+          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          logo_url: localStorage.getItem("user_image") || "/placeholder.svg",
+          is_verified: false,
+        },
+      };
+
+      setTours((prevTours) =>
+        prevTours.map((tour) =>
+          tour.id === tourId
+            ? {
+                ...tour,
+                offers: [...(tour.offers || []), newOffer],
+                offer_count: (tour.offer_count || 0) + 1,
+              }
+            : tour
+        )
+      );
+
+      if (selectedTour && selectedTour.id === tourId) {
+        setSelectedTour((prev) =>
+          prev
+            ? {
+                ...prev,
+                offers: [...(prev.offers || []), newOffer],
+                offer_count: (prev.offer_count || 0) + 1,
+              }
+            : prev
+        );
+      }
+
+      setOfferBudget("");
+      setOfferComment("");
+      toast.success("Offer submitted successfully");
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      toast.error(
+        error?.data?.error
+          ? `${error.data.error} Only agency can do this.`
+          : "Something went wrong"
+      );
+    }
+  };
+
   const handleLike = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -263,7 +292,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
     }
   };
 
-  // Handle share/unshare action
   const handleShare = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -271,20 +299,16 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
     }
 
     try {
-      // Copy to clipboard
-      console.log(String(tourId)); // For debugging
       await navigator.clipboard.writeText(
         `http://localhost:5173/post?postid=${tourId}`
       );
       toast.success("Post link is copied");
 
-      // Send share interaction to backend
       await interact({
         id: tourId,
         data: { interaction_type: "share" },
       }).unwrap();
 
-      // Update local state
       setIsShared((prev) => {
         const newIsShared = { ...prev, [tourId]: !prev[tourId] };
         setTours((prevTours) =>
@@ -340,8 +364,8 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
       toast.error("Failed to copy link or update share");
     }
   };
+
   const acceptOfferHandler = async (offerId, tourId) => {
-    console.log(offerId, tourId);
     if (!token) {
       navigate("/login");
       toast.error("Please log in to accept an offer");
@@ -349,13 +373,9 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
     }
 
     try {
-      // Send accept offer request to backend with only offerId
       await acceptOffer(offerId).unwrap();
-
-      // Remove the tour from the UI
       setTours((prevTours) => prevTours.filter((tour) => tour.id !== tourId));
 
-      // If the popup is open for this tour, close it
       if (selectedTour && selectedTour.id === tourId) {
         setIsPopupOpen(false);
         setSelectedTour(null);
@@ -368,7 +388,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
     }
   };
 
-  // Calculate like and share counts
   const getInteractionCounts = (tour) => {
     const likeCount = tour.interactions.filter(
       (interaction) => interaction.interaction_type === "like"
@@ -385,7 +404,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
-        {/* Mobile Filter Toggle Button */}
         <button
           className="md:hidden flex items-center gap-2 mb-4 bg-white px-4 py-2 rounded-md shadow-sm border border-gray-200"
           onClick={toggleMobileFilter}
@@ -395,7 +413,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
         </button>
 
         <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-          {/* Main Content - Left Side */}
           <div className="w-full md:w-3/4 lg:w-4/5 order-2 md:order-1">
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
@@ -452,7 +469,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
               </p>
             </div>
 
-            {/* Tour Cards */}
             <div className="space-y-6 mb-6">
               {isTourPlanPublicLoading || isFilteredLoading ? (
                 <div>
@@ -461,13 +477,16 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
               ) : displayTours && displayTours.length > 0 ? (
                 displayTours.map((tour) => {
                   const { likeCount, shareCount } = getInteractionCounts(tour);
+                  const { truncated, isTruncated } = truncateText(
+                    tour.description,
+                    100
+                  );
                   return (
                     <div
                       key={tour.id}
                       className="rounded-lg bg-white shadow-sm border border-gray-200"
                     >
                       <div className="p-3 sm:p-4 lg:p-6">
-                        {/* Travel Header */}
                         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
                           <div className="flex-1">
                             <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
@@ -506,14 +525,30 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                           </div>
                         </div>
 
-                        {/* Description */}
                         <div className="mb-4">
                           <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                            {tour.description}
+                            {expandedDescriptions[tour.id]
+                              ? tour.description
+                              : truncated}
+                            {isTruncated && !expandedDescriptions[tour.id] && (
+                              <button
+                                onClick={() => toggleDescription(tour.id)}
+                                className="text-blue-600 hover:underline text-sm ml-1"
+                              >
+                                See More
+                              </button>
+                            )}
+                            {isTruncated && expandedDescriptions[tour.id] && (
+                              <button
+                                onClick={() => toggleDescription(tour.id)}
+                                className="text-blue-600 hover:underline text-sm ml-1"
+                              >
+                                Show Less
+                              </button>
+                            )}
                           </p>
                         </div>
 
-                        {/* Interested Travel Points */}
                         <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                           <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
                             Interested Travel Points:
@@ -529,8 +564,8 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                                   >
                                     {location.trim()}
                                     {index <
-                                      tour.tourist_spots.split(",").length -
-                                        1 && ", "}
+                                      tour.tourist_spots.split(",").length - 1 &&
+                                      ", "}
                                   </span>
                                 ))
                             ) : (
@@ -541,7 +576,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                           </div>
                         </div>
 
-                        {/* Resort Image */}
                         <div className="mb-4">
                           <img
                             src={tour.spot_picture_url || "/placeholder.svg"}
@@ -550,21 +584,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                           />
                         </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-                      
-
-                        {/* Social Stats */}
                         <div className="flex items-center justify-between py-3">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center">
@@ -585,13 +604,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                           </div>
                         </div>
 
-
-
-
-
-                        
-
-                        {/* Social Actions */}
                         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                           <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
                             <button
@@ -600,7 +612,7 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                               className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
                                 isLiked[tour.id]
                                   ? "text-blue-600"
-                                  : "text-gray-600"         
+                                  : "text-gray-600"
                               } hover:text-blue-600 transition-colors hover:cursor-pointer`}
                             >
                               <ThumbsUp
@@ -608,9 +620,7 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                                   isLiked[tour.id] ? "fill-current" : ""
                                 }`}
                               />
-                              <span>
-                                {isLiked[tour.id] ? "Unlike" : "Like"}
-                              </span>
+                              <span>{isLiked[tour.id] ? "Unlike" : "Like"}</span>
                             </button>
                             <button
                               onClick={() => openPopup(tour)}
@@ -624,7 +634,7 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                               disabled={isInteractLoading}
                               className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
                                 isShared[tour.id]
-                                  ? "text-blue-600"
+                                  ? "text-gray-600"
                                   : "text-gray-600"
                               } hover:text-blue-600 transition-colors`}
                             >
@@ -634,150 +644,122 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                                 }`}
                               />
                               <span>
-                                {isShared[tour.id] ? "Unshare" : "Share"}
+                                {isShared[tour.id] ? "Share" : "Share"}
                               </span>
                             </button>
                           </div>
                         </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        {/* Offers Section */}
                         <div className="mt-4 space-y-4">
                           {tour.offers
                             .slice(
                               0,
                               expandedOffers[tour.id] ? tour.offers.length : 3
                             )
-                            .map((offer) => (
-                              <div
-                                key={offer.id}
-                                className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
-                              >
-                                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                                  <img
-                                    src={
-                                      offer.agency.logo_url ||
-                                      "/placeholder.svg"
-                                    }
-                                    alt={`${offer.agency.agency_name} avatar`}
-                                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                                  />
-                                  <div>
+                            .map((offer) => {
+                              const { truncated, isTruncated } = truncateText(
+                                offer.message,
+                                30
+                              );
+                              return (
+                                <div
+                                  key={offer.id}
+                                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
+                                >
+                                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                                    <img
+                                      src={
+                                        offer.agency.logo_url ||
+                                        "/placeholder.svg"
+                                      }
+                                      alt={`${offer.agency.agency_name} avatar`}
+                                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                                    />
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium text-gray-900">
+                                          {offer.agency.agency_name}
+                                        </span>
+                                        {offer.agency.is_verified && (
+                                          <div className="flex space-x-1">
+                                            <span className="text-blue-500">
+                                              <MdVerified
+                                                size={20}
+                                                className="sm:w-6 sm:h-6"
+                                              />
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <p className="text-xs sm:text-sm text-gray-600">
+                                        {expandedOfferMessages[offer.id]
+                                          ? offer.message
+                                          : truncated}
+                                        {isTruncated &&
+                                          !expandedOfferMessages[offer.id] && (
+                                            <button
+                                              onClick={() =>
+                                                toggleOfferMessage(offer.id)
+                                              }
+                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                            >
+                                              See More
+                                            </button>
+                                          )}
+                                        {isTruncated &&
+                                          expandedOfferMessages[offer.id] && (
+                                            <button
+                                              onClick={() =>
+                                                toggleOfferMessage(offer.id)
+                                              }
+                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                            >
+                                              Show Less
+                                            </button>
+                                          )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between sm:justify-end gap-3">
                                     <div className="flex items-center gap-2">
-                                      <span className="font-medium text-gray-900">
-                                        {offer.agency.agency_name}
+                                      <span className="font-semibold text-lg sm:text-xl">
+                                        💰 ${offer.offered_budget}
                                       </span>
-                                      {offer.agency.is_verified && (
-                                        <div className="flex space-x-1">
-                                          <span className="text-blue-500">
-                                            <MdVerified
-                                              size={20}
-                                              className="sm:w-6 sm:h-6"
-                                            />
-                                          </span>
-                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => {}}
+                                        className="px-3 hover:cursor-pointer sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-sm sm:text-md rounded-md hover:bg-blue-700 transition-colors"
+                                      >
+                                        Message
+                                      </button>
+                                      {tour.user ==
+                                        localStorage.getItem("user_id") && (
+                                        <button
+                                          onClick={() =>
+                                            acceptOfferHandler(offer.id, tour.id)
+                                          }
+                                          disabled={isAcceptLoading}
+                                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                            isAcceptLoading
+                                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                              : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                          }`}
+                                        >
+                                          Accept
+                                        </button>
                                       )}
                                     </div>
-                                    <p className="text-xs sm:text-sm text-gray-600">
-                                      {offer.message}
-                                    </p>
                                   </div>
                                 </div>
-                                <div className="flex items-center justify-between sm:justify-end gap-3">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-lg sm:text-xl">
-                                      💰 ${offer.offered_budget}
-                                    </span>
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={() => {}}
-                                      className="px-3 hover:cursor-pointer sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-sm sm:text-md rounded-md hover:bg-blue-700 transition-colors"
-                                    >
-                                      Message
-                                    </button>
-                                    {tour.user ==
-                                      localStorage.getItem("user_id") && (
-                                      <button
-                                        onClick={() =>
-                                          acceptOfferHandler(offer.id, tour.id)
-                                        }
-                                        disabled={isAcceptLoading}
-                                        className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                          isAcceptLoading
-                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                            : "bg-[#3776E2] text-white hover:bg-blue-700"
-                                        }`}
-                                      >
-                                        Accept
-                                      </button>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           {tour.offers.length > 3 && (
                             <button
                               onClick={() => toggleOffers(tour.id)}
                               className="text-blue-600 hover:underline text-sm"
                             >
-                              {expandedOffers[tour.id]
-                                ? "Show Less"
-                                : "See More"}
+                              {expandedOffers[tour.id] ? "Show Less" : "See More"}
                             </button>
                           )}
                         </div>
@@ -791,7 +773,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
             </div>
           </div>
 
-          {/* Sidebar - Right Side */}
           <div
             className={`w-full md:w-1/4 lg:w-1/5 order-1 md:order-2 lg:mt-24 ${
               isMobileFilterOpen ? "block" : "hidden md:block"
@@ -886,7 +867,6 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
         </div>
       </div>
 
-      {/* Popup Modal */}
       {isPopupOpen && selectedTour && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -944,7 +924,29 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                     </div>
                     <div className="mb-4">
                       <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                        {selectedTour.description}
+                        {expandedDescriptions[selectedTour.id]
+                          ? selectedTour.description
+                          : truncateText(selectedTour.description, 100).truncated}
+                        {truncateText(selectedTour.description, 100)
+                          .isTruncated &&
+                          !expandedDescriptions[selectedTour.id] && (
+                            <button
+                              onClick={() => toggleDescription(selectedTour.id)}
+                              className="text-blue-600 hover:underline text-sm ml-1"
+                            >
+                              See More
+                            </button>
+                          )}
+                        {truncateText(selectedTour.description, 100)
+                          .isTruncated &&
+                          expandedDescriptions[selectedTour.id] && (
+                            <button
+                              onClick={() => toggleDescription(selectedTour.id)}
+                              className="text-blue-600 hover:underline text-sm ml-1"
+                            >
+                              Show Less
+                            </button>
+                          )}
                       </p>
                     </div>
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
@@ -1023,7 +1025,9 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                             {isLiked[selectedTour.id] ? "Unlike" : "Like"}
                           </span>
                         </button>
-                        <button className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                        <button
+                          className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                        >
                           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
                           <span>Comments</span>
                         </button>
@@ -1032,7 +1036,7 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                           disabled={isInteractLoading}
                           className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
                             isShared[selectedTour.id]
-                              ? "text-blue-600"
+                              ? "text-gray-600"
                               : "text-gray-600"
                           } hover:text-blue-600 transition-colors`}
                         >
@@ -1042,26 +1046,132 @@ const handleSubmitOffer = async (tourId, budget, comment) => {
                             }`}
                           />
                           <span>
-                            {isShared[selectedTour.id] ? "Unshare" : "Share"}
+                            {isShared[selectedTour.id] ? "Share" : "Share"}
                           </span>
                         </button>
                       </div>
                     </div>
 
+                    <div className="mt-4 space-y-4">
+                      {selectedTour.offers
+                        .slice(
+                          0,
+                          expandedOffers[selectedTour.id]
+                            ? selectedTour.offers.length
+                            : 3
+                        )
+                        .map((offer) => {
+                          const { truncated, isTruncated } = truncateText(
+                            offer.message,
+                            30
+                          );
+                          return (
+                            <div
+                              key={offer.id}
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
+                            >
+                              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                                <img
+                                  src={
+                                    offer.agency.logo_url || "/placeholder.svg"
+                                  }
+                                  alt={`${offer.agency.agency_name} avatar`}
+                                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                                />
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-900">
+                                      {offer.agency.agency_name}
+                                    </span>
+                                    {offer.agency.is_verified && (
+                                      <div className="flex space-x-1">
+                                        <span className="text-blue-500">
+                                          <MdVerified
+                                            size={20}
+                                            className="sm:w-6 sm:h-6"
+                                          />
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-gray-600">
+                                    {expandedOfferMessages[offer.id]
+                                      ? offer.message
+                                      : truncated}
+                                    {isTruncated &&
+                                      !expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() =>
+                                            toggleOfferMessage(offer.id)
+                                          }
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          See More
+                                        </button>
+                                      )}
+                                    {isTruncated &&
+                                      expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() =>
+                                            toggleOfferMessage(offer.id)
+                                          }
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          Show Less
+                                        </button>
+                                      )}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between sm:justify-end gap-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-lg sm:text-xl">
+                                    💰 ${offer.offered_budget}
+                                  </span>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => {}}
+                                    className="px-3 hover:cursor-pointer sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-sm sm:text-md rounded-md hover:bg-blue-700 transition-colors"
+                                  >
+                                    Message
+                                  </button>
+                                  {selectedTour.user ==
+                                    localStorage.getItem("user_id") && (
+                                    <button
+                                      onClick={() =>
+                                        acceptOfferHandler(
+                                          offer.id,
+                                          selectedTour.id
+                                        )
+                                      }
+                                      disabled={isAcceptLoading}
+                                      className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                        isAcceptLoading
+                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                          : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                      }`}
+                                    >
+                                      Accept
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      {selectedTour.offers.length > 3 && (
+                        <button
+                          onClick={() => toggleOffers(selectedTour.id)}
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          {expandedOffers[selectedTour.id]
+                            ? "Show Less"
+                            : "See More"}
+                        </button>
+                      )}
+                    </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-                    
                     <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
                       <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
                         <img

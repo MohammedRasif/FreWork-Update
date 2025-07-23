@@ -33,11 +33,12 @@ export default function UserDashboardLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false); // New state for popup
   const location = useLocation();
   const navigate = useNavigate();
   const { data: profileData, isLoading: isProfileLoading } = useGetTuristProfileQuery();
   let ws = useRef(null);
-  console.log(profileData)
+  console.log(profileData);
 
   // WebSocket for notifications
   useEffect(() => {
@@ -167,6 +168,8 @@ export default function UserDashboardLayout() {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       navigate(path);
+    } else if (itemName === "Change password") {
+      setIsChangePasswordOpen(true);
     } else {
       setSelectedItem(itemName);
       navigate(path);
@@ -176,6 +179,10 @@ export default function UserDashboardLayout() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleClosePopup = () => {
+    setIsChangePasswordOpen(false);
   };
 
   return (
@@ -219,7 +226,7 @@ export default function UserDashboardLayout() {
                 <h3 className="text-2xl text-center font-normal text-[#343E4B]">
                   {profileData.first_name + " " + profileData.last_name}
                 </h3>
-                <span className="text-center text-lg font-bold text-[#343E4B">
+                <span className="text-center text-lg font-bold text-[#343E4B]">
                   {profileData.profession || "User"}
                 </span>
               </div>
@@ -443,15 +450,15 @@ export default function UserDashboardLayout() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem>
+                    {/* <DropdownMenuItem onClick={() => handleItemClick("Upgrade package", "/user/upgrade")}>
                       <CircleArrowUp size={20} />
                       Upgrade package
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    </DropdownMenuItem> */}
+                    <DropdownMenuItem onClick={() => handleItemClick("Contact support", "/user/support")}>
                       <Mail size={20} />
                       Contact support
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Change password", "")}>
                       <Lock size={20} />
                       Change password
                     </DropdownMenuItem>
@@ -466,15 +473,15 @@ export default function UserDashboardLayout() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Upgrade package", "/user/upgrade")}>
                       <CircleArrowUp size={20} />
                       Upgrade package
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Contact support", "/user/support")}>
                       <Mail size={20} />
                       Contact support
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleItemClick("Change password", "")}>
                       <Lock size={20} />
                       Change password
                     </DropdownMenuItem>
@@ -489,6 +496,47 @@ export default function UserDashboardLayout() {
         <main className="flex-1 overflow-auto bg-[#F5F5F6] p-4 sm:p-6">
           <Outlet />
         </main>
+
+        {/* Change Password Popup */}
+        {isChangePasswordOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Change Password</h2>
+                <button onClick={handleClosePopup} className="text-gray-500 hover:text-gray-700">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Old password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">New password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <button className="w-full bg-blue-600 text-white py-2 rounded-md">Confirm</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

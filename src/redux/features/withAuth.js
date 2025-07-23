@@ -174,9 +174,12 @@ tagTypes: ["TourPlan"],
     getChatList: builder.query({
       query: () => "/chat/conversations/",
     }),
+    
     getChatHsitory: builder.query({
       query: (id) => `/chat/conversations/${id}/messages/`,
     }),
+
+
     showUserInpormation: builder.query({
       query: () => "/auth/user_profile/"
     }),
