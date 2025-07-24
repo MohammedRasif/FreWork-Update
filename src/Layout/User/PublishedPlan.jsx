@@ -24,6 +24,7 @@ const currentUserId = localStorage.getItem("user_id");
 
 function PublishedPlan() {
   const { data: posts, isLoading, isError } = useGetPlansQuery();
+  console.log(posts, "posts");
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudget, setOfferBudget] = useState("");
   const [offerComment, setOfferComment] = useState("");
@@ -213,6 +214,7 @@ function PublishedPlan() {
     setSelectedUserId(userId); // Set the user ID to trigger the query
     setShowAgencyModal(true);
     setShowReviews(false);
+    console.log(offer,userId, "offer and userId");
   };
 
   const handleReviewsClick = () => {
@@ -490,7 +492,7 @@ function PublishedPlan() {
                                 </span>
                               </div>
                               <button
-                                onClick={() => handleResponseClick(offer, plan.user)}
+                                onClick={() => handleResponseClick(offer, offer.agency.user)}
                                 className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                               >
                                 Response

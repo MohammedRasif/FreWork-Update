@@ -106,12 +106,16 @@ function Messages() {
   }, [id]);
 
   // Map fetched chat history to messages state
+  const userId = localStorage.getItem("user_id");
   useEffect(() => {
-    if (data && Array.isArray(data.messages)) {
+    // is user
+    console.log("User ID:", userId);
+    if (data && Array.isArray(data.messages) && userId) {
+      console.log("Chat history data:", data.messages);
       const formattedMessages = data.messages.map((msg) => ({
         id: msg.id,
         text: msg.message_type === "text" ? msg.text : null,
-        isUser: msg.sender.role !== "agency",
+        isUser: msg.sender.user_id == userId,
         timestamp: new Date(msg.timestamp),
         is_read: msg.is_read,
         status: "sent",
@@ -119,7 +123,7 @@ function Messages() {
       console.log("Formatted chat history:", formattedMessages);
       setMessages(formattedMessages);
     }
-  }, [data]);
+  }, [data,userId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -300,6 +304,7 @@ function Messages() {
           <div key={message.id || message.tempId}>
             {message.isUser ? (
               <div className="flex justify-end space-x-2">
+                {console.log(message.isUser, "message.isUser")}
                 <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium">
                   {message.text && <p>{message.text}</p>}
                   <div className="flex items-center justify-end mt-1 space-x-1">
