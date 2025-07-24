@@ -42,11 +42,13 @@ function PublishedPlan() {
   const navigate = useNavigate();
 
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
-  const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] = useOfferBudgetMutation();
-  const { data: showResponseData, isLoading: isResponseLoading } = useGetPublicisResponseQuery(selectedUserId, {
-    skip: !selectedUserId, // Skip query until selectedUserId is set
-  });
-  console.log(showResponseData , "showResponseData");
+  const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
+    useOfferBudgetMutation();
+  const { data: showResponseData, isLoading: isResponseLoading } =
+    useGetPublicisResponseQuery(selectedUserId, {
+      skip: !selectedUserId, // Skip query until selectedUserId is set
+    });
+  console.log(showResponseData, "showResponseData");
 
   // Utility function to truncate text to a specified word limit
   const truncateText = (text, wordLimit = 30) => {
@@ -75,16 +77,18 @@ function PublishedPlan() {
       const initialLikes = {};
       const initialShares = {};
       posts.forEach((plan) => {
-        initialLikes[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "like"
-        ) || false;
-        initialShares[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "share"
-        ) || false;
+        initialLikes[plan.id] =
+          plan.interactions?.some(
+            (interaction) =>
+              String(interaction.user) === String(currentUserId) &&
+              interaction.interaction_type === "like"
+          ) || false;
+        initialShares[plan.id] =
+          plan.interactions?.some(
+            (interaction) =>
+              String(interaction.user) === String(currentUserId) &&
+              interaction.interaction_type === "share"
+          ) || false;
       });
       setIsLiked(initialLikes);
       setIsShared(initialShares);
@@ -186,12 +190,14 @@ function PublishedPlan() {
 
   // Calculate interaction counts
   const getInteractionCounts = (plan) => {
-    const likeCount = plan.interactions?.filter(
-      (interaction) => interaction.interaction_type === "like"
-    ).length || 0;
-    const shareCount = plan.interactions?.filter(
-      (interaction) => interaction.interaction_type === "share"
-    ).length || 0;
+    const likeCount =
+      plan.interactions?.filter(
+        (interaction) => interaction.interaction_type === "like"
+      ).length || 0;
+    const shareCount =
+      plan.interactions?.filter(
+        (interaction) => interaction.interaction_type === "share"
+      ).length || 0;
     return { likeCount, shareCount };
   };
 
@@ -214,7 +220,7 @@ function PublishedPlan() {
     setSelectedUserId(userId); // Set the user ID to trigger the query
     setShowAgencyModal(true);
     setShowReviews(false);
-    console.log(offer,userId, "offer and userId");
+    console.log(offer, userId, "offer and userId");
   };
 
   const handleReviewsClick = () => {
@@ -271,7 +277,9 @@ function PublishedPlan() {
                         <div className="space-y-1 text-sm text-gray-600">
                           <p>
                             Willing to go on{" "}
-                            <span className="font-medium">{plan.start_date}</span>
+                            <span className="font-medium">
+                              {plan.start_date}
+                            </span>
                           </p>
                           <p>
                             Duration:{" "}
@@ -335,7 +343,8 @@ function PublishedPlan() {
                               className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                             >
                               {spot.trim()}
-                              {index < plan.tourist_spots.split(",").length - 1 &&
+                              {index <
+                                plan.tourist_spots.split(",").length - 1 &&
                                 ", "}
                             </span>
                           ))
@@ -404,15 +413,17 @@ function PublishedPlan() {
                           onClick={() => handleShare(plan.id)}
                           disabled={isInteractLoading}
                           className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                            isShared[plan.id] ? "text-blue-600" : "text-gray-600"
+                            isShared[plan.id]
+                              ? "text-gray-600"
+                              : "text-gray-600"
                           } hover:text-blue-600 transition-colors`}
                         >
                           <Share2
                             className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                              isShared[plan.id] ? "fill-current" : ""
+                              isShared[plan.id] ? "" : ""
                             }`}
                           />
-                          <span>{isShared[plan.id] ? "Unshare" : "Share"}</span>
+                          <span>{isShared[plan.id] ? "Share" : "Share"}</span>
                         </button>
                       </div>
                     </div>
@@ -437,7 +448,10 @@ function PublishedPlan() {
                   <div className="px-6 pb-6 space-y-4 py-6">
                     {plan.offers && plan.offers.length > 0 ? (
                       plan.offers.map((offer) => {
-                        const { truncated, isTruncated } = truncateText(offer.message, 30);
+                        const { truncated, isTruncated } = truncateText(
+                          offer.message,
+                          30
+                        );
                         return (
                           <div
                             key={offer.id}
@@ -455,22 +469,28 @@ function PublishedPlan() {
                                     {expandedOfferMessages[offer.id]
                                       ? offer.message
                                       : truncated}
-                                    {isTruncated && !expandedOfferMessages[offer.id] && (
-                                      <button
-                                        onClick={() => toggleOfferMessage(offer.id)}
-                                        className="text-blue-600 hover:underline text-sm ml-1"
-                                      >
-                                        See More
-                                      </button>
-                                    )}
-                                    {isTruncated && expandedOfferMessages[offer.id] && (
-                                      <button
-                                        onClick={() => toggleOfferMessage(offer.id)}
-                                        className="text-blue-600 hover:underline text-sm ml-1"
-                                      >
-                                        Show Less
-                                      </button>
-                                    )}
+                                    {isTruncated &&
+                                      !expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() =>
+                                            toggleOfferMessage(offer.id)
+                                          }
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          See More
+                                        </button>
+                                      )}
+                                    {isTruncated &&
+                                      expandedOfferMessages[offer.id] && (
+                                        <button
+                                          onClick={() =>
+                                            toggleOfferMessage(offer.id)
+                                          }
+                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                        >
+                                          Show Less
+                                        </button>
+                                      )}
                                   </span>
                                   {offer.verified && (
                                     <div className="flex space-x-1">
@@ -492,7 +512,9 @@ function PublishedPlan() {
                                 </span>
                               </div>
                               <button
-                                onClick={() => handleResponseClick(offer, offer.agency.user)}
+                                onClick={() =>
+                                  handleResponseClick(offer, offer.agency.user)
+                                }
                                 className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                               >
                                 Response
@@ -735,7 +757,10 @@ function PublishedPlan() {
                     <div className="px-6 pb-6 space-y-4 py-6">
                       {selectedTour.offers && selectedTour.offers.length > 0 ? (
                         selectedTour.offers.map((offer) => {
-                          const { truncated, isTruncated } = truncateText(offer.message, 30);
+                          const { truncated, isTruncated } = truncateText(
+                            offer.message,
+                            30
+                          );
                           return (
                             <div
                               key={offer.id}
@@ -753,22 +778,28 @@ function PublishedPlan() {
                                       {expandedOfferMessages[offer.id]
                                         ? offer.message
                                         : truncated}
-                                      {isTruncated && !expandedOfferMessages[offer.id] && (
-                                        <button
-                                          onClick={() => toggleOfferMessage(offer.id)}
-                                          className="text-blue-600 hover:underline text-sm ml-1"
-                                        >
-                                          See More
-                                        </button>
-                                      )}
-                                      {isTruncated && expandedOfferMessages[offer.id] && (
-                                        <button
-                                          onClick={() => toggleOfferMessage(offer.id)}
-                                          className="text-blue-600 hover:underline text-sm ml-1"
-                                        >
-                                          Show Less
-                                        </button>
-                                      )}
+                                      {isTruncated &&
+                                        !expandedOfferMessages[offer.id] && (
+                                          <button
+                                            onClick={() =>
+                                              toggleOfferMessage(offer.id)
+                                            }
+                                            className="text-blue-600 hover:underline text-sm ml-1"
+                                          >
+                                            See More
+                                          </button>
+                                        )}
+                                      {isTruncated &&
+                                        expandedOfferMessages[offer.id] && (
+                                          <button
+                                            onClick={() =>
+                                              toggleOfferMessage(offer.id)
+                                            }
+                                            className="text-blue-600 hover:underline text-sm ml-1"
+                                          >
+                                            Show Less
+                                          </button>
+                                        )}
                                     </span>
                                     {offer.verified && (
                                       <div className="flex space-x-1">
@@ -790,7 +821,12 @@ function PublishedPlan() {
                                   </span>
                                 </div>
                                 <button
-                                  onClick={() => handleResponseClick(offer, selectedTour.user)}
+                                  onClick={() =>
+                                    handleResponseClick(
+                                      offer,
+                                      selectedTour.user
+                                    )
+                                  }
                                   className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                                 >
                                   Response
@@ -814,143 +850,152 @@ function PublishedPlan() {
       )}
 
       {showAgencyModal && selectedAgency && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg max-w-[63vw] max-h-[80vh] overflow-hidden">
-      <div className="flex h-[450px]">
-        {/* Left Image & Close Button */}
-        <div className="w-1/2 relative">
-          <button
-            onClick={() => {
-              setShowAgencyModal(false);
-              setSelectedUserId(null);
-            }}
-            className="absolute top-4 bg-gray-500 text-white px-4 py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
-          >
-            <GoArrowLeft className="w-4 h-4" />
-            Back
-          </button>
-          <img
-            src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
-            alt="Agency"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Right Content */}
-        <div className="w-1/2 p-6 flex flex-col">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-[90vh] max-h-[80vh] overflow-hidden">
+            <div className="flex h-[450px]">
+              {/* Left Image & Close Button */}
+              <div className="w-1/2 relative">
+                <button
+                  onClick={() => {
+                    setShowAgencyModal(false);
+                    setSelectedUserId(null);
+                  }}
+                  className="absolute top-4 bg-gray-500 text-white px-4 py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
+                >
+                  <GoArrowLeft className="w-4 h-4" />
+                  Back
+                </button>
                 <img
-                  src={showResponseData?.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"}
-                  className="rounded-full w-16 h-16 object-cover"
-                  alt="Agency Logo"
+                  src={
+                    showResponseData?.cover_photo_url ||
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
+                  }
+                  alt="Agency"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  {showResponseData?.company_name || selectedAgency.company}
-                </h2>
-                <div className="flex items-center gap-1 mt-1">
-                  {renderStars(showResponseData?.rating || 4.5)}
-                  <span className="text-sm text-gray-600">({showResponseData?.review_count || 355} </span>
-                  <button
-                    onClick={handleReviewsClick}
-                    className="text-sm text-blue-600 hover:underline cursor-pointer"
-                  >
-                    Reviews
-                  </button>
-                  <span className="text-sm text-gray-600">)</span>
-                </div>
-              </div>
-            </div>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              Response
-            </button>
-          </div>
 
-          {/* Description */}
-          <div className="mb-6 flex-1">
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {showResponseData?.description ||
-                "Aspen is as close as one can get to a storybook alpine town in America..."}
-            </p>
-          </div>
-
-          {/* Facilities */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Facilities</h3>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {["Dinner", "Breakfast", "Lunch", "Snacks(3/day)"].map((item, i) => (
-                  <span key={i} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                    <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                    {item}
-                  </span>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {["24/7 Support during tour", "Local Guides and Language Support"].map((item, i) => (
-                  <span key={i} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                    <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* AnimatePresence block MUST be outside of motion.div */}
-      <AnimatePresence>
-        {showReviews && (
-          <motion.div
-            initial={{ height: 0, opacity: 0, y: -20 }}
-            animate={{ height: "auto", opacity: 1, y: 0 }}
-            exit={{ height: 0, opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="border-t border-gray-200 overflow-hidden"
-            style={{ transformOrigin: "top" }}
-          >
-            <motion.div
-              initial={{ y: -30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -30, opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="p-6 space-y-6"
-            >
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 -mt-5">Recent Reviews</h3>
-                <div className="space-y-4 max-h-56 overflow-y-auto">
-                  <div className="text-gray-600 text-sm">
-                    {showResponseData?.reviews?.length
-                      ? showResponseData.reviews.map((review, index) => (
-                          <div key={index} className="mb-4">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{review.user_name}</span>
-                              {renderStars(review.rating)}
-                            </div>
-                            <p className="text-sm text-gray-600">{review.comment}</p>
-                          </div>
-                        ))
-                      : "No reviews available"}
+              {/* Right Content */}
+              <div className="w-1/2 p-6 flex flex-col">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+                      <img
+                        src={
+                          showResponseData?.agency_logo_url ||
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"
+                        }
+                        className="rounded-full w-16 h-16 object-cover"
+                        alt="Agency Logo"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-semibold text-gray-800">
+                        {showResponseData?.agency_name ||
+                          selectedAgency.company}
+                      </h2>
+                      <div className="flex items-center gap-1 mt-1">
+                        {renderStars(showResponseData?.rating || 4.5)}
+                        <span className="text-sm text-gray-600">
+                          ({showResponseData?.review_count || 0}{" "}
+                        </span>
+                        <button
+                          onClick={handleReviewsClick}
+                          className="text-sm text-blue-600 hover:underline cursor-pointer"
+                        >
+                          Reviews
+                        </button>
+                        <span className="text-sm text-gray-600">)</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  </div>
-)}
 
+                {/* Description */}
+                <div className="mb-6 flex-1">
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {showResponseData?.about ||
+                      "Aspen is as close as one can get to a storybook alpine town in America..."}
+                  </p>
+                </div>
+
+                {/* Facilities */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    Facilities
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      {JSON.parse(
+                        showResponseData?.facilities?.[0] || "[]"
+                      ).map((item, i) => (
+                        <span
+                          key={i}
+                          className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                        >
+                          <FaCheckCircle className="w-3 h-3 text-blue-500" />
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AnimatePresence block for Reviews */}
+            <AnimatePresence>
+              {showReviews && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0, y: -20 }}
+                  animate={{ height: "auto", opacity: 1, y: 0 }}
+                  exit={{ height: 0, opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="border-t border-gray-200 overflow-hidden"
+                  style={{ transformOrigin: "top" }}
+                >
+                  <motion.div
+                    initial={{ y: -30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -30, opacity: 0 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                    className="p-6 space-y-6"
+                  >
+                    <motion.div
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                    >
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4 -mt-5">
+                        Recent Reviews
+                      </h3>
+                      <div className="space-y-4 max-h-56 overflow-y-auto">
+                        <div className="text-gray-600 text-sm">
+                          {showResponseData?.reviews?.length
+                            ? showResponseData.reviews.map((review, index) => (
+                                <div key={index} className="mb-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {review.user_name}
+                                    </span>
+                                    {renderStars(review.rating)}
+                                  </div>
+                                  <p className="text-sm text-gray-600">
+                                    {review.comment}
+                                  </p>
+                                </div>
+                              ))
+                            : "No reviews available"}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
