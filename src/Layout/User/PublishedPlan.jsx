@@ -45,6 +45,7 @@ function PublishedPlan() {
   const { data: showResponseData, isLoading: isResponseLoading } = useGetPublicisResponseQuery(selectedUserId, {
     skip: !selectedUserId, // Skip query until selectedUserId is set
   });
+  console.log(showResponseData , "showResponseData");
 
   // Utility function to truncate text to a specified word limit
   const truncateText = (text, wordLimit = 30) => {
