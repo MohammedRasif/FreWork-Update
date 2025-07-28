@@ -27,6 +27,7 @@ function Messages() {
   // Fetch chat history and plans
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
+  console.log("Plans Data:", plansData);
 
   // State for menu dropdown visibility
   const menuRef = useRef(null);

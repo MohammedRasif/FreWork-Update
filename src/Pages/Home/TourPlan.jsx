@@ -14,6 +14,7 @@ import FullScreenInfinityLoader from "@/lib/Loading";
 import { useNavigate } from "react-router-dom";
 import {
   useAcceptOfferMutation,
+  useInviteToChatMutation,
   useLikePostMutation,
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
@@ -77,6 +78,7 @@ const TourPlanWithPopup = () => {
   // RTK Queries
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
+    console.log(tourPlanPublic, "tourPlanPublic");
   const { data: filteredTourPlan, isLoading: isFilteredLoading } =
     useFilterTourPlanPublicQuery(filters, {
       skip:
@@ -399,6 +401,21 @@ const TourPlanWithPopup = () => {
   };
 
   const displayTours = tours;
+   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
+      useInviteToChatMutation();
+
+   const handleMessage = async (data) => {
+    const role = localStorage.getItem("role");
+    console.log(data);
+    if (role) {
+      try {
+        await invite(data);
+        navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+      } catch (error) {
+        console.log(error, "invite to message");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
@@ -728,11 +745,26 @@ const TourPlanWithPopup = () => {
                                     </div>
                                     <div className="flex gap-2">
                                       <button
-                                        onClick={() => {}}
-                                        className="px-3 hover:cursor-pointer sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-sm sm:text-md rounded-md hover:bg-blue-700 transition-colors"
-                                      >
-                                        Message
-                                      </button>
+  onClick={() => {
+    if (!token) {
+      navigate("/login");
+    } else {
+      // Assuming tourPlanPublic is an array with an object containing the user
+      const userId = tourPlanPublic[0]?.user; // Access the user from the first object
+      if (userId) {
+        handleMessage({ other_user_id: userId });
+      } else {
+        console.error("User ID not found in tourPlanPublic");
+      }
+    }
+  }}
+  // disabled={isAddFevLoading}
+  className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+  aria-label={`Message ${tourPlanPublic[0]?.agency || "Agency"}`}
+>
+  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+  <span className="text-sm sm:text-base font-medium">Message</span>
+</button>
                                       {tour.user ==
                                         localStorage.getItem("user_id") && (
                                         <button

@@ -74,37 +74,49 @@ export default function UserDashboardLayout() {
     console.log(notifications);
   }, [notifications]);
 
-  // Sync selectedItem with current route
-  useEffect(() => {
-    const normalizedLocation = location.pathname.replace(/\/$/, "");
-    const myPlansRoutes = [
-      "/user",
-      "/user/favourite",
-      "/user/accepted",
-      "/user/published",
-    ];
-    if (myPlansRoutes.includes(normalizedLocation)) {
-      setSelectedItem("My Plans");
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", "My Plans");
-      return;
-    }
-    let currentItem = menuItems[0].items.find((item) => {
-      const normalizedPath = item.path.replace(/\/$/, "");
-      return (
-        (!item.exact &&
-          (normalizedPath === normalizedLocation ||
-            normalizedLocation.startsWith(normalizedPath + "/"))) ||
-        (item.exact && normalizedPath === normalizedLocation)
-      );
-    });
-    if (currentItem) {
-      setSelectedItem(currentItem.name);
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", currentItem.name);
-    } else {
-      setSelectedItem(null);
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", null);
-    }
-  }, [location.pathname]);
+ 
+ // Inside UserDashboardLayout component
+useEffect(() => {
+  const normalizedLocation = location.pathname.replace(/\/$/, "");
+  const myPlansRoutes = [
+    "/user",
+    "/user/favourite",
+    "/user/accepted",
+    "/user/published",
+    "/user/CreatePlan", // Existing entry from your previous request
+  ];
+  const profileRoutes = [
+    "/user/profile",
+    "/user/editProfile", // Added /user/editProfile to profile routes
+  ];
+
+  if (myPlansRoutes.includes(normalizedLocation)) {
+    setSelectedItem("My Plans");
+    console.log("normalizedLocation:", normalizedLocation, "selectedItem:", "My Plans");
+    return;
+  }
+  if (profileRoutes.includes(normalizedLocation)) {
+    setSelectedItem("Profile");
+    console.log("normalizedLocation:", normalizedLocation, "selectedItem:", "Profile");
+    return;
+  }
+  let currentItem = menuItems[0].items.find((item) => {
+    const normalizedPath = item.path.replace(/\/$/, "");
+    return (
+      (!item.exact &&
+        (normalizedPath === normalizedLocation ||
+          normalizedLocation.startsWith(normalizedPath + "/"))) ||
+      (item.exact && normalizedPath === normalizedLocation)
+    );
+  });
+  if (currentItem) {
+    setSelectedItem(currentItem.name);
+    console.log("normalizedLocation:", normalizedLocation, "selectedItem:", currentItem.name);
+  } else {
+    setSelectedItem(null);
+    console.log("normalizedLocation:", normalizedLocation, "selectedItem:", null);
+  }
+}, [location.pathname]);
 
   // Close mobile menu when route changes
   useEffect(() => {

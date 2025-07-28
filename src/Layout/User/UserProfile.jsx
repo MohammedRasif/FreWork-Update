@@ -40,7 +40,7 @@ function UserProfile() {
                 user.profile_picture_url ||
                 "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
               }
-              className=" pt-[2px]"
+              className=" pt-[2px] w-full h-full object-cover"
               alt="User profile"
             />
           </div>

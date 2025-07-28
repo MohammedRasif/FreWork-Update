@@ -26,6 +26,8 @@ const Membership = () => {
 
   const { data: AgencyAll, isLoading: isAgencyDataLoading } =
     useGetAllAgencyQuery();
+
+    console.log(AgencyAll, "AgencyAll");
   const { data: TopAgencies, isLoading: isTopAgencyLoading } =
     useGetTopAgencyQuery();
   const { data: SearchAgencies, isLoading: isSearchLoading } =
