@@ -18,15 +18,6 @@ export default function ChatInterface() {
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetchChatList();
-    }, 3000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   // Update and sort chatsList when chatList data is fetched
   useEffect(() => {
@@ -38,9 +29,9 @@ export default function ChatInterface() {
         const timeB = b.last_message_time
           ? new Date(b.last_message_time)
           : new Date(b.updated_at);
-        if (isNaN(timeA.getTime()) && isNaN(timeB.getTime())) return 0;
-        if (isNaN(timeA.getTime())) return 1;
-        if (isNaN(timeB.getTime())) return -1;
+        // Improved date handling with fallback
+        if (!timeA || isNaN(timeA.getTime())) return 1;
+        if (!timeB || isNaN(timeB.getTime())) return -1;
         return timeB - timeA; // Sort in descending order
       });
 
@@ -50,8 +41,11 @@ export default function ChatInterface() {
         image: chat.other_participant_image || "/placeholder.svg",
         lastMessage: chat.last_message || null,
         unreadCount: chat.unread_count || 0,
-        active: false,
+        active: chat.active || false, // Backend support needed for active status
         tourist_is_verified: chat.tourist_is_verified || false,
+        other_user_id: chat.other_user_id || null,
+        tour_plan_title: chat.tour_plan_title || "No Tour Plan",
+        tour_plan_id:chat.tour_plan_id || null
       }));
 
       setChatsList(mappedChats);
@@ -83,6 +77,7 @@ export default function ChatInterface() {
   }, [location.pathname, chatsList]);
 
   const handleAgencyClick = (agency) => {
+    console.log(agency,"adlkgjfldsjljdfslore olsdlk")
     if (!agency.id) return;
     setSelectedAgencyId(agency.id);
     const basePath = location.pathname.includes("/admin/")
@@ -94,9 +89,11 @@ export default function ChatInterface() {
   const isBaseRoute =
     location.pathname === "/user/chat" || location.pathname === "/admin/chat";
 
-  // Filter agencies based on search term
-  const filteredAgencies = chatsList.filter((agency) =>
-    agency.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter agencies based on search term, including tour_plan_title
+  const filteredAgencies = chatsList.filter(
+    (agency) =>
+      agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agency.tour_plan_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Mobile Layout
@@ -108,7 +105,7 @@ export default function ChatInterface() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search chats"
+              placeholder="Search chats or tour plans"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-gray-200 rounded-lg pl-10 pr-4 py-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -125,7 +122,7 @@ export default function ChatInterface() {
             filteredAgencies.map((agency) => (
               <div
                 key={agency.id}
-                onClick={() => handleAgencyClick(agency)}
+                onClick={() => handleAgencyClick(agency,"llllllllllllllllllllllllllllllllll")}
                 className={`flex items-center px-4 py-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200 ${
                   selectedAgencyId === agency.id ? "bg-gray-200" : ""
                 }`}
@@ -143,13 +140,21 @@ export default function ChatInterface() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center mb-1">
-                    <h3 className="font-semibold truncate">{agency.name}</h3>
+                    <div className="flex items-center">
+                      <h3 className="font-semibold truncate">{agency.name}</h3>
+                      {agency.tourist_is_verified && (
+                        <MdVerified className="ml-1 w-4 h-4 text-blue-600" />
+                      )}
+                    </div>
                     {agency.unreadCount > 0 && (
                       <span className="text-[12px] bg-blue-500 text-white px-2 py-1 rounded-full ml-2">
                         {agency.unreadCount}
                       </span>
                     )}
                   </div>
+                  <p className="text-sm text-gray-600 truncate">
+                    {agency.tour_plan_title}
+                  </p>
                   <p className="text-sm text-gray-500 truncate">
                     {agency.lastMessage || "No messages yet"}
                   </p>
@@ -178,7 +183,7 @@ export default function ChatInterface() {
           <div className="m-3 relative">
             <input
               type="text"
-              placeholder="Search chats"
+              placeholder="Search chats or tour plans"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded-md w-full pl-10 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
@@ -194,7 +199,7 @@ export default function ChatInterface() {
               filteredAgencies.map((agency) => (
                 <div
                   key={agency.id}
-                  onClick={() => handleAgencyClick(agency)}
+                  onClick={() => handleAgencyClick(agency,"....................................")}
                   className={`flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252c3b] text-gray-700 dark:text-gray-200 transition-colors border-b border-gray-200 dark:border-gray-300 ${
                     selectedAgencyId === agency.id
                       ? "bg-blue-100 dark:bg-[#2F80A9]"
@@ -208,27 +213,29 @@ export default function ChatInterface() {
                       className="w-10 h-10 rounded-full object-cover"
                       onError={(e) => (e.target.src = "/placeholder.svg")}
                     />
-
-                    <div className="absolute -top-1 -right-1 w-fit">
-                      {agency?.tourist_is_verified && (
-                        <div className=" w-fit absolute top-0 right-0 rounded-full">
-                          <MdVerified className=" w-4 h-4 z-20 text-blue-600" />
-                        </div>
-                      )}
-                      {console.log(agency)}
-                    </div>
+                    {agency.active && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium text-[15px] truncate">
-                        {agency.name}
-                      </span>
+                      <div className="flex items-center">
+                        <span className="font-medium text-[15px] truncate">
+                          {agency.name}
+                        </span>
+                        {agency.tourist_is_verified && (
+                          <MdVerified className="ml-1 w-4 h-4 text-blue-600" />
+                        )}
+                      </div>
                       {agency.unreadCount > 0 && (
                         <span className="text-[12px] bg-blue-500 text-white px-2 py-1 rounded-full ml-2">
                           {agency.unreadCount}
                         </span>
                       )}
                     </div>
+                    <p className="text-sm text-gray-600 truncate">
+                      {agency.tour_plan_title}
+                    </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {agency.lastMessage || "No messages yet"}
                     </p>

@@ -188,6 +188,31 @@ tagTypes: ["TourPlan"],
     showUserInpormation: builder.query({
       query: () => "/auth/user_profile/"
     }),
+    // all about discount
+    askForDiscount: builder.mutation({
+      query: ({ planid, chatid }) => ({
+        url: `/chat/conversations/${chatid}/request-discount/`,
+        method: 'POST',
+        body: { tour_plan_id: planid },
+      }),
+    }),
+    offerDiscount:builder.mutation({
+      query:({id,data})=>({
+        url:`/chat/conversations/${id}/offer-discount/`,
+        method:"POST",
+        body:data
+      })
+    }),
+
+
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password/",
+        method: "POST",
+        body: data,
+      })
+    }),
+
   }),
 });
 
@@ -233,4 +258,10 @@ export const {
   useGetChatHsitoryQuery,
   // show user information
   useShowUserInpormationQuery,
+  // discount
+  useAskForDiscountMutation,
+  useOfferDiscountMutation,
+
+  // change password
+  useChangePasswordMutation,
 } = sqQuery;

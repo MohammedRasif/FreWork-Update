@@ -14,6 +14,8 @@ import {
   Lock,
   Menu,
   X,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import UserAvatar from "../../assets/img/bruce-mars.png";
 import { SlDiamond } from "react-icons/sl";
@@ -24,9 +26,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetTuristProfileQuery } from "@/redux/features/withAuth";
+import { useChangePasswordMutation, useGetTuristProfileQuery } from "@/redux/features/withAuth";
 import { notification_url } from "@/assets/Socketurl";
 import { MdVerified } from "react-icons/md";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function UserDashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -39,6 +42,72 @@ export default function UserDashboardLayout() {
   const { data: profileData, isLoading: isProfileLoading } = useGetTuristProfileQuery();
   let ws = useRef(null);
   console.log(profileData);
+  const [changePassword, { isLoading: isChangePasswordLoading }] = useChangePasswordMutation();
+
+  const [showPasswords, setShowPasswords] = useState({
+    current_password: false,
+    new_password: false,
+    confirm_password: false,
+  });
+
+  // State to manage form inputs
+  const [formData, setFormData] = useState({
+    current_password: '',
+    new_password: '',
+  });
+  
+
+   const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate new password and confirm password
+    if (formData.new_password !== formData.confirm_password) {
+      toast.error('New password and confirm password do not match!');
+      return;
+    }
+
+    try {
+      // Call the API to change password
+      await changePassword({
+        current_password: formData.current_password,
+        new_password: formData.new_password,
+      }).unwrap();
+
+      // Show success toast
+      toast.success('Password changed successfully!');
+
+      // Reset form and close popup
+      setFormData({
+        current_password: '',
+        new_password: '',
+      });
+      handleClosePopup();
+    } catch (error) {
+      // Show error toast
+      toast.error(error?.data?.error || 'Failed to change password');
+    }
+  };
+
+
+
 
   // WebSocket for notifications
   useEffect(() => {
@@ -510,46 +579,103 @@ useEffect(() => {
         </main>
 
         {/* Change Password Popup */}
-        {isChangePasswordOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Change Password</h2>
-                <button onClick={handleClosePopup} className="text-gray-500 hover:text-gray-700">
-                  <X size={20} />
+       {isChangePasswordOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Change Password</h2>
+              <button
+                onClick={handleClosePopup}
+                className="text-gray-500 hover:text-gray-700"
+                disabled={isChangePasswordLoading}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700">Old password</label>
+                <input
+                  type={showPasswords.current_password ? 'text' : 'password'}
+                  name="current_password"
+                  value={formData.current_password}
+                  onChange={handleInputChange}
+                  placeholder="Enter Password"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('current_password')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                >
+                  {showPasswords.current_password ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
                 </button>
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Old password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter Password"
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">New password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter Password"
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter Password"
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <button className="w-full bg-blue-600 text-white py-2 rounded-md">Confirm</button>
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700">New password</label>
+                <input
+                  type={showPasswords.new_password ? 'text' : 'password'}
+                  name="new_password"
+                  value={formData.new_password}
+                  onChange={handleInputChange}
+                  placeholder="Enter Password"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('new_password')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                >
+                  {showPasswords.new_password ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
+                </button>
               </div>
-            </div>
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
+                <input
+                  type={showPasswords.confirm_password ? 'text' : 'password'}
+                  name="confirm_password"
+                  value={formData.confirm_password}
+                  onChange={handleInputChange}
+                  placeholder="Enter Password"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('confirm_password')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                >
+                  {showPasswords.confirm_password ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
+                </button>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 rounded-md disabled:bg-blue-400"
+                disabled={isChangePasswordLoading}
+              >
+                {isChangePasswordLoading ? 'Processing...' : 'Confirm'}
+              </button>
+            </form>
           </div>
-        )}
+        </div>
+      )}
       </div>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
+    
   );
 }

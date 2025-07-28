@@ -213,8 +213,9 @@ const AdminHome = () => {
 
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
+    console.log(token,'hgggggggggggggggggggg')
     if (!token) {
-      navigate("/login");
+      // navigate("/login");
       toast.error("Please log in to submit an offer");
       return;
     }
@@ -259,7 +260,7 @@ const AdminHome = () => {
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error.data?.detail ||
+        error.data?.error ||
           "Failed to submit offer. Only agencies can do this."
       );
     }

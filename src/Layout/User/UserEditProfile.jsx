@@ -7,6 +7,8 @@ import {
   useGetTuristProfileQuery,
   useUpdateTuristProfileMutation,
 } from "@/redux/features/withAuth";
+import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
 function UserEditProfile() {
   const { data: profileData, isLoading: profileLoading } =
@@ -77,7 +79,7 @@ function UserEditProfile() {
     payload.append("bio", formData.describeYourself);
     payload.append("profession", formData.profession);
     payload.append("education", formData.education);
-    payload.append("gender", formData.gender.toLocaleLowerCase());
+    payload.append("gender", formData.gender.toLowerCase());
     payload.append("age", formData.age);
     payload.append("language", formData.language);
     payload.append("address_house_no", formData.houseNo);
@@ -90,11 +92,28 @@ function UserEditProfile() {
 
     try {
       await updateUser(payload).unwrap();
-      // You can show a success message or navigate elsewhere
-      // alert("Profile updated successfully!");
+      // Show success toast
+      toast.success("Profile updated successfully!", {
+        position: "top-right",
+        autoClose: 3000, // Auto-close after 3 seconds
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (err) {
       console.error(err);
-      alert("Error updating profile");
+      // Show error toast
+      toast.error("Error updating profile", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -102,6 +121,8 @@ function UserEditProfile() {
 
   return (
     <div className="p-3 sm:p-4 lg:p-4 font-semibold">
+      {/* Add ToastContainer to render toasts */}
+      <ToastContainer />
       <div className="mb-3 sm:mb-4 lg:mb-5">
         <NavLink
           to="/user/profile"

@@ -2,32 +2,41 @@ import { useState, useRef, useEffect } from "react";
 import { SendIcon, ClockIcon, CheckIcon, XIcon } from "lucide-react";
 import { useLocation, useParams } from "react-router-dom";
 import {
+  useAskForDiscountMutation,
   useGetChatHsitoryQuery,
   useGetPlansQuery,
   useInviteToChatMutation,
+  useOfferDiscountMutation,
 } from "@/redux/features/withAuth";
 import { chat_sockit } from "@/assets/Socketurl";
-import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
+import { v4 as uuidv4 } from "uuid";
+import OfferDiscountForm from "@/components/OfferDiscount";
 
 function Messages() {
-  const { id } = useParams(); // Get agency ID from URL params
+  const { id } = useParams();
   const location = useLocation();
-  const agency = location.state; // Retain agency data from location.state
-  console.log("Agency:", agency);
+  const agency = location.state;
+  const [askDiscount, { isLoading: askDiscountLoading }] = useAskForDiscountMutation();
+  const [offerDiscount, { isLoading: offerDiscountLoading }] = useOfferDiscountMutation();
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const wsRef = useRef(null);
-  const pendingMessagesRef = useRef(new Map()); // Track pending messages by tempId
-  // for diffrent tour
+  const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
+
+  // Offer discount form state
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [discountType, setDiscountType] = useState("percent");
+  const [discountValue, setDiscountValue] = useState("");
+  const [description, setDescription] = useState("");
+  const [offerType, setOfferType] = useState("discount_offer"); // Track whether it's discount_offer or final_offer
 
   // Fetch chat history and plans
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
-  console.log("Plans Data:", plansData);
 
   // State for menu dropdown visibility
   const menuRef = useRef(null);
@@ -53,10 +62,14 @@ function Messages() {
     wsRef.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        console.log("Received WebSocket message:", message); // Debug server response
+        console.log("Received WebSocket message:", message);
         const serverMessage = {
           id: message.id,
-          text: message.message_type === "text" ? message.text : null,
+          message_type: message.message_type,
+          text: message.text,
+          data: message.data || null,
+          tour_plan_id: message.tour_plan_id || null,
+          tour_plan_title: message.tour_plan_title || null,
           isUser: false,
           timestamp: new Date(message.timestamp),
           is_read: message.is_read,
@@ -64,7 +77,7 @@ function Messages() {
         };
 
         // Check if this is a confirmation of a pending message
-        const tempId = message.tempId; // Assume backend echoes tempId
+        const tempId = message.tempId;
         if (tempId && pendingMessagesRef.current.has(tempId)) {
           setMessages((prev) =>
             prev.map((msg) =>
@@ -75,7 +88,6 @@ function Messages() {
           );
           pendingMessagesRef.current.delete(tempId);
         } else {
-          // Add new message from server (e.g., from agency)
           setMessages((prev) => [...prev, serverMessage]);
         }
       } catch (err) {
@@ -85,7 +97,6 @@ function Messages() {
 
     wsRef.current.onerror = (error) => {
       console.error("WebSocket error:", error);
-      // Mark pending messages as failed
       setMessages((prev) =>
         prev.map((msg) =>
           msg.status === "sending" ? { ...msg, status: "failed" } : msg
@@ -95,10 +106,8 @@ function Messages() {
 
     wsRef.current.onclose = () => {
       console.log("WebSocket disconnected");
-      // Optionally add reconnection logic
     };
 
-    // Cleanup on unmount
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
@@ -108,23 +117,24 @@ function Messages() {
 
   // Map fetched chat history to messages state
   const userId = localStorage.getItem("user_id");
+  const userType = localStorage.getItem("role");
   useEffect(() => {
-    // is user
-    console.log("User ID:", userId);
     if (data && Array.isArray(data.messages) && userId) {
-      console.log("Chat history data:", data.messages);
       const formattedMessages = data.messages.map((msg) => ({
         id: msg.id,
-        text: msg.message_type === "text" ? msg.text : null,
+        message_type: msg.message_type,
+        text: msg.text,
+        data: msg.data || null,
+        tour_plan_id: msg.tour_plan_id || null,
+        tour_plan_title: msg.tour_plan_title || null,
         isUser: msg.sender.user_id == userId,
         timestamp: new Date(msg.timestamp),
         is_read: msg.is_read,
         status: "sent",
       }));
-      console.log("Formatted chat history:", formattedMessages);
       setMessages(formattedMessages);
     }
-  }, [data,userId]);
+  }, [data, userId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -137,16 +147,30 @@ function Messages() {
   // Handle sending text message
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
+    if (!selectedDropdown) {
+      alert("Please select a tour plan first");
+      return;
+    }
 
-    const tempId = uuidv4(); // Generate unique temporary ID
+    const tempId = uuidv4();
+    const messageId = uuidv4();
+    const tourPlan = dropdownOptions.find((opt) => opt.value === selectedDropdown);
     const messageObj = {
-      message: newMessage.trim(), // Match backend's expected field
-      tempId, // Include tempId for deduplication
+      id: messageId,
+      // tour_plan_id: selectedDropdown,
+      // tour_plan_title: tourPlan?.label || null,
+      message: newMessage.trim(),
+      data: null,
+      tempId,
     };
 
-    // Optimistic update: Add message to UI with "sending" status
     const localMessage = {
+      id: messageId,
+      message_type: "text",
       text: newMessage.trim(),
+      data: null,
+      tour_plan_id: selectedDropdown,
+      tour_plan_title: tourPlan?.label || null,
       isUser: true,
       timestamp: new Date(),
       is_read: false,
@@ -156,11 +180,9 @@ function Messages() {
     setMessages((prev) => [...prev, localMessage]);
     pendingMessagesRef.current.set(tempId, localMessage);
 
-    // Send message to WebSocket
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(messageObj));
     } else {
-      // Mark as failed if WebSocket is not open
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg
@@ -185,16 +207,19 @@ function Messages() {
     const message = pendingMessagesRef.current.get(tempId);
     if (!message) return;
 
-    // Update status to "sending"
     setMessages((prev) =>
       prev.map((msg) =>
         msg.tempId === tempId ? { ...msg, status: "sending" } : msg
       )
     );
 
-    // Resend message
     const messageObj = {
-      message: message.text,
+      id: message.id,
+      message_type: message.message_type,
+      tour_plan_id: message.tour_plan_id,
+      tour_plan_title: message.tour_plan_title,
+      text: message.text,
+      data: message.data,
       tempId,
     };
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -208,19 +233,63 @@ function Messages() {
     }
   };
 
-  // Handle dropdown change and send selected tour id
+  // Handle dropdown change and send start_conversation
   const handleDropdownChange = async (e) => {
     const selectedId = e.target.value;
+    if (!selectedId || !agency?.agency?.other_user_id) {
+      alert("Please select an agency and tour plan first");
+      return;
+    }
     setSelectedDropdown(selectedId);
     if (selectedId) {
       try {
-        await inviteToChat({ selected_tour_id: selectedId });
+        const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
+        console.log(selectedId,dropdownOptions)
+        const messageId = uuidv4();
+        const tempId = uuidv4();
+        const messageObj = {
+          id: messageId,
+          message_type: "start_conversation",
+          // tour_plan_id: selectedId,
+          // tour_plan_title: tourPlan?.label || null,
+          message: `Conversation started regarding tour plan: ${tourPlan?.label || "Unknown"}`,
+          data: null,
+          tempId,
+        };
+
+        const localMessage = {
+          id: messageId,
+          message_type: "start_conversation",
+          text: messageObj.message,
+          data: new Date(),
+          tour_plan_id: selectedId,
+          tour_plan_title: tourPlan?.label || null,
+          isUser: true,
+          timestamp: new Date(),
+          is_read: false,
+          status: "sending",
+          tempId,
+        };
+        setMessages((prev) => [...prev, localMessage]);
+        pendingMessagesRef.current.set(tempId, localMessage);
+
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify(messageObj));
+        }
+
+        await inviteToChat({ tour_plan_id: Number(selectedId), other_user_id: agency.agency.other_user_id }).unwrap();
       } catch (err) {
-        // Optionally handle error
-        console.error("Failed to send selected tour id:", err);
+        console.error("Failed to send start conversation:", err);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.tempId === tempId ? { ...msg, status: "failed" } : msg
+          )
+        );
+        pendingMessagesRef.current.delete(tempId);
       }
     }
   };
+
   // Handle click outside to close menu
   useEffect(() => {
     function handleClickOutside(event) {
@@ -236,7 +305,272 @@ function Messages() {
     };
   }, [menuOpen]);
 
-  // Handle loading and error states
+  // Handle ask for discount
+  const askForDiscountHandler = async (planid) => {
+    if (!planid || !id) {
+      alert("Please select a plan first");
+      return;
+    }
+    const tempId = uuidv4();
+    const messageId = uuidv4();
+    const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
+    const userEmail = localStorage.getItem("email") || "User";
+    const messageObj = {
+      id: messageId,
+      message_type: "discount_request",
+      tour_plan_id: planid,
+      tour_plan_title: tourPlan?.label || null,
+      text: `${userEmail} is requesting a discount for tour plan ${tourPlan?.label || "Unknown"}`,
+      data: null,
+      tempId,
+    };
+
+    const localMessage = {
+      id: messageId,
+      message_type: "discount_request",
+      text: messageObj.text,
+      data: null,
+      tour_plan_id: planid,
+      tour_plan_title: tourPlan?.label || null,
+      isUser: true,
+      timestamp: new Date(),
+      is_read: false,
+      status: "sending",
+      tempId,
+    };
+    setMessages((prev) => [...prev, localMessage]);
+    pendingMessagesRef.current.set(tempId, localMessage);
+
+    try {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify(messageObj));
+      }
+      const res = await askDiscount({ planid: planid, chatid: id }).unwrap();
+      console.log("Discount request sent:", res);
+    } catch (error) {
+      console.error("Error sending discount request:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.tempId === tempId ? { ...msg, status: "failed" } : msg
+        )
+      );
+      pendingMessagesRef.current.delete(tempId);
+      alert(error.data?.detail || "Failed to request discount. Please try again.");
+    }
+  };
+
+  // Handle offer discount
+  const offerDiscountHandler = async (planid) => {
+    if (!planid || !id) {
+      alert("Please select a plan first");
+      return;
+    }
+
+    const tempId = uuidv4();
+    const messageId = uuidv4();
+    const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
+    const messageObj = {
+      id: messageId,
+      message_type: offerType,
+      // tour_plan_id: planid,
+      // tour_plan_title: tourPlan?.label || null,
+      message: `${offerType === "discount_offer" ? "Discount" : "Final"} offer for tour plan ${tourPlan?.label || "Unknown"}`,
+      data: {
+        type: discountType, // Changed from discount_type to type
+        value: discountValue, // Changed from discount_value to value
+        description: description,
+      },
+      tempId,
+    };
+
+    const localMessage = {
+      id: messageId,
+      message_type: offerType,
+      text: messageObj.text,
+      data: {
+        type: discountType,
+        value: discountValue,
+        description: description,
+      },
+      tour_plan_id: planid,
+      tour_plan_title: tourPlan?.label || null,
+      isUser: true,
+      timestamp: new Date(),
+      is_read: false,
+      status: "sending",
+      tempId,
+    };
+    setMessages((prev) => [...prev, localMessage]);
+    pendingMessagesRef.current.set(tempId, localMessage);
+
+    try {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify(messageObj));
+      }
+      const res = await offerDiscount({
+        id,
+        data: {
+          discount_type: discountType,
+          value: discountValue,
+          description,
+          tour_plan_id: planid,
+        },
+      }).unwrap();
+      console.log(`${offerType === "discount_offer" ? "Discount" : "Final"} offer sent successfully:`, res);
+      setIsPopupOpen(false);
+      setDiscountType("percent");
+      setDiscountValue("");
+      setDescription("");
+      setOfferType("discount_offer");
+    } catch (error) {
+      console.error(`Error sending ${offerType === "discount_offer" ? "discount" : "final"} offer:`, error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.tempId === tempId ? { ...msg, status: "failed" } : msg
+        )
+      );
+      pendingMessagesRef.current.delete(tempId);
+      alert(error.data?.detail || `Failed to send ${offerType === "discount_offer" ? "discount" : "final"} offer. Please try again.`);
+    }
+  };
+
+  // Handle offer accepted
+  const handleOfferAccepted = (planid, messageId) => {
+    if (!planid || !id) {
+      alert("Please select a plan first");
+      return;
+    }
+    const tempId = uuidv4();
+    const newMessageId = uuidv4();
+    const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
+    const messageObj = {
+      id: newMessageId,
+      message_type: "offer_accepted",
+      tour_plan_id: planid,
+      tour_plan_title: tourPlan?.label || null,
+      text: `Offer accepted for tour plan ${tourPlan?.label || "Unknown"}`,
+      data: null,
+      tempId,
+    };
+
+    const localMessage = {
+      id: newMessageId,
+      message_type: "offer_accepted",
+      text: messageObj.text,
+      data: null,
+      tour_plan_id: planid,
+      tour_plan_title: tourPlan?.label || null,
+      isUser: true,
+      timestamp: new Date(),
+      is_read: false,
+      status: "sending",
+      tempId,
+    };
+    setMessages((prev) => [...prev, localMessage]);
+    pendingMessagesRef.current.set(tempId, localMessage);
+
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(messageObj));
+    } else {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.tempId === tempId ? { ...msg, status: "failed" } : msg
+        )
+      );
+      pendingMessagesRef.current.delete(tempId);
+    }
+  };
+
+  const openModal = (type = "discount_offer") => {
+    console.log(agency.agency,"lsdjflsajlkdsjfsad")
+    if (!agency.agency.tour_plan_id) {
+      alert("Please select a plan first");
+      return;
+    }
+    setOfferType(type);
+    setIsPopupOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsPopupOpen(false);
+    setOfferType("discount_offer");
+  };
+
+  // Render message based on message_type
+  const renderMessageContent = (message) => {
+    switch (message.message_type) {
+      case "text":
+        return <p>{message.text}</p>;
+      case "start_conversation":
+        return (
+          <p className="text-blue-600 italic">
+            {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
+          </p>
+        );
+      case "discount_request":
+        return (
+          <p className="text-blue-600">
+            {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
+          </p>
+        );
+      case "discount_offer":
+        return (
+          <>
+            <p className="text-green-600">
+              {console.log(message)}
+              {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
+            </p>
+            {message.data && (
+              <>
+                <p>Discount Type: {message.message_type}</p>
+                <p>Discount Value: {message.data.value}</p>
+                <p>Description: {message.data.description}</p>
+              </>
+            )}
+            {userType === "tourist" && (
+              <button
+                onClick={() => handleOfferAccepted(message.tour_plan_id, message.id)}
+                className="mt-2 bg-green-500 hover:bg-green-400 text-white px-2 py-1 rounded text-sm"
+              >
+                Accept Offer
+              </button>
+            )}
+          </>
+        );
+      case "final_offer":
+        return (
+          <div>
+            <p className="text-purple-600">
+              {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
+            </p>
+            {message.data && (
+              <>
+                <p>Discount Type: {message.data.type}</p>
+                <p>Discount Value: {message.data.value}</p>
+                <p>Description: {message.data.description}</p>
+              </>
+            )}
+            {userType === "tourist" && (
+              <button
+                onClick={() => handleOfferAccepted(message.tour_plan_id, message.id)}
+                className="mt-2 bg-green-500 hover:bg-green-400 text-white px-2 py-1 rounded text-sm"
+              >
+                Accept Offer
+              </button>
+            )}
+          </div>
+        );
+      case "offer_accepted":
+        return (
+          <p className="text-green-600">
+            {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
+          </p>
+        );
+      default:
+        return <p>Unknown message type</p>;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center">
@@ -261,10 +595,11 @@ function Messages() {
     <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        <select
+        {
+          userType === "tourist" ? <select
           className="bg-gray-100 dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded px-3 py-2 focus:outline-none"
           value={selectedDropdown}
-          onChange={handleDropdownChange} // <-- use handler
+          onChange={handleDropdownChange}
           disabled={plansLoading}
         >
           <option value="">Select Option</option>
@@ -273,11 +608,35 @@ function Messages() {
               {opt.label}
             </option>
           ))}
-        </select>
+        </select>:<div>{agency.agency.tour_plan_title || "no tour plan is selected"} {console.log(agency,"kabdullldddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")}</div>
+        }
         <div className="flex items-center space-x-2">
-          <button className="bg-blue-500 hover:bg-blue-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm">
-            Ask for Discount
-          </button>
+          {userType === "tourist" ? (
+            <button
+              onClick={() => askForDiscountHandler(selectedDropdown)}
+              className="bg-blue-500 hover:bg-blue-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm"
+              disabled={askDiscountLoading}
+            >
+              Ask for Discount
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => openModal("discount_offer")}
+                className="bg-blue-500 hover:bg-blue-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm"
+                disabled={offerDiscountLoading}
+              >
+                Offer Discount
+              </button>
+              <button
+                onClick={() => openModal("final_offer")}
+                className="bg-purple-500 hover:bg-purple-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm"
+                disabled={offerDiscountLoading}
+              >
+                Final Offer
+              </button>
+            </>
+          )}
           <div className="relative" ref={menuRef}>
             <button
               className="bg-gray-100 hover:cursor-pointer dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 px-3 text-2xl font-semibold rounded focus:outline-none"
@@ -305,9 +664,9 @@ function Messages() {
           <div key={message.id || message.tempId}>
             {message.isUser ? (
               <div className="flex justify-end space-x-2">
-                {console.log(message.isUser, "message.isUser")}
+                {/* {alert(message.isUser)} */}
                 <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium">
-                  {message.text && <p>{message.text}</p>}
+                  {renderMessageContent(message)}
                   <div className="flex items-center justify-end mt-1 space-x-1">
                     {message.status === "sending" && (
                       <ClockIcon className="h-3 w-3 text-gray-300" />
@@ -345,7 +704,7 @@ function Messages() {
                   />
                 </div>
                 <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
-                  {message.text && <p>{message.text}</p>}
+                  {renderMessageContent(message)}
                   <div className="flex justify-end">
                     <span className="text-[8px] text-gray-500">
                       {message.timestamp.toLocaleTimeString([], {
@@ -381,6 +740,17 @@ function Messages() {
           </button>
         </div>
       </div>
+      <OfferDiscountForm
+        isOpen={isPopupOpen}
+        discountType={discountType}
+        discountValue={discountValue}
+        description={description}
+        onDiscountTypeChange={setDiscountType}
+        onDiscountValueChange={setDiscountValue}
+        onDescriptionChange={setDescription}
+        onClose={handleClose}
+        onConfirm={() => offerDiscountHandler(agency.agency.tour_plan_id)}
+      />
     </div>
   );
 }
