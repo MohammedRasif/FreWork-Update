@@ -21,7 +21,20 @@ export const sqQuery = createApi({
     },
   }),
 
-tagTypes: ["TourPlan"],
+  tagTypes: [
+    "TourPlan",
+    "TouristProfile",
+    "AgencyProfile",
+    "Subscription",
+    "Offer",
+    "AcceptedOffer",
+    "FavoriteAgency",
+    "Review",
+    "Notification",
+    "Chat",
+    "UserProfile",
+    "Discount",
+  ],
   endpoints: (builder) => ({
     newPassword: builder.mutation({
       query: (data) => ({
@@ -29,9 +42,11 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["UserProfile"],
     }),
     getTuristProfile: builder.query({
       query: () => "/tourist/profile/",
+      providesTags: ["TouristProfile"],
     }),
     updateTuristProfile: builder.mutation({
       query: (data) => ({
@@ -39,10 +54,8 @@ tagTypes: ["TourPlan"],
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: ["TouristProfile"],
     }),
-
-
-
 
     // plans
     getPlans: builder.query({
@@ -52,14 +65,9 @@ tagTypes: ["TourPlan"],
 
     // showSubscription data
     showSubscriptionData: builder.query({
-      query:() =>"subscriptions/plans/"
+      query: () => "subscriptions/plans/",
+      providesTags: ["Subscription"],
     }),
-
-
-
-
-
-
 
     createPlanOne: builder.mutation({
       query: (data) => ({
@@ -67,6 +75,7 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["TourPlan"],
     }),
     updatePlan: builder.mutation({
       query: (data) => ({
@@ -74,20 +83,23 @@ tagTypes: ["TourPlan"],
         method: "PATCH",
         body: data.updates,
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: "TourPlan", id }, "TourPlan"],
     }),
     deletePlan: builder.mutation({
       query: (id) => ({
         url: `/tour-plans/${id}/`,
         method: "DELETE",
       }),
+      invalidatesTags: (result, error, id) => [{ type: "TourPlan", id }, "TourPlan"],
     }),
     getOneDetail: builder.query({
       query: (id) => `/tour-plans/${id}/`,
-      
+      providesTags: (result, error, id) => [{ type: "TourPlan", id }],
     }),
     // agency profile
     getAgencyProfile: builder.query({
       query: () => `/agency/profile/`,
+      providesTags: ["AgencyProfile"],
     }),
     updateAgencyProfile: builder.mutation({
       query: (data) => ({
@@ -95,6 +107,7 @@ tagTypes: ["TourPlan"],
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: ["AgencyProfile"],
     }),
     // like
     likePost: builder.mutation({
@@ -103,6 +116,7 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: int.data,
       }),
+      invalidatesTags: (result, error, { id }) => [{ type: "TourPlan", id }, "TourPlan"],
     }),
     // offer a budget
     offerBudget: builder.mutation({
@@ -111,15 +125,18 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Offer"],
     }),
     acceptOffer: builder.mutation({
       query: (id) => ({
         url: `/offers/${id}/accept/`,
         method: "POST",
       }),
+      invalidatesTags: ["Offer", "AcceptedOffer"],
     }),
     getAllacceptedOffer: builder.query({
       query: () => "/accepted-offers/",
+      providesTags: ["AcceptedOffer"],
     }),
     // add to favorite
     addToFavorit: builder.mutation({
@@ -127,9 +144,11 @@ tagTypes: ["TourPlan"],
         url: `/agencies/${id}/favorite/`,
         method: "POST",
       }),
+      invalidatesTags: ["FavoriteAgency"],
     }),
     allFavoritAgency: builder.query({
       query: () => `/tourist/favorite-agencies/`,
+      providesTags: ["FavoriteAgency"],
     }),
     // give review
     giveReview: builder.mutation({
@@ -138,16 +157,20 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: { comment: data.comment, rating: data.rating },
       }),
+      invalidatesTags: ["Review"],
     }),
     getOfferedPlan: builder.query({
-      query:() => "/offers/"
+      query: () => "/offers/",
+      providesTags: ["Offer"],
     }),
     getOneTourPlan: builder.query({
       query: (id) => `/tour-plans/${id}/`,
+      providesTags: (result, error, id) => [{ type: "TourPlan", id }],
     }),
-    //notifications
+    // notifications
     getNotifications: builder.query({
       query: () => `/notifications/`,
+      providesTags: ["Notification"],
     }),
     // chats
     inviteToChat: builder.mutation({
@@ -156,63 +179,78 @@ tagTypes: ["TourPlan"],
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Chat"],
     }),
 
-    // subscription 
+    // subscription
     subscription: builder.mutation({
       query: (data) => ({
         url: "subscriptions/create-checkout-session/",
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Subscription"],
     }),
 
-    //publicis response
+    // publicis response
     getPublicisResponse: builder.query({
       query: (id) => `/agency_details/${id}/`,
+      providesTags: (result, error, id) => [{ type: "AgencyProfile", id }],
     }),
-
-
-
-
 
     getChatList: builder.query({
       query: () => "/chat/conversations/",
+      providesTags: ["Chat"],
     }),
-    
+
     getChatHsitory: builder.query({
       query: (id) => `/chat/conversations/${id}/messages/`,
+      providesTags: (result, error, id) => [{ type: "Chat", id }],
     }),
 
-
     showUserInpormation: builder.query({
-      query: () => "/auth/user_profile/"
+      query: () => "/auth/user_profile/",
+      providesTags: ["UserProfile"],
     }),
     // all about discount
     askForDiscount: builder.mutation({
       query: ({ planid, chatid }) => ({
         url: `/chat/conversations/${chatid}/request-discount/`,
-        method: 'POST',
+        method: "POST",
         body: { tour_plan_id: planid },
       }),
+      invalidatesTags: ["Discount", "Chat"],
     }),
-    offerDiscount:builder.mutation({
+    offerDiscount: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/chat/conversations/${id}/offer-discount/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Discount", "Chat"],
+    }),
+    finalOffer:builder.mutation({
       query:({id,data})=>({
-        url:`/chat/conversations/${id}/offer-discount/`,
+        url:`/chat/conversations/${id}/send-final-offer/`,
         method:"POST",
         body:data
       })
     }),
-
-
+    acceptFinalOffer:builder.mutation({
+      query:({id,data})=>({
+        url:`/chat/conversations/${id}/accept-final-offer/`,
+        method:"POST",
+        body:data
+      })
+    }),
     changePassword: builder.mutation({
       query: (data) => ({
         url: "/auth/change-password/",
         method: "POST",
         body: data,
-      })
+      }),
+      invalidatesTags: ["UserProfile"],
     }),
-
   }),
 });
 
@@ -238,15 +276,14 @@ export const {
   // favorite
   useAddToFavoritMutation,
   useAllFavoritAgencyQuery,
-  //review
+  // review
   useGiveReviewMutation,
-  // show subscrition data
+  // show subscription data
   useShowSubscriptionDataQuery,
   // Subscription
   useSubscriptionMutation,
   // publicis response
   useGetPublicisResponseQuery,
-
 
   useGetOfferedPlanQuery,
   useGetOneTourPlanQuery,
@@ -261,6 +298,8 @@ export const {
   // discount
   useAskForDiscountMutation,
   useOfferDiscountMutation,
+  useFinalOfferMutation,
+  useAcceptFinalOfferMutation,
 
   // change password
   useChangePasswordMutation,

@@ -182,7 +182,7 @@ function SinglePost() {
         message: offerForm.comment,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "/placeholder.svg",
+          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -363,7 +363,7 @@ function SinglePost() {
 
           <div className="mb-4">
             <img
-              src={tour.spot_picture_url || "/placeholder.svg"}
+              src={tour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
               alt="Tour destination"
               className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
             />
@@ -512,7 +512,7 @@ function SinglePost() {
                   >
                     <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                       <img
-                        src={offer.agency?.logo_url || "/placeholder.svg"}
+                        src={offer.agency?.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                         alt={`${
                           offer.agency?.agency_name || "Unknown Agency"
                         } avatar`}

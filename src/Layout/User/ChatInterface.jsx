@@ -38,7 +38,7 @@ export default function ChatInterface() {
       const mappedChats = sortedChats.map((chat) => ({
         id: chat.id?.toString() || "",
         name: chat.other_participant_name || "Unknown User",
-        image: chat.other_participant_image || "/placeholder.svg",
+        image: chat.other_participant_image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
         lastMessage: chat.last_message || null,
         unreadCount: chat.unread_count || 0,
         active: chat.active || false, // Backend support needed for active status
@@ -132,7 +132,7 @@ export default function ChatInterface() {
                     src={agency.image}
                     alt={agency.name}
                     className="w-12 h-12 rounded-full object-cover"
-                    onError={(e) => (e.target.src = "/placeholder.svg")}
+                    onError={(e) => (e.target.src = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")}
                   />
                   {agency.active && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
@@ -211,7 +211,7 @@ export default function ChatInterface() {
                       src={agency.image}
                       alt={agency.name}
                       className="w-10 h-10 rounded-full object-cover"
-                      onError={(e) => (e.target.src = "/placeholder.svg")}
+                      onError={(e) => (e.target.src = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")}
                     />
                     {agency.active && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>

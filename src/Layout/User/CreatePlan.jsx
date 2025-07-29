@@ -15,8 +15,10 @@ import FullScreenInfinityLoader from "@/lib/Loading";
 
 const CreatePlan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [createPlan, { isLoading: isCreating }] = useCreatePlanOneMutation();
-  const [update, { isLoading: isUpdateLoading }] = useUpdatePlanMutation();
+  const [isSavingDraft, setIsSavingDraft] = useState(false); // New state for draft saving
+  const [isPublishing, setIsPublishing] = useState(false); // New state for publishing
+  const [createPlan] = useCreatePlanOneMutation();
+  const [update] = useUpdatePlanMutation();
   const { state } = useLocation();
   const navigate = useNavigate();
   const {
@@ -95,6 +97,13 @@ const CreatePlan = () => {
     }
 
     try {
+      // Set the appropriate loading state based on the action
+      if (status === "draft") {
+        setIsSavingDraft(true);
+      } else {
+        setIsPublishing(true);
+      }
+
       if (state?.id) {
         await update({ id: state.id, updates: formData }).unwrap();
         toast.success("Plan updated successfully!");
@@ -109,6 +118,13 @@ const CreatePlan = () => {
       toast.error(
         `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
       );
+    } finally {
+      // Reset the appropriate loading state
+      if (status === "draft") {
+        setIsSavingDraft(false);
+      } else {
+        setIsPublishing(false);
+      }
     }
   };
 
@@ -443,17 +459,17 @@ const CreatePlan = () => {
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "draft"))}
               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
-              disabled={isCreating || isUpdateLoading}
+              disabled={isSavingDraft || isPublishing}
             >
-              {isCreating || isUpdateLoading ? "Saving..." : "Save for Future"}
+              {isSavingDraft ? "Saving..." : "Save for Future"}
             </button>
             <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "published"))}
               className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-              disabled={isCreating || isUpdateLoading}
+              disabled={isSavingDraft || isPublishing}
             >
-              {isCreating || isUpdateLoading ? "Publishing..." : "Publish Now"}
+              {isPublishing ? "Publishing..." : "Publish Now"}
             </button>
           </div>
         </form>

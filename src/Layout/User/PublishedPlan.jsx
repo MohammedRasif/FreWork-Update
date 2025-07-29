@@ -361,7 +361,7 @@ function PublishedPlan() {
                       <img
                         src={
                           plan.spot_picture_url ||
-                          "/placeholder.svg?height=256&width=512"
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png?height=256&width=512"
                         }
                         alt="Tour destination"
                         className="w-full h-96 object-cover"
@@ -459,7 +459,7 @@ function PublishedPlan() {
                           >
                             <div className="flex items-center gap-4">
                               <img
-                                src={offer.image || "/placeholder.svg"}
+                                src={offer.image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                                 alt={`${offer.company} avatar`}
                                 className="w-11 h-11 rounded-full object-cover"
                               />
@@ -629,7 +629,7 @@ function PublishedPlan() {
                     <div className="mb-4">
                       <img
                         src={
-                          selectedTour.spot_picture_url || "/placeholder.svg"
+                          selectedTour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
@@ -768,7 +768,7 @@ function PublishedPlan() {
                             >
                               <div className="flex items-center gap-4">
                                 <img
-                                  src={offer.image || "/placeholder.svg"}
+                                  src={offer.image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                                   alt={`${offer.company} avatar`}
                                   className="w-11 h-11 rounded-full object-cover"
                                 />

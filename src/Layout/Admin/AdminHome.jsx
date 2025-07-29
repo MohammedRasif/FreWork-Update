@@ -237,7 +237,7 @@ const AdminHome = () => {
         message: comment,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "/placeholder.svg",
+          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -376,7 +376,7 @@ const AdminHome = () => {
                 {plan.spot_picture_url && (
                   <div className="mb-4">
                     <img
-                      src={plan.spot_picture_url || "/placeholder.svg"}
+                      src={plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                       alt={`${plan.location_to} tourist spot`}
                       className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                     />
@@ -647,7 +647,7 @@ const AdminHome = () => {
                   </div>
                   <div className="mb-4">
                     <img
-                      src={selectedPlan.spot_picture_url || "/placeholder.svg"}
+                      src={selectedPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                       alt="Tour destination"
                       className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                     />

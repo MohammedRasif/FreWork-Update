@@ -204,7 +204,7 @@ function AdminOfferPlan() {
                       <img
                         src={
                           tourPlan.spot_picture_url ||
-                          "/placeholder.svg?height=256&width=512"
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png?height=256&width=512"
                         }
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover"
@@ -282,7 +282,7 @@ function AdminOfferPlan() {
                       >
                         <div className="flex items-center gap-3 sm:gap-4 lg:gap-4">
                           <img
-                            src={offer.agency.logo_url || "/placeholder.svg"}
+                            src={offer.agency.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                             alt={`${offer.agency.agency_name} avatar`}
                             className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full object-cover flex-shrink-0"
                           />

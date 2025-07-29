@@ -186,7 +186,7 @@ const TourPlanWithPopup = () => {
         message: comment,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "/placeholder.svg",
+          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -595,7 +595,7 @@ const TourPlanWithPopup = () => {
 
                         <div className="mb-4">
                           <img
-                            src={tour.spot_picture_url || "/placeholder.svg"}
+                            src={tour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                             alt="Tour destination"
                             className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                           />
@@ -687,7 +687,7 @@ const TourPlanWithPopup = () => {
                                     <img
                                       src={
                                         offer.agency.logo_url ||
-                                        "/placeholder.svg"
+                                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                       }
                                       alt={`${offer.agency.agency_name} avatar`}
                                       className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
@@ -1010,7 +1010,7 @@ const TourPlanWithPopup = () => {
                     <div className="mb-4">
                       <img
                         src={
-                          selectedTour.spot_picture_url || "/placeholder.svg"
+                          selectedTour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
@@ -1105,7 +1105,7 @@ const TourPlanWithPopup = () => {
                               <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                                 <img
                                   src={
-                                    offer.agency.logo_url || "/placeholder.svg"
+                                    offer.agency.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
                                   alt={`${offer.agency.agency_name} avatar`}
                                   className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"

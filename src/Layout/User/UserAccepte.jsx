@@ -300,7 +300,7 @@ const UserAccepte = () => {
                   className="bg-white rounded-lg shadow-md overflow-hidden"
                 >
                   <img
-                    src={offer.tour_plan.spot_picture_url || "/placeholder.svg"}
+                    src={offer.tour_plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                     alt={`Tour to ${offer.tour_plan.location_to}`}
                     className="w-full h-48 p-2 rounded-md object-cover"
                   />

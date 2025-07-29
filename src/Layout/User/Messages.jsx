@@ -42,6 +42,11 @@ function Messages() {
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
+  useEffect(()=>{
+    if (agency.agency.tour_plan_id) {
+      setSelectedDropdown(agency.agency.tour_plan_id)
+    }
+  },[])
 
   const dropdownOptions = (plansData || [])
     .filter((plan) => plan.status === "published")
@@ -147,7 +152,7 @@ function Messages() {
   // Handle sending text message
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
-    if (!selectedDropdown) {
+    if (!selectedDropdown && !agency.agency.tour_plan_id) {
       alert("Please select a tour plan first");
       return;
     }
@@ -320,7 +325,7 @@ function Messages() {
       message_type: "discount_request",
       tour_plan_id: planid,
       tour_plan_title: tourPlan?.label || null,
-      text: `${userEmail} is requesting a discount for tour plan ${tourPlan?.label || "Unknown"}`,
+      text: `User is requesting a discount for tour plan ${tourPlan?.label || "Unknown"}`,
       data: null,
       tempId,
     };
@@ -360,7 +365,7 @@ function Messages() {
   };
 
   // Handle offer discount
-  const offerDiscountHandler = async (planid) => {
+  const offerDiscountHandler = async (planid,planTitle) => {
     if (!planid || !id) {
       alert("Please select a plan first");
       return;
@@ -368,13 +373,13 @@ function Messages() {
 
     const tempId = uuidv4();
     const messageId = uuidv4();
-    const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
+    // const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
     const messageObj = {
       id: messageId,
       message_type: offerType,
       // tour_plan_id: planid,
       // tour_plan_title: tourPlan?.label || null,
-      message: `${offerType === "discount_offer" ? "Discount" : "Final"} offer for tour plan ${tourPlan?.label || "Unknown"}`,
+      message: `${offerType === "discount_offer" ? "Discount" : "Final"} offer for tour plan ${planTitle || "Unknown"}`,
       data: {
         type: discountType, // Changed from discount_type to type
         value: discountValue, // Changed from discount_value to value
@@ -393,7 +398,7 @@ function Messages() {
         description: description,
       },
       tour_plan_id: planid,
-      tour_plan_title: tourPlan?.label || null,
+      tour_plan_title: planTitle || null,
       isUser: true,
       timestamp: new Date(),
       is_read: false,
@@ -446,9 +451,9 @@ function Messages() {
     const messageObj = {
       id: newMessageId,
       message_type: "offer_accepted",
-      tour_plan_id: planid,
-      tour_plan_title: tourPlan?.label || null,
-      text: `Offer accepted for tour plan ${tourPlan?.label || "Unknown"}`,
+      // tour_plan_id: planid,
+      // tour_plan_title: tourPlan?.label || null,
+      message: `Offer accepted for tour plan ${tourPlan?.label || "Unknown"}`,
       data: null,
       tempId,
     };
@@ -509,7 +514,7 @@ function Messages() {
         );
       case "discount_request":
         return (
-          <p className="text-blue-600">
+          <p className="text-[#922020]">
             {message.text} {message.tour_plan_title && `(${message.tour_plan_title})`}
           </p>
         );
@@ -530,7 +535,7 @@ function Messages() {
             {userType === "tourist" && (
               <button
                 onClick={() => handleOfferAccepted(message.tour_plan_id, message.id)}
-                className="mt-2 bg-green-500 hover:bg-green-400 text-white px-2 py-1 rounded text-sm"
+                className="mt-2 bg-green-500 hover:cursor-pointer hover:bg-green-400 text-white px-2 py-1 rounded text-sm"
               >
                 Accept Offer
               </button>
@@ -598,7 +603,7 @@ function Messages() {
         {
           userType === "tourist" ? <select
           className="bg-gray-100 dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded px-3 py-2 focus:outline-none"
-          value={selectedDropdown}
+          value={agency?.agency?.tour_plan_id ? agency?.agency?.tour_plan_id: selectedDropdown}
           onChange={handleDropdownChange}
           disabled={plansLoading}
         >
@@ -749,7 +754,7 @@ function Messages() {
         onDiscountValueChange={setDiscountValue}
         onDescriptionChange={setDescription}
         onClose={handleClose}
-        onConfirm={() => offerDiscountHandler(agency.agency.tour_plan_id)}
+        onConfirm={() => offerDiscountHandler(agency.agency.tour_plan_id,agency.agency.tour_plan_title)}
       />
     </div>
   );
