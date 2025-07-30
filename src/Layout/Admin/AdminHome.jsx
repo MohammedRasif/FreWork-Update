@@ -458,7 +458,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
+    <div className="min-h-screen  ">
       <Toaster />
       <div className="flex flex-col lg:flex-row">
         {/* Main Content */}

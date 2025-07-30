@@ -9,6 +9,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { IoIosSend } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  useDeletePublishPlanMutation,
   useGetPlansQuery,
   useGetPublicisResponseQuery,
   useLikePostMutation,
@@ -18,6 +19,7 @@ import FullScreenInfinityLoader from "@/lib/Loading";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { X } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -44,6 +46,8 @@ function PublishedPlan() {
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
+  const [deletePublishPlan, { isLoading: isDeletePublishPlan }] =
+    useDeletePublishPlanMutation();
   const { data: showResponseData, isLoading: isResponseLoading } =
     useGetPublicisResponseQuery(selectedUserId, {
       skip: !selectedUserId, // Skip query until selectedUserId is set
@@ -258,6 +262,23 @@ function PublishedPlan() {
 
   if (!publishedPlans.length) return <div>No published plans available</div>;
 
+  // handleDelete publish plan
+
+  const handleDelete = async (id) => {
+    try {
+      await deletePublishPlan(id).unwrap();
+      toast.success("Plan deleted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      toast.error("Failed to delete plan!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen p-4">
       <Toaster />
@@ -319,8 +340,14 @@ function PublishedPlan() {
                             ref={dropdownRef}
                             className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10"
                           >
-                            <button className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white">
-                              Delete Plan
+                            <button
+                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white"
+                              onClick={() => handleDelete(plan.id)} // Pass plan.id directly from the button
+                              disabled={isDeletePublishPlan}
+                            >
+                              {isDeletePublishPlan
+                                ? "Deleting..."
+                                : "Delete Plan"}
                             </button>
                           </div>
                         )}
@@ -459,7 +486,10 @@ function PublishedPlan() {
                           >
                             <div className="flex items-center gap-4">
                               <img
-                                src={offer.image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                                src={
+                                  offer.image ||
+                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                }
                                 alt={`${offer.company} avatar`}
                                 className="w-11 h-11 rounded-full object-cover"
                               />
@@ -629,7 +659,8 @@ function PublishedPlan() {
                     <div className="mb-4">
                       <img
                         src={
-                          selectedTour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                          selectedTour.spot_picture_url ||
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
@@ -768,7 +799,10 @@ function PublishedPlan() {
                             >
                               <div className="flex items-center gap-4">
                                 <img
-                                  src={offer.image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                                  src={
+                                    offer.image ||
+                                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                  }
                                   alt={`${offer.company} avatar`}
                                   className="w-11 h-11 rounded-full object-cover"
                                 />
@@ -996,6 +1030,7 @@ function PublishedPlan() {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 }

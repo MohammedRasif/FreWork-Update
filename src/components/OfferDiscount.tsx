@@ -49,76 +49,81 @@ export default function OfferDiscountForm({
 
         {/* Content */}
         <div className="p-6">
-          {/* Title */}
-          <h1 className="text-xl font-semibold text-center mb-6 text-gray-900">Offer Discount</h1>
+  {/* Title */}
+  <h1 className="text-xl font-semibold text-center mb-6 text-gray-900">Offer Discount</h1>
 
-          {/* Form Content */}
-          <div className="space-y-6">
-            {/* Set Maximum Discount */}
-            <div>
-              <h2 className="text-base font-medium text-gray-900 mb-4">Set Maximum Discount</h2>
+  {/* Form Content */}
+  <div className="space-y-6">
+    {/* Set Maximum Discount */}
+    <div>
+      <h2 className="text-base font-medium text-gray-900 mb-4">Set Maximum Discount</h2>
 
-              {/* Radio Group */}
-              <div className="flex gap-6 mb-4">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="discountType"
-                    value="price"
-                    checked={discountType === "price"}
-                    onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <span className="text-gray-700">Price</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="discountType"
-                    value="percent"
-                    checked={discountType === "percent"}
-                    onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <span className="text-gray-700">Percent</span>
-                </label>
-              </div>
+      {/* Radio Group */}
+      <div className="flex gap-6 mb-4">
+        <label className="flex items-center space-x-2 cursor-pointer">
+          <input
+            type="radio"
+            name="discountType"
+            value="price"
+            checked={discountType === "price"}
+            onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
+            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+          />
+          <span className="text-gray-700">Price</span>
+        </label>
+        <label className="flex items-center space-x-2 cursor-pointer">
+          <input
+            type="radio"
+            name="discountType"
+            value="percent"
+            checked={discountType === "percent"}
+            onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
+            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+          />
+          <span className="text-gray-700">Percent</span>
+        </label>
+      </div>
 
-              {/* Discount Value Input */}
-              <div>
-                <input
-                  type="text"
-                  placeholder={discountType === "price" ? "Enter price" : "Enter percent"}
-                  value={discountValue}
-                  onChange={(e) => onDiscountValueChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <h2 className="text-base font-medium text-gray-900 mb-4">Describe here</h2>
-              <textarea
-                placeholder="Enter here"
-                value={description}
-                onChange={(e) => onDescriptionChange(e.target.value)}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              />
-            </div>
-          </div>
-
-          {/* Confirm Button */}
-          <div className="mt-6">
-            <button
-              onClick={onConfirm}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Confirm
-            </button>
-          </div>
+      {/* Discount Value Input */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <span className="text-gray-500">
+            {discountType === "price" ? "$" : "%"}
+          </span>
         </div>
+        <input
+          type="text"
+          placeholder={discountType === "price" ? "Enter price" : "Enter percent"}
+          value={discountValue}
+          onChange={(e) => onDiscountValueChange(e.target.value)}
+          className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+    </div>
+
+    {/* Description */}
+    <div>
+      <h2 className="text-base font-medium text-gray-900 mb-4">Describe here</h2>
+      <textarea
+        placeholder="Enter here"
+        value={description}
+        onChange={(e) => onDescriptionChange(e.target.value)}
+        rows={4}
+        className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+      />
+    </div>
+  </div>
+
+  {/* Confirm Button */}
+  <div className="mt-6">
+    <button
+      onClick={onConfirm}
+      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Confirm
+    </button>
+  </div>
+</div>
       </div>
     </div>
   )

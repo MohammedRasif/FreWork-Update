@@ -34,6 +34,7 @@ export const sqQuery = createApi({
     "Chat",
     "UserProfile",
     "Discount",
+    "PublishPlanDelete"
   ],
   endpoints: (builder) => ({
     newPassword: builder.mutation({
@@ -251,6 +252,23 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["UserProfile"],
     }),
+
+    // delete publish plan 
+
+    deletePublishPlan: builder.mutation({
+      query:(id) => ({
+        url: `tour-plans/${id}/`,
+        method:"DELETE"
+      }),
+    invalidatesTags: (result, error, id) => [{ type: "PublishPlanDelete", id }, "PublishPlanDelete"],
+    })
+
+
+
+
+
+
+
   }),
 });
 
@@ -303,4 +321,7 @@ export const {
 
   // change password
   useChangePasswordMutation,
+
+  // delete publish
+  useDeletePublishPlanMutation,
 } = sqQuery;

@@ -221,8 +221,8 @@ const TourPlanWithPopup = () => {
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error?.data?.error
-          ? `${error.data.error} Only agency can do this.`
+        error?.data?.detail
+          ? `${error.data.detail} Only agency can do this.`
           : "Something went wrong"
       );
     }
@@ -1208,8 +1208,8 @@ const TourPlanWithPopup = () => {
                       <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
                         <img
                           src={
-                            localStorage.getItem("user_image") ||
-                            "https://res.cloudinary.com/dpi0t9wfn/image/upload/v1741443124/samples/smile.jpg"
+                            localStorage.getItem("user_image" == null) ||
+                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                           }
                           alt="User avatar"
                           className="rounded-full w-10 h-10 sm:w-11 sm:h-11"

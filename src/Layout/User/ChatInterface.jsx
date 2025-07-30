@@ -18,6 +18,14 @@ export default function ChatInterface() {
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
+  useEffect(()=>{
+    const timeout = setInterval(() => {
+      refetchChatList()
+    }, 3000);
+    return ()=>{
+      return clearInterval(timeout)
+    }
+  },[])
 
   // Update and sort chatsList when chatList data is fetched
   useEffect(() => {
