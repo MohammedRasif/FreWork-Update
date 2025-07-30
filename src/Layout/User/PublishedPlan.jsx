@@ -314,7 +314,7 @@ function PublishedPlan() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right flex items-center space-x-2 relative">
+                      <div className=" flex items-center  relative">
                         <div>
                           <p className="text-lg font-bold text-gray-700">
                             Budget ${plan.budget}
@@ -329,20 +329,21 @@ function PublishedPlan() {
                             e.preventDefault();
                             setIsDropdownOpen(!isDropdownOpen);
                           }}
+                          className="relative" // Ensure the button is a positioning context
                         >
                           <HiDotsVertical
                             size={22}
-                            className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors -mt-3"
+                            className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors ml-2 "
                           />
                         </button>
                         {isDropdownOpen && (
                           <div
                             ref={dropdownRef}
-                            className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10"
+                            className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10 animate-dropdown"
                           >
                             <button
                               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white"
-                              onClick={() => handleDelete(plan.id)} // Pass plan.id directly from the button
+                              onClick={() => handleDelete(plan.id)}
                               disabled={isDeletePublishPlan}
                             >
                               {isDeletePublishPlan
@@ -1005,20 +1006,64 @@ function PublishedPlan() {
                       </h3>
                       <div className="space-y-4 max-h-56 overflow-y-auto">
                         <div className="text-gray-600 text-sm">
-                          {showResponseData?.reviews?.length
-                            ? showResponseData.reviews.map((review, index) => (
-                                <div key={index} className="mb-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium">
-                                      {review.user_name}
-                                    </span>
-                                    {renderStars(review.rating)}
+                          {showResponseData?.recent_reviews?.length
+                            ? showResponseData.recent_reviews.map(
+                                (review, index) => (
+                                  <div className="mb-6 p-4 bg-white rounded-lg shadow-md border border-pink-200">
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-lg">
+                                        {review.tourist_name
+                                          .charAt(0)
+                                          .toUpperCase()}
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-lg text-gray-800">
+                                              {
+                                                review.tourist_name.split(
+                                                  "@"
+                                                )[0]
+                                              }
+                                            </span>
+                                            <div className="flex">
+                                              {Array.from(
+                                                { length: 5 },
+                                                (_, i) => (
+                                                  <svg
+                                                    key={i}
+                                                    className={`w-5 h-5 ${
+                                                      i < review.rating
+                                                        ? "text-yellow-400"
+                                                        : "text-gray-300"
+                                                    }`}
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                  >
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.357 2.44a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.357-2.44a1 1 0 00-1.175 0l-3.357 2.44c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.31 9.397c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.97z" />
+                                                  </svg>
+                                                )
+                                              )}
+                                            </div>
+                                          </div>
+                                          <span className="text-sm text-gray-500 italic">
+                                            {new Date(
+                                              review.created_at
+                                            ).toLocaleDateString("en-GB", {
+                                              day: "numeric",
+                                              month: "long",
+                                              year: "numeric",
+                                            })}
+                                          </span>
+                                        </div>
+                                        <p className="text-gray-600 text-base mt-2">
+                                          {review.comment}
+                                        </p>
+                                      </div>
+                                    </div>
                                   </div>
-                                  <p className="text-sm text-gray-600">
-                                    {review.comment}
-                                  </p>
-                                </div>
-                              ))
+                                )
+                              )
                             : "No reviews available"}
                         </div>
                       </div>

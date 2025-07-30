@@ -18,6 +18,7 @@ const UserAccepte = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // New state for search
   const { data, isLoading } = useGetAllacceptedOfferQuery();
+  console.log(data,"helllllll")
   const [reviewMessage, setReviewMessage] = useState("");
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [giveReview, { isLoading: isReviewLoading }] = useGiveReviewMutation();

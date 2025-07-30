@@ -304,9 +304,9 @@ function Messages() {
         setMessages((prev) => [...prev, localMessage]);
         pendingMessagesRef.current.set(tempId, localMessage);
 
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify(messageObj));
-        }
+        // if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        //   wsRef.current.send(JSON.stringify(messageObj));
+        // }
 
         await inviteToChat({
           tour_plan_id: Number(selectedId),
@@ -595,12 +595,15 @@ function Messages() {
       // if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       //   wsRef.current.send(JSON.stringify(messageObj));
       // }
+      // const res = await acceptFinalOffer({
+      //   id,
+      //   data: {
+      //     tour_plan_id: planid,
+      //     message_id: messageId,
+      //   },
+      // }).unwrap();
       const res = await acceptFinalOffer({
-        id,
-        data: {
-          tour_plan_id: planid,
-          message_id: messageId,
-        },
+        id
       }).unwrap();
       console.log("Final offer accepted successfully:", res);
     } catch (error) {

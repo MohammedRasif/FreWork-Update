@@ -238,10 +238,9 @@ export const sqQuery = createApi({
       })
     }),
     acceptFinalOffer:builder.mutation({
-      query:({id,data})=>({
+      query:({id})=>({
         url:`/chat/conversations/${id}/accept-final-offer/`,
         method:"POST",
-        body:data
       })
     }),
     changePassword: builder.mutation({

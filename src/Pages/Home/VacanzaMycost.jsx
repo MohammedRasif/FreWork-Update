@@ -27,7 +27,7 @@ const VacanzaMycost = () => {
         <div className="absolute top-0 left-0 w-full h-full z-10"></div>
 
         {/* Content Container */}
-        <div className="relative z-20 flex flex-col items-center justify-center min-h-[20vh] md:h-[85vh] px-1 py-0">
+        <div className="relative z-20 flex flex-col items-center justify-center min-h-[20vh] md:h-[70vh] px-1 py-0">
           {/* Steps Container */}
           <div className="flex flex-row gap-4 items-center justify-center space-x-6 md:space-x-20 lg:space-x-32 w-full overflow-x-auto h-full">
             {/* Step 1 */}

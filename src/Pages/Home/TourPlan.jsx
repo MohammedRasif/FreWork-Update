@@ -78,7 +78,7 @@ const TourPlanWithPopup = () => {
   // RTK Queries
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
-    console.log(tourPlanPublic, "tourPlanPublic");
+  console.log(tourPlanPublic, "tourPlanPublic");
   const { data: filteredTourPlan, isLoading: isFilteredLoading } =
     useFilterTourPlanPublicQuery(filters, {
       skip:
@@ -186,7 +186,9 @@ const TourPlanWithPopup = () => {
         message: comment,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -401,10 +403,10 @@ const TourPlanWithPopup = () => {
   };
 
   const displayTours = tours;
-   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
-      useInviteToChatMutation();
+  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
+    useInviteToChatMutation();
 
-   const handleMessage = async (data) => {
+  const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
     console.log(data);
     if (role) {
@@ -581,8 +583,8 @@ const TourPlanWithPopup = () => {
                                   >
                                     {location.trim()}
                                     {index <
-                                      tour.tourist_spots.split(",").length - 1 &&
-                                      ", "}
+                                      tour.tourist_spots.split(",").length -
+                                        1 && ", "}
                                   </span>
                                 ))
                             ) : (
@@ -595,7 +597,10 @@ const TourPlanWithPopup = () => {
 
                         <div className="mb-4">
                           <img
-                            src={tour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                            src={
+                              tour.spot_picture_url ||
+                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                            }
                             alt="Tour destination"
                             className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                           />
@@ -637,7 +642,9 @@ const TourPlanWithPopup = () => {
                                   isLiked[tour.id] ? "fill-current" : ""
                                 }`}
                               />
-                              <span>{isLiked[tour.id] ? "Unlike" : "Like"}</span>
+                              <span>
+                                {isLiked[tour.id] ? "Unlike" : "Like"}
+                              </span>
                             </button>
                             <button
                               onClick={() => openPopup(tour)}
@@ -657,7 +664,7 @@ const TourPlanWithPopup = () => {
                             >
                               <Share2
                                 className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                                  isShared[tour.id] ? "fill-current" : ""
+                                  isShared[tour.id] ? "" : ""
                                 }`}
                               />
                               <span>
@@ -745,31 +752,43 @@ const TourPlanWithPopup = () => {
                                     </div>
                                     <div className="flex gap-2">
                                       <button
-  onClick={() => {
-    if (!token) {
-      navigate("/login");
-    } else {
-      // Assuming tourPlanPublic is an array with an object containing the user
-      const userId = tourPlanPublic[0]?.user; // Access the user from the first object
-      if (userId) {
-        handleMessage({ other_user_id: userId });
-      } else {
-        console.error("User ID not found in tourPlanPublic");
-      }
-    }
-  }}
-  // disabled={isAddFevLoading}
-  className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
-  aria-label={`Message ${tourPlanPublic[0]?.agency || "Agency"}`}
->
-  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-  <span className="text-sm sm:text-base font-medium">Message</span>
-</button>
+                                        onClick={() => {
+                                          if (!token) {
+                                            navigate("/login");
+                                          } else {
+                                            // Assuming tourPlanPublic is an array with an object containing the user
+                                            const userId =
+                                              tourPlanPublic[0]?.user; // Access the user from the first object
+                                            if (userId) {
+                                              handleMessage({
+                                                other_user_id: userId,
+                                              });
+                                            } else {
+                                              console.error(
+                                                "User ID not found in tourPlanPublic"
+                                              );
+                                            }
+                                          }
+                                        }}
+                                        // disabled={isAddFevLoading}
+                                        className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+                                        aria-label={`Message ${
+                                          tourPlanPublic[0]?.agency || "Agency"
+                                        }`}
+                                      >
+                                        <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="text-sm sm:text-base font-medium">
+                                          Message
+                                        </span>
+                                      </button>
                                       {tour.user ==
                                         localStorage.getItem("user_id") && (
                                         <button
                                           onClick={() =>
-                                            acceptOfferHandler(offer.id, tour.id)
+                                            acceptOfferHandler(
+                                              offer.id,
+                                              tour.id
+                                            )
                                           }
                                           disabled={isAcceptLoading}
                                           className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
@@ -791,7 +810,9 @@ const TourPlanWithPopup = () => {
                               onClick={() => toggleOffers(tour.id)}
                               className="text-blue-600 hover:underline text-sm"
                             >
-                              {expandedOffers[tour.id] ? "Show Less" : "See More"}
+                              {expandedOffers[tour.id]
+                                ? "Show Less"
+                                : "See More"}
                             </button>
                           )}
                         </div>
@@ -958,7 +979,8 @@ const TourPlanWithPopup = () => {
                       <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
                         {expandedDescriptions[selectedTour.id]
                           ? selectedTour.description
-                          : truncateText(selectedTour.description, 100).truncated}
+                          : truncateText(selectedTour.description, 100)
+                              .truncated}
                         {truncateText(selectedTour.description, 100)
                           .isTruncated &&
                           !expandedDescriptions[selectedTour.id] && (
@@ -1010,7 +1032,8 @@ const TourPlanWithPopup = () => {
                     <div className="mb-4">
                       <img
                         src={
-                          selectedTour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                          selectedTour.spot_picture_url ||
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
@@ -1057,9 +1080,7 @@ const TourPlanWithPopup = () => {
                             {isLiked[selectedTour.id] ? "Unlike" : "Like"}
                           </span>
                         </button>
-                        <button
-                          className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                        >
+                        <button className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors">
                           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
                           <span>Comments</span>
                         </button>
@@ -1105,7 +1126,8 @@ const TourPlanWithPopup = () => {
                               <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                                 <img
                                   src={
-                                    offer.agency.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                    offer.agency.logo_url ||
+                                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
                                   alt={`${offer.agency.agency_name} avatar`}
                                   className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"

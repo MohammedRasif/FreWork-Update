@@ -25,19 +25,19 @@ export default function AgencyCard({ agency }) {
 
       <div className="flex flex-col flex-grow p-2 sm:p-4 min-h-0">
         {/* Agency Name */}
-        <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-1 sm:mb-2 truncate">
+        <h3 className="font-semibold text-gray-900 text-sm sm:text-xl mb-1 sm:mb-2 truncate ">
           {agency.agency_name}
         </h3>
 
         {/* Rating and Review Count */}
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-0.5 sm:gap-1">
-            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current text-yellow-500" />
-            <span className="text-xs sm:text-sm font-medium text-gray-900">
+            <Star className="w-3 h-3 sm:w-5 sm:h-5 fill-current text-yellow-500" />
+            <span className="text-xs sm:text-[15px] font-medium text-gray-900">
               {agency.average_rating.toFixed(1)}
             </span>
           </div>
-          <span className="text-xs sm:text-sm text-gray-600">
+          <span className="text-xs sm:text-[15px] text-gray-600">
             {agency.review_count}{" "}
             {agency.review_count === 1 ? "review" : "reviews"}
           </span>
