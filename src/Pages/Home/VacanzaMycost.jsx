@@ -20,7 +20,7 @@ const VacanzaMycost = () => {
         <img
           src={img}
           alt="Background"
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[25vh] sm:h-[60vh] md:h-[80vh] z-0 object-contain hidden md:block"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[25vh] sm:h-[60vh] md:h-[80vh] z-0 object-contain hidden ld:block"
         />
 
         {/* Overlay (optional for readability, kept transparent) */}
@@ -29,7 +29,7 @@ const VacanzaMycost = () => {
         {/* Content Container */}
         <div className="relative z-20 flex flex-col items-center justify-center min-h-[20vh] md:h-[70vh] px-1 py-0">
           {/* Steps Container */}
-          <div className="flex flex-row gap-4 items-center justify-center space-x-6 md:space-x-20 lg:space-x-32 w-full overflow-x-auto h-full">
+          <div className="flex flex-row gap-4 items-center justify-center space-x-6 md:space-x-20 lg:space-x-32 w-full h-full">
             {/* Step 1 */}
            
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white">

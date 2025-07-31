@@ -4,10 +4,22 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useGetTopAgencyQuery } from "@/redux/features/baseApi";
 import AgencyCard from "@/components/ui/AgencyCard";
+import { useRef } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css";
+import MountainCard from "@/components/ui/MountainCard";
 
 const Agencies = () => {
+  const mountainPrevRef = useRef(null);
+    const mountainNextRef = useRef(null);
   const { data: topAgency = [], isLoading, isError } = useGetTopAgencyQuery();
   console.log(topAgency, "tttttttt");
+
 
   // Slider settings
   const sliderSettings = {
@@ -90,7 +102,9 @@ const Agencies = () => {
         </h1>
       </div>
       <div className="max-w-7xl mx-auto">
-        {isLoading ? (
+
+
+        {/* {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
           </div>
@@ -102,7 +116,8 @@ const Agencies = () => {
           <div className="text-center text-gray-600 py-6">
             No agencies available at the moment.
           </div>
-        ) : (
+        ) :
+         (
           <Slider {...sliderSettings}>
             {topAgency.map((item) => (
               <div key={item.id} className="px-2">
@@ -110,7 +125,61 @@ const Agencies = () => {
               </div>
             ))}
           </Slider>
-        )}
+        )
+        } */}
+
+
+         {topAgency.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-black mb-4">
+                  Mountain Adventures
+                </h2>
+
+                <div className="relative">
+                  <button
+                    ref={mountainPrevRef}
+                    className="absolute top-1/2 -left-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
+                    style={{ transform: "translateY(-50%)" }}
+                  >
+                    <ArrowLeft />
+                  </button>
+
+                  <button
+                    ref={mountainNextRef}
+                    className="absolute top-1/2 -right-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
+                    style={{ transform: "translateY(-50%)" }}
+                  >
+                    <ArrowRight />
+                  </button>
+
+                  <Swiper
+                    modules={[Pagination, Navigation]}
+                    spaceBetween={0}
+                    pagination={{ clickable: true }}
+                    navigation={{
+                      prevEl: mountainPrevRef.current,
+                      nextEl: mountainNextRef.current,
+                    }}
+                    onBeforeInit={(swiper) => {
+                      swiper.params.navigation.prevEl = mountainPrevRef.current;
+                      swiper.params.navigation.nextEl = mountainNextRef.current;
+                    }}
+                    breakpoints={{
+                      760: { slidesPerView: 3 },
+                      480: { slidesPerView: 2 },
+                      320: { slidesPerView: 2 },
+                    }}
+                    loop={true}
+                  >
+                    {topAgency.map((p) => (
+                      <SwiperSlide key={p.id} className="px-2 mb-12">
+                        <AgencyCard agency={p} />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
+              </div>
+            )}
       </div>
       {topAgency.length === 0 ? null : (
         <NavLink to="/membership" className="flex justify-center">

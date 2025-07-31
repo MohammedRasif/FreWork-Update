@@ -145,7 +145,7 @@ export const router = createBrowserRouter([
   },
 
   // make it private
-  { path: `/tour-plans/:id`, element: <PrivateRoute><SinglePost /></PrivateRoute> },
+  { path: `/tour-plans/:id`, element: <SinglePost /> },
   { path: "/register", element: <Registration /> },
   { path: "/login", element: <Login /> },
   { path: "/verify", element: <EmailVerification /> },

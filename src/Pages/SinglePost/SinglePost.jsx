@@ -15,22 +15,24 @@ import toast, { Toaster } from "react-hot-toast";
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
 
-function SinglePost() {
-  const { id } = useParams();
+function SinglePost({ prid }) {
   const navigate = useNavigate();
   const [postData, setPostData] = useState({});
   const [isLiked, setIsLiked] = useState(false);
   const [isShared, setIsShared] = useState(false);
   const [offerForm, setOfferForm] = useState({ budget: "", comment: "" });
   const [expandedOffers, setExpandedOffers] = useState(false);
-
   // RTK Queries
+  const { id: paramId } = useParams();
+  const finalId = paramId || prid.id;
+  console.log("paramId:", paramId, "prid:", prid, "finalId:", finalId);
   const {
     data: post,
     isLoading: isPostLoading,
     error: postError,
-  } = useGetOneDetailQuery(id, {
-    skip: !id,
+    refetch,
+  } = useGetOneDetailQuery(finalId, {
+    skip: !finalId,
   });
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
@@ -66,7 +68,6 @@ function SinglePost() {
       }
     }
   }, [post, postError, currentUserId]);
-
   // Handle offer form changes
   const handleOfferChange = (e) => {
     const { name, value } = e.target;
@@ -182,7 +183,9 @@ function SinglePost() {
         message: offerForm.comment,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -290,11 +293,10 @@ function SinglePost() {
         onClick={() => navigate(-1)}
         className=" text-gray-800 rounded-md  transition-colors absolute top-4 left-4 cursor-pointer"
       >
-        <MdOutlineKeyboardBackspace  size={24}/>
-
+        <MdOutlineKeyboardBackspace size={24} />
       </button>
 
-      <div className="rounded-lg bg-white shadow-sm border border-gray-200  w-full lg:-mt-10 mt-10">
+      <div className="rounded-lg bg-white shadow-sm border border-gray-200  w-full lg:my-20 mt-10">
         <div className="p-3 sm:p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
             <div className="flex-1">
@@ -363,7 +365,10 @@ function SinglePost() {
 
           <div className="mb-4">
             <img
-              src={tour.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+              src={
+                tour.spot_picture_url ||
+                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+              }
               alt="Tour destination"
               className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
             />
@@ -512,7 +517,10 @@ function SinglePost() {
                   >
                     <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                       <img
-                        src={offer.agency?.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                        src={
+                          offer.agency?.logo_url ||
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                        }
                         alt={`${
                           offer.agency?.agency_name || "Unknown Agency"
                         } avatar`}

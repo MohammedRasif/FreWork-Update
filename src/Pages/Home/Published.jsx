@@ -269,8 +269,8 @@ const Published = () => {
                     }}
                     breakpoints={{
                       760: { slidesPerView: 3 },
-                      480: { slidesPerView: 2 },
-                      320: { slidesPerView: 2 },
+                      480: { slidesPerView: 1.1 },
+                      320: { slidesPerView: 1.1 },
                     }}
                     loop={true}
                   >

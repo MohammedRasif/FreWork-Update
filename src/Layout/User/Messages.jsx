@@ -268,7 +268,7 @@ function Messages() {
   // Handle dropdown change and send start_conversation
   const handleDropdownChange = async (e) => {
     const selectedId = e.target.value;
-    if (!selectedId || !agency?.agency?.other_user_id) {
+    if (!agency?.agency?.other_user_id) {
       alert("Please select an agency and tour plan first");
       return;
     }

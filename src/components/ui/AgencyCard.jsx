@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 export default function AgencyCard({ agency }) {
   return (
-    <div className="flex flex-col w-full max-w-[160px] sm:max-w-sm mx-1 sm:mx-2 h-[180px] sm:h-[400px] overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg">
+    <div className="flex flex-col w-full max-w-[160px] sm:max-w-sm mx-1 sm:mx-2 h-[180px] sm:h-[330px] overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg">
       <div className="relative flex-shrink-0">
         {/* Cover Photo */}
         <div className="aspect-[4/3] overflow-hidden">
