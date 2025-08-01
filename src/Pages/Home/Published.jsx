@@ -319,16 +319,16 @@ const Published = () => {
                       swiper.params.navigation.prevEl = mountainPrevRef.current;
                       swiper.params.navigation.nextEl = mountainNextRef.current;
                     }}
-                    breakpoints={{
+                     breakpoints={{
                       760: { slidesPerView: 3 },
-                      480: { slidesPerView: 2 },
-                      320: { slidesPerView: 2 },
+                      480: { slidesPerView: 1.1 },
+                      320: { slidesPerView: 1.1 },
                     }}
                     loop={true}
                   >
                     {mountainTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <MountainCard tourPlan={p} />
+                       <BeachCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -371,16 +371,16 @@ const Published = () => {
                       swiper.params.navigation.prevEl = relaxPrevRef.current;
                       swiper.params.navigation.nextEl = relaxNextRef.current;
                     }}
-                    breakpoints={{
+                     breakpoints={{
                       760: { slidesPerView: 3 },
-                      480: { slidesPerView: 2 },
-                      320: { slidesPerView: 2 },
+                      480: { slidesPerView: 1.1 },
+                      320: { slidesPerView: 1.1 },
                     }}
                     loop={true}
                   >
                     {relaxTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <RelaxCard tourPlan={p} />
+                        <BeachCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -427,24 +427,15 @@ const Published = () => {
                       swiper.params.navigation.prevEl = prevRef.current;
                       swiper.params.navigation.nextEl = nextRef.current;
                     }}
-                    breakpoints={{
-                      760: {
-                        slidesPerView: 3,
-                        slidesPerGroup: 1,
-                      },
-                      480: {
-                        slidesPerView: 2,
-                        slidesPerGroup: 1,
-                      },
-                      320: {
-                        slidesPerView: 2,
-                        slidesPerGroup: 1,
-                      },
+                     breakpoints={{
+                      760: { slidesPerView: 3 },
+                      480: { slidesPerView: 1.1 },
+                      320: { slidesPerView: 1.1 },
                     }}
                   >
                     {groupTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <GroupCard tourPlan={p} />
+                        <BeachCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>

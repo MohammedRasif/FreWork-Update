@@ -56,19 +56,20 @@
 //     </Link>
 //   );
 // }
-import React, { useState } from "react"
-import Modal from "react-modal"
-import { Link, useNavigate } from "react-router-dom"
-import SinglePost from "@/Pages/SinglePost/SinglePost"
+import React, { useState } from "react";
+import Modal from "react-modal";
+import { Link, useNavigate } from "react-router-dom";
+import SinglePost from "@/Pages/SinglePost/SinglePost";
 
-Modal.setAppElement("#root") // This avoids screen reader accessibility warnings
+Modal.setAppElement("#root");
 
 export default function TourCard({ tourPlan }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
 
-  const role = localStorage.getItem("role")
-  const token = localStorage.getItem("access_token")
-  const navigate = useNavigate()
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
 
   return (
     <>
@@ -135,17 +136,20 @@ export default function TourCard({ tourPlan }) {
             >
               View Details
             </Link>
-            {
-              role === "agency" && <button
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
-              onClick={() => {
-                if (!token) navigate("/login")
-                setIsModalOpen(true)
-              }}
-            >
-              Submit offer
-            </button>
-            }
+            {role !== "tourist" && (
+              <button
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
+                onClick={() => {
+                  if (!token) {
+                    setIsQuestionModalOpen(true);
+                  } else {
+                    setIsModalOpen(true);
+                  }
+                }}
+              >
+                Submit Offer
+              </button>
+            )}
           </div>
 
           {/* Travel Points */}
@@ -157,7 +161,44 @@ export default function TourCard({ tourPlan }) {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Question Modal */}
+      <Modal
+        isOpen={isQuestionModalOpen}
+        onRequestClose={() => setIsQuestionModalOpen(false)}
+        contentLabel="Agency Question Modal"
+        className="max-w-md mx-auto mt-24 bg-white rounded-2xl shadow-lg p-8 outline-none"
+        overlayClassName="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      >
+        <div className="text-center space-y-6">
+          <h2 className="text-2xl font-bold font-cute">
+            Are You an Agency?
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Let us know if you're an agency to proceed with your offer!
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => {
+                setIsQuestionModalOpen(false);
+                navigate("/register"); 
+              }}
+              className="px-6 py-2 bg-blue-600 hover:cursor-pointer text-white rounded-full font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                setIsQuestionModalOpen(false);
+              }}
+              className="px-6 py-2 bg-gray-300 hover:cursor-pointer text-gray-800 rounded-full font-medium hover:bg-gray-400 transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Submit Offer Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -176,8 +217,7 @@ export default function TourCard({ tourPlan }) {
         <div className="w-full h-[70vh] overflow-y-auto">
           <SinglePost prid={{ id: tourPlan.id }} />
         </div>
-        
       </Modal>
     </>
-  )
+  );
 }
