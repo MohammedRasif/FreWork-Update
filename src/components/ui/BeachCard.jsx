@@ -55,22 +55,59 @@
 //       </div>
 //     </Link>
 //   );
-// }
-import React, { useState } from "react";
+// } 
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { Link, useNavigate } from "react-router-dom";
 import SinglePost from "@/Pages/SinglePost/SinglePost";
-
+ 
 Modal.setAppElement("#root");
-
+ 
 export default function TourCard({ tourPlan }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
-
-  const role = localStorage.getItem("role");
-  const token = localStorage.getItem("access_token");
+  const [localTourPlan, setLocalTourPlan] = useState(tourPlan); // Local state for tourPlan
+  const [role, setRole] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLocalStorageLoaded, setIsLocalStorageLoaded] = useState(false);
+ 
   const navigate = useNavigate();
-
+ 
+  // Initialize localStorage values and sync tourPlan
+  useEffect(() => {
+    // Fetch localStorage values
+    const fetchLocalStorage = () => {
+      setRole(localStorage.getItem("role") || "tourist");
+      setToken(localStorage.getItem("access_token"));
+      setIsLocalStorageLoaded(true);
+    };
+ 
+    fetchLocalStorage();
+ 
+    // Listen for storage events to handle dynamic localStorage changes
+    window.addEventListener("storage", fetchLocalStorage);
+    return () => window.removeEventListener("storage", fetchLocalStorage);
+  }, []);
+ 
+  // Sync localTourPlan with tourPlan prop when it changes
+  useEffect(() => {
+    setLocalTourPlan(tourPlan);
+  }, [tourPlan]);
+ 
+  // Callback to update localTourPlan after an offer is submitted
+  const handleOfferSubmitted = (updatedData) => {
+    setLocalTourPlan((prev) => ({
+      ...prev,
+      offer_count: updatedData.offer_count || prev.offer_count + 1,
+      // Update other fields if needed, e.g., offers array
+    }));
+    setIsModalOpen(false); // Close the modal after submission
+  };
+ 
+  if (!isLocalStorageLoaded) {
+    return <div>Loading user data...</div>;
+  }
+ 
   return (
     <>
       <div className="flex flex-col shadow-lg w-full max-w-sm mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
@@ -78,89 +115,123 @@ export default function TourCard({ tourPlan }) {
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img
-              src={tourPlan.spot_picture_url || "/images/beach-placeholder.jpg"}
-              alt={`${tourPlan.location_to} destination`}
+              src={localTourPlan.spot_picture_url || "/images/beach-placeholder.jpg"}
+              alt={`${localTourPlan.location_to} destination`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
-              <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">{tourPlan.tourist_spots}</h2>
-              <p className="text-sm md:text-base opacity-90 italic">Drone Shot</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">
+                {localTourPlan.tourist_spots}
+              </h2>
+              <p className="text-sm md:text-base opacity-90 italic">
+                Drone Shot
+              </p>
             </div>
           </div>
         </div>
-
+ 
         {/* Content */}
         <div className="flex flex-col flex-grow p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-gray-900">{tourPlan.location_to}</h3>
+            <h3 className="text-xl font-bold text-gray-900">
+              {localTourPlan.location_to}
+            </h3>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-5 h-5 text-green-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-sm text-green-600 font-medium">Richiesta reale</span>
+              <span className="text-sm text-green-600 font-medium">
+                Richiesta reale
+              </span>
             </div>
           </div>
-
+ 
           {/* Details */}
           <div className="space-y-2 text-sm text-gray-700">
-            <p><span className="font-medium">Disponibile a procedere dal:</span> {tourPlan.start_date}</p>
-            <p><span className="font-medium">Include:</span> {tourPlan.duration}</p>
-            <p><span className="font-medium">Categoria:</span> {tourPlan.destination_type}</p>
+            <p>
+              <span className="font-medium">Disponibile a procedere dal:</span>{" "}
+              {localTourPlan.start_date}
+            </p>
+            <p>
+              <span className="font-medium">Include:</span> {localTourPlan.duration}
+            </p>
+            <p>
+              <span className="font-medium">Categoria:</span>{" "}
+              {localTourPlan.destination_type}
+            </p>
           </div>
-
+ 
           {/* Budget */}
           <div className="py-2">
-            <p className="text-lg font-bold text-gray-900">Budget: ${tourPlan.budget}</p>
+            <p className="text-lg font-bold text-gray-900">
+              Budget: ${localTourPlan.budget}
+            </p>
           </div>
-
+ 
           {/* Total */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-700">
-              <span className="font-medium">Totale:</span> {tourPlan.total_members}{" "}
-              {tourPlan.total_members > 1 ? "persone" : "persona"}
+              <span className="font-medium">Totale:</span>{" "}
+              {localTourPlan.total_members}{" "}
+              {localTourPlan.total_members > 1 ? "persone" : "persona"}
             </span>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              1 offerta ricevuta
+              {localTourPlan.offer_count} Offer received
             </span>
           </div>
-
+ 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div
+            className={localTourPlan.offer_count < 3 ? "flex gap-3 pt-" : "pt-4"}
+          >
             <Link
-              to={`/tour-plans/${tourPlan.id}`}
+              to={`/tour-plans/${localTourPlan.id}`}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
             >
               View Details
             </Link>
-            {role !== "tourist" && (
-              <button
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
-                onClick={() => {
-                  if (!token) {
-                    setIsQuestionModalOpen(true);
-                  } else {
-                    setIsModalOpen(true);
-                  }
-                }}
-              >
-                Submit Offer
-              </button>
+ 
+            {localTourPlan.offer_count < 3 ? (
+              role !== "tourist" && (
+                <button
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
+                  onClick={() => {
+                    if (!token) {
+                      setIsQuestionModalOpen(true);
+                    } else {
+                      setIsModalOpen(true);
+                    }
+                  }}
+                >
+                  Submit Offer
+                </button>
+              )
+            ) : (
+              <p className="text-sm text-red-600 font-medium mt-3">
+                Offers completed – this request has already received 3 offers.
+                Please explore other available requests.
+              </p>
             )}
           </div>
-
+ 
           {/* Travel Points */}
           <div className="pt-2 border-t border-gray-100">
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Punti di viaggio:</span> {tourPlan.tourist_spots}
+              <span className="font-medium">Punti di viaggio:</span>{" "}
+              {localTourPlan.tourist_spots}
             </p>
           </div>
         </div>
       </div>
-
+ 
       {/* Question Modal */}
       <Modal
         isOpen={isQuestionModalOpen}
@@ -170,9 +241,7 @@ export default function TourCard({ tourPlan }) {
         overlayClassName="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
       >
         <div className="text-center space-y-6">
-          <h2 className="text-2xl font-bold font-cute">
-            Are You an Agency?
-          </h2>
+          <h2 className="text-2xl font-bold font-cute">Are You an Agency?</h2>
           <p className="text-gray-600 text-sm">
             Let us know if you're an agency to proceed with your offer!
           </p>
@@ -180,7 +249,7 @@ export default function TourCard({ tourPlan }) {
             <button
               onClick={() => {
                 setIsQuestionModalOpen(false);
-                navigate("/register"); 
+                navigate("/register");
               }}
               className="px-6 py-2 bg-blue-600 hover:cursor-pointer text-white rounded-full font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
             >
@@ -197,7 +266,7 @@ export default function TourCard({ tourPlan }) {
           </div>
         </div>
       </Modal>
-
+ 
       {/* Submit Offer Modal */}
       <Modal
         isOpen={isModalOpen}
@@ -215,9 +284,10 @@ export default function TourCard({ tourPlan }) {
           </button>
         </div>
         <div className="w-full h-[70vh] overflow-y-auto">
-          <SinglePost prid={{ id: tourPlan.id }} />
+          <SinglePost prid={{ id: localTourPlan.id }} onOfferSubmitted={handleOfferSubmitted} />
         </div>
       </Modal>
     </>
   );
 }
+ 

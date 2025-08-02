@@ -12,20 +12,24 @@ import { MdOutlineKeyboardBackspace, MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 
-const token = localStorage.getItem("access_token");
-const currentUserId = localStorage.getItem("user_id");
-
 function SinglePost({ prid }) {
   const navigate = useNavigate();
+  const { id: paramId } = useParams();
+  const finalId = paramId || prid?.id;
+
+  // State for localStorage values
+  const [token, setToken] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [role, setRole] = useState(null);
+  const [isLocalStorageLoaded, setIsLocalStorageLoaded] = useState(false);
+
   const [postData, setPostData] = useState({});
   const [isLiked, setIsLiked] = useState(false);
   const [isShared, setIsShared] = useState(false);
   const [offerForm, setOfferForm] = useState({ budget: "", comment: "" });
   const [expandedOffers, setExpandedOffers] = useState(false);
+
   // RTK Queries
-  const { id: paramId } = useParams();
-  const finalId = paramId || prid.id;
-  console.log("paramId:", paramId, "prid:", prid, "finalId:", finalId);
   const {
     data: post,
     isLoading: isPostLoading,
@@ -41,13 +45,29 @@ function SinglePost({ prid }) {
     useAcceptOfferMutation();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
 
+  // Initialize localStorage values
+  useEffect(() => {
+    const fetchLocalStorage = () => {
+      setToken(localStorage.getItem("access_token"));
+      setCurrentUserId(localStorage.getItem("user_id"));
+      setRole(localStorage.getItem("role") || "tourist");
+      setIsLocalStorageLoaded(true);
+    };
+
+    fetchLocalStorage();
+
+    // Optional: Listen for storage events if localStorage is updated dynamically
+    window.addEventListener("storage", fetchLocalStorage);
+    return () => window.removeEventListener("storage", fetchLocalStorage);
+  }, []);
+
   // Initialize post data and like/share status
   useEffect(() => {
     if (postError) {
       console.error("Failed to fetch post:", postError);
       toast.error("Failed to load post data");
     }
-    if (post) {
+    if (post && isLocalStorageLoaded) {
       console.log("Post data:", post);
       setPostData(post);
       if (currentUserId) {
@@ -67,7 +87,8 @@ function SinglePost({ prid }) {
         );
       }
     }
-  }, [post, postError, currentUserId]);
+  }, [post, postError, currentUserId, isLocalStorageLoaded]);
+
   // Handle offer form changes
   const handleOfferChange = (e) => {
     const { name, value } = e.target;
@@ -171,7 +192,7 @@ function SinglePost({ prid }) {
     }
     try {
       await offerBudgetToBack({
-        id,
+        id: finalId,
         data: {
           offered_budget: parseFloat(offerForm.budget),
           message: offerForm.comment,
@@ -202,8 +223,8 @@ function SinglePost({ prid }) {
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error.data?.detail
-          ? `${error.data.detail} Only agency can do this.`
+        error.data?.error
+          ? `${error.data.error} Only agency can do this.`
           : "Something went wrong"
       );
     }
@@ -241,7 +262,6 @@ function SinglePost({ prid }) {
       toast.error("Cannot message yourself");
       return;
     }
-    const role = localStorage.getItem("role") || "tourist";
     try {
       await invite({ other_user_id: otherUserId }).unwrap();
       toast.success("Chat initiated successfully");
@@ -267,10 +287,18 @@ function SinglePost({ prid }) {
 
   const { likeCount, shareCount } = getInteractionCounts(postData);
 
+  if (!isLocalStorageLoaded) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading user data...
+      </div>
+    );
+  }
+
   if (isPostLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading...
+        Loading post...
       </div>
     );
   }
@@ -284,19 +312,18 @@ function SinglePost({ prid }) {
   }
 
   const tour = postData;
-  const role = localStorage.getItem("role") || "tourist";
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto ">
+    <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
       <Toaster />
       <button
         onClick={() => navigate(-1)}
-        className=" text-gray-800 rounded-md  transition-colors absolute top-4 left-4 cursor-pointer"
+        className="text-gray-800 rounded-md transition-colors absolute top-4 left-4 cursor-pointer"
       >
         <MdOutlineKeyboardBackspace size={24} />
       </button>
 
-      <div className="rounded-lg bg-white shadow-sm border border-gray-200  w-full lg:my-20 mt-10">
+      <div className="rounded-lg bg-white shadow-sm border border-gray-200 w-full lg:my-20 mt-10">
         <div className="p-3 sm:p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
             <div className="flex-1">
@@ -434,11 +461,11 @@ function SinglePost({ prid }) {
                   <img
                     className="w-full"
                     src={
-                      `${
-                        "http://res.cloudinary.com/ds97wytcs" +
-                        localStorage.getItem("user_image")
-                      }` ||
-                      "http://res.cloudinary.com/ds97wytcs/image/upload/v1752053074/sjxpjoqalo27rqrn8hbd.jpg"
+                      localStorage.getItem("user_image")
+                        ? `http://res.cloudinary.com/ds97wytcs${localStorage.getItem(
+                            "user_image"
+                          )}`
+                        : "http://res.cloudinary.com/ds97wytcs/image/upload/v1752053074/sjxpjoqalo27rqrn8hbd.jpg"
                     }
                     alt=""
                   />
