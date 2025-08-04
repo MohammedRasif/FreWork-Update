@@ -13,7 +13,9 @@ import { useNavigate } from "react-router-dom";
 import {
   useAddToFavoritMutation,
   useInviteToChatMutation,
+  useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
+import { toast, ToastContainer } from "react-toastify";
 
 const Membership = () => {
   const [agency, setAgency] = useState([]);
@@ -27,12 +29,14 @@ const Membership = () => {
   const { data: AgencyAll, isLoading: isAgencyDataLoading } =
     useGetAllAgencyQuery();
 
-    console.log(AgencyAll, "AgencyAll");
+  console.log(AgencyAll, "AgencyAll");
   const { data: TopAgencies, isLoading: isTopAgencyLoading } =
     useGetTopAgencyQuery();
   const { data: SearchAgencies, isLoading: isSearchLoading } =
     useSearchAgencyQuery(searchTerm, { skip: !searchTerm });
   const [addToFavo, { isLoading: isAddFevLoading }] = useAddToFavoritMutation();
+  const { data: userData, isLoading } = useShowUserInpormationQuery();
+  console.log(userData,"hello ")
 
   // invite to chat
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
@@ -80,26 +84,31 @@ const Membership = () => {
           : item
       )
     );
-
     try {
-      // Call the API to add/remove from favorites
       await addToFavo(agencyUserId).unwrap();
     } catch (error) {
-      // Revert both states on error
+      // Revert state on failure
       setFavorites(prevFavorites);
       setAgency(prevAgency);
-      console.error("Failed to toggle favorite:", error);
-      // Optionally show an error message
-      // Example: toast.error("Failed to update favorite status");
+
+      // Show error message from response
+      const errorMessage =
+        error?.data?.detail ||
+        error?.detail ||
+        "Failed to update favorite status";
+      toast.error(errorMessage);
     }
   };
+
   // Set agency data to state when fetched (all agencies or search results)
   useEffect(() => {
     if (searchTerm && SearchAgencies) {
       setAgency(
         SearchAgencies.map((item) => ({
           id: item.id,
-          image: item.cover_photo_url || "https://via.placeholder.com/300",
+          image:
+            item.cover_photo_url ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
           verified: item.is_verified,
           agency: item.agency_name || "Unknown Agency",
           rating: item.average_rating.toFixed(1),
@@ -124,7 +133,9 @@ const Membership = () => {
       setAgency(
         AgencyAll.map((item) => ({
           id: item.id,
-          image: item.cover_photo_url || "https://via.placeholder.com/300",
+          image:
+            item.cover_photo_url ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
           verified: item.is_verified,
           agency: item.agency_name || "Unknown Agency",
           rating: item.average_rating.toFixed(1),
@@ -233,7 +244,10 @@ const Membership = () => {
                 {/* Image */}
                 <div className="w-full sm:w-72 h-48 sm:h-56 relative">
                   <img
-                    src={plan.image}
+                    src={
+                      plan.image ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpgs"
+                    }
                     alt={`${plan.location} tour`}
                     className="w-full h-full object-cover"
                   />
@@ -273,7 +287,10 @@ const Membership = () => {
                         <div className="w-10 h-10 rounded-full overflow-hidden">
                           <img
                             className=""
-                            src={plan.logo_url || ""}
+                            src={
+                              plan.logo_url ||
+                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                            }
                             alt="logo"
                           />
                         </div>
@@ -372,6 +389,7 @@ const Membership = () => {
           </div>
         )}
       </div>
+      <ToastContainer></ToastContainer>
     </div>
   );
 };

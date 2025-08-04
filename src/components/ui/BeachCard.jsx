@@ -115,7 +115,7 @@ export default function TourCard({ tourPlan }) {
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img
-              src={localTourPlan.spot_picture_url || "/images/beach-placeholder.jpg"}
+              src={localTourPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"}
               alt={`${localTourPlan.location_to} destination`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />

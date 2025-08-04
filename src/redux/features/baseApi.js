@@ -4,20 +4,22 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://endlessly-unified-guppy.ngrok-free.app",
-    prepareHeaders: (header) => {
-      header.set("ngrok-skip-browser-warning", "true");
-      return header;
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
     },
   }),
-
-  tagTypes: [],
+  // Define tag types for cache management
+  tagTypes: ["User", "Agency", "TourPlan"],
   endpoints: (builder) => ({
+    // User-related mutations
     createUser: builder.mutation({
       query: (userData) => ({
         url: "/auth/normal_signup/",
         method: "POST",
         body: userData,
       }),
+      invalidatesTags: ["User"], // Invalidate User-related queries on signup
     }),
     logIn: builder.mutation({
       query: (loginData) => ({
@@ -25,6 +27,7 @@ export const baseApi = createApi({
         method: "POST",
         body: loginData,
       }),
+      invalidatesTags: ["User"], // Invalidate User-related queries on login
     }),
     otpVerify: builder.mutation({
       query: (otpData) => ({
@@ -32,6 +35,7 @@ export const baseApi = createApi({
         method: "POST",
         body: otpData,
       }),
+      invalidatesTags: ["User"], // Invalidate User-related queries on OTP verification
     }),
     reSendOtp: builder.mutation({
       query: (email) => ({
@@ -39,6 +43,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
+      invalidatesTags: ["User"], // Invalidate User-related queries on OTP resend
     }),
     verifyEmail: builder.mutation({
       query: (email) => ({
@@ -46,24 +51,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
-    }),
-    // agency
-    getAllAgency: builder.query({
-      query: () => "/public/agencies/",
-    }),
-    getTopAgency: builder.query({
-      query: () => "/public/top-agencies/",
-    }),
-    searchAgency: builder.query({
-      query: (search) => `public/agencies/?search=${search}`,
-    }),
-    // tour plan
-    getTourPlanPublic: builder.query({
-      query: () => `/public/tour-plans/`,
-    }),
-    filterTourPlanPublic: builder.query({
-      query: (query) =>
-        `/public/tour-plans?search=${query.search}&min_budget=${query.min}&max_budget=${query.max}&country=${query.country}&type=${query.type}&category=${query.category}`,
+      invalidatesTags: ["User"], // Invalidate User-related queries on email verification
     }),
     updatePassword: builder.mutation({
       query: (data) => ({
@@ -71,13 +59,31 @@ export const baseApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["User"], // Invalidate User-related queries on password update
     }),
-
-
-
-
-
-    
+    // Agency-related queries
+    getAllAgency: builder.query({
+      query: () => "/public/agencies/",
+      providesTags: ["Agency"], // Cache this query with Agency tag
+    }),
+    getTopAgency: builder.query({
+      query: () => "/public/top-agencies/",
+      providesTags: ["Agency"], // Cache this query with Agency tag
+    }),
+    searchAgency: builder.query({
+      query: (search) => `/public/agencies/?search=${search}`,
+      providesTags: ["Agency"], // Cache this query with Agency tag
+    }),
+    // Tour plan-related queries
+    getTourPlanPublic: builder.query({
+      query: () => `/public/tour-plans/`,
+      providesTags: ["TourPlan"], // Cache this query with TourPlan tag
+    }),
+    filterTourPlanPublic: builder.query({
+      query: (query) =>
+        `/public/tour-plans/?search=${query.search}&min_budget=${query.min}&max_budget=${query.max}&country=${query.country}&type=${query.type}&category=${query.category}`,
+      providesTags: ["TourPlan"], // Cache this query with TourPlan tag
+    }),
   }),
 });
 
@@ -88,12 +94,11 @@ export const {
   useReSendOtpMutation,
   useVerifyEmailMutation,
   useUpdatePasswordMutation,
-  // agency
+  // Agency
   useGetAllAgencyQuery,
   useGetTopAgencyQuery,
   useSearchAgencyQuery,
-  // tour plan
-  useFilterTourPlanPublicQuery,
+  // Tour Plan
   useGetTourPlanPublicQuery,
-  //user published plan
+  useFilterTourPlanPublicQuery,
 } = baseApi;
