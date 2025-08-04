@@ -276,7 +276,7 @@ const AdminProfile = () => {
           <img
             src={
               profileData?.cover_photo_url ||
-              "https://via.placeholder.com/384x288?text=No+Image"
+              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
             }
             alt="Agency Cover"
             className="w-full h-48 sm:h-72 object-cover rounded-lg"

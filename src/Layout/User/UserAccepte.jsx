@@ -18,7 +18,7 @@ const UserAccepte = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // New state for search
   const { data, isLoading } = useGetAllacceptedOfferQuery();
-  console.log(data,"helllllll")
+  console.log(data, "helllllll");
   const [reviewMessage, setReviewMessage] = useState("");
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [giveReview, { isLoading: isReviewLoading }] = useGiveReviewMutation();
@@ -168,7 +168,9 @@ const UserAccepte = () => {
           {isLoading ? (
             <FullScreenInfinityLoader />
           ) : upcomingTours.length === 0 ? (
-            <p>No upcoming tours found.</p>
+            <div className="w-full  rounded-xl p-4  flex justify-center h-auto items-center">
+              <p className="text-[#70798F] text-lg">No upcoming tours found.</p>
+            </div>
           ) : (
             upcomingTours.map((offer) => (
               <div
@@ -284,24 +286,32 @@ const UserAccepte = () => {
 
       {activeTab === "completed" && (
         <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-6">
-            Previous Tour Plans
-          </h3>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {isLoading ? (
               <div className="w-full h-full flex items-center justify-center">
                 <FullScreenInfinityLoader />
               </div>
             ) : completedTours.length === 0 ? (
-              <p>No completed tours found.</p>
+              <div className="w-[80vh]  rounded-xl p-4 flex justify-center  items-center">
+                <p className="text-[#70798F] text-lg">
+                  No completed tours found.
+                </p>
+              </div>
             ) : (
               completedTours.map((offer) => (
                 <div
                   key={offer.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden"
                 >
+                  <h3 className="text-xl font-semibold text-gray-800 mb-6">
+                    Previous Tour Plans
+                  </h3>
                   <img
-                    src={offer.tour_plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                    src={
+                      offer.tour_plan.spot_picture_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    }
                     alt={`Tour to ${offer.tour_plan.location_to}`}
                     className="w-full h-48 p-2 rounded-md object-cover"
                   />

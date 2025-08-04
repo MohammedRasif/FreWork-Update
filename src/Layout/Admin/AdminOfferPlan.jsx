@@ -50,7 +50,7 @@ function AdminOfferPlan() {
     );
   if (isError || !offeredPlans || offeredPlans.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center">
         Fetching plans or no plans available.
       </div>
     );

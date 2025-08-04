@@ -260,7 +260,9 @@ function PublishedPlan() {
     ? posts.filter((plan) => plan.status === "published")
     : [];
 
-  if (!publishedPlans.length) return <div>No published plans available</div>;
+  if (!publishedPlans.length) return <div className="w-full  rounded-xl p-4  flex justify-center h-auto items-center">
+            <p className="text-[#70798F] text-lg">No published plans available</p>
+          </div> 
 
   // handleDelete publish plan
 

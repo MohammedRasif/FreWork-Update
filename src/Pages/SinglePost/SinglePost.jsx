@@ -4,6 +4,7 @@ import {
   useOfferBudgetMutation,
   useAcceptOfferMutation,
   useInviteToChatMutation,
+  useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -38,6 +39,7 @@ function SinglePost({ prid }) {
   } = useGetOneDetailQuery(finalId, {
     skip: !finalId,
   });
+  const { data: userData, isLoading: isUserLoading } = useShowUserInpormationQuery(); // Added
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
@@ -56,7 +58,6 @@ function SinglePost({ prid }) {
 
     fetchLocalStorage();
 
-    // Optional: Listen for storage events if localStorage is updated dynamically
     window.addEventListener("storage", fetchLocalStorage);
     return () => window.removeEventListener("storage", fetchLocalStorage);
   }, []);
@@ -287,7 +288,7 @@ function SinglePost({ prid }) {
 
   const { likeCount, shareCount } = getInteractionCounts(postData);
 
-  if (!isLocalStorageLoaded) {
+  if (!isLocalStorageLoaded || isUserLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Loading user data...
@@ -534,86 +535,101 @@ function SinglePost({ prid }) {
           )}
 
           <div className="mt-4 space-y-4">
-            {tour.offers && tour.offers.length > 0 ? (
+            {isUserLoading ? (
+              <div>Loading user data...</div>
+            ) : tour.offers && tour.offers.length > 0 ? (
               tour.offers
                 .slice(0, expandedOffers ? tour.offers.length : 3)
-                .map((offer) => (
-                  <div
-                    key={offer.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                      <img
-                        src={
-                          offer.agency?.logo_url ||
-                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                        }
-                        alt={`${
-                          offer.agency?.agency_name || "Unknown Agency"
-                        } avatar`}
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">
-                            {offer.agency?.agency_name || "Unknown Agency"}
-                          </span>
-                          {offer.agency?.is_verified && (
-                            <span className="text-blue-500">
-                              <MdVerified size={20} className="sm:w-6 sm:h-6" />
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          {offer.message || "No message provided"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-3">
-                      <span className="font-semibold text-lg sm:text-xl">
-                        💰 ${offer.offered_budget || "N/A"}
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleMessage(offer.agency?.user)}
-                          disabled={
-                            isInviteLoading ||
-                            isInteractLoading ||
-                            isOfferBudgetLoading ||
-                            isAcceptLoading ||
-                            !offer.agency?.user
-                          }
-                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                            isInviteLoading ||
-                            isInteractLoading ||
-                            isOfferBudgetLoading ||
-                            isAcceptLoading ||
-                            !offer.agency?.user
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
-                          }`}
-                        >
-                          {isInviteLoading ? "Sending..." : "Message"}
-                        </button>
-                        {tour.user === currentUserId && (
-                          <button
-                            onClick={() =>
-                              acceptOfferHandler(offer.id, tour.id)
+                .map((offer) => {
+                  console.log({
+                    userDataId: userData?.user_id,
+                    agencyUser: offer?.agency?.user,
+                    tourUser: tour.user,
+                    conditionResult:
+                      userData?.user_id &&
+                      offer?.agency?.user &&
+                      tour.user &&
+                      (userData.user_id === offer.agency.user || userData.user_id === tour.user),
+                  });
+                  return (
+                    userData?.user_id &&
+                    offer?.agency?.user &&
+                    tour.user &&
+                    (userData.user_id === offer.agency.user || userData.user_id === tour.user) ? (
+                      <div
+                        key={offer.id}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                          <img
+                            src={
+                              offer.agency?.logo_url ||
+                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                             }
-                            disabled={isAcceptLoading}
-                            className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                              isAcceptLoading
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-[#3776E2] text-white hover:bg-blue-700"
-                            }`}
-                          >
-                            Accept
-                          </button>
-                        )}
+                            alt={`${offer.agency?.agency_name || "Unknown Agency"} avatar`}
+                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                          />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900">
+                                {offer.agency?.agency_name || "Unknown Agency"}
+                              </span>
+                              {offer.agency?.is_verified && (
+                                <span className="text-blue-500">
+                                  <MdVerified size={20} className="sm:w-6 sm:h-6" />
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs sm:text-sm text-gray-600">
+                              {offer.message || "No message provided"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-3">
+                          <span className="font-semibold text-lg sm:text-xl">
+                            💰 ${offer.offered_budget || "N/A"}
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleMessage(offer.agency?.user)}
+                              disabled={
+                                isInviteLoading ||
+                                isInteractLoading ||
+                                isOfferBudgetLoading ||
+                                isAcceptLoading ||
+                                !offer.agency?.user
+                              }
+                              className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                isInviteLoading ||
+                                isInteractLoading ||
+                                isOfferBudgetLoading ||
+                                isAcceptLoading ||
+                                !offer.agency?.user
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
+                              }`}
+                            >
+                              {isInviteLoading ? "Sending..." : "Message"}
+                            </button>
+                            {tour.user === currentUserId && (
+                              <button
+                                onClick={() => acceptOfferHandler(offer.id, tour.id)}
+                                disabled={isAcceptLoading}
+                                className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                  isAcceptLoading
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                }`}
+                              >
+                                Accept
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))
+                    ) : null
+                  );
+                })
             ) : (
               <p className="text-gray-600 text-sm">No offers available</p>
             )}
