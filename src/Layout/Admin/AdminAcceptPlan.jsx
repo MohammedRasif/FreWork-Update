@@ -4,6 +4,7 @@ import TourPlanDetails from "@/components/TourplanDetails";
 
 export default function AdminAcceptPlan() {
   const { data: toursData, isLoading, isError } = useGetAllacceptedOfferQuery();
+  console.log(toursData,"acceptedddddd")
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTourId, setSelectedTourId] = useState(null);
 

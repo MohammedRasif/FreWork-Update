@@ -53,92 +53,6 @@ const Published = () => {
   );
   console.log({ groupTrips });
 
-  // const sliderSettings = {
-  //   dots: true,
-  //   infinite: publishedData.length > 2,
-  //   speed: 500,
-  //   slidesToShow: 3,
-  //   slidesToScroll: 1,
-  //   arrows: true,
-  //   responsive: [
-  //     {
-  //       breakpoint: 1024,
-  //       settings: {
-  //         slidesToShow: 2,
-  //         slidesToScroll: 1,
-  //         infinite: true,
-  //         dots: true,
-  //         arrows: true,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 640,
-  //       settings: {
-  //         slidesToShow: 2,
-  //         slidesToScroll: 2,
-  //         infinite: true,
-  //         dots: true,
-  //         arrows: false,
-  //         variableWidth: true,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 480,
-  //       settings: {
-  //         slidesToShow: 1,
-  //         slidesToScroll: 1,
-  //         infinite: true,
-  //         dots: true,
-  //         arrows: false,
-  //         variableWidth: true,
-  //       },
-  //     },
-  //   ],
-  // };
-
-  // const getSliderSettings = (length) => ({
-  //   dots: false,
-  //   infinite: length > 3,
-  //   speed: 500,
-  //   slidesToShow: 3,
-  //   slidesToScroll: 1,
-  //   arrows: true,
-  //   responsive: [
-  //     {
-  //       breakpoint: 1024,
-  //       settings: {
-  //         slidesToShow: 3,
-  //         slidesToScroll: 1,
-  //         infinite: length > 2,
-  //         dots: false,
-  //         arrows: true,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 640,
-  //       settings: {
-  //         slidesToShow: 1.5,
-  //         slidesToScroll: 1,
-  //         infinite: length > 1,
-  //         dots: false,
-  //         arrows: false,
-  //         variableWidth: false,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 480,
-  //       settings: {
-  //         slidesToShow: 2,
-  //         slidesToScroll: 1,
-  //         infinite: length > 1,
-  //         dots: false,
-  //         arrows: false,
-  //         variableWidth: false,
-  //       },
-  //     },
-  //   ],
-  // });
-
   const getSliderSettings = (length) => ({
     dots: true, // change from false to true
     infinite: length > 3,
@@ -191,16 +105,22 @@ const Published = () => {
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#4691F2]/10">
       <style jsx>{`
-        .slick-slide > div {
+        .mySwiper {
+          padding: 0 10px;
+        }
+        .swiper-slide {
           display: flex;
-          align-items: stretch;
+          justify-content: center;
+          align-items: center;
         }
-        .slick-track {
-          display: flex !important;
-          align-items: stretch !important;
+        .swiper-pagination {
+          position: relative;
+          margin-top: 10px;
         }
-        .slick-slide {
-          height: auto !important;
+        .swiper-button-prev,
+        .swiper-button-next {
+          color: #3182ce;
+          transform: scale(0.8);
         }
       `}</style>
 
@@ -239,25 +159,13 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  <button
-                    ref={beachPrevRef}
-                    className="absolute top-1/2 -left-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowLeft />
-                  </button>
+                  
 
-                  <button
-                    ref={beachNextRef}
-                    className="absolute top-1/2 -right-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowRight />
-                  </button>
+                  
 
                   <Swiper
                     modules={[Pagination, Navigation]}
-                    spaceBetween={0}
+                    spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
                       prevEl: beachPrevRef.current,
@@ -268,11 +176,12 @@ const Published = () => {
                       swiper.params.navigation.nextEl = beachNextRef.current;
                     }}
                     breakpoints={{
-                      760: { slidesPerView: 3 },
-                      480: { slidesPerView: 1.1 },
-                      320: { slidesPerView: 1.1 },
+                      1024: { slidesPerView: 4, spaceBetween: 12 },
+                      768: { slidesPerView: 3, spaceBetween: 10 },
+                      320: { slidesPerView: 2, spaceBetween: 8 },
                     }}
                     loop={true}
+                    className="mySwiper"
                   >
                     {beachTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
@@ -291,44 +200,33 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  <button
-                    ref={mountainPrevRef}
-                    className="absolute top-1/2 -left-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowLeft />
-                  </button>
+                  
 
-                  <button
-                    ref={mountainNextRef}
-                    className="absolute top-1/2 -right-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowRight />
-                  </button>
+                  
 
                   <Swiper
                     modules={[Pagination, Navigation]}
-                    spaceBetween={0}
+                    spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
-                      prevEl: mountainPrevRef.current,
-                      nextEl: mountainNextRef.current,
+                      prevEl: beachPrevRef.current,
+                      nextEl: beachNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = mountainPrevRef.current;
-                      swiper.params.navigation.nextEl = mountainNextRef.current;
+                      swiper.params.navigation.prevEl = beachPrevRef.current;
+                      swiper.params.navigation.nextEl = beachNextRef.current;
                     }}
-                     breakpoints={{
-                      760: { slidesPerView: 3 },
-                      480: { slidesPerView: 1.1 },
-                      320: { slidesPerView: 1.1 },
+                    breakpoints={{
+                      1024: { slidesPerView: 4, spaceBetween: 12 },
+                      768: { slidesPerView: 3, spaceBetween: 10 },
+                      320: { slidesPerView: 2, spaceBetween: 8 },
                     }}
                     loop={true}
+                    className="mySwiper"
                   >
                     {mountainTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                       <BeachCard tourPlan={p} />
+                        <BeachCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -343,40 +241,29 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  <button
-                    ref={relaxPrevRef}
-                    className="absolute top-1/2 -left-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowLeft />
-                  </button>
+                  
 
-                  <button
-                    ref={relaxNextRef}
-                    className="absolute top-1/2 -right-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowRight />
-                  </button>
+                  
 
                   <Swiper
                     modules={[Pagination, Navigation]}
-                    spaceBetween={0}
+                    spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
-                      prevEl: relaxPrevRef.current,
-                      nextEl: relaxNextRef.current,
+                      prevEl: beachPrevRef.current,
+                      nextEl: beachNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = relaxPrevRef.current;
-                      swiper.params.navigation.nextEl = relaxNextRef.current;
+                      swiper.params.navigation.prevEl = beachPrevRef.current;
+                      swiper.params.navigation.nextEl = beachNextRef.current;
                     }}
-                     breakpoints={{
-                      760: { slidesPerView: 3 },
-                      480: { slidesPerView: 1.1 },
-                      320: { slidesPerView: 1.1 },
+                    breakpoints={{
+                      1024: { slidesPerView: 4, spaceBetween: 12 },
+                      768: { slidesPerView: 3, spaceBetween: 10 },
+                      320: { slidesPerView: 2, spaceBetween: 8 },
                     }}
                     loop={true}
+                    className="mySwiper"
                   >
                     {relaxTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
@@ -396,42 +283,25 @@ const Published = () => {
 
                 <div className="relative">
                   {/* Custom arrows */}
-                  <button
-                    ref={prevRef}
-                    title="Previous"
-                    className="absolute  top-1/2 -left-10 z-10 cursor-pointer hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center  border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowLeft />
-                  </button>
-
-                  <button
-                    ref={nextRef}
-                    title="Next"
-                    className="absolute cursor-pointer top-1/2 -right-10 z-10 hidden lg:flex w-10 h-10 items-center justify-center bg-white border rounded-full shadow"
-                    style={{ transform: "translateY(-50%)" }}
-                  >
-                    <ArrowRight />
-                  </button>
-
                   <Swiper
                     modules={[Pagination, Navigation]}
-                    spaceBetween={0}
+                    spaceBetween={12}
                     pagination={{ clickable: true }}
-                    loop={true}
                     navigation={{
-                      prevEl: prevRef.current,
-                      nextEl: nextRef.current,
+                      prevEl: beachPrevRef.current,
+                      nextEl: beachNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = prevRef.current;
-                      swiper.params.navigation.nextEl = nextRef.current;
+                      swiper.params.navigation.prevEl = beachPrevRef.current;
+                      swiper.params.navigation.nextEl = beachNextRef.current;
                     }}
-                     breakpoints={{
-                      760: { slidesPerView: 3 },
-                      480: { slidesPerView: 1.1 },
-                      320: { slidesPerView: 1.1 },
+                    breakpoints={{
+                      1024: { slidesPerView: 4, spaceBetween: 12 },
+                      768: { slidesPerView: 3, spaceBetween: 10 },
+                      320: { slidesPerView: 2, spaceBetween: 8 },
                     }}
+                    loop={true}
+                    className="mySwiper"
                   >
                     {groupTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">

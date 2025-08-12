@@ -124,10 +124,10 @@ const HomeLayout = ({ children }) => {
   return (
     <div className="w-full h-auto">
       <div className="w-full flex flex-col gap-2 px-4">
-        <h2 className="text-[#343E4B] font-semibold text-3xl">
-          Welcome,{" "}
-          <span className="font-normal">
-            Publish your plan to get perfect offer
+        <h2 className="text-[#343E4B] font-semibold text-xl">
+         <span className="text-[28px]"> Welcome, </span>
+          <span className="font-normal text-[18px] font">
+             Share your vacation plan and receive 3 personalized offers from agencies.
           </span>
         </h2>
       </div>

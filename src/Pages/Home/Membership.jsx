@@ -283,7 +283,7 @@ const Membership = () => {
                   {/* Agency Header */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
                     <div className="flex items-center space-x-3 mb-3 sm:mb-0">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10  rounded-full flex items-center justify-center">
                         <div className="w-10 h-10 rounded-full overflow-hidden">
                           <img
                             className=""

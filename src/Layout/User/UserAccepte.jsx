@@ -45,33 +45,33 @@ const UserAccepte = () => {
 
   // Filter tours based on date, status, and search query
   const today = new Date();
-  const upcomingTours =
-    data?.filter((offer) => {
-      const startDate = new Date(offer.tour_plan.start_date);
-      return (
-        startDate >= today &&
-        offer.status === "accepted" &&
-        (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
-        (!searchQuery ||
-          offer.tour_plan.location_to
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()))
-      );
-    }) || [];
+const upcomingTours = data?.filter((offer) => {
+  const startDate = new Date(offer.tour_plan.start_date);
+  const endDate = new Date(offer.tour_plan.end_date);
+  return (
+    startDate >= today &&
+    endDate >= today && // Ensure the tour hasn't ended
+    offer.status === "accepted" &&
+    (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
+    (!searchQuery ||
+      offer.tour_plan.location_to
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()))
+  );
+}) || [];
 
-  const completedTours =
-    data?.filter((offer) => {
-      const endDate = new Date(offer.tour_plan.end_date);
-      return (
-        endDate < today &&
-        offer.status === "accepted" &&
-        (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
-        (!searchQuery ||
-          offer.tour_plan.location_to
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()))
-      );
-    }) || [];
+  const completedTours = data?.filter((offer) => {
+  const endDate = new Date(offer.tour_plan.end_date);
+  return (
+    endDate < today &&
+    offer.status === "completed" &&
+    (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
+    (!searchQuery ||
+      offer.tour_plan.location_to // Fixed from attour_plan
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()))
+  );
+}) || [];
 
   // Handle search input change
   const handleSearchChange = (e) => {

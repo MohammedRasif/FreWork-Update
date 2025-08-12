@@ -44,7 +44,7 @@ function AdminOfferPlan() {
   // Handle loading and error states
   if (isLoading)
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center">
         Loading...
       </div>
     );
@@ -73,7 +73,7 @@ function AdminOfferPlan() {
   const tourPlans = Object.values(tourPlansMap);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ">
       <div className="flex">
         {/* Main Content */}
         <div className="flex-1">

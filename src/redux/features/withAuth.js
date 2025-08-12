@@ -208,6 +208,7 @@ export const sqQuery = createApi({
       query: (id) => `/chat/conversations/${id}/messages/`,
       providesTags: (result, error, id) => [{ type: "Chat", id }],
     }),
+    
 
     showUserInpormation: builder.query({
       query: () => "/auth/user_profile/",
