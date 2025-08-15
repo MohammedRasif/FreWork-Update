@@ -39,7 +39,8 @@ function SinglePost({ prid }) {
   } = useGetOneDetailQuery(finalId, {
     skip: !finalId,
   });
-  const { data: userData, isLoading: isUserLoading } = useShowUserInpormationQuery(); // Added
+  const { data: userData, isLoading: isUserLoading } =
+    useShowUserInpormationQuery(); // Added
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
@@ -328,10 +329,10 @@ function SinglePost({ prid }) {
         <div className="p-3 sm:p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
             <div className="flex-1">
-              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 my-2">
+              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 lg:my-2 lg:mt-0">
                 {tour.location_to || "Unknown Destination"}
               </h2>
-              <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+              {/* <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                 <p className="text-[16px]">
                   Willing to go on{" "}
                   <span className="font-medium">
@@ -348,27 +349,27 @@ function SinglePost({ prid }) {
                   Category:{" "}
                   <span className="font-medium">{tour.category || "N/A"}</span>
                 </p>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
-              <div>
+              {/* <div>
                 <p className="text-[16px] lg:text-lg font-bold text-gray-700">
                   Budget ${tour.budget || "N/A"}
                 </p>
                 <p className="text-[16px] lg:text-md text-gray-800">
                   Total {tour.total_members || "N/A"} person
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 -mt-5">
             <p className="text-[16px] text-gray-600 leading-relaxed">
               {tour.description || "No description available"}
             </p>
           </div>
 
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+          {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
             <p className="text-[16px] lg:text-lg font-medium text-gray-700">
               Interested Travel Points:
             </p>
@@ -389,9 +390,9 @@ function SinglePost({ prid }) {
                 </span>
               )}
             </div>
-          </div>
+          </div> */}
 
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <img
               src={
                 tour.spot_picture_url ||
@@ -400,9 +401,9 @@ function SinglePost({ prid }) {
               alt="Tour destination"
               className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
             />
-          </div>
+          </div> */}
 
-          <div className="flex items-center justify-between py-3">
+          {/* <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center">
                 <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
@@ -417,9 +418,9 @@ function SinglePost({ prid }) {
               <span>{tour.offer_count || 0} Offers</span>
               <span>{shareCount} Shares</span>
             </div>
-          </div>
+          </div> */}
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          {/* <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
               <button
                 onClick={() => handleLike(tour.id)}
@@ -450,7 +451,7 @@ function SinglePost({ prid }) {
                 <span>{isShared ? "Unshare" : "Share"}</span>
               </button>
             </div>
-          </div>
+          </div> */}
 
           {role !== "tourist" && (
             <div className="mt-6 border-t border-gray-200 pt-4">
@@ -458,7 +459,7 @@ function SinglePost({ prid }) {
                 Place Your Offer
               </h3>
               <div className="flex">
-                <div className="w-9 h-9 mt-7 rounded-full overflow-hidden border border-gray-300">
+                {/* <div className="w-9 h-9 mt-7 rounded-full overflow-hidden border border-gray-300">
                   <img
                     className="w-full"
                     src={
@@ -470,17 +471,17 @@ function SinglePost({ prid }) {
                     }
                     alt=""
                   />
-                </div>
+                </div> */}
                 <form
                   onSubmit={handleOfferSubmit}
-                  className="px-6 rounded-xl mx-auto grow"
+                  className=" rounded-xl mx-auto grow"
                 >
                   <div>
                     <label
                       htmlFor="budget"
-                      className="block text-sm font-medium text-gray-700 mb-1"
+                      className="block lg:text-md   font-medium text-gray-700 mb-1"
                     >
-                      Budget
+                      Offer
                     </label>
                     <input
                       type="number"
@@ -488,7 +489,7 @@ function SinglePost({ prid }) {
                       id="budget"
                       value={offerForm.budget}
                       onChange={handleOfferChange}
-                      placeholder="Enter your budget"
+                      placeholder="Enter your budget (e.g., 6000)"
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
@@ -497,7 +498,7 @@ function SinglePost({ prid }) {
                   <div>
                     <label
                       htmlFor="comment"
-                      className="block text-sm font-medium text-gray-700 mb-1"
+                      className="block lg:text-md  font-medium text-gray-700 mb-1"
                     >
                       Message
                     </label>
@@ -510,6 +511,45 @@ function SinglePost({ prid }) {
                       placeholder="Enter your message"
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="applyDiscount"
+                        id="applyDiscount"
+                        checked={offerForm.applyDiscount || false}
+                        onChange={handleOfferChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <span className="ml-2 lg:text-md  text-gray-700">
+                        Apply an additional discount
+                      </span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      The site automatically suggests to visitors to request an
+                      additional discount, increasing conversions by 30%. If you
+                      want to offer more, do so by checking this.
+                    </p>
+                  </div>
+
+                  <div className="mt-4 mb-2">
+                    <label
+                      htmlFor="discount"
+                      className="block lg:text-md  font-medium text-gray-700 mb-1"
+                    >
+                      Discount
+                    </label>
+                    <input
+                      type="number"
+                      name="discount"
+                      id="discount"
+                      value={offerForm.discount || ""}
+                      onChange={handleOfferChange}
+                      placeholder="Enter discount percentage"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                   </div>
 
@@ -549,86 +589,93 @@ function SinglePost({ prid }) {
                       userData?.user_id &&
                       offer?.agency?.user &&
                       tour.user &&
-                      (userData.user_id === offer.agency.user || userData.user_id === tour.user),
+                      (userData.user_id === offer.agency.user ||
+                        userData.user_id === tour.user),
                   });
-                  return (
-                    userData?.user_id &&
+                  return userData?.user_id &&
                     offer?.agency?.user &&
                     tour.user &&
-                    (userData.user_id === offer.agency.user || userData.user_id === tour.user) ? (
-                      <div
-                        key={offer.id}
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
-                      >
-                        <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                          <img
-                            src={
-                              offer.agency?.logo_url ||
-                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                            }
-                            alt={`${offer.agency?.agency_name || "Unknown Agency"} avatar`}
-                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                          />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-900">
-                                {offer.agency?.agency_name || "Unknown Agency"}
+                    (userData.user_id === offer.agency.user ||
+                      userData.user_id === tour.user) ? (
+                    <div
+                      key={offer.id}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                        <img
+                          src={
+                            offer.agency?.logo_url ||
+                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                          }
+                          alt={`${
+                            offer.agency?.agency_name || "Unknown Agency"
+                          } avatar`}
+                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900">
+                              {offer.agency?.agency_name || "Unknown Agency"}
+                            </span>
+                            {offer.agency?.is_verified && (
+                              <span className="text-blue-500">
+                                <MdVerified
+                                  size={20}
+                                  className="sm:w-6 sm:h-6"
+                                />
                               </span>
-                              {offer.agency?.is_verified && (
-                                <span className="text-blue-500">
-                                  <MdVerified size={20} className="sm:w-6 sm:h-6" />
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs sm:text-sm text-gray-600">
-                              {offer.message || "No message provided"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between sm:justify-end gap-3">
-                          <span className="font-semibold text-lg sm:text-xl">
-                            💰 ${offer.offered_budget || "N/A"}
-                          </span>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleMessage(offer.agency?.user)}
-                              disabled={
-                                isInviteLoading ||
-                                isInteractLoading ||
-                                isOfferBudgetLoading ||
-                                isAcceptLoading ||
-                                !offer.agency?.user
-                              }
-                              className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                isInviteLoading ||
-                                isInteractLoading ||
-                                isOfferBudgetLoading ||
-                                isAcceptLoading ||
-                                !offer.agency?.user
-                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                  : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
-                              }`}
-                            >
-                              {isInviteLoading ? "Sending..." : "Message"}
-                            </button>
-                            {tour.user === currentUserId && (
-                              <button
-                                onClick={() => acceptOfferHandler(offer.id, tour.id)}
-                                disabled={isAcceptLoading}
-                                className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                  isAcceptLoading
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-[#3776E2] text-white hover:bg-blue-700"
-                                }`}
-                              >
-                                Accept
-                              </button>
                             )}
                           </div>
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            {offer.message || "No message provided"}
+                          </p>
                         </div>
                       </div>
-                    ) : null
-                  );
+                      <div className="flex items-center justify-between sm:justify-end gap-3">
+                        <span className="font-semibold text-lg sm:text-xl">
+                          💰 ${offer.offered_budget || "N/A"}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleMessage(offer.agency?.user)}
+                            disabled={
+                              isInviteLoading ||
+                              isInteractLoading ||
+                              isOfferBudgetLoading ||
+                              isAcceptLoading ||
+                              !offer.agency?.user
+                            }
+                            className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                              isInviteLoading ||
+                              isInteractLoading ||
+                              isOfferBudgetLoading ||
+                              isAcceptLoading ||
+                              !offer.agency?.user
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
+                            }`}
+                          >
+                            {isInviteLoading ? "Sending..." : "Message"}
+                          </button>
+                          {tour.user === currentUserId && (
+                            <button
+                              onClick={() =>
+                                acceptOfferHandler(offer.id, tour.id)
+                              }
+                              disabled={isAcceptLoading}
+                              className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                isAcceptLoading
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-[#3776E2] text-white hover:bg-blue-700"
+                              }`}
+                            >
+                              Accept
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null;
                 })
             ) : (
               <p className="text-gray-600 text-sm">No offers available</p>
