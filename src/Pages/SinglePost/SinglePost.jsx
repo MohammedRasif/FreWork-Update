@@ -8,18 +8,19 @@ import {
 } from "@/redux/features/withAuth";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ThumbsUp, Share2 } from "lucide-react";
+import { ThumbsUp, Share2, MapPin, Navigation, X } from "lucide-react";
 import { MdOutlineKeyboardBackspace, MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
   const { id: paramId } = useParams();
   const finalId = paramId || prid?.id;
 
-  // State for localStorage values
   const [token, setToken] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [role, setRole] = useState(null);
@@ -28,10 +29,14 @@ function SinglePost({ prid }) {
   const [postData, setPostData] = useState({});
   const [isLiked, setIsLiked] = useState(false);
   const [isShared, setIsShared] = useState(false);
-  const [offerForm, setOfferForm] = useState({ budget: "", comment: "" });
+  const [offerForm, setOfferForm] = useState({
+    budget: "",
+    comment: "",
+    discount: "",
+  });
   const [expandedOffers, setExpandedOffers] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // RTK Queries
   const {
     data: post,
     isLoading: isPostLoading,
@@ -41,7 +46,7 @@ function SinglePost({ prid }) {
     skip: !finalId,
   });
   const { data: userData, isLoading: isUserLoading } =
-    useShowUserInpormationQuery(); // Added
+    useShowUserInpormationQuery();
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
@@ -49,7 +54,6 @@ function SinglePost({ prid }) {
     useAcceptOfferMutation();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
 
-  // Initialize localStorage values
   useEffect(() => {
     const fetchLocalStorage = () => {
       setToken(localStorage.getItem("access_token"));
@@ -59,19 +63,16 @@ function SinglePost({ prid }) {
     };
 
     fetchLocalStorage();
-
     window.addEventListener("storage", fetchLocalStorage);
     return () => window.removeEventListener("storage", fetchLocalStorage);
   }, []);
 
-  // Initialize post data and like/share status
   useEffect(() => {
     if (postError) {
       console.error("Failed to fetch post:", postError);
       toast.error("Failed to load post data");
     }
     if (post && isLocalStorageLoaded) {
-      console.log("Post data:", post);
       setPostData(post);
       if (currentUserId) {
         setIsLiked(
@@ -92,13 +93,11 @@ function SinglePost({ prid }) {
     }
   }, [post, postError, currentUserId, isLocalStorageLoaded]);
 
-  // Handle offer form changes
   const handleOfferChange = (e) => {
     const { name, value } = e.target;
     setOfferForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle like/unlike action
   const handleLike = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -110,27 +109,7 @@ function SinglePost({ prid }) {
         id: tourId,
         data: { interaction_type: "like" },
       }).unwrap();
-      setIsLiked((prev) => {
-        const newIsLiked = !prev;
-        setPostData((prevTour) => ({
-          ...prevTour,
-          interactions: newIsLiked
-            ? [
-                ...prevTour.interactions.filter(
-                  (i) =>
-                    String(i.user) !== String(currentUserId) ||
-                    i.interaction_type !== "like"
-                ),
-                { user: currentUserId, interaction_type: "like" },
-              ]
-            : prevTour.interactions.filter(
-                (i) =>
-                  String(i.user) !== String(currentUserId) ||
-                  i.interaction_type !== "like"
-              ),
-        }));
-        return newIsLiked;
-      });
+      setIsLiked((prev) => !prev);
       toast.success(isLiked ? "Post unliked" : "Post liked");
     } catch (error) {
       console.error("Failed to update like:", error);
@@ -138,7 +117,6 @@ function SinglePost({ prid }) {
     }
   };
 
-  // Handle share/unshare action
   const handleShare = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -154,34 +132,13 @@ function SinglePost({ prid }) {
         id: tourId,
         data: { interaction_type: "share" },
       }).unwrap();
-      setIsShared((prev) => {
-        const newIsShared = !prev;
-        setPostData((prevTour) => ({
-          ...prevTour,
-          interactions: newIsShared
-            ? [
-                ...prevTour.interactions.filter(
-                  (i) =>
-                    String(i.user) !== String(currentUserId) ||
-                    i.interaction_type !== "share"
-                ),
-                { user: currentUserId, interaction_type: "share" },
-              ]
-            : prevTour.interactions.filter(
-                (i) =>
-                  String(i.user) !== String(currentUserId) ||
-                  i.interaction_type !== "share"
-              ),
-        }));
-        return newIsShared;
-      });
+      setIsShared((prev) => !prev);
     } catch (error) {
       console.error("Failed to update share:", error);
       toast.error("Failed to copy link or update share");
     }
   };
 
-  // Handle offer submission
   const handleOfferSubmit = async (e) => {
     e.preventDefault();
     if (!token) {
@@ -216,13 +173,11 @@ function SinglePost({ prid }) {
       };
       setPostData((prev) => ({
         ...prev,
-        offers: [
-          ...(prev.offers || []).filter((offer) => offer.id !== newOffer.id),
-          newOffer,
-        ],
+        offers: [...(prev.offers || []), newOffer],
         offer_count: (prev.offer_count || 0) + 1,
       }));
-      setOfferForm({ budget: "", comment: "" });
+      setOfferForm({ budget: "", comment: "", discount: "" });
+      setIsPopupOpen(false);
       toast.success("Offer submitted successfully");
     } catch (error) {
       console.error("Failed to submit offer:", error);
@@ -234,7 +189,6 @@ function SinglePost({ prid }) {
     }
   };
 
-  // Handle accept offer
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
       navigate("/login");
@@ -251,7 +205,6 @@ function SinglePost({ prid }) {
     }
   };
 
-  // Handle message action
   const handleMessage = async (otherUserId) => {
     if (!token) {
       navigate("/login");
@@ -276,16 +229,13 @@ function SinglePost({ prid }) {
     }
   };
 
-  // Calculate interaction counts
   const getInteractionCounts = (tour) => {
     const likeCount =
-      tour.interactions?.filter(
-        (interaction) => interaction.interaction_type === "like"
-      ).length || 0;
+      tour.interactions?.filter((i) => i.interaction_type === "like").length ||
+      0;
     const shareCount =
-      tour.interactions?.filter(
-        (interaction) => interaction.interaction_type === "share"
-      ).length || 0;
+      tour.interactions?.filter((i) => i.interaction_type === "share").length ||
+      0;
     return { likeCount, shareCount };
   };
 
@@ -316,6 +266,15 @@ function SinglePost({ prid }) {
   }
 
   const tour = postData;
+  const hasMaxOffers = tour.offer_count >= 3;
+
+  const handleSentOfferClick = () => {
+    if (hasMaxOffers) {
+      toast.error("Sorry, this post already has 3 offers submitted.");
+    } else {
+      setIsPopupOpen(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
@@ -327,161 +286,151 @@ function SinglePost({ prid }) {
         <MdOutlineKeyboardBackspace size={24} />
       </button>
 
-      <div className="rounded-lg bg-white shadow-sm border border-gray-200 w-full lg:my-20 mt-10">
-        <div className="p-3 sm:p-4 lg:p-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
-            <div className="flex-1">
-              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 lg:my-2 lg:mt-0">
-                {tour.location_to || "Unknown Destination"}
-              </h2>
-              <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                <p className="text-[16px]">
-                  Willing to go on{" "}
-                  <span className="font-medium">
-                    {tour.start_date || "N/A"}
-                  </span>
-                </p>
-                <p className="text-[16px]">
-                  Duration:{" "}
-                  <span className="font-medium">
-                    {tour.duration || "N/A"} days
-                  </span>
-                </p>
-                <p className="text-[16px]">
-                  Category:{" "}
-                  <span className="font-medium">{tour.category || "N/A"}</span>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
-              <div>
-                <p className="text-[16px] lg:text-lg font-bold text-gray-700">
-                  Budget ${tour.budget || "N/A"}
-                </p>
-                <p className="text-[16px] lg:text-md text-gray-800">
-                  Total {tour.total_members || "N/A"} person
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-4 -mt-5">
-            <p className="text-[16px] text-gray-600 leading-relaxed">
-              {tour.description || "No description available"}
-            </p>
-          </div>
-
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-            <p className="text-[16px] lg:text-lg font-medium text-gray-700">
-              Interested Travel Points:
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {tour.tourist_spots ? (
-                tour.tourist_spots.split(",").map((location, index) => (
-                  <span
-                    key={index}
-                    className="text-[16px] lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-                  >
-                    {location.trim()}
-                    {index < tour.tourist_spots.split(",").length - 1 && ", "}
-                  </span>
-                ))
-              ) : (
-                <span className="text-[16px] lg:text-lg text-gray-600">
-                  None
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-4">
+      <div className="flex flex-col shadow-lg w-80 lg:w-96 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
+        <div className="relative">
+          <div className="aspect-[4/3] overflow-hidden">
             <img
               src={
                 tour.spot_picture_url ||
-                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
               }
-              alt="Tour destination"
-              className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
+              alt={`${tour.location_to} destination`}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
-          </div>
-
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center">
-                <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                  <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                </div>
+            <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
+              <h2 className="text-2xl md:text-4xl font-bold text-center px-4 mb-2">
+                {tour.location_to}
+              </h2>
+              <p className="text-sm md:text-base opacity-90 italic">
+                Drone Shot
+              </p>
+            </div>
+            {tour.offers && tour.offers.length > 0 && (
+              <div className="absolute bottom-4 left-2/5 -translate-x-2/5 flex items-center space-x-1 overflow-x-auto px-2 scrollbar-none">
+                {tour.offers.map((offer) => (
+                  <img
+                    key={offer.id}
+                    src={
+                      offer.agency?.logo_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    }
+                    alt={`${offer.agency?.agency_name} logo`}
+                    className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
+                  />
+                ))}
               </div>
-              <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                {likeCount} Likes
+            )}
+            {tour.offer_count < 3 ? (
+              role !== "tourist" && <div></div>
+            ) : (
+              <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
+                <IoCheckmarkCircleSharp className="mr-1" size={16} />
+                Offers completed
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col flex-grow p-4 space-y-1">
+          <div className="flex items-center justify-between">
+            <h3 className="lg:text-3xl text-2xl font-bold text-gray-900">
+              {tour.location_to}
+            </h3>
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-green-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-sm text-green-600 font-medium">
+                Real Request
               </span>
             </div>
-            <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-              <span>{tour.offer_count || 0} Offers</span>
-              <span>{shareCount} Shares</span>
-            </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-            <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
-              <button
-                onClick={() => handleLike(tour.id)}
-                disabled={isInteractLoading}
-                className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                  isLiked ? "text-blue-600" : "text-gray-600"
-                } hover:text-blue-600 transition-colors hover:cursor-pointer`}
-              >
-                <ThumbsUp
-                  className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                    isLiked ? "fill-current" : ""
-                  }`}
-                />
-                <span>{isLiked ? "Unlike" : "Like"}</span>
-              </button>
-              <button
-                onClick={() => handleShare(tour.id)}
-                disabled={isInteractLoading}
-                className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm hover:cursor-pointer ${
-                  isShared ? "text-blue-600" : "text-gray-600"
-                } hover:text-blue-600 transition-colors`}
-              >
-                <Share2
-                  className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                    isShared ? "fill-current" : ""
-                  }`}
-                />
-                <span>{isShared ? "Unshare" : "Share"}</span>
-              </button>
-            </div>
+          <div className="space-y-1 text-md text-gray-700">
+            <p>
+              <span className="font-medium">Date:</span> {tour.start_date} to{" "}
+              {tour.end_date || "N/A"} ({tour.duration || "N/A"})
+            </p>
+          </div>
+          <p>
+            <span className="font-medium">Categoria:</span> {tour.travel_type}
+          </p>
+
+          <div className="">
+            <p className="text-xl font-bold text-gray-900">
+              Budget: ${tour.budget}
+            </p>
           </div>
 
-          {role !== "tourist" && (
-            <div className="mt-6 border-t border-gray-200 pt-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Place Your Offer
-              </h3>
-              <div className="flex">
-                {/* <div className="w-9 h-9 mt-7 rounded-full overflow-hidden border border-gray-300">
-                  <img
-                    className="w-full"
-                    src={
-                      localStorage.getItem("user_image")
-                        ? `http://res.cloudinary.com/ds97wytcs${localStorage.getItem(
-                            "user_image"
-                          )}`
-                        : "http://res.cloudinary.com/ds97wytcs/image/upload/v1752053074/sjxpjoqalo27rqrn8hbd.jpg"
-                    }
-                    alt=""
-                  />
-                </div> */}
-                <form
-                  onSubmit={handleOfferSubmit}
-                  className=" rounded-xl mx-auto grow"
+          <div className="flex items-center justify-between">
+            <span className="text-md text-gray-700">
+              <span className="font-medium">Total:</span> {tour.total_members}{" "}
+              {tour.total_members > 1 ? "people" : "person"}
+            </span>
+            {/* <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              {tour.offer_count} Offer received
+            </span> */}
+          </div>
+
+          <div>
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <MapPin className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Points of travel:</span>{" "}
+                {tour.tourist_spots || "None"}
+              </span>
+            </p>
+
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <Navigation className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Departure from:</span>{" "}
+                {tour.location_from || "N/A"}
+              </span>
+            </p>
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <IoPersonSharp className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Contact verified via email</span>{" "}
+                {/* {tour.location_from || "N/A"} */}
+              </span>
+            </p>
+          </div>
+
+          <div className="pt-2 w-full">
+            <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
+              <DialogTrigger className="backdrop-blur-2xl" asChild>
+                <button
+                  onClick={handleSentOfferClick}
+                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
                 >
+                  Sent Offer
+                </button>
+              </DialogTrigger>
+              <DialogContent className="lg:w-96">
+                <button
+                  onClick={() => setIsPopupOpen(false)}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors"
+                  aria-label="Close"
+                >
+                  <X size={24} />
+                </button>
+                <h3 className="text-lg font-semibold text-gray-800 ">
+                  Place Your Offer
+                </h3>
+                <form onSubmit={handleOfferSubmit} className="space-y-2">
                   <div>
                     <label
                       htmlFor="budget"
-                      className="block lg:text-md   font-medium text-gray-700 mb-1"
+                      className="block text-md font-medium text-gray-700 mb-1"
                     >
                       Offer
                     </label>
@@ -500,7 +449,7 @@ function SinglePost({ prid }) {
                   <div>
                     <label
                       htmlFor="comment"
-                      className="block lg:text-md  font-medium text-gray-700 mb-1"
+                      className="block text-md font-medium text-gray-700 mb-1"
                     >
                       Message
                     </label>
@@ -516,7 +465,7 @@ function SinglePost({ prid }) {
                     />
                   </div>
 
-                  <div className="mt-4">
+                  <div className="">
                     <label className="flex items-center">
                       <input
                         type="checkbox"
@@ -526,7 +475,7 @@ function SinglePost({ prid }) {
                         onChange={handleOfferChange}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
-                      <span className="ml-2 lg:text-md  text-gray-700">
+                      <span className="ml-2 text-md text-gray-700">
                         Apply an additional discount
                       </span>
                     </label>
@@ -537,27 +486,22 @@ function SinglePost({ prid }) {
                     </p>
                   </div>
 
-                  <div className="mt-4 mb-2">
+                  <div className="">
                     <label
                       htmlFor="discount"
-                      className="block lg:text-md  font-medium text-gray-700 mb-1"
+                      className="block text-md font-medium text-gray-700 mb-1"
                     >
                       Discount
                     </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        name="discount"
-                        id="discount"
-                        value={offerForm.discount || ""}
-                        onChange={handleOfferChange}
-                        placeholder="Enter discount percentage"
-                        className="w-full px-4 py-2 pr-10 pl-8 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition "
-                      />
-                      {/* <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
-    %
-  </span> */}
-                    </div>
+                    <input
+                      type="number"
+                      name="discount"
+                      id="discount"
+                      value={offerForm.discount || ""}
+                      onChange={handleOfferChange}
+                      placeholder="Enter discount percentage"
+                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    />
                   </div>
 
                   <button
@@ -577,127 +521,119 @@ function SinglePost({ prid }) {
                     Submit Offer
                   </button>
                 </form>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 space-y-4">
-            {isUserLoading ? (
-              <div>Loading user data...</div>
-            ) : tour.offers && tour.offers.length > 0 ? (
-              tour.offers
-                .slice(0, expandedOffers ? tour.offers.length : 3)
-                .map((offer) => {
-                  console.log({
-                    userDataId: userData?.user_id,
-                    agencyUser: offer?.agency?.user,
-                    tourUser: tour.user,
-                    conditionResult:
-                      userData?.user_id &&
-                      offer?.agency?.user &&
-                      tour.user &&
-                      (userData.user_id === offer.agency.user ||
-                        userData.user_id === tour.user),
-                  });
-                  return userData?.user_id &&
-                    offer?.agency?.user &&
-                    tour.user &&
-                    (userData.user_id === offer.agency.user ||
-                      userData.user_id === tour.user) ? (
-                    <div
-                      key={offer.id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                        <img
-                          src={
-                            offer.agency?.logo_url ||
-                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                          }
-                          alt={`${
-                            offer.agency?.agency_name || "Unknown Agency"
-                          } avatar`}
-                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                        />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900">
-                              {offer.agency?.agency_name || "Unknown Agency"}
-                            </span>
-                            {offer.agency?.is_verified && (
-                              <span className="text-blue-500">
-                                <MdVerified
-                                  size={20}
-                                  className="sm:w-6 sm:h-6"
-                                />
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs sm:text-sm text-gray-600">
-                            {offer.message || "No message provided"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-3">
-                        <span className="font-semibold text-lg sm:text-xl">
-                          💰 ${offer.offered_budget || "N/A"}
-                        </span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleMessage(offer.agency?.user)}
-                            disabled={
-                              isInviteLoading ||
-                              isInteractLoading ||
-                              isOfferBudgetLoading ||
-                              isAcceptLoading ||
-                              !offer.agency?.user
-                            }
-                            className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                              isInviteLoading ||
-                              isInteractLoading ||
-                              isOfferBudgetLoading ||
-                              isAcceptLoading ||
-                              !offer.agency?.user
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
-                            }`}
+                <div className=" space-y-4">
+                  {isUserLoading ? (
+                    <div>Loading user data...</div>
+                  ) : tour.offers && tour.offers.length > 0 ? (
+                    tour.offers
+                      .slice(0, expandedOffers ? tour.offers.length : 3)
+                      .map((offer) => {
+                        return userData?.user_id &&
+                          offer?.agency?.user &&
+                          tour.user &&
+                          (userData.user_id === offer.agency.user ||
+                            userData.user_id === tour.user) ? (
+                          <div
+                            key={offer.id}
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
                           >
-                            {isInviteLoading ? "Sending..." : "Message"}
-                          </button>
-                          {tour.user === currentUserId && (
-                            <button
-                              onClick={() =>
-                                acceptOfferHandler(offer.id, tour.id)
-                              }
-                              disabled={isAcceptLoading}
-                              className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                isAcceptLoading
-                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                  : "bg-[#3776E2] text-white hover:bg-blue-700"
-                              }`}
-                            >
-                              Accept
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null;
-                })
-            ) : (
-              <p className="text-gray-600 text-sm">No offers available</p>
-            )}
-            {tour.offers?.length > 3 && (
-              <button
-                onClick={() => setExpandedOffers(!expandedOffers)}
-                className="text-blue-600 hover:underline text-sm"
-              >
-                {expandedOffers ? "Show Less" : "See More"}
-              </button>
-            )}
+                            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                              <img
+                                src={
+                                  offer.agency?.logo_url ||
+                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                }
+                                alt={`${
+                                  offer.agency?.agency_name || "Unknown Agency"
+                                } avatar`}
+                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                              />
+                              {/* <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-gray-900">
+                                    {offer.agency?.agency_name ||
+                                      "Unknown Agency"}
+                                  </span>
+                                  {offer.agency?.is_verified && (
+                                    <span className="text-blue-500">
+                                      <MdVerified
+                                        size={20}
+                                        className="sm:w-6 sm:h-6"
+                                      />
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs sm:text-sm text-gray-600">
+                                  {offer.message || "No message provided"}
+                                </p>
+                              </div> */}
+                            </div>
+                            <div className="flex items-center justify-between sm:justify-end gap-3">
+                              <span className="font-semibold text-lg sm:text-xl">
+                                💰 ${offer.offered_budget || "N/A"}
+                              </span>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleMessage(offer.agency?.user)
+                                  }
+                                  disabled={
+                                    isInviteLoading ||
+                                    isInteractLoading ||
+                                    isOfferBudgetLoading ||
+                                    isAcceptLoading ||
+                                    !offer.agency?.user
+                                  }
+                                  className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                    isInviteLoading ||
+                                    isInteractLoading ||
+                                    isOfferBudgetLoading ||
+                                    isAcceptLoading ||
+                                    !offer.agency?.user
+                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                      : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
+                                  }`}
+                                >
+                                  {isInviteLoading ? "Sending..." : "Message"}
+                                </button>
+                                {tour.user === currentUserId && (
+                                  <button
+                                    onClick={() =>
+                                      acceptOfferHandler(offer.id, tour.id)
+                                    }
+                                    disabled={isAcceptLoading}
+                                    className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                      isAcceptLoading
+                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                    }`}
+                                  >
+                                    Accept
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })
+                  ) : (
+                    <p className="text-gray-600 text-sm">No offers available</p>
+                  )}
+                  {tour.offers?.length > 3 && (
+                    <button
+                      onClick={() => setExpandedOffers(!expandedOffers)}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      {expandedOffers ? "Show Less" : "See More"}
+                    </button>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
+
       <ToastContainer />
     </div>
   );
