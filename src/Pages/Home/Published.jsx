@@ -105,24 +105,33 @@ const Published = () => {
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#4691F2]/10">
       <style jsx>{`
-        .mySwiper {
-          padding: 0 10px;
-        }
-        .swiper-slide {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .swiper-pagination {
-          position: relative;
-          margin-top: 10px;
-        }
-        .swiper-button-prev,
-        .swiper-button-next {
-          color: #3182ce;
-          transform: scale(0.8);
-        }
-      `}</style>
+  .mySwiper {
+    padding: 0 10px;
+  }
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .swiper-pagination {
+    position: relative;
+    margin-top: 10px;
+  }
+  .swiper-button-prev,
+  .swiper-button-next {
+    color: #3182ce;
+    transform: scale(0.8);
+  }
+  @media (max-width: 480px) {
+    .swiper-slide {
+      width: 100% !important;
+    }
+    .swiper-slide > div {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+`}</style>
 
       {/* .slick-dots {
         display: none !important;
@@ -159,10 +168,6 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  
-
-                  
-
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
@@ -178,7 +183,7 @@ const Published = () => {
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
                       768: { slidesPerView: 3, spaceBetween: 10 },
-                      320: { slidesPerView: 2, spaceBetween: 8 },
+                      320: { slidesPerView: 1, spaceBetween: 8 },
                     }}
                     loop={true}
                     className="mySwiper"
@@ -200,10 +205,6 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  
-
-                  
-
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
@@ -219,7 +220,7 @@ const Published = () => {
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
                       768: { slidesPerView: 3, spaceBetween: 10 },
-                      320: { slidesPerView: 2, spaceBetween: 8 },
+                      320: { slidesPerView: 1, spaceBetween: 8 },
                     }}
                     loop={true}
                     className="mySwiper"
@@ -241,10 +242,6 @@ const Published = () => {
                 </h2>
 
                 <div className="relative">
-                  
-
-                  
-
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
@@ -260,7 +257,7 @@ const Published = () => {
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
                       768: { slidesPerView: 3, spaceBetween: 10 },
-                      320: { slidesPerView: 2, spaceBetween: 8 },
+                      320: { slidesPerView: 1, spaceBetween: 8 },
                     }}
                     loop={true}
                     className="mySwiper"
@@ -298,7 +295,7 @@ const Published = () => {
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
                       768: { slidesPerView: 3, spaceBetween: 10 },
-                      320: { slidesPerView: 2, spaceBetween: 8 },
+                      320: { slidesPerView: 1, spaceBetween: 8 },
                     }}
                     loop={true}
                     className="mySwiper"

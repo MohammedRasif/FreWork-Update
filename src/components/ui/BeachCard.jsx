@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SinglePost from "@/Pages/SinglePost/SinglePost";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { MapPin, Navigation } from "lucide-react";
@@ -41,6 +41,10 @@ export default function TourCard({ tourPlan }) {
     setIsModalOpen(false);
   };
 
+  const handleViewDetails = () => {
+    navigate(`/tour-plans/${localTourPlan.id}`);
+  };
+
   if (!isLocalStorageLoaded) {
     return <div>Loading user data...</div>;
   }
@@ -68,7 +72,16 @@ export default function TourCard({ tourPlan }) {
             </div>
             {/* Display agency logos */}
             {localTourPlan.offers && localTourPlan.offers.length > 0 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-1">
+              <div
+                className="
+    absolute bottom-4
+    left-2/5 -translate-x-2/5
+    flex items-center space-x-1
+    overflow-x-auto
+    px-2
+    scrollbar-none
+  "
+              >
                 {localTourPlan.offers.map((offer) => (
                   <img
                     key={offer.agency.id}
@@ -77,7 +90,11 @@ export default function TourCard({ tourPlan }) {
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
                     alt={`${offer.agency.agency_name} logo`}
-                    className="w-11 h-11 object-contain rounded-full border-1 border-white bg-white"
+                    className="
+        w-12 h-12
+        object-contain rounded-full border border-white bg-white
+        flex-shrink-0
+      "
                   />
                 ))}
               </div>
@@ -90,7 +107,7 @@ export default function TourCard({ tourPlan }) {
             <h3 className="text-xl font-bold text-gray-900">
               {localTourPlan.location_to}
             </h3>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <svg
                 className="w-5 h-5 text-green-500"
                 fill="currentColor"
@@ -105,7 +122,7 @@ export default function TourCard({ tourPlan }) {
               <span className="text-sm text-green-600 font-medium">
                 Richiesta reale
               </span>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-1 text-sm text-gray-700">
@@ -117,16 +134,10 @@ export default function TourCard({ tourPlan }) {
                 : "N/A"}{" "}
               ({localTourPlan.duration})
             </p>
-
             {/* <p>
-              <span className="font-medium">Include:</span>{" "}
-              {localTourPlan.included ||
-                "Round-trip flight + Hotel + Transfers"}
-            </p> */}
-            <p>
               <span className="font-medium">Categoria:</span>{" "}
               {localTourPlan.travel_type}
-            </p>
+            </p> */}
           </div>
 
           <div className="">
@@ -141,12 +152,12 @@ export default function TourCard({ tourPlan }) {
               {localTourPlan.total_members}{" "}
               {localTourPlan.total_members > 1 ? "persone" : "persona"}
             </span>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            {/* <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
               {localTourPlan.offer_count} Offer received
-            </span>
+            </span> */}
           </div>
 
-          <p className="text-sm text-gray-600 flex items-center gap-2">
+          {/* <p className="text-sm text-gray-600 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-gray-500" />
             <span>
               <span className="font-medium">Points of travel:</span>{" "}
@@ -160,30 +171,21 @@ export default function TourCard({ tourPlan }) {
               <span className="font-medium">Departure from:</span>{" "}
               {localTourPlan.location_from}
             </span>
-          </p>
-
-          {/* Accommodation type example */}
-          {/* <p className="text-sm text-gray-600 flex items-center gap-2">
-    <Hotel className="w-4 h-4 text-gray-500" />
-    <span>
-      <span className="font-medium">Accommodation type:</span>{" "}
-      {localTourPlan.accommodation_type || "4★ Hotel"}
-    </span>
-  </p> */}
+          </p> */}
 
           <div
             className={
               localTourPlan.offer_count < 3
                 ? "pt-2 w-full relative"
-                : "pt-2 w-full "
+                : "pt-2 w-full"
             }
           >
-            <Link
-              to={`/tour-plans/${localTourPlan.id}`}
+            <button
+              onClick={handleViewDetails}
               className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
             >
               View Details
-            </Link>
+            </button>
 
             {localTourPlan.offer_count < 3 ? (
               role !== "tourist" && <div></div>

@@ -68,6 +68,11 @@ const Navbar = () => {
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("name");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_image");
     setIsProfileOpen(false);
     setIsOpen(false);
     navigate("/login");

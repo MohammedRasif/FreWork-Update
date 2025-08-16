@@ -12,6 +12,7 @@ import { ThumbsUp, Share2 } from "lucide-react";
 import { MdOutlineKeyboardBackspace, MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
@@ -198,6 +199,7 @@ function SinglePost({ prid }) {
         data: {
           offered_budget: parseFloat(offerForm.budget),
           message: offerForm.comment,
+          discount_percentage: offerForm.discount || 0,
         },
       }).unwrap();
       const newOffer = {
@@ -332,7 +334,7 @@ function SinglePost({ prid }) {
               <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 lg:my-2 lg:mt-0">
                 {tour.location_to || "Unknown Destination"}
               </h2>
-              {/* <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+              <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                 <p className="text-[16px]">
                   Willing to go on{" "}
                   <span className="font-medium">
@@ -349,17 +351,17 @@ function SinglePost({ prid }) {
                   Category:{" "}
                   <span className="font-medium">{tour.category || "N/A"}</span>
                 </p>
-              </div> */}
+              </div>
             </div>
             <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
-              {/* <div>
+              <div>
                 <p className="text-[16px] lg:text-lg font-bold text-gray-700">
                   Budget ${tour.budget || "N/A"}
                 </p>
                 <p className="text-[16px] lg:text-md text-gray-800">
                   Total {tour.total_members || "N/A"} person
                 </p>
-              </div> */}
+              </div>
             </div>
           </div>
 
@@ -369,7 +371,7 @@ function SinglePost({ prid }) {
             </p>
           </div>
 
-          {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
             <p className="text-[16px] lg:text-lg font-medium text-gray-700">
               Interested Travel Points:
             </p>
@@ -390,9 +392,9 @@ function SinglePost({ prid }) {
                 </span>
               )}
             </div>
-          </div> */}
+          </div>
 
-          {/* <div className="mb-4">
+          <div className="mb-4">
             <img
               src={
                 tour.spot_picture_url ||
@@ -401,9 +403,9 @@ function SinglePost({ prid }) {
               alt="Tour destination"
               className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
             />
-          </div> */}
+          </div>
 
-          {/* <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center">
                 <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
@@ -418,9 +420,9 @@ function SinglePost({ prid }) {
               <span>{tour.offer_count || 0} Offers</span>
               <span>{shareCount} Shares</span>
             </div>
-          </div> */}
+          </div>
 
-          {/* <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
               <button
                 onClick={() => handleLike(tour.id)}
@@ -451,7 +453,7 @@ function SinglePost({ prid }) {
                 <span>{isShared ? "Unshare" : "Share"}</span>
               </button>
             </div>
-          </div> */}
+          </div>
 
           {role !== "tourist" && (
             <div className="mt-6 border-t border-gray-200 pt-4">
@@ -542,15 +544,20 @@ function SinglePost({ prid }) {
                     >
                       Discount
                     </label>
-                    <input
-                      type="number"
-                      name="discount"
-                      id="discount"
-                      value={offerForm.discount || ""}
-                      onChange={handleOfferChange}
-                      placeholder="Enter discount percentage"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    />
+                    <div className="relative">
+                      <input
+                        type="number"
+                        name="discount"
+                        id="discount"
+                        value={offerForm.discount || ""}
+                        onChange={handleOfferChange}
+                        placeholder="Enter discount percentage"
+                        className="w-full px-4 py-2 pr-10 pl-8 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition "
+                      />
+                      {/* <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
+    %
+  </span> */}
+                    </div>
                   </div>
 
                   <button
@@ -691,6 +698,7 @@ function SinglePost({ prid }) {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

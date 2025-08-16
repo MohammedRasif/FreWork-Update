@@ -47,11 +47,14 @@ const TourPlanWithPopup = () => {
   });
   const [offerComment, setOfferComment] = useState("");
   const [tourPlanPublicUser, setTourPlanPublicUser] = useState({});
+
+  // Add this to the state declarations at the top of the component (if not already present)
   const [offerForm, setOfferForm] = useState({
     applyDiscount: false,
     discount: "",
   });
 
+  // Add this handler function to manage offer form changes (if not already present)
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
     setOfferForm((prev) => ({
@@ -234,6 +237,7 @@ const TourPlanWithPopup = () => {
           is_verified: false,
         },
       };
+
       // Update tours state
       setTours((prevTours) =>
         prevTours.map((tour) =>
@@ -274,7 +278,6 @@ const TourPlanWithPopup = () => {
       );
     }
   };
-
   const handleLike = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -533,7 +536,7 @@ const TourPlanWithPopup = () => {
               </p>
             </div>
 
-            <div className="space-y-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {isTourPlanPublicLoading || isFilteredLoading ? (
                 <div>
                   <FullScreenInfinityLoader />
@@ -546,335 +549,325 @@ const TourPlanWithPopup = () => {
                     100
                   );
                   return (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
-                      {tours.map((tour) => (
-                        <div
-                          key={tour.id}
-                          className="rounded-lg bg-white shadow-sm border border-gray-200"
-                        >
-                          <div className="p-3 sm:p-4 lg:p-6">
-                            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
-                              <div className="flex-1">
-                                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
-                                  {tour.location_to}
-                                </h2>
-                                <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                                  <p>
-                                    Willing to go on{" "}
-                                    <span className="font-medium">
-                                      {tour.start_date}
-                                    </span>
-                                  </p>
-                                  <p>
-                                    Include:{" "}
-                                    <span className="font-medium">
-                                      {tour.duration}
-                                    </span>
-                                  </p>
-                                  <p>
-                                    Category:{" "}
-                                    <span className="font-medium">
-                                      {tour.category}
-                                    </span>
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
-                                <div>
-                                  <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                                    Budget ${tour.budget}
-                                  </p>
-                                  <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                                    Total {tour.total_members} person
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="mb-4">
-                              <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                                {expandedDescriptions[tour.id]
-                                  ? tour.description
-                                  : truncated}
-                                {isTruncated &&
-                                  !expandedDescriptions[tour.id] && (
-                                    <button
-                                      onClick={() => toggleDescription(tour.id)}
-                                      className="text-blue-600 hover:underline text-sm ml-1"
-                                    >
-                                      See More
-                                    </button>
-                                  )}
-                                {isTruncated &&
-                                  expandedDescriptions[tour.id] && (
-                                    <button
-                                      onClick={() => toggleDescription(tour.id)}
-                                      className="text-blue-600 hover:underline text-sm ml-1"
-                                    >
-                                      Show Less
-                                    </button>
-                                  )}
-                              </p>
-                            </div>
-
-                            <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                              <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
-                                Interested Travel Points:
-                              </p>
-                              <div className="flex flex-wrap gap-1">
-                                {tour.tourist_spots ? (
-                                  tour.tourist_spots
-                                    .split(",")
-                                    .map((location, index) => (
-                                      <span
-                                        key={index}
-                                        className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-                                      >
-                                        {location.trim()}
-                                        {index <
-                                          tour.tourist_spots.split(",").length -
-                                            1 && ", "}
-                                      </span>
-                                    ))
-                                ) : (
-                                  <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                                    None
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="mb-4">
-                              <img
-                                src={
-                                  tour.spot_picture_url ||
-                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                }
-                                alt="Tour destination"
-                                className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
-                              />
-                            </div>
-
-                            <div className="flex items-center justify-between py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center">
-                                  <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                                    <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                                  </div>
-                                  <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                                    <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                                  </div>
-                                </div>
-                                <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
-                                  {likeCount} Likes
+                    <div
+                      key={tour.id}
+                      className="rounded-lg bg-white shadow-sm border border-gray-200"
+                    >
+                      <div className="p-3 sm:p-4 lg:p-6">
+                        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
+                          <div className="flex-1">
+                            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
+                              {tour.location_to}
+                            </h2>
+                            <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                              <p>
+                                Willing to go on{" "}
+                                <span className="font-medium">
+                                  {tour.start_date}
                                 </span>
-                              </div>
-                              <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-                                <span>{tour.offer_count} Offers</span>
-                                <span>{shareCount} Shares</span>
-                              </div>
+                              </p>
+                              <p>
+                                Include:{" "}
+                                <span className="font-medium">
+                                  {tour.duration}
+                                </span>
+                              </p>
+                              <p>
+                                Category:{" "}
+                                <span className="font-medium">
+                                  {tour.category}
+                                </span>
+                              </p>
                             </div>
-
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                              <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
-                                <button
-                                  onClick={() => handleLike(tour.id)}
-                                  disabled={isInteractLoading}
-                                  className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                                    isLiked[tour.id]
-                                      ? "text-blue-600"
-                                      : "text-gray-600"
-                                  } hover:text-blue-600 transition-colors hover:cursor-pointer`}
-                                >
-                                  <ThumbsUp
-                                    className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                                      isLiked[tour.id] ? "fill-current" : ""
-                                    }`}
-                                  />
-                                  <span>
-                                    {isLiked[tour.id] ? "Unlike" : "Like"}
-                                  </span>
-                                </button>
-                                <button
-                                  onClick={() => openPopup(tour)}
-                                  className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                                >
-                                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
-                                  <span>Comments</span>
-                                </button>
-                                <button
-                                  onClick={() => handleShare(tour.id)}
-                                  disabled={isInteractLoading}
-                                  className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                                    isShared[tour.id]
-                                      ? "text-gray-600"
-                                      : "text-gray-600"
-                                  } hover:text-blue-600 transition-colors`}
-                                >
-                                  <Share2
-                                    className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                                      isShared[tour.id] ? "" : ""
-                                    }`}
-                                  />
-                                  <span>
-                                    {isShared[tour.id] ? "Share" : "Share"}
-                                  </span>
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="mt-4 space-y-4">
-                              {tour.offers
-                                .slice(
-                                  0,
-                                  expandedOffers[tour.id]
-                                    ? tour.offers.length
-                                    : 3
-                                )
-                                .map((offer) => {
-                                  const { truncated, isTruncated } =
-                                    truncateText(offer.message, 30);
-                                  return userData?.user_id &&
-                                    offer?.agency?.user &&
-                                    tourPlanPublicUser[tour.id] &&
-                                    (userData.user_id === offer.agency.user ||
-                                      userData.user_id ===
-                                        tourPlanPublicUser[tour.id]) ? (
-                                    <div
-                                      key={offer.id}
-                                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
-                                    >
-                                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                                        <img
-                                          src={
-                                            offer.agency.logo_url ||
-                                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                          }
-                                          alt={`${offer.agency.agency_name} avatar`}
-                                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                                        />
-                                        <div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-medium text-gray-900">
-                                              {offer.agency.agency_name}
-                                            </span>
-                                            {offer.agency.is_verified && (
-                                              <div className="flex space-x-1">
-                                                <span className="text-blue-500">
-                                                  <MdVerified
-                                                    size={20}
-                                                    className="sm:w-6 sm:h-6"
-                                                  />
-                                                </span>
-                                              </div>
-                                            )}
-                                          </div>
-                                          <p className="text-xs sm:text-sm text-gray-600">
-                                            {expandedOfferMessages[offer.id]
-                                              ? offer.message
-                                              : truncated}
-                                            {isTruncated &&
-                                              !expandedOfferMessages[
-                                                offer.id
-                                              ] && (
-                                                <button
-                                                  onClick={() =>
-                                                    toggleOfferMessage(offer.id)
-                                                  }
-                                                  className="text-blue-600 hover:underline text-sm ml-1"
-                                                >
-                                                  See More
-                                                </button>
-                                              )}
-                                            {isTruncated &&
-                                              expandedOfferMessages[
-                                                offer.id
-                                              ] && (
-                                                <button
-                                                  onClick={() =>
-                                                    toggleOfferMessage(offer.id)
-                                                  }
-                                                  className="text-blue-600 hover:underline text-sm ml-1"
-                                                >
-                                                  Show Less
-                                                </button>
-                                              )}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center justify-between sm:justify-end gap-3">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-semibold text-lg sm:text-xl">
-                                            💰 ${offer.offered_budget}
-                                          </span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                          <button
-                                            onClick={() => {
-                                              if (!token) {
-                                                navigate("/login");
-                                              } else {
-                                                const userId = tour.user;
-                                                if (userId) {
-                                                  handleMessage({
-                                                    other_user_id: userId,
-                                                  });
-                                                } else {
-                                                  console.error(
-                                                    "User ID not found in tour"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                            className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
-                                            aria-label={`Message ${
-                                              offer.agency.agency_name ||
-                                              "Agency"
-                                            }`}
-                                          >
-                                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                                            <span className="text-sm sm:text-base font-medium">
-                                              Message
-                                            </span>
-                                          </button>
-                                          {tour.user ==
-                                            localStorage.getItem("user_id") && (
-                                            <button
-                                              onClick={() =>
-                                                acceptOfferHandler(
-                                                  offer.id,
-                                                  tour.id
-                                                )
-                                              }
-                                              disabled={isAcceptLoading}
-                                              className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                                isAcceptLoading
-                                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                  : "bg-[#3776E2] text-white hover:bg-blue-700"
-                                              }`}
-                                            >
-                                              Accept
-                                            </button>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ) : null;
-                                })}
-                              {tour.offers.length > 3 && (
-                                <button
-                                  onClick={() => toggleOffers(tour.id)}
-                                  className="text-blue-600 hover:underline text-sm"
-                                >
-                                  {expandedOffers[tour.id]
-                                    ? "Show Less"
-                                    : "See More"}
-                                </button>
-                              )}
+                          </div>
+                          <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
+                            <div>
+                              <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
+                                Budget ${tour.budget}
+                              </p>
+                              <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                                Total {tour.total_members} person
+                              </p>
                             </div>
                           </div>
                         </div>
-                      ))}
+
+                        <div className="mb-4">
+                          <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
+                            {expandedDescriptions[tour.id]
+                              ? tour.description
+                              : truncated}
+                            {isTruncated && !expandedDescriptions[tour.id] && (
+                              <button
+                                onClick={() => toggleDescription(tour.id)}
+                                className="text-blue-600 hover:underline text-sm ml-1"
+                              >
+                                See More
+                              </button>
+                            )}
+                            {isTruncated && expandedDescriptions[tour.id] && (
+                              <button
+                                onClick={() => toggleDescription(tour.id)}
+                                className="text-blue-600 hover:underline text-sm ml-1"
+                              >
+                                Show Less
+                              </button>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                          <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
+                            Interested Travel Points:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {tour.tourist_spots ? (
+                              tour.tourist_spots
+                                .split(",")
+                                .map((location, index) => (
+                                  <span
+                                    key={index}
+                                    className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                  >
+                                    {location.trim()}
+                                    {index <
+                                      tour.tourist_spots.split(",").length -
+                                        1 && ", "}
+                                  </span>
+                                ))
+                            ) : (
+                              <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
+                                None
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <img
+                            src={
+                              tour.spot_picture_url ||
+                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                            }
+                            alt="Tour destination"
+                            className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                                <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                              </div>
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
+                                <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                              </div>
+                            </div>
+                            <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
+                              {likeCount} Likes
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
+                            <span>{tour.offer_count} Offers</span>
+                            <span>{shareCount} Shares</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                          <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
+                            <button
+                              onClick={() => handleLike(tour.id)}
+                              disabled={isInteractLoading}
+                              className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                                isLiked[tour.id]
+                                  ? "text-blue-600"
+                                  : "text-gray-600"
+                              } hover:text-blue-600 transition-colors hover:cursor-pointer`}
+                            >
+                              <ThumbsUp
+                                className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                                  isLiked[tour.id] ? "fill-current" : ""
+                                }`}
+                              />
+                              <span>
+                                {isLiked[tour.id] ? "Unlike" : "Like"}
+                              </span>
+                            </button>
+                            <button
+                              onClick={() => openPopup(tour)}
+                              className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                            >
+                              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
+                              <span>Comments</span>
+                            </button>
+                            <button
+                              onClick={() => handleShare(tour.id)}
+                              disabled={isInteractLoading}
+                              className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                                isShared[tour.id]
+                                  ? "text-gray-600"
+                                  : "text-gray-600"
+                              } hover:text-blue-600 transition-colors`}
+                            >
+                              <Share2
+                                className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                                  isShared[tour.id] ? "" : ""
+                                }`}
+                              />
+                              <span>
+                                {isShared[tour.id] ? "Share" : "Share"}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                        <p></p>
+
+                        <div className="mt-4 space-y-4">
+                          {tour.offers
+                            .slice(
+                              0,
+                              expandedOffers[tour.id] ? tour.offers.length : 3
+                            )
+                            .map((offer) => {
+                              const { truncated, isTruncated } = truncateText(
+                                offer.message,
+                                30
+                              );
+                              return userData?.user_id &&
+                                offer?.agency?.user &&
+                                tourPlanPublicUser[tour.id] &&
+                                (userData.user_id === offer.agency.user ||
+                                  userData.user_id ===
+                                    tourPlanPublicUser[tour.id]) ? (
+                                <div
+                                  key={offer.id}
+                                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50"
+                                >
+                                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                                    <img
+                                      src={
+                                        offer.agency.logo_url ||
+                                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                      }
+                                      alt={`${offer.agency.agency_name} avatar`}
+                                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                                    />
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium text-gray-900">
+                                          {offer.agency.agency_name}
+                                        </span>
+                                        {offer.agency.is_verified && (
+                                          <div className="flex space-x-1">
+                                            <span className="text-blue-500">
+                                              <MdVerified
+                                                size={20}
+                                                className="sm:w-6 sm:h-6"
+                                              />
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <p className="text-xs sm:text-sm text-gray-600">
+                                        {expandedOfferMessages[offer.id]
+                                          ? offer.message
+                                          : truncated}
+                                        {isTruncated &&
+                                          !expandedOfferMessages[offer.id] && (
+                                            <button
+                                              onClick={() =>
+                                                toggleOfferMessage(offer.id)
+                                              }
+                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                            >
+                                              See More
+                                            </button>
+                                          )}
+                                        {isTruncated &&
+                                          expandedOfferMessages[offer.id] && (
+                                            <button
+                                              onClick={() =>
+                                                toggleOfferMessage(offer.id)
+                                              }
+                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                            >
+                                              Show Less
+                                            </button>
+                                          )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-semibold text-lg sm:text-xl">
+                                        💰 ${offer.offered_budget}
+                                      </span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => {
+                                          if (!token) {
+                                            navigate("/login");
+                                          } else {
+                                            const userId = tour.user; // Use tour.user instead of tourPlanPublic[0]?.user
+                                            if (userId) {
+                                              handleMessage({
+                                                other_user_id: userId,
+                                              });
+                                            } else {
+                                              console.error(
+                                                "User ID not found in tour"
+                                              );
+                                            }
+                                          }
+                                        }}
+                                        className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+                                        aria-label={`Message ${
+                                          offer.agency.agency_name || "Agency"
+                                        }`}
+                                      >
+                                        <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="text-sm sm:text-base font-medium">
+                                          Message
+                                        </span>
+                                      </button>
+                                      {tour.user ==
+                                        localStorage.getItem("user_id") && (
+                                        <button
+                                          onClick={() =>
+                                            acceptOfferHandler(
+                                              offer.id,
+                                              tour.id
+                                            )
+                                          }
+                                          disabled={isAcceptLoading}
+                                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
+                                            isAcceptLoading
+                                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                              : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                          }`}
+                                        >
+                                          Accept
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : null;
+                            })}
+                          {tour.offers.length > 3 && (
+                            <button
+                              onClick={() => toggleOffers(tour.id)}
+                              className="text-blue-600 hover:underline text-sm"
+                            >
+                              {expandedOffers[tour.id]
+                                ? "Show Less"
+                                : "See More"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   );
                 })
@@ -885,7 +878,7 @@ const TourPlanWithPopup = () => {
           </div>
 
           <div
-            className={`w-full md:w-1/4 lg:w-1/5 order-1 md:order-2 lg:mt-32 ${
+            className={`w-full md:w-1/4 lg:w-1/5 order-1 md:order-2 lg:mt-24 ${
               isMobileFilterOpen ? "block" : "hidden md:block"
             }`}
           >
@@ -980,7 +973,7 @@ const TourPlanWithPopup = () => {
 
       {isPopupOpen && selectedTour && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">
                 Tour Details
@@ -1315,7 +1308,7 @@ const TourPlanWithPopup = () => {
                     </div>
 
                     <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
-                      <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
+                      {/* <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
                         <img
                           src={
                             localStorage.getItem("user_image" == null) ||
@@ -1324,7 +1317,7 @@ const TourPlanWithPopup = () => {
                           alt="User avatar"
                           className="rounded-full w-10 h-10 sm:w-11 sm:h-11"
                         />
-                      </div>
+                      </div> */}
                       <div className="flex-1 w-full">
                         <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
                           Place your offer

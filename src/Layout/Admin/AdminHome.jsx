@@ -23,15 +23,18 @@ const AdminHome = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLiked, setIsLiked] = useState({});
   const [isShared, setIsShared] = useState({});
-  const [likeCounts, setLikeCounts] = useState({}); // New state for like counts
+  const [likeCounts, setLikeCounts] = useState({});
   const [offerBudget, setOfferBudget] = useState(0);
   const [offerComment, setOfferComment] = useState("");
+  const [offerForm, setOfferForm] = useState({
+    applyDiscount: false,
+    discount: "",
+  });
   const popupRef = useRef(null);
   const navigate = useNavigate();
 
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
-    console.log(tourPlanPublic)
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
@@ -64,6 +67,13 @@ const AdminHome = () => {
     }
   }, [tourPlanPublic, currentUserId]);
 
+  // Force re-render of selectedPlan when likeCounts change
+  useEffect(() => {
+    if (selectedPlan) {
+      setSelectedPlan((prev) => ({ ...prev }));
+    }
+  }, [likeCounts, selectedPlan?.id]);
+
   // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -72,6 +82,7 @@ const AdminHome = () => {
         setSelectedPlan(null);
         setOfferBudget(0);
         setOfferComment("");
+        setOfferForm({ applyDiscount: false, discount: "" });
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -132,10 +143,8 @@ const AdminHome = () => {
         id: planId,
         data: { interaction_type: "like" },
       }).unwrap();
-      // toast.success(wasLiked ? "Unliked" : "Liked");
     } catch (error) {
       console.error("Failed to update like:", error);
-      // Revert optimistic updates on failure
       setLikeCounts({ ...likeCounts, [planId]: likeCounts[planId] });
       setIsLiked({ ...isLiked, [planId]: wasLiked });
       if (selectedPlan && selectedPlan.id === planId) {
@@ -157,7 +166,6 @@ const AdminHome = () => {
             : prev
         );
       }
-      // toast.error("Failed to update like");
     }
   };
 
@@ -211,11 +219,18 @@ const AdminHome = () => {
     }
   };
 
+  // Handle offer form changes
+  const handleOfferChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setOfferForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
-    console.log(token,'hgggggggggggggggggggg')
     if (!token) {
-      // navigate("/login");
       toast.error("Please log in to submit an offer");
       return;
     }
@@ -225,19 +240,35 @@ const AdminHome = () => {
       return;
     }
 
+    if (offerForm.applyDiscount && (!offerForm.discount || offerForm.discount <= 0)) {
+      toast.error("Please provide a valid discount percentage");
+      return;
+    }
+
     try {
+      const offerData = {
+        offered_budget: parseFloat(budget),
+        message: comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : 0,
+      };
+
       await offerBudgetToBack({
         id: planId,
-        data: { offered_budget: parseFloat(budget), message: comment },
+        data: offerData,
       }).unwrap();
 
       const newOffer = {
-        id: currentUserId,
+        id: `${currentUserId}-${Date.now()}`,
         offered_budget: parseFloat(budget),
         message: comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : 0,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url: localStorage.getItem("user_image") || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           is_verified: false,
         },
       };
@@ -256,6 +287,7 @@ const AdminHome = () => {
 
       setOfferBudget(0);
       setOfferComment("");
+      setOfferForm({ applyDiscount: false, discount: "" });
       toast.success("Offer submitted successfully");
     } catch (error) {
       console.error("Failed to submit offer:", error);
@@ -268,7 +300,7 @@ const AdminHome = () => {
 
   // Open/close popup
   const openPopup = (plan) => {
-    setSelectedPlan({ ...plan, interactions: plan.interactions || [] });
+    setSelectedPlan({ ...plan, interactions: plan.interactions || [], offers: plan.offers || [] });
     setIsPopupOpen(true);
   };
 
@@ -277,6 +309,7 @@ const AdminHome = () => {
     setSelectedPlan(null);
     setOfferBudget(0);
     setOfferComment("");
+    setOfferForm({ applyDiscount: false, discount: "" });
   };
 
   // Calculate interaction counts
@@ -458,7 +491,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div className="min-h-screen  ">
+    <div className="min-h-screen">
       <Toaster />
       <div className="flex flex-col lg:flex-row">
         {/* Main Content */}
@@ -582,7 +615,7 @@ const AdminHome = () => {
                       <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                         {selectedPlan.location_to}
                       </h2>
-                      <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      {/* <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                         <p>
                           Willing to go on{" "}
                           <span className="font-medium">
@@ -601,9 +634,9 @@ const AdminHome = () => {
                             {selectedPlan.category}
                           </span>
                         </p>
-                      </div>
+                      </div> */}
                     </div>
-                    <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
+                    {/* <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                       <div>
                         <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
                           Budget ${selectedPlan.budget}
@@ -612,14 +645,14 @@ const AdminHome = () => {
                           Total {selectedPlan.total_members} person
                         </p>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="mb-4">
                     <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
                       {selectedPlan.description}
                     </p>
                   </div>
-                  <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                  {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                     <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
                       Interested Travel Points:
                     </p>
@@ -644,7 +677,7 @@ const AdminHome = () => {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </div> */}
                   <div className="mb-4">
                     <img
                       src={selectedPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
@@ -693,13 +726,13 @@ const AdminHome = () => {
                           {isLiked[selectedPlan.id] ? "Unlike" : "Like"}
                         </span>
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => openPopup(selectedPlan)}
                         className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                       >
                         <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
                         <span>Offers</span>
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleShare(selectedPlan.id)}
                         disabled={isInteractLoading}
@@ -721,7 +754,7 @@ const AdminHome = () => {
                     </div>
                   </div>
                   <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
-                    <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
+                    {/* <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
                       <img
                         src={
                           localStorage.getItem("user_image") ||
@@ -730,7 +763,7 @@ const AdminHome = () => {
                         alt="User avatar"
                         className="rounded-full w-10 h-10 sm:w-11 sm:h-11"
                       />
-                    </div>
+                    </div> */}
                     <div className="flex-1 w-full">
                       <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
                         Place your offer
@@ -750,6 +783,44 @@ const AdminHome = () => {
                           className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                           rows="4"
                         />
+                        <div className="mt-4">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="applyDiscount"
+                              id="applyDiscount"
+                              checked={offerForm.applyDiscount}
+                              onChange={handleOfferChange}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <span className="ml-2 lg:text-md text-gray-700">
+                              Apply an additional discount
+                            </span>
+                          </label>
+                          <p className="text-xs text-gray-500 mt-1">
+                            The site automatically suggests to visitors to request
+                            an additional discount, increasing conversions by 30%.
+                            If you want to offer more, do so by checking this.
+                          </p>
+                        </div>
+                        <div className="mt-4 mb-2">
+                          <label
+                            htmlFor="discount"
+                            className="block lg:text-md font-medium text-gray-700 mb-1"
+                          >
+                            Discount
+                          </label>
+                          <input
+                            type="number"
+                            name="discount"
+                            id="discount"
+                            value={offerForm.discount}
+                            onChange={handleOfferChange}
+                            placeholder="Enter discount percentage"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            disabled={!offerForm.applyDiscount}
+                          />
+                        </div>
                         <button
                           onClick={() =>
                             handleSubmitOffer(
@@ -771,6 +842,45 @@ const AdminHome = () => {
                       </div>
                     </div>
                   </div>
+                  {selectedPlan.offers && selectedPlan.offers.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                        Offers
+                      </h3>
+                      {selectedPlan.offers.map((offer) => (
+                        <div
+                          key={offer.id}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
+                        >
+                          <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                            <img
+                              src={offer.agency.logo_url}
+                              alt={`${offer.agency.agency_name} avatar`}
+                              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                            />
+                            <div>
+                              <span className="font-medium text-gray-900">
+                                {offer.agency.agency_name}
+                              </span>
+                              <p className="text-xs sm:text-sm text-gray-600">
+                                {offer.message}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-lg sm:text-xl">
+                              ${offer.offered_budget}
+                            </span>
+                            {offer.apply_discount && offer.discount > 0 && (
+                              <span className="text-sm text-green-600">
+                                ({offer.discount}% off)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
