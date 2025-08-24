@@ -29,7 +29,7 @@ const Navbar = () => {
       setActiveLink("membership");
     } else if (pathname === "/pricing") {
       setActiveLink("agencies");
-    } else if (pathname === "/tourPlan") {
+    } else if (pathname === "/s") {
       setActiveLink("tours");
     } else if (pathname === "/contact") {
       setActiveLink("contact");
@@ -173,13 +173,13 @@ const Navbar = () => {
           Membership Plans
         </NavLink>
         <NavLink
-          to="/tourPlan"
+          to="/tourPlans"
           className={`text-base text-[20px] font-medium ${
             activeLink === "tours"
               ? "text-[#2464EC] border-b-2 border-[#2464EC]"
               : "text-gray-700 hover:text-blue-600"
           }`}
-          onClick={() => handleLinkClick("tours", "/tourPlan")}
+          onClick={() => handleLinkClick("tours", "/tourPlans")}
         >
           Tour Plans
         </NavLink>
@@ -301,13 +301,13 @@ const Navbar = () => {
                 Membership Plans
               </NavLink>
               <NavLink
-                to="/tourPlan"
+                to="/tourPlans"
                 className={`text-base text-[20px] font-medium ${
                   activeLink === "tours"
                     ? "text-[#2464EC] border-b-2 border-[#2464EC]"
                     : "text-gray-700 hover:text-blue-600"
                 }`}
-                onClick={() => handleLinkClick("tours", "/tourPlan")}
+                onClick={() => handleLinkClick("tours", "/tourPlans")}
               >
                 Tour Plans
               </NavLink>

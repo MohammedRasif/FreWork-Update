@@ -33,6 +33,7 @@ import SinglePost from "@/Pages/SinglePost/SinglePost";
 import ViewAllPost from "@/Pages/ViewAllPost/ViewAllPost";
 import PrivateRoute from "./PrivetRoute";
 import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
+import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
       { path: "/membership", element: <Membership /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/tourPlan", element: <TourPlan /> },
+      { path: "/tourPlans", element: <TourPlanDouble /> },
       { path: "/contact", element: <Contact /> },
       { path: "/viewall", element: <ViewAllPost /> },
     ],
