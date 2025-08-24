@@ -269,12 +269,20 @@ function SinglePost({ prid }) {
   const hasMaxOffers = tour.offer_count >= 3;
 
   const handleSentOfferClick = () => {
+    if (!token) {
+      navigate("/login");
+      toast.error("Please log in to submit an offer");
+      return;
+    }
     if (hasMaxOffers) {
       toast.error("Sorry, this post already has 3 offers submitted.");
     } else {
       setIsPopupOpen(true);
     }
   };
+
+  // Determine if the "Sent Offer" button should be shown
+  const showSentOfferButton = !token || role === "agency";
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
@@ -286,7 +294,7 @@ function SinglePost({ prid }) {
         <MdOutlineKeyboardBackspace size={24} />
       </button>
 
-      <div className="flex flex-col shadow-lg w-80 lg:w-96 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
+      <div className="flex flex-col shadow-lg w-80 lg:w-[50vh] mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img
@@ -314,14 +322,14 @@ function SinglePost({ prid }) {
                       offer.agency?.logo_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={`${offer.agency?.agency_name} logo`}
+                    alt={`${offer.agency?.agency_name || "Unknown Agency"} logo`}
                     className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
                   />
                 ))}
               </div>
             )}
             {tour.offer_count < 3 ? (
-              role !== "tourist" && <div></div>
+              <div></div>
             ) : (
               <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
                 <IoCheckmarkCircleSharp className="mr-1" size={16} />
@@ -375,9 +383,6 @@ function SinglePost({ prid }) {
               <span className="font-medium">Total:</span> {tour.total_members}{" "}
               {tour.total_members > 1 ? "people" : "person"}
             </span>
-            {/* <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              {tour.offer_count} Offer received
-            </span> */}
           </div>
 
           <div>
@@ -399,23 +404,24 @@ function SinglePost({ prid }) {
             <p className="text-md text-gray-600 flex items-center gap-2">
               <IoPersonSharp className="w-6 h-5 text-gray-500" />
               <span>
-                <span className="font-medium">Contact verified via email</span>{" "}
-                {/* {tour.location_from || "N/A"} */}
+                <span className="font-medium">Contact verified via email</span>
               </span>
             </p>
           </div>
 
           <div className="pt-2 w-full">
             <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
-              <DialogTrigger className="backdrop-blur-2xl" asChild>
-                <button
-                  onClick={handleSentOfferClick}
-                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
-                >
-                  Sent Offer
-                </button>
-              </DialogTrigger>
-              <DialogContent className="lg:w-96">
+              {showSentOfferButton && (
+                <DialogTrigger className="backdrop-blur-2xl" asChild>
+                  <button
+                    onClick={handleSentOfferClick}
+                    className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
+                  >
+                    Sent Offer
+                  </button>
+                </DialogTrigger>
+              )}
+              <DialogContent className="lg:w-[60vh]">
                 <button
                   onClick={() => setIsPopupOpen(false)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors"
@@ -548,25 +554,6 @@ function SinglePost({ prid }) {
                                 } avatar`}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
-                              {/* <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium text-gray-900">
-                                    {offer.agency?.agency_name ||
-                                      "Unknown Agency"}
-                                  </span>
-                                  {offer.agency?.is_verified && (
-                                    <span className="text-blue-500">
-                                      <MdVerified
-                                        size={20}
-                                        className="sm:w-6 sm:h-6"
-                                      />
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs sm:text-sm text-gray-600">
-                                  {offer.message || "No message provided"}
-                                </p>
-                              </div> */}
                             </div>
                             <div className="flex items-center justify-between sm:justify-end gap-3">
                               <span className="font-semibold text-lg sm:text-xl">

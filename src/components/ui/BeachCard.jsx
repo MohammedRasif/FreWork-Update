@@ -75,21 +75,20 @@ export default function TourCard({ tourPlan }) {
               <div
                 className="
     absolute bottom-4
-    left-2/5 -translate-x-2/5
-    flex items-center space-x-1
-    overflow-x-auto
+    flex flex-col items-center space-y-3
+    overflow-y-auto
     px-2
     scrollbar-none
   "
               >
-                {localTourPlan.offers.map((offer) => (
+                {localTourPlan?.offers?.map((offer) => (
                   <img
-                    key={offer.agency.id}
+                    key={offer.agency?.id || Math.random()} // fallback key
                     src={
-                      offer.agency.logo_url ||
+                      offer.agency?.logo_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={`${offer.agency.agency_name} logo`}
+                    alt={`${offer.agency?.agency_name || "Agency"} logo`}
                     className="
         w-12 h-12
         object-contain rounded-full border border-white bg-white
