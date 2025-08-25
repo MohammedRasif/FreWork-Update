@@ -5,6 +5,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useShowUserInpormationQuery } from "@/redux/features/withAuth";
 import img from "../../assets/img/1000062305-removebg-preview.png";
+
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -15,25 +16,25 @@ const Navbar = () => {
 
   // Get user data from the query
   const { data: userData, isLoading } = useShowUserInpormationQuery();
-  console.log(userData)
+  console.log(userData);
 
   // Check if access_token exists in localStorage
   const isAuthenticated = !!localStorage.getItem("access_token");
 
+  // Define route-to-link mapping
+  const routeMap = {
+    "/": "home",
+    "/membership": "membership",
+    "/pricing": "agencies",
+    "/tourPlans": "tours",
+    "/contact": "contact",
+  };
+
   // Update activeLink based on the current route
   useEffect(() => {
     const pathname = location.pathname;
-    if (pathname === "/") {
-      setActiveLink("home");
-    } else if (pathname === "/membership") {
-      setActiveLink("membership");
-    } else if (pathname === "/pricing") {
-      setActiveLink("agencies");
-    } else if (pathname === "/s") {
-      setActiveLink("tours");
-    } else if (pathname === "/contact") {
-      setActiveLink("contact");
-    }
+    const newActiveLink = routeMap[pathname] || "home"; // Default to "home" if route not found
+    setActiveLink(newActiveLink);
   }, [location.pathname]);
 
   // Close profile dropdown when clicking outside
@@ -109,7 +110,7 @@ const Navbar = () => {
     <nav className="w-full bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between relative">
       {/* Logo/Brand */}
       <div className="font-bold lg:h-11 h-8 text-gray-800">
-        <img src={img} className="h-full" alt="" />
+        <img src={img} className="h-full" alt="Logo" />
       </div>
 
       {/* Hamburger Icon for Mobile */}
@@ -205,7 +206,7 @@ const Navbar = () => {
               onClick={toggleProfileDropdown}
             >
               <img
-                src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png" }
+                src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                 alt="User profile"
                 className="w-10 h-10 rounded-full object-cover"
               />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Heart, Share2, ThumbsUp, MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useGetTourPlanPublicQuery } from "@/redux/features/baseApi";
@@ -20,6 +20,7 @@ const AdminHome = () => {
   const [activeTab, setActiveTab] = useState("All Plans");
   const [searchQuery, setSearchQuery] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [modalType, setModalType] = useState("view"); // "view" or "offer"
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLiked, setIsLiked] = useState({});
   const [isShared, setIsShared] = useState({});
@@ -72,7 +73,7 @@ const AdminHome = () => {
     if (selectedPlan) {
       setSelectedPlan((prev) => ({ ...prev }));
     }
-  }, [likeCounts, selectedPlan?.id]);
+  }, [likeCounts]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -240,17 +241,22 @@ const AdminHome = () => {
       return;
     }
 
-    if (offerForm.applyDiscount && (!offerForm.discount || offerForm.discount <= 0)) {
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || offerForm.discount <= 0)
+    ) {
       toast.error("Please provide a valid discount percentage");
       return;
     }
 
     try {
       const offerData = {
-        offered_budget: parseFloat(budget),
+        offered_budget: Number.parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : 0,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
       };
 
       await offerBudgetToBack({
@@ -260,10 +266,12 @@ const AdminHome = () => {
 
       const newOffer = {
         id: `${currentUserId}-${Date.now()}`,
-        offered_budget: parseFloat(budget),
+        offered_budget: Number.parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : 0,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -299,14 +307,20 @@ const AdminHome = () => {
   };
 
   // Open/close popup
-  const openPopup = (plan) => {
-    setSelectedPlan({ ...plan, interactions: plan.interactions || [], offers: plan.offers || [] });
+  const openPopup = (plan, type = "view") => {
+    setSelectedPlan({
+      ...plan,
+      interactions: plan.interactions || [],
+      offers: plan.offers || [],
+    });
+    setModalType(type);
     setIsPopupOpen(true);
   };
 
   const closePopup = () => {
     setIsPopupOpen(false);
     setSelectedPlan(null);
+    setModalType("view");
     setOfferBudget(0);
     setOfferComment("");
     setOfferForm({ applyDiscount: false, discount: "" });
@@ -341,140 +355,97 @@ const AdminHome = () => {
           return (
             <div
               key={plan.id}
-              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6"
+              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6  mx-auto"
             >
-              <div className="p-3 sm:p-4 lg:p-6">
-                {/* Travel Header */}
-                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
-                  <div className="flex-1">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
-                      {plan.location_to}
-                    </h2>
-                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                      <p>
-                        Willing to go on{" "}
-                        <span className="font-medium">{plan.start_date}</span>
-                      </p>
-                      <p>
-                        Include:{" "}
-                        <span className="font-medium">{plan.duration}</span>
-                      </p>
-                      <p>
-                        Category:{" "}
-                        <span className="font-medium">{plan.category}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
+              <div className=" ">
+                <div className="flex justify-between">
+                  <div className=" flex ">
                     <div>
-                      <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                        Budget ${plan.budget}
-                      </p>
-                      <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                        Total {plan.total_members} person
-                      </p>
+                      {/* Resort Image */}
+                      <div>
+                        <img
+                          src={
+                            plan.spot_picture_url
+                              ? plan.spot_picture_url
+                              : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                          }
+                          alt={`${plan.location_to || "Tourist spot"}`}
+                          className="lg:h-44 lg:w-56 object-cover rounded-l-lg mr-5"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex-1">
+                        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-5">
+                          {plan.location_to}
+                        </h2>
+                        <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                          <p>
+                            Dates:{" "}
+                            <span className="font-medium">
+                              {plan.start_date} —{" "}
+                              {plan.end_date || plan.start_date}
+                            </span>
+                          </p>
+                          <p>
+                            Total members:{" "}
+                            <span className="font-medium">
+                              {plan.total_members}
+                            </span>
+                          </p>
+                          <p>
+                            Category:{" "}
+                            <span className="font-medium">{plan.category}</span>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Description */}
-                <div className="mb-4">
-                  <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                    {plan.description}
-                  </p>
-                </div>
-
-                {/* Interested Travel Points */}
-                {plan.tourist_spots && (
-                  <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                    <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
-                      Interested Travel Points:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {plan.tourist_spots.split(",").map((spot, index) => (
-                        <span
-                          key={index}
-                          className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                  {/* Travel Header */}
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0 mt-5 mr-3">
+                    <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
+                      <div>
+                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
+                          Budget ${plan.budget}.00
+                        </p>
+                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                          {plan.total_members} person
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        <button
+                          onClick={() => {
+                            // Handle deal closed action
+                            toast.success("Deal marked as closed");
+                          }}
+                          className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
                         >
-                          {spot.trim()}
-                          {index < plan.tourist_spots.split(",").length - 1 &&
-                            ", "}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Resort Image */}
-                {plan.spot_picture_url && (
-                  <div className="mb-4">
-                    <img
-                      src={plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
-                      alt={`${plan.location_to} tourist spot`}
-                      className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-
-                {/* Social Stats */}
-                <div className="flex items-center justify-between py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                        <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                      </div>
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                        <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                          Deal closed
+                        </button>
+                        <button
+                          onClick={() => openPopup(plan, "view")}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => openPopup(plan, "offer")}
+                          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                        >
+                          Send offer
+                        </button>
+                        <button
+                          onClick={() => {
+                            // Handle decline request action
+                            toast.success("Request declined");
+                          }}
+                          className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
+                        >
+                          Decline request
+                        </button>
                       </div>
                     </div>
-                    <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
-                      {likeCount} Likes
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-                    <span>{plan.offer_count || 0} Offers</span>
-                    <span>{shareCount} Shares</span>
-                  </div>
-                </div>
-
-                {/* Social Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
-                    <button
-                      onClick={() => handleLike(plan.id)}
-                      disabled={isInteractLoading}
-                      className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                        isLiked[plan.id] ? "text-blue-600" : "text-gray-600"
-                      } hover:text-blue-600 transition-colors`}
-                    >
-                      <ThumbsUp
-                        className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                          isLiked[plan.id] ? "fill-current" : ""
-                        }`}
-                      />
-                      <span>{isLiked[plan.id] ? "Unlike" : "Like"}</span>
-                    </button>
-                    <button
-                      onClick={() => openPopup(plan)}
-                      className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                    >
-                      <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
-                      <span>Offers</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare(plan.id)}
-                      disabled={isInteractLoading}
-                      className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                        isShared[plan.id] ? "text-blue-600" : "text-gray-600"
-                      } hover:text-blue-600 transition-colors`}
-                    >
-                      <Share2
-                        className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                          isShared[plan.id] ? "fill-current" : ""
-                        }`}
-                      />
-                      <span>{isShared[plan.id] ? "Unshare" : "Share"}</span>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -487,6 +458,214 @@ const AdminHome = () => {
         return <AdminAcceptPlan />;
       default:
         return null;
+    }
+  };
+
+  const renderModalContent = () => {
+    if (modalType === "view") {
+      return (
+        <div className="p-4">
+          <div className="rounded-lg bg-white shadow-sm border border-gray-200">
+            <div className="p-3 sm:p-4 lg:p-6">
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
+                <div className="flex-1">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
+                    {selectedPlan.location_to}
+                  </h2>
+                  <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                    <p>
+                      Willing to go on{" "}
+                      <span className="font-medium">
+                        {selectedPlan.start_date}
+                      </span>
+                    </p>
+                    <p>
+                      Include:{" "}
+                      <span className="font-medium">
+                        {selectedPlan.duration}
+                      </span>
+                    </p>
+                    <p>
+                      Category:{" "}
+                      <span className="font-medium">
+                        {selectedPlan.category}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
+                  <div>
+                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
+                      Budget ${selectedPlan.budget}
+                    </p>
+                    <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                      Total {selectedPlan.total_members} person
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mb-4">
+                <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
+                  {selectedPlan.description}
+                </p>
+              </div>
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
+                  Interested Travel Points:
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {selectedPlan.tourist_spots ? (
+                    selectedPlan.tourist_spots
+                      .split(",")
+                      .map((location, index) => (
+                        <span
+                          key={index}
+                          className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {location.trim()}
+                          {index <
+                            selectedPlan.tourist_spots.split(",").length - 1 &&
+                            ", "}
+                        </span>
+                      ))
+                  ) : (
+                    <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
+                      None
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="mb-4">
+                <img
+                  src={
+                    selectedPlan.spot_picture_url ||
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                  }
+                  alt="Tour destination"
+                  className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (modalType === "offer") {
+      return (
+        <div className="p-4">
+          <div className="flex-1 w-full">
+            <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
+              Place your offer
+            </p>
+            <div className="flex flex-col gap-3">
+              <input
+                type="number"
+                placeholder="Enter your budget"
+                value={offerBudget}
+                onChange={(e) => setOfferBudget(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              />
+              <textarea
+                placeholder="Enter your comment"
+                value={offerComment}
+                onChange={(e) => setOfferComment(e.target.value)}
+                className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                rows="4"
+              />
+              <div className="mt-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="applyDiscount"
+                    id="applyDiscount"
+                    checked={offerForm.applyDiscount}
+                    onChange={handleOfferChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 lg:text-md text-gray-700">
+                    Apply an additional discount
+                  </span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  The site automatically suggests to visitors to request an
+                  additional discount, increasing conversions by 30%. If you
+                  want to offer more, do so by checking this.
+                </p>
+              </div>
+              <div className="mt-4 mb-2">
+                <label
+                  htmlFor="discount"
+                  className="block lg:text-md font-medium text-gray-700 mb-1"
+                >
+                  Discount
+                </label>
+                <input
+                  type="number"
+                  name="discount"
+                  id="discount"
+                  value={offerForm.discount}
+                  onChange={handleOfferChange}
+                  placeholder="Enter discount percentage"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  disabled={!offerForm.applyDiscount}
+                />
+              </div>
+              <button
+                onClick={() =>
+                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
+                }
+                className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
+                  offerBudget && offerComment.trim()
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                disabled={!offerBudget || !offerComment.trim()}
+              >
+                <IoIosSend size={24} />
+                <span>Submit Offer</span>
+              </button>
+            </div>
+          </div>
+          {selectedPlan.offers && selectedPlan.offers.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                Offers
+              </h3>
+              {selectedPlan.offers.map((offer) => (
+                <div
+                  key={offer.id}
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
+                >
+                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
+                    <img
+                      src={offer.agency.logo_url || "/placeholder.svg"}
+                      alt={`${offer.agency.agency_name} avatar`}
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        {offer.agency.agency_name}
+                      </span>
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        {offer.message}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-lg sm:text-xl">
+                      ${offer.offered_budget}
+                    </span>
+                    {offer.apply_discount && offer.discount > 0 && (
+                      <span className="text-sm text-green-600">
+                        ({offer.discount}% off)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
     }
   };
 
@@ -589,7 +768,6 @@ const AdminHome = () => {
         </div>
       </div>
 
-      {/* Popup Modal */}
       {isPopupOpen && selectedPlan && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
           <div
@@ -598,7 +776,7 @@ const AdminHome = () => {
           >
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">
-                Tour Details
+                {modalType === "view" ? "Tour Details" : "Send Offer"}
               </h2>
               <button
                 onClick={closePopup}
@@ -607,283 +785,7 @@ const AdminHome = () => {
                 <X size={24} />
               </button>
             </div>
-            <div className="p-4">
-              <div className="rounded-lg bg-white shadow-sm border border-gray-200">
-                <div className="p-3 sm:p-4 lg:p-6">
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
-                    <div className="flex-1">
-                      <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
-                        {selectedPlan.location_to}
-                      </h2>
-                      {/* <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                        <p>
-                          Willing to go on{" "}
-                          <span className="font-medium">
-                            {selectedPlan.start_date}
-                          </span>
-                        </p>
-                        <p>
-                          Include:{" "}
-                          <span className="font-medium">
-                            {selectedPlan.duration}
-                          </span>
-                        </p>
-                        <p>
-                          Category:{" "}
-                          <span className="font-medium">
-                            {selectedPlan.category}
-                          </span>
-                        </p>
-                      </div> */}
-                    </div>
-                    {/* <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
-                      <div>
-                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                          Budget ${selectedPlan.budget}
-                        </p>
-                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                          Total {selectedPlan.total_members} person
-                        </p>
-                      </div>
-                    </div> */}
-                  </div>
-                  <div className="mb-4">
-                    <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                      {selectedPlan.description}
-                    </p>
-                  </div>
-                  {/* <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                    <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                      Interested Travel Points:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedPlan.tourist_spots ? (
-                        selectedPlan.tourist_spots
-                          .split(",")
-                          .map((location, index) => (
-                            <span
-                              key={index}
-                              className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-                            >
-                              {location.trim()}
-                              {index <
-                                selectedPlan.tourist_spots.split(",").length -
-                                  1 && ", "}
-                            </span>
-                          ))
-                      ) : (
-                        <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                          None
-                        </span>
-                      )}
-                    </div>
-                  </div> */}
-                  <div className="mb-4">
-                    <img
-                      src={selectedPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
-                      alt="Tour destination"
-                      className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                          <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                        </div>
-                        <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                          <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
-                        </div>
-                      </div>
-                      <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
-                        {likeCounts[selectedPlan.id] || 0} Likes
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-                      <span>{selectedPlan.offer_count || 0} Offers</span>
-                      <span>
-                        {getInteractionCounts(selectedPlan).shareCount} Shares
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-4 sm:gap-6 lg:gap-6">
-                      <button
-                        onClick={() => handleLike(selectedPlan.id)}
-                        disabled={isInteractLoading}
-                        className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                          isLiked[selectedPlan.id]
-                            ? "text-blue-600"
-                            : "text-gray-600"
-                        } hover:text-blue-600 transition-colors`}
-                      >
-                        <ThumbsUp
-                          className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                            isLiked[selectedPlan.id] ? "fill-current" : ""
-                          }`}
-                        />
-                        <span>
-                          {isLiked[selectedPlan.id] ? "Unlike" : "Like"}
-                        </span>
-                      </button>
-                      {/* <button
-                        onClick={() => openPopup(selectedPlan)}
-                        className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                      >
-                        <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
-                        <span>Offers</span>
-                      </button> */}
-                      <button
-                        onClick={() => handleShare(selectedPlan.id)}
-                        disabled={isInteractLoading}
-                        className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
-                          isShared[selectedPlan.id]
-                            ? "text-blue-600"
-                            : "text-gray-600"
-                        } hover:text-blue-600 transition-colors`}
-                      >
-                        <Share2
-                          className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
-                            isShared[selectedPlan.id] ? "fill-current" : ""
-                          }`}
-                        />
-                        <span>
-                          {isShared[selectedPlan.id] ? "Unshare" : "Share"}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
-                    {/* <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
-                      <img
-                        src={
-                          localStorage.getItem("user_image") ||
-                          "https://res.cloudinary.com/dpi0t9wfn/image/upload/v1741443124/samples/smile.jpg"
-                        }
-                        alt="User avatar"
-                        className="rounded-full w-10 h-10 sm:w-11 sm:h-11"
-                      />
-                    </div> */}
-                    <div className="flex-1 w-full">
-                      <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
-                        Place your offer
-                      </p>
-                      <div className="flex flex-col gap-3">
-                        <input
-                          type="number"
-                          placeholder="Enter your budget"
-                          value={offerBudget}
-                          onChange={(e) => setOfferBudget(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                        />
-                        <textarea
-                          placeholder="Enter your comment"
-                          value={offerComment}
-                          onChange={(e) => setOfferComment(e.target.value)}
-                          className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                          rows="4"
-                        />
-                        <div className="mt-4">
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="applyDiscount"
-                              id="applyDiscount"
-                              checked={offerForm.applyDiscount}
-                              onChange={handleOfferChange}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <span className="ml-2 lg:text-md text-gray-700">
-                              Apply an additional discount
-                            </span>
-                          </label>
-                          <p className="text-xs text-gray-500 mt-1">
-                            The site automatically suggests to visitors to request
-                            an additional discount, increasing conversions by 30%.
-                            If you want to offer more, do so by checking this.
-                          </p>
-                        </div>
-                        <div className="mt-4 mb-2">
-                          <label
-                            htmlFor="discount"
-                            className="block lg:text-md font-medium text-gray-700 mb-1"
-                          >
-                            Discount
-                          </label>
-                          <input
-                            type="number"
-                            name="discount"
-                            id="discount"
-                            value={offerForm.discount}
-                            onChange={handleOfferChange}
-                            placeholder="Enter discount percentage"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            disabled={!offerForm.applyDiscount}
-                          />
-                        </div>
-                        <button
-                          onClick={() =>
-                            handleSubmitOffer(
-                              selectedPlan.id,
-                              offerBudget,
-                              offerComment
-                            )
-                          }
-                          className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-                            offerBudget && offerComment.trim()
-                              ? "bg-blue-600 text-white hover:bg-blue-700"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
-                          disabled={!offerBudget || !offerComment.trim()}
-                        >
-                          <IoIosSend size={24} />
-                          <span>Submit Offer</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  {selectedPlan.offers && selectedPlan.offers.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                        Offers
-                      </h3>
-                      {selectedPlan.offers.map((offer) => (
-                        <div
-                          key={offer.id}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
-                        >
-                          <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                            <img
-                              src={offer.agency.logo_url}
-                              alt={`${offer.agency.agency_name} avatar`}
-                              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                            />
-                            <div>
-                              <span className="font-medium text-gray-900">
-                                {offer.agency.agency_name}
-                              </span>
-                              <p className="text-xs sm:text-sm text-gray-600">
-                                {offer.message}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-lg sm:text-xl">
-                              ${offer.offered_budget}
-                            </span>
-                            {offer.apply_discount && offer.discount > 0 && (
-                              <span className="text-sm text-green-600">
-                                ({offer.discount}% off)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            {renderModalContent()}
           </div>
         </div>
       )}

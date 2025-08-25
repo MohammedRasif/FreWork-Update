@@ -68,6 +68,10 @@ const TourPlanDouble = () => {
     discount: "",
   });
 
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top when component mounts
+  }, []);
+
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
     setOfferForm((prev) => ({
@@ -97,7 +101,6 @@ const TourPlanDouble = () => {
     }));
   };
 
-  
   const toggleOfferMessage = (offerId) => {
     setExpandedOfferMessages((prev) => ({
       ...prev,
@@ -462,7 +465,7 @@ const TourPlanDouble = () => {
   const displayTours = tours;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
+    <div className=" bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -564,10 +567,10 @@ const TourPlanDouble = () => {
                   return (
                     <div
                       key={tour.id}
-                      className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6"
+                      className="rounded-lg bg-white shadow-sm border  border-gray-200 mb-6"
                     >
-                      <div className="relative">
-                        <div className="aspect-[4/3] overflow-hidden">
+                      <div className="relative ">
+                        <div className="aspect-[4/3] overflow-hidden  ">
                           <img
                             src={
                               tour.spot_picture_url ||
@@ -585,7 +588,7 @@ const TourPlanDouble = () => {
                             </p>
                           </div>
                           {tour.offers && tour.offers.length > 0 && (
-                            <div className="absolute bottom-4 left-2/5 -translate-x-2/5 flex items-center space-x-1 overflow-x-auto px-2 scrollbar-none">
+                            <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none">
                               {tour.offers.map((offer) => (
                                 <img
                                   key={offer.id}

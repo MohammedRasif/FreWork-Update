@@ -313,7 +313,7 @@ const Published = () => {
         )}
       </div>
 
-      <NavLink to="/viewall" className="flex justify-center mt-2">
+      <NavLink to="/tourPlans" className="flex justify-center mt-2">
         <h1 className="w-5/6 md:w-auto h-[48px]  rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
           see more
         </h1>
