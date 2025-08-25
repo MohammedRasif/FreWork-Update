@@ -1,4 +1,3 @@
-"use client";
 
 import { motion } from "framer-motion";
 import img from "../../assets/img/background.jpg";
@@ -6,15 +5,19 @@ import img1 from "../../assets/img/banner.png";
 import { useState } from "react";
 import BannerSectionPopup from "./bannerSectionPupup";
 
+
 const Banner = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const accessToken = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
+  const showCreateRequestButton = !accessToken || role === "tourist";
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);
   };
 
   const closePopup = () => {
-    setIsPopupOpen(false); // Ensure this updates the state
+    setIsPopupOpen(false);
   };
 
   return (
@@ -49,12 +52,14 @@ const Banner = () => {
         </p>
 
         {/* CTA Button */}
-        <button
-          onClick={handleButtonClick}
-          className="mt-3 md:mt-10 bg-[#FF6600] hover:bg-[#e55600] text-white text-[20px] md:text-[24px] font-medium py-[14px] md:py-[16px] px-[28px] md:px-[36px] rounded-[10px] md:rounded-[12px] max-w-[80%] md:w-[300px] lg:w-[350px] mx-auto"
-        >
-          Create Request
-        </button>
+        {showCreateRequestButton && (
+          <button
+            onClick={handleButtonClick}
+            className="mt-3 md:mt-10 bg-[#FF6600] hover:bg-[#e55600] text-white text-[20px] md:text-[24px] font-medium py-[14px] md:py-[16px] px-[28px] md:px-[36px] rounded-[10px] md:rounded-[12px] max-w-[80%] md:w-[300px] lg:w-[350px] mx-auto"
+          >
+            Create Request
+          </button>
+        )}
       </div>
 
       {/* Popup */}
@@ -69,7 +74,7 @@ const Banner = () => {
             initial={{ scale: 0.7 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.7 }}
-            className=" p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+            className="p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
           >
             <BannerSectionPopup closeForm={closePopup} />
           </motion.div>

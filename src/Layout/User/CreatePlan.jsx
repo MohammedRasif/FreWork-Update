@@ -1,10 +1,7 @@
-"use client";
-
 import { useForm } from "react-hook-form";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-
 import {
   useCreatePlanOneMutation,
   useGetOneDetailQuery,
@@ -15,8 +12,8 @@ import FullScreenInfinityLoader from "@/lib/Loading";
 
 const CreatePlan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isSavingDraft, setIsSavingDraft] = useState(false); // New state for draft saving
-  const [isPublishing, setIsPublishing] = useState(false); // New state for publishing
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [createPlan] = useCreatePlanOneMutation();
   const [update] = useUpdatePlanMutation();
   const { state } = useLocation();
@@ -38,8 +35,11 @@ const CreatePlan = () => {
   // Populate form with data when oldData is available
   useEffect(() => {
     if (state?.id && oldData) {
-      setValue("locationFrom", oldData.location_from);
-      setValue("locationTo", oldData.location_to);
+      setValue("name", oldData.name || "");
+      setValue("email", oldData.email || "");
+      setValue("phoneNumber", oldData.phone_number || "");
+      setValue("locationFrom", oldData.location_from || "");
+      setValue("locationTo", oldData.location_to || "");
       setValue(
         "startingDate",
         oldData.start_date
@@ -52,12 +52,16 @@ const CreatePlan = () => {
           ? new Date(oldData.end_date).toISOString().split("T")[0]
           : ""
       );
-      setValue("adult", oldData.adult_count || 0); // Assuming oldData has adult field
-      setValue("child", oldData.child_count || 0); // Assuming oldData has child field
-      setValue("budget", oldData.budget);
-      setValue("touristSpots", oldData.tourist_spots);
-      setValue("description", oldData.description);
-      setValue("category", oldData.category);
+      setValue("adult", oldData.adult_count || 0);
+      setValue("child", oldData.child_count || 0);
+      setValue("budget", oldData.budget || "");
+      setValue("touristSpots", oldData.tourist_spots || "");
+      setValue("description", oldData.description || "");
+      setValue("travelType", oldData.travel_type || "");
+      setValue("destinationType", oldData.destination_type || "");
+      setValue("typeOfAccommodation", oldData.type_of_accommodation || "");
+      setValue("minimumHotelStars", oldData.minimum_hotel_stars || "");
+      setValue("mealPlan", oldData.meal_plan || "");
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
   }, [state?.id, oldData, setValue]);
@@ -68,13 +72,15 @@ const CreatePlan = () => {
       return;
     }
 
-    // Validate that at least one adult or child is provided
     if (!data.adult && !data.child) {
       toast.error("At least one adult or child is required");
       return;
     }
 
     const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("phone_number", data.phoneNumber);
     formData.append("location_from", data.locationFrom);
     formData.append("location_to", data.locationTo);
     formData.append("start_date", data.startingDate);
@@ -85,6 +91,9 @@ const CreatePlan = () => {
     formData.append("description", data.description);
     formData.append("travel_type", data.travelType);
     formData.append("destination_type", data.destinationType);
+    formData.append("type_of_accommodation", data.typeOfAccommodation);
+    formData.append("includes", data.minimumHotelStars);
+    formData.append("meal_plan", data.mealPlan);
     formData.append("status", status);
     formData.append("tourist_spots", data.touristSpots);
     formData.append(
@@ -97,7 +106,6 @@ const CreatePlan = () => {
     }
 
     try {
-      // Set the appropriate loading state based on the action
       if (status === "draft") {
         setIsSavingDraft(true);
       } else {
@@ -113,13 +121,12 @@ const CreatePlan = () => {
         reset();
         setSelectedFile(null);
       }
-      navigate("/user"); // Redirect to plans list
+      navigate("/user");
     } catch (error) {
       toast.error(
         `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
       );
     } finally {
-      // Reset the appropriate loading state
       if (status === "draft") {
         setIsSavingDraft(false);
       } else {
@@ -158,7 +165,150 @@ const CreatePlan = () => {
 
         {/* Form */}
         <form className="space-y-6">
-          {/* Row 1: Location From & To */}
+          {/* Row 1: Name, Email, Phone Number */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                Name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register("name", { required: "Name is required" })}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Invalid email address",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                placeholder="Enter your phone number"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register("phoneNumber", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^[0-9]{10,15}$/,
+                    message: "Invalid phone number",
+                  },
+                })}
+              />
+              {errors.phoneNumber && (
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.phoneNumber.message}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-row gap-4">
+              <div>
+                <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                  Type of Accommodation
+                </label>
+                <select
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register("typeOfAccommodation", {
+                    required: "Type of accommodation is required",
+                  })}
+                >
+                  <option value="" disabled selected>
+                    Select Accommodation Type
+                  </option>
+                  <option value="hotel">Hotel</option>
+                  <option value="resort">Resort</option>
+                  <option value="homestay">Homestay</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="hostel">Hostel</option>
+                </select>
+                {errors.typeOfAccommodation && (
+                  <p className="text-red-500 text-[14px] mt-1">
+                    {errors.typeOfAccommodation.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                  Destination Type
+                </label>
+                <select
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register("destinationType", {
+                    required: "Destination Type is required",
+                  })}
+                >
+                  <option value="" disabled selected>
+                    Select Destination Type
+                  </option>
+                  <option value="beach">Beach trips</option>
+                  <option value="mountain">Mountain adventures</option>
+                  <option value="desert">Relaxing tours</option>
+                  <option value="island">Group packages</option>
+                </select>
+                {errors.destinationType && (
+                  <p className="text-red-500 text-[14px] mt-1">
+                    {errors.destinationType.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                  Minimum Hotel Stars
+                </label>
+                <select
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...register("minimumHotelStars", {
+                    required: "Minimum hotel stars is required",
+                  })}
+                >
+                  <option value="" disabled selected>
+                    Select Star Rating
+                  </option>
+                  <option value="1">1 Star</option>
+                  <option value="2">2 Stars</option>
+                  <option value="3">3 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+                {errors.minimumHotelStars && (
+                  <p className="text-red-500 text-[14px] mt-1">
+                    {errors.minimumHotelStars.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Location From & To */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -198,7 +348,7 @@ const CreatePlan = () => {
             </div>
           </div>
 
-          {/* Row 2: Starting Date & Ending Date */}
+          {/* Row 3: Starting Date & Ending Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -242,7 +392,7 @@ const CreatePlan = () => {
             </div>
           </div>
 
-          {/* Row 3: Adult & Child & Budget */}
+          {/* Row 4: Adult & Child & Budget */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex w-full gap-4">
               <div className="flex-1">
@@ -309,7 +459,7 @@ const CreatePlan = () => {
             </div>
           </div>
 
-          {/* Row 4: Tourist Spots & Upload Picture */}
+          {/* Row 5: Tourist Spots & Upload Picture */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -350,7 +500,7 @@ const CreatePlan = () => {
             </div>
           </div>
 
-          {/* Row 5: Description & Category */}
+          {/* Row 6: Description & Meal Plan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -370,64 +520,33 @@ const CreatePlan = () => {
                 </p>
               )}
             </div>
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Travel Type Dropdown */}
-              <div className="flex-1">
-                <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Travel Type
-                </label>
-                <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register("travelType", { required: "Travel Type is required" })}
-                >
-                  <option value="" disabled selected>
-                    Select Travel Type
-                  </option>
-                  <option value="family">Family</option>
-                  <option value="group">Group</option>
-                  <option value="relax">Relax</option>
-                  <option value="adventure">Adventure</option>
-                  <option value="honeymoon">Honeymoon</option>
-                  <option value="solo">Solo</option>
-                  <option value="luxury">Luxury</option>
-                </select>
-                {errors.travelType && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.travelType.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Destination Type Dropdown */}
-              <div className="flex-1">
-                <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Destination Type
-                </label>
-                <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register("destinationType", { required: "Destination Type is required" })}
-                >
-                  <option value="" disabled selected>
-                    Select Destination Type
-                  </option>
-                  <option value="beach">Beach</option>
-                  <option value="mountain">Mountain</option>
-                  <option value="city">City</option>
-                  <option value="forest">Forest</option>
-                  <option value="desert">Desert</option>
-                  <option value="island">Island</option>
-                  <option value="lake">Lake</option>
-                  <option value="village">Village</option>
-                  <option value="snow">Snow</option>
-                </select>
-                {errors.destinationType && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.destinationType.message}
-                  </p>
-                )}
-              </div>
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                Meal Plan
+              </label>
+              <select
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {...register("mealPlan", { required: "Meal plan is required" })}
+              >
+                <option value="" disabled selected>
+                  Select Meal Plan
+                </option>
+                <option value="none">No Meals</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="half-board">
+                  Half-Board (Breakfast & Dinner)
+                </option>
+                <option value="full-board">Full-Board (All Meals)</option>
+              </select>
+              {errors.mealPlan && (
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.mealPlan.message}
+                </p>
+              )}
             </div>
           </div>
+
+          {/* Row 7: Travel Type, Destination Type, Type of Accommodation, Minimum Hotel Stars */}
 
           {/* Confirmation Checkbox */}
           <div className="flex items-start gap-3 mt-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -20,16 +20,18 @@ import RelaxCard from "@/components/ui/RelaxCard";
 import GroupCard from "@/components/ui/GroupCard";
 import { useRef } from "react";
 import { ArrowBigRight, ArrowLeft, ArrowRight } from "lucide-react";
+import { GoChevronRight } from "react-icons/go";
 
 const Published = () => {
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  const navigate = useNavigate();
   const beachPrevRef = useRef(null);
   const beachNextRef = useRef(null);
   const mountainPrevRef = useRef(null);
   const mountainNextRef = useRef(null);
   const relaxPrevRef = useRef(null);
   const relaxNextRef = useRef(null);
+  const groupPrevRef = useRef(null);
+  const groupNextRef = useRef(null);
   const {
     data: publishedData = [],
     isLoading,
@@ -39,29 +41,30 @@ const Published = () => {
   const beachTrips = publishedData?.filter(
     (p) => p.destination_type?.trim().toLowerCase() === "beach"
   );
-  console.log({ beachTrips });
   const mountainTrips = publishedData.filter(
     (p) => p.destination_type?.trim().toLowerCase() === "mountain"
   );
-  console.log({ mountainTrips });
   const relaxTrips = publishedData.filter(
     (p) => p.travel_type?.trim().toLowerCase() === "relax"
   );
-  console.log({ relaxTrips });
   const groupTrips = publishedData.filter(
     (p) => p.travel_type?.trim().toLowerCase() === "group"
   );
-  console.log({ groupTrips });
+
+  const handleCategoryClick = (category) => {
+    localStorage.setItem("selectedCategory", category);
+    navigate("/tourPlans");
+  };
 
   const getSliderSettings = (length) => ({
-    dots: true, // change from false to true
+    dots: true,
     infinite: length > 3,
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
     arrows: true,
-    swipe: true, // ✅ enables swipe
-    touchMove: true, // ✅ enables smooth touch interaction
+    swipe: true,
+    touchMove: true,
     responsive: [
       {
         breakpoint: 1024,
@@ -69,7 +72,7 @@ const Published = () => {
           slidesToShow: 3,
           slidesToScroll: 1,
           infinite: length > 2,
-          dots: true, // change from false to true
+          dots: true,
           arrows: true,
         },
       },
@@ -79,7 +82,7 @@ const Published = () => {
           slidesToShow: 1.5,
           slidesToScroll: 1,
           infinite: length > 1,
-          dots: true, // change from false to true
+          dots: true,
           arrows: false,
           variableWidth: false,
           swipe: true,
@@ -92,7 +95,7 @@ const Published = () => {
           slidesToShow: 2,
           slidesToScroll: 1,
           infinite: length > 1,
-          dots: true, // change from false to true
+          dots: true,
           arrows: false,
           variableWidth: false,
           swipe: true,
@@ -105,37 +108,45 @@ const Published = () => {
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#4691F2]/10">
       <style jsx>{`
-  .mySwiper {
-    padding: 0 10px;
-  }
-  .swiper-slide {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .swiper-pagination {
-    position: relative;
-    margin-top: 10px;
-  }
-  .swiper-button-prev,
-  .swiper-button-next {
-    color: #3182ce;
-    transform: scale(0.8);
-  }
-  @media (max-width: 480px) {
-    .swiper-slide {
-      width: 100% !important;
-    }
-    .swiper-slide > div {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-  }
-`}</style>
-
-      {/* .slick-dots {
-        display: none !important;
-      } */}
+        .mySwiper {
+          padding: 0 10px;
+        }
+        .swiper-slide {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .swiper-pagination {
+          position: relative;
+          margin-top: 10px;
+        }
+        .swiper-button-prev,
+        .swiper-button-next {
+          color: #3182ce;
+          transform: scale(0.8);
+        }
+        @media (max-width: 480px) {
+          .swiper-slide {
+            width: 100% !important;
+          }
+          .swiper-slide > div {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+        }
+        .category-button {
+          background: none;
+          border: none;
+          padding: 0;
+          font: inherit;
+          cursor: pointer;
+          text-align: left;
+          transition: color 0.2s ease-in-out;
+        }
+        .category-button:hover {
+          color: #3182ce;
+        }
+      `}</style>
 
       <div className="text-center py-1 mb-6 sm:py-12 lg:py-16">
         <p className="text-gray-700 text-[13px] md:text-lg lg:mb-4 font-medium">
@@ -163,10 +174,15 @@ const Published = () => {
           <>
             {beachTrips.length > 0 && (
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-black mb-4">
+                <button
+                  value="beach"
+                  onClick={() => handleCategoryClick("beach")}
+                  className="text-3xl font-bold text-black mb-4 flex items-center hover:cursor-pointer"
+                >
                   Beach Trips
-                </h2>
+                  <GoChevronRight className="mt-[5px]" />
 
+                </button>
                 <div className="relative">
                   <Swiper
                     modules={[Pagination, Navigation]}
@@ -200,22 +216,26 @@ const Published = () => {
 
             {mountainTrips.length > 0 && (
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-black mb-4">
+                <button
+                  value="mountain"
+                  onClick={() => handleCategoryClick("mountain")}
+                  className="text-3xl font-bold text-black flex items-center mb-4 hover:cursor-pointer"
+                >
                   Mountain Adventures
-                </h2>
-
+                  <GoChevronRight className="mt-[5px]" />
+                </button>
                 <div className="relative">
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
-                      prevEl: beachPrevRef.current,
-                      nextEl: beachNextRef.current,
+                      prevEl: mountainPrevRef.current,
+                      nextEl: mountainNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = beachPrevRef.current;
-                      swiper.params.navigation.nextEl = beachNextRef.current;
+                      swiper.params.navigation.prevEl = mountainPrevRef.current;
+                      swiper.params.navigation.nextEl = mountainNextRef.current;
                     }}
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
@@ -227,7 +247,7 @@ const Published = () => {
                   >
                     {mountainTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <BeachCard tourPlan={p} />
+                        <MountainCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -237,22 +257,25 @@ const Published = () => {
 
             {relaxTrips.length > 0 && (
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-black mb-4">
-                  Relaxing Tours
-                </h2>
-
+                <button
+                  value="desert"
+                  onClick={() => handleCategoryClick("desert")}
+                  className="text-3xl font-bold text-black mb-4 hover:cursor-pointer flex items-center"
+                >
+                  Relaxing Tours <GoChevronRight className="mt-[5px]" />
+                </button>
                 <div className="relative">
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
-                      prevEl: beachPrevRef.current,
-                      nextEl: beachNextRef.current,
+                      prevEl: relaxPrevRef.current,
+                      nextEl: relaxNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = beachPrevRef.current;
-                      swiper.params.navigation.nextEl = beachNextRef.current;
+                      swiper.params.navigation.prevEl = relaxPrevRef.current;
+                      swiper.params.navigation.nextEl = relaxNextRef.current;
                     }}
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
@@ -264,7 +287,7 @@ const Published = () => {
                   >
                     {relaxTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <BeachCard tourPlan={p} />
+                        <RelaxCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -274,23 +297,25 @@ const Published = () => {
 
             {groupTrips.length > 0 && (
               <div className="">
-                <h2 className="text-2xl font-bold text-black mb-4">
-                  Group Packages
-                </h2>
-
+                <button
+                  value="island"
+                  onClick={() => handleCategoryClick("island")}
+                  className="text-3xl font-bold text-black mb-4 flex items-center hover:cursor-pointer"
+                >
+                  Group Packages <GoChevronRight className="mt-[5px]" />
+                </button>
                 <div className="relative">
-                  {/* Custom arrows */}
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
                     pagination={{ clickable: true }}
                     navigation={{
-                      prevEl: beachPrevRef.current,
-                      nextEl: beachNextRef.current,
+                      prevEl: groupPrevRef.current,
+                      nextEl: groupNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = beachPrevRef.current;
-                      swiper.params.navigation.nextEl = beachNextRef.current;
+                      swiper.params.navigation.prevEl = groupPrevRef.current;
+                      swiper.params.navigation.nextEl = groupNextRef.current;
                     }}
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
@@ -302,7 +327,7 @@ const Published = () => {
                   >
                     {groupTrips.map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <BeachCard tourPlan={p} />
+                        <GroupCard tourPlan={p} />
                       </SwiperSlide>
                     ))}
                   </Swiper>
@@ -314,7 +339,7 @@ const Published = () => {
       </div>
 
       <NavLink to="/tourPlans" className="flex justify-center mt-2">
-        <h1 className="w-5/6 md:w-auto h-[48px]  rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
+        <h1 className="w-5/6 md:w-auto h-[48px] rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
           see more
         </h1>
       </NavLink>

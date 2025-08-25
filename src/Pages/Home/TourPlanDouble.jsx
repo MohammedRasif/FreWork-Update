@@ -493,13 +493,10 @@ const TourPlanDouble = () => {
                       }
                     >
                       <option value="">Select a category</option>
-                      <option value="adventure">Adventure</option>
-                      <option value="cultural">Cultural</option>
-                      <option value="relaxation">Relaxation</option>
-                      <option value="historical">Historical</option>
-                      <option value="beach">Beach</option>
-                      <option value="wildlife">Wildlife</option>
-                      <option value="romantic">Romantic</option>
+                      <option value="beach">Beach trips</option>
+                      <option value="mountain">Mountain adventures</option>
+                      <option value="desert">Relaxing tours</option>
+                      <option value="island">Group packages</option>
                     </select>
                   </div>
                   <div className="relative w-full sm:w-auto">

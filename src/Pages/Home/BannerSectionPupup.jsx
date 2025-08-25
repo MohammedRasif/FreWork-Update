@@ -1,13 +1,14 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { useCreatePlanOneMutation, useUpdatePlanMutation } from "@/redux/features/withAuth";
+import {
+  useCreatePlanOneMutation,
+  useUpdatePlanMutation,
+} from "@/redux/features/withAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 
 export default function BannerSectionPopup({ closeForm }) {
-  const totalSteps = 4; // Increased to 4 to accommodate new step
+  const totalSteps = 5; // Increased to 5 to accommodate new fields
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -26,6 +27,10 @@ export default function BannerSectionPopup({ closeForm }) {
     uploadedFile: null,
     travelType: "",
     destinationType: "",
+    typeOfAccommodation: "",
+    minimumHotelStars: "",
+    mealPlan: "",
+    includeRoundTripFlight: false,
     confirmation: false,
   });
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,26 +49,75 @@ export default function BannerSectionPopup({ closeForm }) {
     reset,
   } = useForm();
 
-  // Populate form with data when state?.id exists
+
+
   useEffect(() => {
-    if (state?.id) {
+    if (state?.id ) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
       setValue("locationFrom", state?.location_from || "");
       setValue("locationTo", state?.location_to || "");
-      setValue("startingDate", state?.start_date ? new Date(state.start_date).toISOString().split("T")[0] : "");
-      setValue("endingDate", state?.end_date ? new Date(state.end_date).toISOString().split("T")[0] : "");
-      setValue("adults", state?.adult_count || "");
-      setValue("children", state?.child_count || "");
+      setValue(
+        "startingDate",
+        state?.start_date
+          ? new Date(state?.start_date).toISOString().split("T")[0]
+          : ""
+      );
+      setValue(
+        "endingDate",
+        state?.end_date
+          ? new Date(state?.end_date).toISOString().split("T")[0]
+          : ""
+      );
+      setValue("adult", state?.adult_count || 0);
+      setValue("child", state?.child_count || 0);
       setValue("budget", state?.budget || "");
       setValue("touristSpots", state?.tourist_spots || "");
       setValue("description", state?.description || "");
       setValue("travelType", state?.travel_type || "");
       setValue("destinationType", state?.destination_type || "");
+      setValue("typeOfAccommodation", state?.type_of_accommodation || "");
+      setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
+      setValue("mealPlan", state?.meal_plan || "");
       setValue("confirmation", !!state?.is_confirmed_request);
     }
   }, [state?.id, setValue]);
+
+  // Populate form with data when state?.id exists
+  // useEffect(() => {
+  //   if (state?.id) {
+  //     setValue("name", state?.name || "");
+  //     setValue("email", state?.email || "");
+  //     setValue("phoneNumber", state?.phone_number || "");
+  //     setValue("locationFrom", state?.location_from || "");
+  //     setValue("locationTo", state?.location_to || "");
+  //     setValue(
+  //       "startingDate",
+  //       state?.start_date
+  //         ? new Date(state.start_date).toISOString().split("T")[0]
+  //         : ""
+  //     );
+  //     setValue(
+  //       "endingDate",
+  //       state?.end_date
+  //         ? new Date(state.end_date).toISOString().split("T")[0]
+  //         : ""
+  //     );
+  //     setValue("adults", state?.adult_count || "");
+  //     setValue("children", state?.child_count || "");
+  //     setValue("budget", state?.budget || "");
+  //     setValue("touristSpots", state?.tourist_spots || "");
+  //     setValue("description", state?.description || "");
+  //     setValue("travel_type", state?.travel_type || "");
+  //     setValue("destinationType", state?.destination_type || "");
+  //     setValue("typeOfAccommodation", state?.type_of_accommodation || "");
+  //     setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
+  //     setValue("mealPlan", state?.meal_plan || "");
+  //     setValue("includeRoundTripFlight", !!state?.include_round_trip_flight);
+  //     setValue("confirmation", !!state?.is_confirmed_request);
+  //   }
+  // }, [state?.id, setValue]);
 
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
@@ -84,74 +138,89 @@ export default function BannerSectionPopup({ closeForm }) {
     }
   };
 
-  const onSubmit = async (data, status) => {
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      toast.error("Please log in to create a plan");
-      navigate("/login");
-      return;
+const onSubmit = async (data, status) => {
+  console.log("onSubmit called with data:", data, "status:", status);
+
+  const accessToken = localStorage.getItem("access_token");
+  console.log("Access Token:", accessToken);
+  if (!accessToken) {
+    toast.error("Please log in to create a plan");
+    navigate("/login");
+    return;
+  }
+
+  if (data.endingDate < data.startingDate) {
+    toast.error("End date must be after start date");
+    return;
+  }
+
+  if (!data.adults && !data.children) {
+    toast.error("At least one adult or child is required");
+    return;
+  }
+
+  const formDataToSend = new FormData();
+  formDataToSend.append("name", data.name);
+  formDataToSend.append("email", data.email);
+  formDataToSend.append("phone_number", data.phoneNumber);
+  formDataToSend.append("location_from", data.locationFrom);
+  formDataToSend.append("location_to", data.locationTo);
+  formDataToSend.append("start_date", data.startingDate);
+  formDataToSend.append("end_date", data.endingDate);
+  formDataToSend.append("adult_count", data.adults || 0); // Fixed
+  formDataToSend.append("child_count", data.children || 0); // Fixed
+  formDataToSend.append("budget", data.budget);
+  formDataToSend.append("description", data.description);
+  formDataToSend.append("travel_type", data.travelType);
+  formDataToSend.append("destination_type", data.destinationType);
+  formDataToSend.append("type_of_accommodation", data.typeOfAccommodation);
+  formDataToSend.append("includes", data.minimumHotelStars);
+  formDataToSend.append("meal_plan", data.mealPlan);
+  formDataToSend.append("status", status);
+  formDataToSend.append("tourist_spots", data.touristSpots);
+  formDataToSend.append("is_confirmed_request", data.confirmation ? "true" : "false");
+
+  if (selectedFile) {
+    formDataToSend.append("spot_picture", selectedFile);
+  }
+
+  console.log("FormData to send:");
+  for (let [key, value] of formDataToSend.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+
+  try {
+    if (status === "draft") {
+      setIsSavingDraft(true);
+    } else {
+      setIsPublishing(true);
     }
 
-    if (data.endingDate < data.startingDate) {
-      toast.error("End date must be after start date");
-      return;
+    if (state?.id) {
+      const response = await updatePlan({ id: state.id, updates: formDataToSend }).unwrap();
+      console.log("Update Plan Response:", response);
+      toast.success("Plan updated successfully!");
+    } else {
+      const response = await createPlan(formDataToSend).unwrap();
+      console.log("Create Plan Response:", response);
+      toast.success("Plan created successfully!");
+      reset();
+      setSelectedFile(null);
     }
-
-    if (!data.adults && !data.children) {
-      toast.error("At least one adult or child is required");
-      return;
+    console.log("Navigating to /user and closing form");
+    navigate("/user");
+    closeForm();
+  } catch (error) {
+    console.error("API Error:", error);
+    toast.error(`Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`);
+  } finally {
+    if (status === "draft") {
+      setIsSavingDraft(false);
+    } else {
+      setIsPublishing(false);
     }
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("name", data.name);
-    formDataToSend.append("email", data.email);
-    formDataToSend.append("phone_number", data.phoneNumber);
-    formDataToSend.append("location_from", data.locationFrom);
-    formDataToSend.append("location_to", data.locationTo);
-    formDataToSend.append("start_date", data.startingDate);
-    formDataToSend.append("end_date", data.endingDate);
-    formDataToSend.append("adult_count", data.adults || 0);
-    formDataToSend.append("child_count", data.children || 0);
-    formDataToSend.append("budget", data.budget);
-    formDataToSend.append("description", data.description);
-    formDataToSend.append("travel_type", data.travelType);
-    formDataToSend.append("destination_type", data.destinationType);
-    formDataToSend.append("status", status);
-    formDataToSend.append("tourist_spots", data.touristSpots);
-    formDataToSend.append("is_confirmed_request", data.confirmation ? "true" : "false");
-
-    if (selectedFile) {
-      formDataToSend.append("spot_picture", selectedFile);
-    }
-
-    try {
-      if (status === "draft") {
-        setIsSavingDraft(true);
-      } else {
-        setIsPublishing(true);
-      }
-
-      if (state?.id) {
-        await updatePlan({ id: state.id, updates: formDataToSend }).unwrap();
-        toast.success("Plan updated successfully!");
-      } else {
-        await createPlan(formDataToSend).unwrap();
-        toast.success("Plan created successfully!");
-        reset();
-        setSelectedFile(null);
-      }
-      navigate("/user");
-      closeForm();
-    } catch (error) {
-      toast.error(`Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`);
-    } finally {
-      if (status === "draft") {
-        setIsSavingDraft(false);
-      } else {
-        setIsPublishing(false);
-      }
-    }
-  };
+  }
+};
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -162,106 +231,160 @@ export default function BannerSectionPopup({ closeForm }) {
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden md:max-w-2xl sm:max-w-md transition-all duration-300">
+    <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
       {/* Progress Bar */}
-      <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-4">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-semibold text-white">
+      <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
+        <div className="flex justify-between items-center mb-2 sm:mb-3">
+          <span className="text-xs sm:text-sm font-semibold text-white">
             Step {currentStep} of {totalSteps}
           </span>
-          <span className="text-sm font-semibold text-white">{Math.round(progressPercentage)}% Complete</span>
+          <span className="text-xs sm:text-sm font-semibold text-white">
+            {Math.round(progressPercentage)}% Complete
+          </span>
         </div>
-        <div className="w-full bg-white/30 rounded-full h-3">
+        <div className="w-full bg-white/30 rounded-full h-2 sm:h-3">
           <div
-            className="bg-white h-3 rounded-full transition-all duration-500 ease-in-out"
+            className="bg-white h-2 sm:h-3 rounded-full transition-all duration-500 ease-in-out"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="p-6 sm:p-4">
-        <h2 className="text-2xl font-extrabold text-gray-800 mb-4 text-center sm:text-2xl">Create Your Tour Plan</h2>
+      <div className="p-3 sm:p-4 xs:p-2">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 mb-3 sm:mb-4 text-center">
+          Create Your Tour Plan
+        </h2>
 
         {/* Step 1: Basic Information */}
         {currentStep === 1 && (
-          <div className="space-y-1">
-            <div className="grid grid-cols-1 gap-4 sm:gap-3">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location (From)</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Location (From)
+                </label>
                 <input
-                  {...register("locationFrom", { required: "Location (From) is required" })}
+                  {...register("locationFrom", {
+                    required: "Location (From) is required",
+                  })}
                   type="text"
-                  placeholder="Enter starting location"
+                  placeholder="Starting location"
                   defaultValue={formData.locationFrom}
-                  onChange={(e) => updateFormData("locationFrom", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  onChange={(e) =>
+                    updateFormData("locationFrom", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.locationFrom && <span className="text-red-500 text-xs mt-1">{errors.locationFrom.message}</span>}
+                {errors.locationFrom && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.locationFrom.message}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location (To)</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Location (To)
+                </label>
                 <input
-                  {...register("locationTo", { required: "Location (To) is required" })}
+                  {...register("locationTo", {
+                    required: "Location (To) is required",
+                  })}
                   type="text"
-                  placeholder="Enter destination"
+                  placeholder="Destination"
                   defaultValue={formData.locationTo}
                   onChange={(e) => updateFormData("locationTo", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.locationTo && <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>}
+                {errors.locationTo && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.locationTo.message}
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Starting Date</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Starting Date
+                </label>
                 <input
-                  {...register("startingDate", { required: "Starting Date is required" })}
+                  {...register("startingDate", {
+                    required: "Starting Date is required",
+                  })}
                   type="date"
                   defaultValue={formData.startingDate}
-                  onChange={(e) => updateFormData("startingDate", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  onChange={(e) =>
+                    updateFormData("startingDate", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.startingDate && <span className="text-red-500 text-xs mt-1">{errors.startingDate.message}</span>}
+                {errors.startingDate && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.startingDate.message}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ending Date</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Ending Date
+                </label>
                 <input
-                  {...register("endingDate", { required: "Ending Date is required" })}
+                  {...register("endingDate", {
+                    required: "Ending Date is required",
+                  })}
                   type="date"
                   defaultValue={formData.endingDate}
                   onChange={(e) => updateFormData("endingDate", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.endingDate && <span className="text-red-500 text-xs mt-1">{errors.endingDate.message}</span>}
+                {errors.endingDate && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.endingDate.message}
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Adults</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Adults
+                </label>
                 <input
-                  {...register("adults", { required: "At least one adult or child is required" })}
+                  {...register("adults", {
+                    required: "At least one adult or child is required",
+                  })}
                   type="number"
-                  placeholder="Number of adults"
+                  placeholder="Adults"
                   defaultValue={formData.adults}
                   onChange={(e) => updateFormData("adults", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.adults && <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>}
+                {errors.adults && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.adults.message}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Children</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Children
+                </label>
                 <input
                   {...register("children")}
                   type="number"
-                  placeholder="Number of children"
+                  placeholder="Children"
                   defaultValue={formData.children}
                   onChange={(e) => updateFormData("children", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
-                {errors.children && <span className="text-red-500 text-xs mt-1">{errors.children.message}</span>}
+                {errors.children && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.children.message}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -269,72 +392,214 @@ export default function BannerSectionPopup({ closeForm }) {
 
         {/* Step 2: Details */}
         {currentStep === 2 && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Budget</label>
-              <input
-                {...register("budget", { required: "Budget is required" })}
-                type="text"
-                placeholder="Enter budget (USD)"
-                defaultValue={formData.budget}
-                onChange={(e) => updateFormData("budget", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
-              />
-              {errors.budget && <span className="text-red-500 text-xs mt-1">{errors.budget.message}</span>}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Budget
+                </label>
+                <input
+                  {...register("budget", { required: "Budget is required" })}
+                  type="text"
+                  placeholder="Budget (USD)"
+                  defaultValue={formData.budget}
+                  onChange={(e) => updateFormData("budget", e.target.value)}
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                />
+                {errors.budget && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.budget.message}
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Tourist Spots
+                </label>
+                <input
+                  {...register("touristSpots", {
+                    required: "Tourist Spots are required",
+                  })}
+                  type="text"
+                  placeholder="E.g., Cox's Bazar, Sundarbans"
+                  defaultValue={formData.touristSpots}
+                  onChange={(e) =>
+                    updateFormData("touristSpots", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                />
+                {errors.touristSpots && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.touristSpots.message}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tourist Spots</label>
-              <input
-                {...register("touristSpots", { required: "Tourist Spots are required" })}
-                type="text"
-                placeholder="E.g., Cox's Bazar, Sundarbans, Bandarban"
-                defaultValue={formData.touristSpots}
-                onChange={(e) => updateFormData("touristSpots", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
-              />
-              {errors.touristSpots && <span className="text-red-500 text-xs mt-1">{errors.touristSpots.message}</span>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
               <textarea
-                {...register("description", { required: "Description is required" })}
+                {...register("description", {
+                  required: "Description is required",
+                })}
                 placeholder="Describe your trip"
-                rows="5"
+                rows="4"
                 defaultValue={formData.description}
                 onChange={(e) => updateFormData("description", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent resize-none text-sm transition-all duration-200"
+                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent resize-none text-xs sm:text-sm transition-all duration-200"
               ></textarea>
-              {errors.description && <span className="text-red-500 text-xs mt-1">{errors.description.message}</span>}
+              {errors.description && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.description.message}
+                </span>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Upload Picture (Optional)</label>
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 sm:p-3">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Upload Picture (Optional)
+              </label>
+              <div className="border-2 border-dashed border-gray-200 rounded-lg p-3 sm:p-4">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#FF6600] file:text-white hover:file:bg-[#e55600] transition-all duration-200"
+                  className="w-full text-xs sm:text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 sm:file:py-2 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-[#FF6600] file:text-white hover:file:bg-[#e55600] transition-all duration-200"
                 />
-                {selectedFile && <p className="mt-2 text-sm text-gray-600">Selected: {selectedFile.name}</p>}
+                {selectedFile && (
+                  <p className="mt-2 text-xs sm:text-sm text-gray-600">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 3: Preferences */}
+        {/* Step 3: Accommodation Preferences */}
         {currentStep === 3 && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:gap-3">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Travel Type</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Type of Accommodation
+                </label>
                 <select
-                  {...register("travelType", { required: "Travel Type is required" })}
+                  {...register("typeOfAccommodation", {
+                    required: "Type of Accommodation is required",
+                  })}
+                  defaultValue={formData.typeOfAccommodation}
+                  onChange={(e) =>
+                    updateFormData("typeOfAccommodation", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                >
+                  <option value="">Select Accommodation Type</option>
+                  <option value="hotel">Hotel</option>
+                  <option value="resort">Resort</option>
+                  <option value="homestay">Homestay</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="hostel">Hostel</option>
+                </select>
+                {errors.typeOfAccommodation && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.typeOfAccommodation.message}
+                  </span>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Minimum Hotel Stars
+                </label>
+                <select
+                  {...register("minimumHotelStars", {
+                    required: "Minimum Hotel Stars is required",
+                  })}
+                  defaultValue={formData.minimumHotelStars}
+                  onChange={(e) =>
+                    updateFormData("minimumHotelStars", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                >
+                  <option value="">Select Star Rating</option>
+                  <option value="1">1 Star</option>
+                  <option value="2">2 Stars</option>
+                  <option value="3">3 Stars</option>
+                  <option value="4">4 Stars</option>
+                  <option value="5">5 Stars</option>
+                </select>
+                {errors.minimumHotelStars && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.minimumHotelStars.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Meal Plan
+              </label>
+              <select
+                {...register("mealPlan", { required: "Meal Plan is required" })}
+                defaultValue={formData.mealPlan}
+                onChange={(e) => updateFormData("mealPlan", e.target.value)}
+                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+              >
+                <option value="">Select Meal Plan</option>
+                <option value="none">No Meals</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="half-board">
+                  Half-Board (Breakfast & Dinner)
+                </option>
+                <option value="full-board">Full-Board (All Meals)</option>
+              </select>
+              {errors.mealPlan && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.mealPlan.message}
+                </span>
+              )}
+            </div>
+
+            {/* <div className="flex items-start">
+              <input
+                {...register("includeRoundTripFlight")}
+                type="checkbox"
+                id="includeRoundTripFlight"
+                checked={formData.includeRoundTripFlight}
+                onChange={(e) =>
+                  updateFormData("includeRoundTripFlight", e.target.checked)
+                }
+                className="h-4 w-4 text-[#FF6600] focus:ring-[#FF6600] border-gray-300 rounded mt-1"
+              />
+              <label
+                htmlFor="includeRoundTripFlight"
+                className="ml-2 text-xs sm:text-sm text-gray-700"
+              >
+                Include Round-Trip Flight
+              </label>
+            </div> */}
+          </div>
+        )}
+
+        {/* Step 4: Travel Preferences (Moved from Step 3) */}
+        {currentStep === 4 && (
+          <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Travel Type
+                </label>
+                <select
+                  {...register("travelType", {
+                    required: "Travel Type is required",
+                  })}
                   defaultValue={formData.travelType}
                   onChange={(e) => updateFormData("travelType", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
                   <option value="">Select Travel Type</option>
                   <option value="family">Family Trip</option>
@@ -343,15 +608,25 @@ export default function BannerSectionPopup({ closeForm }) {
                   <option value="group">Group Travel</option>
                   <option value="business">Business Travel</option>
                 </select>
-                {errors.travelType && <span className="text-red-500 text-xs mt-1">{errors.travelType.message}</span>}
+                {errors.travelType && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.travelType.message}
+                  </span>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Destination Type</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Destination Type
+                </label>
                 <select
-                  {...register("destinationType", { required: "Destination Type is required" })}
+                  {...register("destinationType", {
+                    required: "Destination Type is required",
+                  })}
                   defaultValue={formData.destinationType}
-                  onChange={(e) => updateFormData("destinationType", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                  onChange={(e) =>
+                    updateFormData("destinationType", e.target.value)
+                  }
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
                   <option value="">Select Destination Type</option>
                   <option value="beach">Beach</option>
@@ -361,42 +636,88 @@ export default function BannerSectionPopup({ closeForm }) {
                   <option value="adventure">Adventure</option>
                   <option value="cultural">Cultural</option>
                 </select>
-                {errors.destinationType && <span className="text-red-500 text-xs mt-1">{errors.destinationType.message}</span>}
+                {errors.destinationType && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.destinationType.message}
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="bg-gray-50 p-4 sm:p-3 rounded-lg shadow-sm">
-              <h3 className="font-semibold text-gray-800 mb-3 text-base">Review Your Information</h3>
-              <div className="space-y-2 text-sm text-gray-600">
-                <p><span className="font-medium">From:</span> {formData.locationFrom || "Not specified"}</p>
-                <p><span className="font-medium">To:</span> {formData.locationTo || "Not specified"}</p>
-                <p><span className="font-medium">Dates:</span> {formData.startingDate} to {formData.endingDate}</p>
-                <p><span className="font-medium">Travelers:</span> {formData.adults} adults, {formData.children} children</p>
-                <p><span className="font-medium">Budget:</span> {formData.budget || "Not specified"}</p>
-                <p><span className="font-medium">Travel Type:</span> {formData.travelType || "Not specified"}</p>
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-gray-800 mb-2 sm:mb-3 text-sm sm:text-base">
+                Review Your Information
+              </h3>
+              <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+                <p>
+                  <span className="font-medium">From:</span>{" "}
+                  {formData.locationFrom || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">To:</span>{" "}
+                  {formData.locationTo || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Dates:</span>{" "}
+                  {formData.startingDate} to {formData.endingDate}
+                </p>
+                <p>
+                  <span className="font-medium">Travelers:</span>{" "}
+                  {formData.adults} adults, {formData.children} children
+                </p>
+                <p>
+                  <span className="font-medium">Budget:</span>{" "}
+                  {formData.budget || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Accommodation:</span>{" "}
+                  {formData.typeOfAccommodation || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Hotel Stars:</span>{" "}
+                  {formData.minimumHotelStars || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Meal Plan:</span>{" "}
+                  {formData.mealPlan || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Flight:</span>{" "}
+                  {formData.includeRoundTripFlight
+                    ? "Included"
+                    : "Not included"}
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 4: Personal Information */}
-        {currentStep === 4 && (
-          <div className="space-y-4">
+        {/* Step 5: Personal Information (Moved from Step 4) */}
+        {currentStep === 5 && (
+          <div className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
               <input
                 {...register("name", { required: "Name is required" })}
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Full name"
                 defaultValue={formData.name}
                 onChange={(e) => updateFormData("name", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
               />
-              {errors.name && <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>}
+              {errors.name && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <input
                 {...register("email", {
                   required: "Email is required",
@@ -406,16 +727,22 @@ export default function BannerSectionPopup({ closeForm }) {
                   },
                 })}
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Email"
                 defaultValue={formData.email}
                 onChange={(e) => updateFormData("email", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
               />
-              {errors.email && <span className="text-red-500 text-xs mt-1">{errors.email.message}</span>}
+              {errors.email && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </span>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+              </label>
               <input
                 {...register("phoneNumber", {
                   required: "Phone Number is required",
@@ -425,70 +752,88 @@ export default function BannerSectionPopup({ closeForm }) {
                   },
                 })}
                 type="tel"
-                placeholder="Enter your phone number"
+                placeholder="Phone number"
                 defaultValue={formData.phoneNumber}
                 onChange={(e) => updateFormData("phoneNumber", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
               />
-              {errors.phoneNumber && <span className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</span>}
+              {errors.phoneNumber && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.phoneNumber.message}
+                </span>
+              )}
             </div>
 
             <div className="flex items-start">
               <input
-                {...register("confirmation", { required: "You must confirm the request" })}
+                {...register("confirmation", {
+                  required: "You must confirm the request",
+                })}
                 type="checkbox"
                 id="confirmation"
                 checked={formData.confirmation}
-                onChange={(e) => updateFormData("confirmation", e.target.checked)}
+                onChange={(e) =>
+                  updateFormData("confirmation", e.target.checked)
+                }
                 className="h-4 w-4 text-[#FF6600] focus:ring-[#FF6600] border-gray-300 rounded mt-1"
               />
-              <label htmlFor="confirmation" className="ml-2 text-sm text-gray-700">
-                I confirm this is a travel request, and all provided information is valid and does not include any third party.
+              <label
+                htmlFor="confirmation"
+                className="ml-2 text-xs sm:text-sm text-gray-700"
+              >
+                I confirm this is a travel request, and all provided information
+                is valid and does not include any third party.
               </label>
-              {errors.confirmation && <span className="text-red-500 text-xs mt-1">{errors.confirmation.message}</span>}
+              {errors.confirmation && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.confirmation.message}
+                </span>
+              )}
             </div>
           </div>
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2 mb-3 sm:mb-0">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 sm:mb-0 w-full sm:w-auto">
             {currentStep > 1 && (
               <button
                 onClick={prevStep}
-                className="px-2 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-sm transition-all duration-200"
+                className="px-2 py-1 sm:px-2 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
               >
                 Previous
               </button>
             )}
             <button
               onClick={closeForm}
-              className="px-2 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-sm transition-all duration-200"
+              className="px-2 py-1 sm:px-2.1 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
             >
               Cancel
             </button>
-            <button
+            {/* <button
               onClick={handleSubmit((data) => onSubmit(data, "draft"))}
               disabled={isSavingDraft || isPublishing}
-              className="px-2 py-2 border border-[#FF6600] text-[#FF6600] rounded-lg hover:bg-[#FF6600] hover:text-white font-medium text-sm transition-all duration-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="px-2 py-1 sm:px-2.1 sm:py-1 border border-[#FF6600] text-[#FF6600] rounded-lg hover:bg-[#FF6600] hover:text-white font-medium text-xs sm:text-sm transition-all duration-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               {isSavingDraft ? "Saving Draft..." : "Save as Draft"}
-            </button>
+            </button> */}
           </div>
 
-          <div>
+          <div className="w-full sm:w-auto">
             {currentStep < totalSteps ? (
               <button
                 onClick={nextStep}
-                className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-2 px-6 rounded-lg text-sm w-full sm:w-auto transition-all duration-200"
+                className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1.5 sm:py-2 px-4 sm:px-6 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
                 Next
               </button>
             ) : (
               <button
                 onClick={handleSubmit((data) => onSubmit(data, "published"))}
-                disabled={isSavingDraft || isPublishing || !formData.confirmation}
-                className="bg-[#FF6600] hover:bg-[#e55600] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-1 rounded-lg text-sm w-full sm:w-auto transition-all duration-200"
+                disabled={
+                  isSavingDraft || isPublishing || !formData.confirmation
+                }
+                className="bg-[#FF6600] hover:bg-[#e55600] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
                 {isPublishing ? "Publishing..." : "Submit Request"}
               </button>
