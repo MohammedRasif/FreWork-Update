@@ -41,32 +41,32 @@ const AdminHome = () => {
     useOfferBudgetMutation();
 
   // Initialize like, share, and like count states
-  useEffect(() => {
-    if (tourPlanPublic && currentUserId) {
-      const initialLikes = {};
-      const initialShares = {};
-      const initialLikeCounts = {};
-      tourPlanPublic.forEach((plan) => {
-        initialLikes[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "like"
-        );
-        initialShares[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "share"
-        );
-        initialLikeCounts[plan.id] =
-          plan.interactions?.filter(
-            (interaction) => interaction.interaction_type === "like"
-          ).length || 0;
-      });
-      setIsLiked(initialLikes);
-      setIsShared(initialShares);
-      setLikeCounts(initialLikeCounts);
-    }
-  }, [tourPlanPublic, currentUserId]);
+  // useEffect(() => {
+  //   if (tourPlanPublic && currentUserId) {
+  //     const initialLikes = {};
+  //     const initialShares = {};
+  //     const initialLikeCounts = {};
+  //     tourPlanPublic.forEach((plan) => {
+  //       initialLikes[plan.id] = plan.interactions?.some(
+  //         (interaction) =>
+  //           String(interaction.user) === String(currentUserId) &&
+  //           interaction.interaction_type === "like"
+  //       );
+  //       initialShares[plan.id] = plan.interactions?.some(
+  //         (interaction) =>
+  //           String(interaction.user) === String(currentUserId) &&
+  //           interaction.interaction_type === "share"
+  //       );
+  //       initialLikeCounts[plan.id] =
+  //         plan.interactions?.filter(
+  //           (interaction) => interaction.interaction_type === "like"
+  //         ).length || 0;
+  //     });
+  //     setIsLiked(initialLikes);
+  //     setIsShared(initialShares);
+  //     setLikeCounts(initialLikeCounts);
+  //   }
+  // }, [tourPlanPublic, currentUserId]);
 
   // Force re-render of selectedPlan when likeCounts change
   useEffect(() => {

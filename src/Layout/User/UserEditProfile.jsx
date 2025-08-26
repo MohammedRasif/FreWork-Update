@@ -197,33 +197,8 @@ function UserEditProfile() {
             />
           </div>
           {/* Profession */}
-          <div>
-            <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Profession
-            </label>
-            <input
-              type="text"
-              name="profession"
-              value={formData.profession}
-              onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
-            />
-          </div>
-          {/* Education */}
-          <div>
-            <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Education
-            </label>
-            <input
-              type="text"
-              name="education"
-              value={formData.education}
-              onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
-            />
-          </div>
+          
+          
           {/* Gender and Age */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3">

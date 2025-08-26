@@ -100,12 +100,12 @@ function UserProfile() {
               {user.gender || "N/A"}
             </p>
           </div>
-          <div>
+          {/* <div>
             <p className="text-sm text-gray-500">Educational qualification</p>
             <p className="text-md font-medium text-gray-800">
               {user.education || "N/A"}
             </p>
-          </div>
+          </div> */}
           <div>
             <p className="text-sm text-gray-500">Language</p>
             <p className="text-md font-medium text-gray-800">

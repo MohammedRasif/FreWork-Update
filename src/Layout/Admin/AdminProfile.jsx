@@ -172,14 +172,14 @@ const AdminProfile = () => {
       icon: <FaEnvelope className="w-4 h-4 text-gray-500" />,
       text: profileData.contact_email,
     },
-    profileData?.website_url && {
-      icon: <FaGlobe className="w-4 h-4 text-gray-500" />,
-      text: profileData.website_url,
-    },
-    profileData?.address && {
-      icon: <FaMapMarkerAlt className="w-4 h-4 text-gray-500 mt-0.5" />,
-      text: profileData.address,
-    },
+    // profileData?.website_url && {
+    //   icon: <FaGlobe className="w-4 h-4 text-gray-500" />,
+    //   text: profileData.website_url,
+    // },
+    // profileData?.address && {
+    //   icon: <FaMapMarkerAlt className="w-4 h-4 text-gray-500 mt-0.5" />,
+    //   text: profileData.address,
+    // },
   ].filter(Boolean);
 
   return (
@@ -321,7 +321,7 @@ const AdminProfile = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
         <div className="bg-white p-3 sm:p-4 rounded-md">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
             Contact Information
@@ -344,7 +344,7 @@ const AdminProfile = () => {
           </div>
         </div>
 
-        <div className="bg-white p-3 sm:p-4 rounded-md">
+        {/* <div className="bg-white p-3 sm:p-4 rounded-md">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
             Facilities
           </h3>
@@ -366,9 +366,9 @@ const AdminProfile = () => {
               </p>
             )}
           </div>
-        </div>
+        </div> */}
 
-        <div className="bg-white p-3 sm:p-4 rounded-md">
+        {/* <div className="bg-white p-3 sm:p-4 rounded-md">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
             Service Categories
           </h3>
@@ -388,10 +388,8 @@ const AdminProfile = () => {
               </p>
             )}
           </div>
-        </div>
-      </div>
-
-      <div className="bg-white p-3 sm:p-4 rounded-md">
+        </div> */}
+        <div className="bg-white p-3 sm:p-4 rounded-md">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
           Our Aim
         </h3>
@@ -399,6 +397,9 @@ const AdminProfile = () => {
           {profileData?.our_aim || "No aim description available."}
         </p>
       </div>
+      </div>
+
+      
     </div>
   );
 };

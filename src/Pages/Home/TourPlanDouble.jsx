@@ -276,24 +276,24 @@ const TourPlanDouble = () => {
         if (selectedTour && selectedTour.id === tourId) {
           setSelectedTour((prev) =>
             prev
-              ? {
-                  ...prev,
-                  interactions: newIsLiked[tourId]
-                    ? [
-                        ...prev.interactions.filter(
+                ? {
+                    ...prev,
+                    interactions: newIsLiked[tourId]
+                      ? [
+                          ...prev.interactions.filter(
+                            (i) =>
+                              String(i.user) !== String(currentUserId) ||
+                              i.interaction_type !== "like"
+                          ),
+                          { user: currentUserId, interaction_type: "like" },
+                        ]
+                      : prev.interactions.filter(
                           (i) =>
                             String(i.user) !== String(currentUserId) ||
                             i.interaction_type !== "like"
                         ),
-                        { user: currentUserId, interaction_type: "like" },
-                      ]
-                    : prev.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "like"
-                      ),
-                }
-              : prev
+                  }
+                : prev
           );
         }
         return newIsLiked;
@@ -530,7 +530,7 @@ const TourPlanDouble = () => {
                           />
                           <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
-                              {tour.location_from}
+                              {tour.location_to}
                             </h2>
                             <p className="text-sm md:text-base opacity-90 italic">
                               Drone Shot
@@ -565,7 +565,7 @@ const TourPlanDouble = () => {
                       <div className="flex flex-col flex-grow p-4 space-y-1">
                         <div className="flex items-center justify-between">
                           <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
-                            {tour.location_from}
+                            {tour.location_to}
                           </h3>
                           <div className="flex items-center gap-2">
                             <svg
@@ -634,14 +634,16 @@ const TourPlanDouble = () => {
                           </p>
                         </div>
 
-                        <div className="pt-2 w-full">
-                          <button
-                            onClick={handleSentOfferClick}
-                            className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
-                          >
-                            Sent Offer
-                          </button>
-                        </div>
+                        {showSentOfferButton && (
+                          <div className="pt-2 w-full">
+                            <button
+                              onClick={handleSentOfferClick}
+                              className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
+                            >
+                              Sent Offer
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
