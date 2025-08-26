@@ -43,35 +43,32 @@ const UserAccepte = () => {
     setSelectedStar(index + 1);
   };
 
-  // Filter tours based on date, status, and search query
+  // Filter tours based on status, date, and search query
   const today = new Date();
-const upcomingTours = data?.filter((offer) => {
-  const startDate = new Date(offer.tour_plan.start_date);
-  const endDate = new Date(offer.tour_plan.end_date);
-  return (
-    startDate >= today &&
-    endDate >= today && // Ensure the tour hasn't ended
-    offer.status === "accepted" &&
-    (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
-    (!searchQuery ||
-      offer.tour_plan.location_to
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()))
-  );
-}) || [];
+  const upcomingTours = data?.filter((offer) => {
+    const startDate = new Date(offer.tour_plan.start_date);
+    const endDate = new Date(offer.tour_plan.end_date);
+    return (
+      offer.status === "accepted" &&
+      (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
+      (!searchQuery ||
+        offer.tour_plan.location_to
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()))
+    );
+  }) || [];
 
   const completedTours = data?.filter((offer) => {
-  const endDate = new Date(offer.tour_plan.end_date);
-  return (
-    endDate < today &&
-    offer.status === "completed" &&
-    (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
-    (!searchQuery ||
-      offer.tour_plan.location_to // Fixed from attour_plan
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()))
-  );
-}) || [];
+    const endDate = new Date(offer.tour_plan.end_date);
+    return (
+      offer.status === "completed" &&
+      (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
+      (!searchQuery ||
+        offer.tour_plan.location_to
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()))
+    );
+  }) || [];
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -168,7 +165,7 @@ const upcomingTours = data?.filter((offer) => {
           {isLoading ? (
             <FullScreenInfinityLoader />
           ) : upcomingTours.length === 0 ? (
-            <div className="w-full  rounded-xl p-4  flex justify-center h-auto items-center">
+            <div className="w-full rounded-xl p-4 flex justify-center h-auto items-center">
               <p className="text-[#70798F] text-lg">No upcoming tours found.</p>
             </div>
           ) : (
@@ -250,30 +247,46 @@ const upcomingTours = data?.filter((offer) => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div>
-                            <div className="text-sm font-medium">
-                              {offer.agency.agency_name}
-                            </div>
-                            <div className="flex items-center gap-1 justify-end">
-                              <FiStar className="text-yellow-400 fill-current" />
-                              <span className="text-sm">4.3 (355 Reviews)</span>
-                            </div>
-                          </div>
-                          <button className="text-blue-600 text-sm hover:underline cursor-pointer">
-                            See more
-                          </button>
-                        </div>
-                        <img
+                      <div className="">
+                        <div className="flex flex-col items-end">
+                           <img
                           src={offer.agency.logo_url}
-                          className="rounded-full w-16 h-16 object-cover"
+                          className="rounded-full w-16 h-16 object-cover "
                           alt="Agency logo"
                           onError={(e) => {
                             e.target.src =
                               "https://via.placeholder.com/64?text=Agency+Logo";
                           }}
                         />
+                        </div>
+                        <div className="text-right">
+                          <div>
+                            <div className="text-[24px] font-medium">
+                              {offer.agency.agency_name}
+                            </div>
+                            <div>
+                              <div className="text-[16px] text-gray-500">
+                                {offer.agency.contact_email}
+                              </div>
+                              <div>
+                                <div className="text-[16px] text-gray-500">
+                                  {offer.agency.contact_phone}
+                                </div>
+                                <div>
+                                  <div className="text-[16px] text-gray-500">
+                                    {offer.agency.address}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* <div className="flex items-center gap-1 justify-end">
+                              <FiStar className="text-yellow-400 fill-current" />
+                              <span className="text-sm">4.3 (355 Reviews)</span>
+                            </div> */}
+                          </div>
+                         
+                        </div>
+                       
                       </div>
                     </div>
                   </div>
@@ -286,14 +299,13 @@ const upcomingTours = data?.filter((offer) => {
 
       {activeTab === "completed" && (
         <div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {isLoading ? (
               <div className="w-full h-full flex items-center justify-center">
                 <FullScreenInfinityLoader />
               </div>
             ) : completedTours.length === 0 ? (
-              <div className="w-[80vh]  rounded-xl p-4 flex justify-center  items-center">
+              <div className="w-[80vh] rounded-xl p-4 flex justify-center items-center">
                 <p className="text-[#70798F] text-lg">
                   No completed tours found.
                 </p>
