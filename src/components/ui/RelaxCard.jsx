@@ -117,14 +117,14 @@ export default function BeachCard({ tourPlan }) {
             {localTourPlan.total_members}{" "}
             {localTourPlan.total_members > 1 ? "people" : "person"}
           </span>
-          {localTourPlan.offer_count > 0 && (
+          {/* {localTourPlan.offer_count > 0 && (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
               {localTourPlan.offer_count} Offer{localTourPlan.offer_count > 1 ? "s" : ""} received
             </span>
-          )}
+          )} */}
         </div>
 
-        <p className="text-sm text-gray-600 flex items-center gap-2">
+        {/* <p className="text-sm text-gray-600 flex items-center gap-2">
           <MapPin className="w-4 h-4 text-gray-500" />
           <span>
             <span className="font-medium">Points of travel:</span>{" "}
@@ -138,7 +138,7 @@ export default function BeachCard({ tourPlan }) {
             <span className="font-medium">Departure from:</span>{" "}
             {localTourPlan.location_from}
           </span>
-        </p>
+        </p> */}
 
         <div
           className={
