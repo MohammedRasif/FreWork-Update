@@ -3,11 +3,11 @@ import { HiDotsVertical } from "react-icons/hi";
 import { ThumbsUp, Heart, MessageCircle, Share2, Menu, MapPin, Navigation, X } from "lucide-react";
 import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 import { MdVerified } from "react-icons/md";
-import { useGetTourPlanPublicQuery } from "@/redux/features/baseApi";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
 import {
   useAcceptOfferMutation,
+  useGetTourPlanPublicQuery,
   useInviteToChatMutation,
   useLikePostMutation,
   useOfferBudgetMutation,

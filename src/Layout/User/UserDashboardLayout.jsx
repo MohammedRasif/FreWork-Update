@@ -105,10 +105,6 @@ export default function UserDashboardLayout() {
       toast.error(error?.data?.error || 'Failed to change password');
     }
   };
-
-
-
-
   // WebSocket for notifications
   useEffect(() => {
     ws.current = new WebSocket(notification_url);
@@ -282,7 +278,8 @@ useEffect(() => {
         {/* Logo */}
         {!isProfileLoading && profileData && (
           <div className="h-auto flex items-center px-4">
-            <div className="flex flex-col w-full justify-center items-center mt-16">
+            <NavLink to="/" className="w-full">
+              <div className="flex flex-col w-full justify-center items-center mt-16">
               <div className="relative">
                 <div
                   className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50 ${
@@ -294,7 +291,7 @@ useEffect(() => {
                   <img
                     src={profileData.profile_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
                     alt="User"
-                    className="w-16 rounded-full"
+                    className="w-16 h-16 rounded-full"
                   />
                 </div>
                 {profileData?.is_verified && (
@@ -312,6 +309,7 @@ useEffect(() => {
                 </span>
               </div>
             </div>
+            </NavLink>
           </div>
         )}
 

@@ -11,7 +11,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 
-import { useGetTourPlanPublicQuery } from "@/redux/features/baseApi";
 
 import Card from "@/components/ui/Card";
 import BeachCard from "@/components/ui/BeachCard";
@@ -21,6 +20,7 @@ import GroupCard from "@/components/ui/GroupCard";
 import { useRef } from "react";
 import { ArrowBigRight, ArrowLeft, ArrowRight } from "lucide-react";
 import { GoChevronRight } from "react-icons/go";
+import { useGetTourPlanPublicQuery } from "@/redux/features/withAuth";
 
 const Published = () => {
   const navigate = useNavigate();

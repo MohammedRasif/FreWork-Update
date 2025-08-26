@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { data } from "react-router-dom";
 
 export const sqQuery = createApi({
   reducerPath: "sqQuery",
@@ -8,14 +7,12 @@ export const sqQuery = createApi({
     prepareHeaders: (headers, { endpoint }) => {
       headers.set("ngrok-skip-browser-warning", "true");
 
-      // ✅ Skip token for public endpoints
-      const publicEndpoints = ["getOneDetail", "getTourPlanPublic"];
-      if (!publicEndpoints.includes(endpoint)) {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
+      // Include token for all requests if available, letting the server handle authentication
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
+      // The server should return public data without a token and enriched data with a token
 
       return headers;
     },
@@ -34,7 +31,7 @@ export const sqQuery = createApi({
     "Chat",
     "UserProfile",
     "Discount",
-    "PublishPlanDelete"
+    "PublishPlanDelete",
   ],
   endpoints: (builder) => ({
     newPassword: builder.mutation({
@@ -84,14 +81,20 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data.updates,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "TourPlan", id }, "TourPlan"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "TourPlan", id },
+        "TourPlan",
+      ],
     }),
     deletePlan: builder.mutation({
       query: (id) => ({
         url: `/tour-plans/${id}/`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [{ type: "TourPlan", id }, "TourPlan"],
+      invalidatesTags: (result, error, id) => [
+        { type: "TourPlan", id },
+        "TourPlan",
+      ],
     }),
     getOneDetail: builder.query({
       query: (id) => `/tour-plans/${id}/`,
@@ -117,7 +120,10 @@ export const sqQuery = createApi({
         method: "POST",
         body: int.data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "TourPlan", id }, "TourPlan"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "TourPlan", id },
+        "TourPlan",
+      ],
     }),
     // offer a budget
     offerBudget: builder.mutation({
@@ -208,7 +214,6 @@ export const sqQuery = createApi({
       query: (id) => `/chat/conversations/${id}/messages/`,
       providesTags: (result, error, id) => [{ type: "Chat", id }],
     }),
-    
 
     showUserInpormation: builder.query({
       query: () => "/auth/user_profile/",
@@ -231,18 +236,26 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["Discount", "Chat"],
     }),
-    finalOffer:builder.mutation({
-      query:({id,data})=>({
-        url:`/chat/conversations/${id}/send-final-offer/`,
-        method:"POST",
-        body:data
-      })
+    finalOffer: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/chat/conversations/${id}/send-final-offer/`,
+        method: "POST",
+        body: data,
+      }),
     }),
-    acceptFinalOffer:builder.mutation({
-      query:({id})=>({
-        url:`/chat/conversations/${id}/accept-final-offer/`,
-        method:"POST",
-      })
+    acceptFinalOffer: builder.mutation({
+      query: ({ id }) => ({
+        url: `/chat/conversations/${id}/accept-final-offer/`,
+        method: "POST",
+      }),
+    }),
+    //decline request
+    declineRequest: builder.mutation({
+      query: ({ id }) => ({
+        url: `declined-request/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Discount"],
     }),
     changePassword: builder.mutation({
       query: (data) => ({
@@ -253,22 +266,23 @@ export const sqQuery = createApi({
       invalidatesTags: ["UserProfile"],
     }),
 
-    // delete publish plan 
+    // delete publish plan
 
     deletePublishPlan: builder.mutation({
-      query:(id) => ({
+      query: (id) => ({
         url: `tour-plans/${id}/`,
-        method:"DELETE"
+        method: "DELETE",
       }),
-    invalidatesTags: (result, error, id) => [{ type: "PublishPlanDelete", id }, "PublishPlanDelete"],
-    })
-
-
-
-
-
-
-
+      invalidatesTags: (result, error, id) => [
+        { type: "PublishPlanDelete", id },
+        "PublishPlanDelete",
+      ],
+    }),
+    // Tour plan-related queries
+    getTourPlanPublic: builder.query({
+      query: () => `/public/tour-plans/`,
+      providesTags: ["TourPlan"], // Cache this query with TourPlan tag
+    }),
   }),
 });
 
@@ -324,4 +338,8 @@ export const {
 
   // delete publish
   useDeletePublishPlanMutation,
+
+  // decline request
+  useDeclineRequestMutation,
+  useGetTourPlanPublicQuery,
 } = sqQuery;

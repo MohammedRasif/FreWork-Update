@@ -32,7 +32,7 @@ const VacanzaMycost = () => {
           <div className="flex flex-row gap-4 items-center justify-center space-x-6 md:space-x-20 lg:space-x-32 w-full overflow-x-auto h-full">
             {/* Step 1 */}
            
-            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white">
+            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[290px] lg:bg-white">
               <div className="relative">
                 <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
                   <img
@@ -43,7 +43,7 @@ const VacanzaMycost = () => {
                 </div>
               </div>
               <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
-                Publish Request
+                Publish the requests
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
                 Enter Your Travel Request
@@ -52,7 +52,7 @@ const VacanzaMycost = () => {
               </p>
             </div>
             {/* Step 2 */}
-            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white">
+            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[300px] lg:bg-white">
               <div className="relative">
                 <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
                   <img
@@ -63,7 +63,7 @@ const VacanzaMycost = () => {
                 </div>
               </div>
               <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
-                Personalized Offers
+                Receive personalized offers
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
                 Get convenient proposals
@@ -83,7 +83,7 @@ const VacanzaMycost = () => {
                 </div>
               </div>
               <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
-                Free Booking
+                Choose and go
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
                 Easily contact the agency

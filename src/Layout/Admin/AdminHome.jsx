@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import { useGetTourPlanPublicQuery } from "@/redux/features/baseApi";
 import toast, { Toaster } from "react-hot-toast";
 import {
+  useDeclineRequestMutation,
+  useGetTourPlanPublicQuery,
   useLikePostMutation,
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
@@ -19,6 +20,7 @@ const currentUserId = localStorage.getItem("user_id");
 const AdminHome = () => {
   const [activeTab, setActiveTab] = useState("All Plans");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("All"); // New state for filter: "All" or "Offered"
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [modalType, setModalType] = useState("view"); // "view" or "offer"
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -39,34 +41,36 @@ const AdminHome = () => {
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
+  const [declineRequest, { isLoading: isDeclineRequestLoading }] =
+    useDeclineRequestMutation();
 
   // Initialize like, share, and like count states
-  // useEffect(() => {
-  //   if (tourPlanPublic && currentUserId) {
-  //     const initialLikes = {};
-  //     const initialShares = {};
-  //     const initialLikeCounts = {};
-  //     tourPlanPublic.forEach((plan) => {
-  //       initialLikes[plan.id] = plan.interactions?.some(
-  //         (interaction) =>
-  //           String(interaction.user) === String(currentUserId) &&
-  //           interaction.interaction_type === "like"
-  //       );
-  //       initialShares[plan.id] = plan.interactions?.some(
-  //         (interaction) =>
-  //           String(interaction.user) === String(currentUserId) &&
-  //           interaction.interaction_type === "share"
-  //       );
-  //       initialLikeCounts[plan.id] =
-  //         plan.interactions?.filter(
-  //           (interaction) => interaction.interaction_type === "like"
-  //         ).length || 0;
-  //     });
-  //     setIsLiked(initialLikes);
-  //     setIsShared(initialShares);
-  //     setLikeCounts(initialLikeCounts);
-  //   }
-  // }, [tourPlanPublic, currentUserId]);
+  useEffect(() => {
+    if (tourPlanPublic && currentUserId) {
+      const initialLikes = {};
+      const initialShares = {};
+      const initialLikeCounts = {};
+      tourPlanPublic.forEach((plan) => {
+        initialLikes[plan.id] = plan.interactions?.some(
+          (interaction) =>
+            String(interaction.user) === String(currentUserId) &&
+            interaction.interaction_type === "like"
+        );
+        initialShares[plan.id] = plan.interactions?.some(
+          (interaction) =>
+            String(interaction.user) === String(currentUserId) &&
+            interaction.interaction_type === "share"
+        );
+        initialLikeCounts[plan.id] =
+          plan.interactions?.filter(
+            (interaction) => interaction.interaction_type === "like"
+          ).length || 0;
+      });
+      setIsLiked(initialLikes);
+      setIsShared(initialShares);
+      setLikeCounts(initialLikeCounts);
+    }
+  }, [tourPlanPublic, currentUserId]);
 
   // Force re-render of selectedPlan when likeCounts change
   useEffect(() => {
@@ -90,10 +94,16 @@ const AdminHome = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter plans based on search query
-  const filteredPlans = tourPlanPublic.filter((plan) =>
-    plan.location_to.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter plans based on search query and filter option
+  const filteredPlans = tourPlanPublic.filter((plan) => {
+    const matchesSearch = plan.location_to
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      filter === "All" ||
+      (filter === "Offered" && plan.offered_status === true); // Filter by offered_status
+    return matchesSearch && matchesFilter;
+  });
 
   // Handle like/unlike action
   const handleLike = async (planId) => {
@@ -144,8 +154,10 @@ const AdminHome = () => {
         id: planId,
         data: { interaction_type: "like" },
       }).unwrap();
+      // Success is handled optimistically, no additional toast needed here
     } catch (error) {
       console.error("Failed to update like:", error);
+      // Revert optimistic updates on error
       setLikeCounts({ ...likeCounts, [planId]: likeCounts[planId] });
       setIsLiked({ ...isLiked, [planId]: wasLiked });
       if (selectedPlan && selectedPlan.id === planId) {
@@ -167,6 +179,7 @@ const AdminHome = () => {
             : prev
         );
       }
+      toast.error("Failed to like the plan");
     }
   };
 
@@ -306,6 +319,31 @@ const AdminHome = () => {
     }
   };
 
+  // Handle decline request
+  const handleDeclineRequest = async (planId) => {
+    if (!token) {
+      toast.error("Please log in to decline a request");
+      return;
+    }
+
+    try {
+      // Dismiss any existing toasts to avoid overlap
+      toast.dismiss();
+      await declineRequest({ id: planId }).unwrap();
+      toast.success("Request declined successfully");
+      // Optionally remove the plan from the list or update UI
+      setFilteredPlans((prev) => prev.filter((plan) => plan.id !== planId));
+      if (selectedPlan && selectedPlan.id === planId) {
+        closePopup();
+      }
+    } catch (error) {
+      // Dismiss any existing toasts before showing error
+      toast.dismiss();
+      console.error("Failed to decline request:", error);
+      toast.error(error.data?.error || "Failed to decline request");
+    }
+  };
+
   // Open/close popup
   const openPopup = (plan, type = "view") => {
     setSelectedPlan({
@@ -355,11 +393,11 @@ const AdminHome = () => {
           return (
             <div
               key={plan.id}
-              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6  mx-auto"
+              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
             >
-              <div className=" ">
+              <div className="">
                 <div className="flex justify-between">
-                  <div className=" flex ">
+                  <div className="flex">
                     <div>
                       {/* Resort Image */}
                       <div>
@@ -415,15 +453,6 @@ const AdminHome = () => {
                       </div>
                       <div className="flex flex-wrap gap-2 mt-4">
                         <button
-                          onClick={() => {
-                            // Handle deal closed action
-                            toast.success("Deal marked as closed");
-                          }}
-                          className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
-                        >
-                          Deal closed
-                        </button>
-                        <button
                           onClick={() => openPopup(plan, "view")}
                           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                         >
@@ -436,13 +465,13 @@ const AdminHome = () => {
                           Send offer
                         </button>
                         <button
-                          onClick={() => {
-                            // Handle decline request action
-                            toast.success("Request declined");
-                          }}
-                          className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
+                          onClick={() => handleDeclineRequest(plan.id)}
+                          disabled={isDeclineRequestLoading}
+                          className={`px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                            isDeclineRequestLoading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
                         >
-                          Decline request
+                          {isDeclineRequestLoading ? "Declining..." : "Decline request"}
                         </button>
                       </div>
                     </div>
@@ -683,30 +712,40 @@ const AdminHome = () => {
                 Choose perfect offer for you
               </span>
             </h1>
-            {/* Search field */}
+            {/* Search and Filter fields */}
             {activeTab === "All Plans" && (
-              <div className="relative w-full lg:max-w-[30vh]">
-                <input
-                  type="text"
-                  placeholder="Search by Tour Location"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
-                />
-                <svg
-                  className="absolute right-2 sm:right-3 lg:right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              <div className="flex items-center space-x-4">
+                <div className="relative w-full lg:max-w-[30vh]">
+                  <input
+                    type="text"
+                    placeholder="Search by Tour Location"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
                   />
-                </svg>
+                  <svg
+                    className="absolute right-2 sm:right-3 lg:right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700"
+                >
+                  <option value="All">All</option>
+                  <option value="Offered">Offered</option>
+                </select>
               </div>
             )}
           </div>
