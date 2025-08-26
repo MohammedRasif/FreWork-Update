@@ -4,7 +4,7 @@ import { data } from "react-router-dom";
 export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://endlessly-unified-guppy.ngrok-free.app",
+    baseUrl: "https://novel-fresh-spaniel.ngrok-free.app/",
     prepareHeaders: (headers, { endpoint }) => {
       headers.set("ngrok-skip-browser-warning", "true");
 
