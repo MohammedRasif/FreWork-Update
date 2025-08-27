@@ -4,6 +4,7 @@ import img from "../../assets/img/background.jpg";
 import img1 from "../../assets/img/banner.png";
 import { useState } from "react";
 import BannerSectionPopup from "./bannerSectionPupup";
+import { useNavigate } from "react-router-dom";
 
 
 const Banner = () => {
@@ -11,6 +12,10 @@ const Banner = () => {
   const accessToken = localStorage.getItem("access_token");
   const role = localStorage.getItem("role");
   const showCreateRequestButton = !accessToken || role === "tourist";
+  const navigator = useNavigate();
+  if (accessToken == null) {
+    navigator("/login");
+  }
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);

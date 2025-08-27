@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { HiDotsVertical } from "react-icons/hi";
-import { ThumbsUp, Heart, MessageCircle, Share2, Menu, MapPin, Navigation, X } from "lucide-react";
+import {
+  ThumbsUp,
+  Heart,
+  MessageCircle,
+  Share2,
+  Menu,
+  MapPin,
+  Navigation,
+  X,
+  ShieldCheck,
+  Clock4,
+  BedDouble,
+  Utensils,
+} from "lucide-react";
 import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 import { MdVerified } from "react-icons/md";
 import { debounce } from "lodash";
@@ -15,6 +28,7 @@ import {
 } from "@/redux/features/withAuth";
 import toast, { Toaster } from "react-hot-toast";
 import TourPlanPopup from "./TourPlanPopup";
+import { FaListUl } from "react-icons/fa";
 
 // Temporary fallback for FullScreenInfinityLoader
 const FullScreenInfinityLoader = () => (
@@ -57,10 +71,13 @@ const TourPlanDouble = () => {
     }
   }, []);
 
-  const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } = useGetTourPlanPublicQuery();
+  const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
+    useGetTourPlanPublicQuery();
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
-  const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] = useOfferBudgetMutation();
-  const [acceptOffer, { isLoading: isAcceptLoading }] = useAcceptOfferMutation();
+  const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
+    useOfferBudgetMutation();
+  const [acceptOffer, { isLoading: isAcceptLoading }] =
+    useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
 
@@ -94,13 +111,17 @@ const TourPlanDouble = () => {
 
     if (filters.destination_type) {
       filteredData = filteredData.filter(
-        (tour) => tour.destination_type?.toLowerCase() === filters.destination_type.toLowerCase()
+        (tour) =>
+          tour.destination_type?.toLowerCase() ===
+          filters.destination_type.toLowerCase()
       );
     }
 
     if (filters.travel_type) {
       filteredData = filteredData.filter((tour) =>
-        tour.travel_type?.toLowerCase().includes(filters.travel_type.toLowerCase())
+        tour.travel_type
+          ?.toLowerCase()
+          .includes(filters.travel_type.toLowerCase())
       );
     }
 
@@ -178,7 +199,9 @@ const TourPlanDouble = () => {
         offered_budget: parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
+        discount: offerForm.applyDiscount
+          ? parseFloat(offerForm.discount)
+          : null,
       };
 
       const response = await offerBudgetToBack({
@@ -191,7 +214,9 @@ const TourPlanDouble = () => {
         offered_budget: parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
+        discount: offerForm.applyDiscount
+          ? parseFloat(offerForm.discount)
+          : null,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -276,24 +301,24 @@ const TourPlanDouble = () => {
         if (selectedTour && selectedTour.id === tourId) {
           setSelectedTour((prev) =>
             prev
-                ? {
-                    ...prev,
-                    interactions: newIsLiked[tourId]
-                      ? [
-                          ...prev.interactions.filter(
-                            (i) =>
-                              String(i.user) !== String(currentUserId) ||
-                              i.interaction_type !== "like"
-                          ),
-                          { user: currentUserId, interaction_type: "like" },
-                        ]
-                      : prev.interactions.filter(
+              ? {
+                  ...prev,
+                  interactions: newIsLiked[tourId]
+                    ? [
+                        ...prev.interactions.filter(
                           (i) =>
                             String(i.user) !== String(currentUserId) ||
                             i.interaction_type !== "like"
                         ),
-                  }
-                : prev
+                        { user: currentUserId, interaction_type: "like" },
+                      ]
+                    : prev.interactions.filter(
+                        (i) =>
+                          String(i.user) !== String(currentUserId) ||
+                          i.interaction_type !== "like"
+                      ),
+                }
+              : prev
           );
         }
         return newIsLiked;
@@ -465,7 +490,9 @@ const TourPlanDouble = () => {
                       placeholder="Search by departure location..."
                       className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full sm:w-64"
                       value={filters.search}
-                      onChange={(e) => handleFilterChange("search", e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("search", e.target.value)
+                      }
                     />
                     <svg
                       className="absolute left-3 top-2.5 h-4 w-4 text-gray-400"
@@ -507,7 +534,9 @@ const TourPlanDouble = () => {
                       return;
                     }
                     if (hasMaxOffers) {
-                      toast.error("Sorry, this post already has 3 offers submitted.");
+                      toast.error(
+                        "Sorry, this post already has 3 offers submitted."
+                      );
                     } else {
                       openPopup(tour);
                     }
@@ -519,14 +548,14 @@ const TourPlanDouble = () => {
                       className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6"
                     >
                       <div className="relative">
-                        <div className="aspect-[4/3] overflow-hidden">
+                        <div className="] overflow-hidden">
                           <img
                             src={
                               tour.spot_picture_url ||
                               "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                             }
                             alt={`${tour.location_to} destination`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300"
                           />
                           <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
@@ -545,7 +574,10 @@ const TourPlanDouble = () => {
                                     offer.agency?.logo_url ||
                                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
-                                  alt={`${offer.agency?.agency_name || "Unknown Agency"} logo`}
+                                  alt={`${
+                                    offer.agency?.agency_name ||
+                                    "Unknown Agency"
+                                  } logo`}
                                   className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
                                 />
                               ))}
@@ -555,7 +587,10 @@ const TourPlanDouble = () => {
                             <div></div>
                           ) : (
                             <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
-                              <IoCheckmarkCircleSharp className="mr-1" size={16} />
+                              <IoCheckmarkCircleSharp
+                                className="mr-1"
+                                size={16}
+                              />
                               Offers completed
                             </div>
                           )}
@@ -612,24 +647,73 @@ const TourPlanDouble = () => {
                         </div>
 
                         <div>
+                          {/* Points of travel */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MapPin className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Points of travel:</span>{" "}
+                              <span className="font-medium">
+                                Points of travel:
+                              </span>{" "}
                               {tour.tourist_spots || "None"}
                             </span>
                           </p>
+
+                          {/* Departure from */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <Navigation className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Departure from:</span>{" "}
+                              <span className="font-medium">
+                                Departure from:
+                              </span>{" "}
                               {tour.location_from || "N/A"}
                             </span>
                           </p>
+
+                          {/* Includes */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <IoPersonSharp className="w-6 h-5 text-gray-500" />
+                            <FaListUl className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Contact verified via email</span>
+                              <span className="font-medium">Includes:</span>{" "}
+                              {tour.includes || "N/A"}
+                            </span>
+                          </p>
+
+                          {/* Meal plan */}
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <Utensils className="w-6 h-5 text-gray-500" />
+                            <span>
+                              <span className="font-medium">Meal plan:</span>{" "}
+                              {tour.meal_plan || "N/A"}
+                            </span>
+                          </p>
+
+                          {/* Accommodation */}
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <BedDouble className="w-6 h-5 text-gray-500" />
+                            <span>
+                              <span className="font-medium">
+                                Type of accommodation:
+                              </span>{" "}
+                              {tour.type_of_accommodation || "N/A"}
+                            </span>
+                          </p>
+
+                          {/* Duration */}
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <Clock4 className="w-6 h-5 text-gray-500" />
+                            <span>
+                              <span className="font-medium">Duration:</span>{" "}
+                              {tour.Duration || "N/A"}
+                            </span>
+                          </p>
+
+                          {/* Contact Verified */}
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <ShieldCheck className="w-6 h-5 text-green-500" />
+                            <span>
+                              <span className="font-medium">
+                                Contact verified via email
+                              </span>
                             </span>
                           </p>
                         </div>
@@ -679,7 +763,9 @@ const TourPlanDouble = () => {
                     placeholder="Search by departure location"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.search}
-                    onChange={(e) => handleFilterChange("search", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -692,14 +778,18 @@ const TourPlanDouble = () => {
                       placeholder="Min"
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={filters.min}
-                      onChange={(e) => handleFilterChange("min", e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("min", e.target.value)
+                      }
                     />
                     <input
                       type="text"
                       placeholder="Max"
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={filters.max}
-                      onChange={(e) => handleFilterChange("max", e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("max", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -710,7 +800,9 @@ const TourPlanDouble = () => {
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
                     value={filters.country}
-                    onChange={(e) => handleFilterChange("country", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("country", e.target.value)
+                    }
                   >
                     <option value="">Select a country</option>
                     <option value="thailand">Thailand</option>
@@ -732,7 +824,9 @@ const TourPlanDouble = () => {
                     placeholder="Search by travel type"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.travel_type}
-                    onChange={(e) => handleFilterChange("travel_type", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("travel_type", e.target.value)
+                    }
                   />
                 </div>
               </div>
