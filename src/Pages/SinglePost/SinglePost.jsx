@@ -8,13 +8,24 @@ import {
 } from "@/redux/features/withAuth";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ThumbsUp, Share2, MapPin, Navigation, X } from "lucide-react";
+import {
+  ThumbsUp,
+  Share2,
+  MapPin,
+  Navigation,
+  X,
+  Utensils,
+  BedDouble,
+  Clock4,
+  ShieldCheck,
+} from "lucide-react";
 import { MdOutlineKeyboardBackspace, MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
+import { FaListUl } from "react-icons/fa";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
@@ -322,7 +333,9 @@ function SinglePost({ prid }) {
                       offer.agency?.logo_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={`${offer.agency?.agency_name || "Unknown Agency"} logo`}
+                    alt={`${
+                      offer.agency?.agency_name || "Unknown Agency"
+                    } logo`}
                     className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
                   />
                 ))}
@@ -386,6 +399,7 @@ function SinglePost({ prid }) {
           </div>
 
           <div>
+            {/* Points of travel */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MapPin className="w-6 h-5 text-gray-500" />
               <span>
@@ -394,6 +408,7 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
+            {/* Departure from */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <Navigation className="w-6 h-5 text-gray-500" />
               <span>
@@ -401,14 +416,51 @@ function SinglePost({ prid }) {
                 {tour.location_from || "N/A"}
               </span>
             </p>
+
+            {/* Includes */}
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <IoPersonSharp className="w-6 h-5 text-gray-500" />
+              <FaListUl className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Includes:</span>{" "}
+                {tour.includes || "N/A"}
+              </span>
+            </p>
+
+            {/* Meal plan */}
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <Utensils className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Meal plan:</span>{" "}
+                {tour.meal_plan || "N/A"}
+              </span>
+            </p>
+
+            {/* Accommodation */}
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <BedDouble className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Type of accommodation:</span>{" "}
+                {tour.type_of_accommodation || "N/A"}
+              </span>
+            </p>
+
+            {/* Duration */}
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <Clock4 className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Duration:</span>{" "}
+                {tour.Duration || "N/A"}
+              </span>
+            </p>
+
+            {/* Contact Verified */}
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <ShieldCheck className="w-6 h-5 text-green-500" />
               <span>
                 <span className="font-medium">Contact verified via email</span>
               </span>
             </p>
           </div>
-
           <div className="pt-2 w-full">
             <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
               {showSentOfferButton && (

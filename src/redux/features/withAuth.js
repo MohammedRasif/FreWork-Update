@@ -250,13 +250,15 @@ export const sqQuery = createApi({
       }),
     }),
     //decline request
-    declineRequest: builder.mutation({
-      query: ({ id }) => ({
-        url: `declined-request/${id}`,
-        method: "POST",
-      }),
-      invalidatesTags: ["Discount"],
-    }),
+ declineRequest: builder.mutation({
+   query: ({ id }) => ({
+     url: `declined-request/${id}`,
+     method: "POST",
+   }),
+   invalidatesTags: ["Discount", "Chat"]
+
+}),
+
     changePassword: builder.mutation({
       query: (data) => ({
         url: "/auth/change-password/",

@@ -327,23 +327,13 @@ const AdminHome = () => {
     }
 
     try {
-      // Dismiss any existing toasts to avoid overlap
-      toast.dismiss();
-      await declineRequest({ id: planId }).unwrap();
+      const res = await declineRequest({ id: planId }).unwrap();
+
       toast.success("Request declined successfully");
-      // Optionally remove the plan from the list or update UI
-      setFilteredPlans((prev) => prev.filter((plan) => plan.id !== planId));
-      if (selectedPlan && selectedPlan.id === planId) {
-        closePopup();
-      }
     } catch (error) {
-      // Dismiss any existing toasts before showing error
-      toast.dismiss();
-      console.error("Failed to decline request:", error);
-      toast.error(error.data?.error || "Failed to decline request");
+      toast.error(error?.data?.error || "Failed to decline request");
     }
   };
-
   // Open/close popup
   const openPopup = (plan, type = "view") => {
     setSelectedPlan({
@@ -468,10 +458,14 @@ const AdminHome = () => {
                           onClick={() => handleDeclineRequest(plan.id)}
                           disabled={isDeclineRequestLoading}
                           className={`px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                            isDeclineRequestLoading ? "opacity-50 cursor-not-allowed" : ""
+                            isDeclineRequestLoading
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }`}
                         >
-                          {isDeclineRequestLoading ? "Declining..." : "Decline request"}
+                          {isDeclineRequestLoading
+                            ? "Declining..."
+                            : "Decline request"}
                         </button>
                       </div>
                     </div>
