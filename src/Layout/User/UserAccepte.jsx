@@ -45,30 +45,32 @@ const UserAccepte = () => {
 
   // Filter tours based on status, date, and search query
   const today = new Date();
-  const upcomingTours = data?.filter((offer) => {
-    const startDate = new Date(offer.tour_plan.start_date);
-    const endDate = new Date(offer.tour_plan.end_date);
-    return (
-      offer.status === "accepted" &&
-      (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
-      (!searchQuery ||
-        offer.tour_plan.location_to
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()))
-    );
-  }) || [];
+  const upcomingTours =
+    data?.filter((offer) => {
+      const startDate = new Date(offer.tour_plan.start_date);
+      const endDate = new Date(offer.tour_plan.end_date);
+      return (
+        offer.status === "accepted" &&
+        (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
+        (!searchQuery ||
+          offer.tour_plan.location_to
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()))
+      );
+    }) || [];
 
-  const completedTours = data?.filter((offer) => {
-    const endDate = new Date(offer.tour_plan.end_date);
-    return (
-      offer.status === "completed" &&
-      (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
-      (!searchQuery ||
-        offer.tour_plan.location_to
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()))
-    );
-  }) || [];
+  const completedTours =
+    data?.filter((offer) => {
+      const endDate = new Date(offer.tour_plan.end_date);
+      return (
+        offer.status === "completed" &&
+        (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
+        (!searchQuery ||
+          offer.tour_plan.location_to
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()))
+      );
+    }) || [];
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -172,20 +174,20 @@ const UserAccepte = () => {
             upcomingTours.map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                className="bg-white rounded-lg shadow-md overflow-hidden mb-6"
               >
                 <div className="flex">
-                  <div className="w-1/3 overflow-hidden">
+                  <div className="w-3/6 overflow-hidden">
                     <img
-                      src={offer.tour_plan.spot_picture_url}
+                      src={
+                        offer.tour_plan.spot_picture_url ||
+                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                      }
                       alt={`Tour to ${offer.tour_plan.location_to}`}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/300x200?text=Tour+Image";
-                      }}
                     />
                   </div>
+
                   <div className="w-full p-6">
                     <div className="flex justify-between items-start mb-4 h-full">
                       <div className="flex flex-col h-full">
@@ -249,15 +251,15 @@ const UserAccepte = () => {
                       </div>
                       <div className="">
                         <div className="flex flex-col items-end">
-                           <img
-                          src={offer.agency.logo_url}
-                          className="rounded-full w-16 h-16 object-cover "
-                          alt="Agency logo"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/64?text=Agency+Logo";
-                          }}
-                        />
+                          <img
+                            src={offer.agency.logo_url}
+                            className="rounded-full w-16 h-16 object-cover "
+                            alt="Agency logo"
+                            onError={(e) => {
+                              e.target.src =
+                                "https://via.placeholder.com/64?text=Agency+Logo";
+                            }}
+                          />
                         </div>
                         <div className="text-right">
                           <div>
@@ -284,9 +286,7 @@ const UserAccepte = () => {
                               <span className="text-sm">4.3 (355 Reviews)</span>
                             </div> */}
                           </div>
-                         
                         </div>
-                       
                       </div>
                     </div>
                   </div>

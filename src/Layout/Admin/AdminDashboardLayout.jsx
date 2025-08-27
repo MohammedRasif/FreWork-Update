@@ -136,6 +136,10 @@ export default function AdminDashboardLayout() {
     if (itemName === "Logout") {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
+      localStorage.removeItem("name");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("user_image");
       navigate(path);
     } else if (itemName === "Change password") {
       setIsChangePasswordOpen(true);

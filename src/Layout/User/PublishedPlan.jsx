@@ -391,7 +391,7 @@ function PublishedPlan() {
                       <img
                         src={
                           plan.spot_picture_url ||
-                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png?height=256&width=512"
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                         }
                         alt="Tour destination"
                         className="w-full h-96 object-cover"
@@ -490,7 +490,7 @@ function PublishedPlan() {
                             <div className="flex items-center gap-4">
                               <img
                                 src={
-                                  offer.image ||
+                                  offer.agency.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={`${offer.company} avatar`}

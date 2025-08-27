@@ -5,7 +5,6 @@ import { MdVerified } from "react-icons/md";
 import toast from "react-hot-toast";
 import { IoIosSend } from "react-icons/io";
 
-
 const TourPlanPopup = ({
   tour,
   onClose,
@@ -31,7 +30,6 @@ const TourPlanPopup = ({
     discount: "",
   });
 
-  
   const truncateText = (text, wordLimit = 100) => {
     if (!text || typeof text !== "string") {
       return { truncated: "", isTruncated: false };
@@ -436,7 +434,12 @@ const TourPlanPopup = ({
                         />
                       </div>
                       <button
-                        onClick={() => handleSubmitOffer(tour.id, offerBudget, offerComment)}
+                        onClick={() =>
+                          handleSubmitOffer(tour.id, offerBudget, offerComment, {
+                            applyDiscount: offerForm.applyDiscount,
+                            discount: offerForm.discount,
+                          })
+                        }
                         className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center cursor-pointer ${
                           offerBudget &&
                           offerComment.trim() &&

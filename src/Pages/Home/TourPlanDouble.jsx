@@ -37,9 +37,6 @@ const FullScreenInfinityLoader = () => (
   </div>
 );
 
-const token = localStorage.getItem("access_token");
-const currentUserId = localStorage.getItem("user_id");
-
 const TourPlanDouble = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
   const [isLiked, setIsLiked] = useState({});
@@ -59,6 +56,9 @@ const TourPlanDouble = () => {
     destination_type: "",
     travel_type: "",
   });
+
+  const token = localStorage.getItem("access_token");
+  const currentUserId = localStorage.getItem("user_id");
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top when component mounts
@@ -182,7 +182,7 @@ const TourPlanDouble = () => {
     setSelectedTour(null);
   };
 
-  const handleSubmitOffer = async (tourId, budget, comment) => {
+  const handleSubmitOffer = async (tourId, budget, comment, offerForm) => {
     if (!token) {
       navigate("/login");
       toast.error("Please log in to submit an offer");
@@ -199,9 +199,7 @@ const TourPlanDouble = () => {
         offered_budget: parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? parseFloat(offerForm.discount)
-          : null,
+        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
       };
 
       const response = await offerBudgetToBack({
@@ -214,9 +212,7 @@ const TourPlanDouble = () => {
         offered_budget: parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? parseFloat(offerForm.discount)
-          : null,
+        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -254,8 +250,8 @@ const TourPlanDouble = () => {
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error?.data?.detail
-          ? `${error.data.detail} Only agency can do this.`
+        error?.data?.error
+          ? `${error.data.error} Only agency can do this.`
           : "Something went wrong"
       );
     }
@@ -548,7 +544,7 @@ const TourPlanDouble = () => {
                       className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6"
                     >
                       <div className="relative">
-                        <div className="] overflow-hidden">
+                        <div className="overflow-hidden">
                           <img
                             src={
                               tour.spot_picture_url ||
