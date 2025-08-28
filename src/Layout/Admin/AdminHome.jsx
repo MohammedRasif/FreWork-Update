@@ -562,7 +562,7 @@ const AdminHome = () => {
                 <img
                   src={
                     selectedPlan.spot_picture_url ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                   }
                   alt="Tour destination"
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"

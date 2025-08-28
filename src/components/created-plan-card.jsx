@@ -5,6 +5,8 @@ import {
   Trash,
   MoveLeft,
   Edit,
+  MessageSquare,
+  Check,
 } from "lucide-react";
 import PlanImage1 from "../assets/img/plan-image-1.png";
 import CardViewImage from "../assets/img/card-view-image.png";
@@ -22,18 +24,51 @@ import {
   DialogHeader,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Overlay } from "@radix-ui/react-dialog"; // Import Overlay
+import { Overlay } from "@radix-ui/react-dialog"; 
 import {
   useDeletePlanMutation,
+  useInviteToChatMutation,
   useUpdatePlanMutation,
 } from "@/redux/features/withAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoArrowBackSharp } from "react-icons/io5";
+import { FaMoneyBillWave } from "react-icons/fa";
+import { MdVerified } from "react-icons/md";
+import { toast } from "react-toastify";
 
 export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   console.log(plan);
   const [updatePlan, { isLoading: updateLoading }] = useUpdatePlanMutation();
   const [deletePlan, { isLoading: deleteLoading }] = useDeletePlanMutation();
+  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
+    useInviteToChatMutation();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
+  const currentUserId = parseInt(localStorage.getItem("user_id"));
+
+  const handleMessage = async (offer) => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const otherUserId = offer?.agency?.user; 
+
+    if (!otherUserId) {
+      toast.error("Recipient ID not found.");
+      return;
+    }
+
+    try {
+      await invite({ other_user_id: otherUserId });
+      toast.success("Chat invitation sent successfully!");
+      navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+    } catch (error) {
+      console.error("Invite error:", error);
+      toast.error("Failed to send chat invitation. Please try again.");
+    }
+  };
 
   const handlePublishToggle = async () => {
     try {
@@ -72,7 +107,10 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
       {/* left image */}
       <div className="w-full md:w-[168px] h-[200px] md:h-[147px] rounded-md overflow-hidden">
         <img
-          src={plan.spot_picture_url || PlanImage1}
+          src={
+            plan.spot_picture_url ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+          }
           alt="Plan Image"
           className="w-full h-full object-cover object-center"
         />
@@ -162,28 +200,40 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                   <Button variant="secondary">View</Button>
                 </DialogTrigger>
                 <Overlay className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" />
-                
+
                 <DialogContent className="max-w-3xl">
-                  <DialogClose >
-                      <button className="flex justify-start hover:cursor-pointer w-10"><IoArrowBackSharp size={20}/></button>
-                    </DialogClose>
+                  <DialogClose>
+                    <button className="flex justify-start hover:cursor-pointer w-10">
+                      <IoArrowBackSharp size={20} />
+                    </button>
+                  </DialogClose>
                   <DialogHeader>
-                    <h3 className="text-xl font-semibold">{plan.location_from} to {plan.location_to}</h3>
+                    <h3 className="text-xl font-semibold">
+                      {plan.location_from} to {plan.location_to}
+                    </h3>
                   </DialogHeader>
                   <div className="space-y-4">
                     {/* Larger image section */}
-                   
 
                     {/* Plan details */}
                     <div>
                       <p className="text-sm text-[#70798F]">
-                        Willing to go on: <span className="text-[#343E4B] font-medium">{new Date(plan.start_date).toLocaleDateString()}</span>
+                        Willing to go on:{" "}
+                        <span className="text-[#343E4B] font-medium">
+                          {new Date(plan.start_date).toLocaleDateString()}
+                        </span>
                       </p>
                       <p className="text-sm text-[#70798F]">
-                        Duration: <span className="text-[#343E4B] font-medium">{plan.duration || '10 Days'}</span>
+                        Duration:{" "}
+                        <span className="text-[#343E4B] font-medium">
+                          {plan.duration || "10 Days"}
+                        </span>
                       </p>
                       <p className="text-sm text-[#70798F] mb-3">
-                        Category: <span className="text-[#343E4B] font-medium">{plan.destination_type}</span>
+                        Category:{" "}
+                        <span className="text-[#343E4B] font-medium">
+                          {plan.destination_type}
+                        </span>
                       </p>
                       {/* <p className="text-sm text-[#70798F]">
                         Budget: <span className="text-[#343E4B] font-medium">${plan.budget} USD</span>
@@ -192,21 +242,83 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         Total Members: <span className="text-[#343E4B] font-medium">{plan.total_members} Person</span>
                       </p> */}
                       <p className="text-sm text-[#70798F] mb-2">
-                      {plan.description || 'Lorem Ipsum is simply dummy text... see more'}
+                        {plan.description ||
+                          "Lorem Ipsum is simply dummy text... see more"}
                       </p>
                       <p className="text-sm text-[#70798F]">
-                        Interested Tourist Points: <span className="text-[#343E4B] font-medium">{plan.tourist_spots || 'Location, Location, Location, Location, Location'}</span>
+                        Interested Tourist Points:{" "}
+                        <span className="text-[#343E4B] font-medium">
+                          {plan.tourist_spots ||
+                            "Location, Location, Location, Location, Location"}
+                        </span>
                       </p>
                     </div>
-                     <div className="w-full h-[350px] rounded-md overflow-hidden">
+
+                    <div className="w-full h-[300px] rounded-md overflow-hidden">
                       <img
                         src={plan.spot_picture_url || PlanImage1}
                         alt="Plan Image"
                         className="w-full h-full  object-center"
                       />
                     </div>
+                    <div>
+                      <h1 className="text-xl font-semibold">
+                        Agencies Who Made Offers
+                      </h1>
+                      {plan?.offers?.map((offer) => (
+                        <div className="flex items-center justify-between  p-4 rounded-xl w-full">
+                          {/* Left Section: Logo + Agency Info */}
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={
+                                offer?.agency?.logo_url ||
+                                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                              }
+                              alt={offer?.agency?.agency_name}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
 
-                    
+                            <div>
+                              <div className="flex items-center gap-1">
+                                <h2 className="font-semibold text-gray-900">
+                                  {offer?.agency?.agency_name ||
+                                    "Unknown Agency"}
+                                </h2>
+                                {offer?.agency?.is_verified && (
+                                  <MdVerified
+                                    size={20}
+                                    className="sm:w-5 sm:h-5 text-blue-700"
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Section: Price + Message Button */}
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 text-gray-800 font-medium">
+                              <FaMoneyBillWave className="text-orange-500" />$
+                              {offer?.offered_budget}
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1 text-gray-800 font-medium">
+                                <FaMoneyBillWave className="text-orange-500" />$
+                                {offer?.offered_budget}
+                              </div>
+
+                              <button
+                                onClick={() => handleMessage(offer)}
+                                className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                                disabled={isInviteLoading}
+                              >
+                                <MessageSquare size={16} /> Message
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
