@@ -285,6 +285,19 @@ export const sqQuery = createApi({
       query: () => `/public/tour-plans/`,
       providesTags: ["TourPlan"], // Cache this query with TourPlan tag
     }),
+
+    // seen notification
+    seenNotification: builder.mutation({
+      query: (data) => ({
+        url: "read-all/",
+        method: "POST", // Assuming POST method for marking as seen action  
+      }),
+      invalidatesTags: ["Notification"],
+    }),
+
+
+
+
   }),
 });
 
@@ -344,4 +357,6 @@ export const {
   // decline request
   useDeclineRequestMutation,
   useGetTourPlanPublicQuery,
+  // seen notification
+  useSeenNotificationMutation,
 } = sqQuery;

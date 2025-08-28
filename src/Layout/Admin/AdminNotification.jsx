@@ -1,4 +1,4 @@
-import { useGetNotificationsQuery } from "@/redux/features/withAuth";
+import { useGetNotificationsQuery, useSeenNotificationMutation } from "@/redux/features/withAuth";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -9,13 +9,53 @@ const AdminNotification = () => {
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const { data: notificationsData, isLoading: isNotificationsLoading } =
     useGetNotificationsQuery();
+  const [seenNotification] = useSeenNotificationMutation();
+  const token = localStorage.getItem("access_token");
+  console.log(token)
+
+
+  useEffect(() => {
+    
+    const baseUrl = "https://novel-fresh-spaniel.ngrok-free.app/";
+    const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
+    const socket = new WebSocket(socketUrl);
+    
+
+    socket.onmessage = (event) => {
+      try {
+        const newNotification = JSON.parse(event.data);
+        
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
+    };
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+    return () => {
+      socket.close();
+    };
+  }, [token]); 
 
   useEffect(() => {
     if (notificationsData) {
       setNotifications(notificationsData);
+      notificationsData.forEach((item) => {
+        if (!item.seen) {
+          seenNotification(item.id);
+        }
+      });
       console.log(notificationsData);
     }
-  }, [isNotificationsLoading]);
+  }, [notificationsData, seenNotification]);
 
   const handleDeleteClick = (id) => {
     setSelectedNotificationId(id);
@@ -80,7 +120,6 @@ const AdminNotification = () => {
                 </button>
               </div>
             </div>
-            // <div>hello {console.log(item)}</div>
           ))}
       </div>
 
