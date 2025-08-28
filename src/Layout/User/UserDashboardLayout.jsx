@@ -60,6 +60,7 @@ export default function UserDashboardLayout() {
     new_password: "",
     confirm_password: "",
   });
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
@@ -114,19 +115,26 @@ export default function UserDashboardLayout() {
     const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
     ws.current.onopen = () => {
-      console.log("Success WebSocket connected");
+      console.log("WebSocket connected successfully");
     };
     ws.current.onmessage = (event) => {
-      console.log("Raw message:", event.data);
+      console.log("Raw message received:", event.data); // Debug raw data
       try {
-        console.log("Parsed message:", data);
+        const messageData = JSON.parse(event.data);
+        console.log("Parsed message:", messageData); // Debug parsed data
+        if (messageData.unread_count !== undefined) {
+          setUnreadCount(messageData.unread_count);
+          console.log("Updated unreadCount:", messageData.unread_count); // Debug state update
+        } else {
+          console.warn("unread_count not found in message:", messageData);
+        }
       } catch (error) {
         console.error("Error parsing message:", error);
       }
     };
 
     ws.current.onerror = (error) => {
-      console.error("WebSocket error details:", error);
+      console.error("WebSocket error:", error);
       if (error.message) console.error("Error message:", error.message);
       if (error.code) console.error("Error code:", error.code);
     };
@@ -540,16 +548,17 @@ export default function UserDashboardLayout() {
               <NavLink
                 to="/user/notification"
                 className={({ isActive }) =>
-                  `p-2 rounded-full relative ${
-                    isActive ? "bg-[#3776E2] text-white" : "bg-[#EEF1F5]"
-                  }`
+                  `p-2 rounded-full relative z-10 ${isActive ? " " : ""}`
                 }
               >
-                <Bell size={20} className="sm:w-6 sm:h-6" />
-                {notifications.length > 0 && (
-                  <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
-                )}
+                <Bell size={20} className="sm:w-6 sm:h-6  " />
               </NavLink>
+              {unreadCount > 0 && (
+                <h1 className="-ml-11 font-bold -mt-5 z-30 hover:cursor-pointer">
+                  {unreadCount}
+                </h1>
+              )}
+
               <div className="hidden sm:flex items-center justify-center gap-5">
                 <h4 className="text-xl font-medium">Settings</h4>
                 <DropdownMenu>
