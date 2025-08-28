@@ -87,7 +87,7 @@ const TourPlanDouble = () => {
 
     if (filters.search) {
       filteredData = filteredData.filter((tour) =>
-        tour.location_from?.toLowerCase().includes(filters.search.toLowerCase())
+        tour.location_to?.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
 
@@ -483,7 +483,7 @@ const TourPlanDouble = () => {
                   <div className="relative w-full sm:w-auto">
                     <input
                       type="text"
-                      placeholder="Search by departure location..."
+                      placeholder="Search by destination"
                       className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full sm:w-64"
                       value={filters.search}
                       onChange={(e) =>
@@ -750,20 +750,20 @@ const TourPlanDouble = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Search by Departure Location
+                    Search by Destination
                   </label>
                   <input
                     type="text"
-                    placeholder="Search by departure location"
+                    placeholder="Search by destination"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
                       handleFilterChange("search", e.target.value)
                     }
                   />
-                </div>
+                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price Range (USD)
