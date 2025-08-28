@@ -250,14 +250,13 @@ export const sqQuery = createApi({
       }),
     }),
     //decline request
- declineRequest: builder.mutation({
-   query: ({ id }) => ({
-     url: `declined-request/${id}`,
-     method: "POST",
-   }),
-   invalidatesTags: ["Discount", "Chat"]
-
-}),
+    declineRequest: builder.mutation({
+      query: ({ id }) => ({
+        url: `declined-request/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Discount", "Chat"],
+    }),
 
     changePassword: builder.mutation({
       query: (data) => ({
@@ -290,14 +289,19 @@ export const sqQuery = createApi({
     seenNotification: builder.mutation({
       query: (data) => ({
         url: "read-all/",
-        method: "POST", // Assuming POST method for marking as seen action  
+        method: "POST", // Assuming POST method for marking as seen action
       }),
       invalidatesTags: ["Notification"],
     }),
 
-
-
-
+    // delete notification
+    deleteNotification: builder.mutation({
+      query: (id) => ({
+        url: `notification/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
   }),
 });
 
@@ -359,4 +363,6 @@ export const {
   useGetTourPlanPublicQuery,
   // seen notification
   useSeenNotificationMutation,
+  // delete notification
+  useDeleteNotificationMutation,
 } = sqQuery;

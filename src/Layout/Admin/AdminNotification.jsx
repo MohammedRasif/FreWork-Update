@@ -1,38 +1,68 @@
-import { useGetNotificationsQuery, useSeenNotificationMutation } from "@/redux/features/withAuth";
+import { useDeleteNotificationMutation, useGetNotificationsQuery, useSeenNotificationMutation } from "@/redux/features/withAuth";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { toast } from "react-toastify"; // Import react-toastify
 
 const AdminNotification = () => {
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
-  const { data: notificationsData, isLoading: isNotificationsLoading } =
-    useGetNotificationsQuery();
+  const { data: notificationsData, isLoading: isNotificationsLoading } = useGetNotificationsQuery();
   const [seenNotification] = useSeenNotificationMutation();
+  const [deleteNotification] = useDeleteNotificationMutation(); // Corrected: No id passed here
   const token = localStorage.getItem("access_token");
-  console.log(token)
 
+  // Request notification permission on component mount
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   useEffect(() => {
-    
     const baseUrl = "https://novel-fresh-spaniel.ngrok-free.app/";
     const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
-    
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
 
     socket.onmessage = (event) => {
       try {
         const newNotification = JSON.parse(event.data);
-        
+        console.log("New notification received:", newNotification);
+
+        // Update notifications state with the new notification
+        setNotifications((prev) => [...prev, newNotification]);
+
+        // Trigger desktop notification if permitted
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("New Notification", {
+            body: newNotification.message || "You have a new notification!",
+            icon: "/path/to/icon.png",
+          });
+        } else if ("Notification" in window && Notification.permission !== "denied") {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              new Notification("New Notification", {
+                body: newNotification.message || "You have a new notification!",
+                icon: "/path/to/icon.png",
+              });
+            }
+          });
+        }
+
+        // Mark as seen if applicable
+        if (newNotification.id && !newNotification.seen) {
+          seenNotification(newNotification.id);
+        }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
     };
 
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-    };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
@@ -40,10 +70,11 @@ const AdminNotification = () => {
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
+
     return () => {
       socket.close();
     };
-  }, [token]); 
+  }, [token, seenNotification]);
 
   useEffect(() => {
     if (notificationsData) {
@@ -53,7 +84,6 @@ const AdminNotification = () => {
           seenNotification(item.id);
         }
       });
-      console.log(notificationsData);
     }
   }, [notificationsData, seenNotification]);
 
@@ -62,12 +92,40 @@ const AdminNotification = () => {
     setShowPopup(true);
   };
 
-  const handleConfirmDelete = () => {
-    setNotifications(
-      notifications.filter((item) => item.id !== selectedNotificationId)
-    );
-    setShowPopup(false);
-    setSelectedNotificationId(null);
+  const handleConfirmDelete = async () => {
+    try {
+      // Trigger the delete mutation with the selectedNotificationId
+      await deleteNotification(selectedNotificationId).unwrap();
+      
+      // Update the local state to remove the deleted notification
+      setNotifications(
+        notifications.filter((item) => item.id !== selectedNotificationId)
+      );
+
+      // Show success toast
+      toast.success("Notification deleted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Close the popup
+      setShowPopup(false);
+      setSelectedNotificationId(null);
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+      toast.error("Failed to delete notification!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   const handleCancelDelete = () => {
@@ -82,17 +140,15 @@ const AdminNotification = () => {
         <h1 className="text-2xl sm:text-3xl font-semibold text-gray-700 text-center sm:text-left">
           All Notifications
         </h1>
-        <a
-          href="#"
-          className="text-sm sm:text-md underline text-center sm:text-right"
-        >
-          Clear all
-        </a>
       </div>
 
       {/* Notifications List */}
       <div className="space-y-2">
-        {!isNotificationsLoading &&
+        {isNotificationsLoading ? (
+          <p>Loading notifications...</p>
+        ) : notifications.length === 0 ? (
+          <p>No notifications available.</p>
+        ) : (
           notifications.map((item) => (
             <div
               key={item.id}
@@ -114,13 +170,13 @@ const AdminNotification = () => {
                 >
                   <RiDeleteBin6Line
                     size={24}
-                    sm:size={28}
                     className="py-1 px-[2px]"
                   />
                 </button>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
 
       {/* Popup */}

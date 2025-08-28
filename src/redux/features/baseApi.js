@@ -78,7 +78,7 @@ export const baseApi = createApi({
     filterTourPlanPublic: builder.query({
       query: (query) =>
         `/public/tour-plans/?search=${query.search}&min_budget=${query.min}&max_budget=${query.max}&country=${query.country}&type=${query.type}&category=${query.category}`,
-      providesTags: ["TourPlan"], // Cache this query with TourPlan tag
+      providesTags: ["TourPlan"], 
     }),
   }),
 });
