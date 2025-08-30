@@ -557,9 +557,7 @@ const TourPlanDouble = () => {
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
                               {tour.location_to}
                             </h2>
-                            <p className="text-sm md:text-base opacity-90 italic">
-                              Drone Shot
-                            </p>
+                            
                           </div>
                           {tour.offers && tour.offers.length > 0 && (
                             <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none">
@@ -619,8 +617,7 @@ const TourPlanDouble = () => {
                         <div className="space-y-1 text-md text-gray-700">
                           <p>
                             <span className="font-medium">Date:</span>{" "}
-                            {tour.start_date} to {tour.end_date || "N/A"} (
-                            {tour.duration || "N/A"})
+                            {tour.start_date} 
                           </p>
                           <p>
                             <span className="font-medium">Category:</span>{" "}
@@ -699,7 +696,7 @@ const TourPlanDouble = () => {
                             <Clock4 className="w-6 h-5 text-gray-500" />
                             <span>
                               <span className="font-medium">Duration:</span>{" "}
-                              {tour.Duration || "N/A"}
+                              {tour.duration || "N/A"}
                             </span>
                           </p>
 
