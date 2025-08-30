@@ -551,10 +551,15 @@ function Messages() {
   const navigate = useNavigate();
   const [isButtonVisible, setIsButtonVisible] = useState(true);
 
-  const handleViewDetails = () => {
-    navigate(`/tour-plans/${agency.agency.tour_plan_id}`);
-    setIsButtonVisible(false);
-  };
+const handleViewDetails = () => {
+  if (!agency?.agency?.tour_plan_id) {
+    alert("Tourist has not provided a tour plan.");
+    return;
+  }
+  navigate(`/tour-plans/${agency.agency.tour_plan_id}`);
+  setIsButtonVisible(false);
+};
+
 
 
   // Handle accept final offer
