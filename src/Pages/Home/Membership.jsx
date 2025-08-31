@@ -36,7 +36,7 @@ const Membership = () => {
     useSearchAgencyQuery(searchTerm, { skip: !searchTerm });
   const [addToFavo, { isLoading: isAddFevLoading }] = useAddToFavoritMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
-  console.log(userData,"hello ")
+  console.log(userData, "hello ");
 
   // invite to chat
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
@@ -329,7 +329,30 @@ const Membership = () => {
                       </span>
                     </button>
                   </div>
-
+                  <div className="pb-5">
+                    <h1 className="text-2xl font-semibold text-black">
+                      Our Service Category
+                    </h1>
+                    {plan?.service_categories?.length > 0 ? (
+                      <span className="text-gray-700 text-base">
+                        {(() => {
+                          try {
+                            return JSON.parse(plan.service_categories[0])
+                              .map(
+                                (category) =>
+                                  category.charAt(0).toUpperCase() +
+                                  category.slice(1)
+                              )
+                              .join(", ");
+                          } catch (error) {
+                            return "Error parsing categories";
+                          }
+                        })()}
+                      </span>
+                    ) : (
+                      <span>No categories available</span>
+                    )}
+                  </div>
                   {/* About Section */}
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-800 mb-2 text-base">

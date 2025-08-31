@@ -48,9 +48,7 @@ export default function BeachCard({ tourPlan }) {
             <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">
               {localTourPlan.location_to}
             </h2>
-            <p className="text-sm md:text-base opacity-90 italic">
-              Drone Shot
-            </p>
+            
           </div>
           {/* Display agency logos */}
           {localTourPlan.offers && localTourPlan.offers.length > 0 && (

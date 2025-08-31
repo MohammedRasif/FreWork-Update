@@ -11,7 +11,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 
-
 import Card from "@/components/ui/Card";
 import BeachCard from "@/components/ui/BeachCard";
 import MountainCard from "@/components/ui/MountainCard";
@@ -181,36 +180,44 @@ const Published = () => {
                 >
                   Beach Trips
                   <GoChevronRight className="mt-[5px]" />
-
                 </button>
                 <div className="relative">
-                  <Swiper
-                    modules={[Pagination, Navigation]}
-                    spaceBetween={12}
-                    pagination={{ clickable: true }}
-                    navigation={{
-                      prevEl: beachPrevRef.current,
-                      nextEl: beachNextRef.current,
-                    }}
-                    onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = beachPrevRef.current;
-                      swiper.params.navigation.nextEl = beachNextRef.current;
-                    }}
-                    breakpoints={{
-                      1024: { slidesPerView: 4, spaceBetween: 12 },
-                      768: { slidesPerView: 3, spaceBetween: 10 },
-                      320: { slidesPerView: 1, spaceBetween: 8 },
-                    }}
-                    loop={true}
-                    className="mySwiper"
-                  >
-                    {beachTrips.map((p) => (
-                      <SwiperSlide key={p.id} className="px-2 mb-12">
-                        <BeachCard tourPlan={p} />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </div>
+  <Swiper
+    modules={[Pagination, Navigation]}
+    spaceBetween={12}
+    pagination={{
+      clickable: true,
+      renderBullet: (index, className) => {
+        return `
+          <span class="${className} custom-pagination-bullet">
+            <span class="pagination-number">${index + 1}</span>
+          </span>
+        `;
+      },
+    }}
+    navigation={{
+      prevEl: beachPrevRef.current,
+      nextEl: beachNextRef.current,
+    }}
+    onBeforeInit={(swiper) => {
+      swiper.params.navigation.prevEl = beachPrevRef.current;
+      swiper.params.navigation.nextEl = beachNextRef.current;
+    }}
+    breakpoints={{
+      1024: { slidesPerView: 4, spaceBetween: 12 },
+      768: { slidesPerView: 3, spaceBetween: 10 },
+      320: { slidesPerView: 1, spaceBetween: 8 },
+    }}
+    loop={true}
+    className="mySwiper"
+  >
+    {beachTrips.slice(-6).map((p) => (
+      <SwiperSlide key={p.id} className="px-2 mb-12">
+        <BeachCard tourPlan={p} />
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</div>
               </div>
             )}
 
@@ -228,7 +235,16 @@ const Published = () => {
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
-                    pagination={{ clickable: true }}
+                    pagination={{
+                      clickable: true,
+                      renderBullet: (index, className) => {
+                        return `
+          <span class="${className} custom-pagination-bullet">
+            <span class="pagination-number">${index + 1}</span>
+          </span>
+        `;
+                      },
+                    }}
                     navigation={{
                       prevEl: mountainPrevRef.current,
                       nextEl: mountainNextRef.current,
@@ -245,7 +261,7 @@ const Published = () => {
                     loop={true}
                     className="mySwiper"
                   >
-                    {mountainTrips.map((p) => (
+                    {mountainTrips.slice(-6).map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
                         <MountainCard tourPlan={p} />
                       </SwiperSlide>
@@ -268,7 +284,16 @@ const Published = () => {
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
-                    pagination={{ clickable: true }}
+                    pagination={{
+                      clickable: true,
+                      renderBullet: (index, className) => {
+                        return `
+          <span class="${className} custom-pagination-bullet">
+            <span class="pagination-number">${index + 1}</span>
+          </span>
+        `;
+                      },
+                    }}
                     navigation={{
                       prevEl: relaxPrevRef.current,
                       nextEl: relaxNextRef.current,
@@ -285,7 +310,7 @@ const Published = () => {
                     loop={true}
                     className="mySwiper"
                   >
-                    {relaxTrips.map((p) => (
+                    {relaxTrips.slice(-6).map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
                         <RelaxCard tourPlan={p} />
                       </SwiperSlide>
@@ -325,7 +350,7 @@ const Published = () => {
                     loop={true}
                     className="mySwiper"
                   >
-                    {groupTrips.map((p) => (
+                    {groupTrips.slice(-6).map((p) => (
                       <SwiperSlide key={p.id} className="px-2 mb-12">
                         <GroupCard tourPlan={p} />
                       </SwiperSlide>

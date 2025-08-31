@@ -297,21 +297,36 @@ const AdminProfile = () => {
                   <span className="text-sm sm:text-[16px]">Edit</span>
                 </NavLink>
               </div>
-              <div className="flex items-center gap-2 mb-4 lg:mb-7">
+              <div className="flex items-center gap-2 mb-4 ">
                 <div className="flex items-center">
                   <FaStar className="w-4 h-4 text-yellow-400 fill-current" />
                   <span className="text-sm sm:text-[15px] font-medium text-gray-900 ml-1">
                     {profileData?.rating || 0}
                   </span>
                 </div>
-                <span className="text-sm sm:text-[15px] text-blue-600">
+                <span className="text-sm sm:text-[15px] text-blue-600 ">
                   ({profileData?.review_count || 0} Reviews)
                 </span>
               </div>
             </div>
           </div>
           <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
+            <div className="pb-5">
+              <h1 className="text-2xl font-semibold text-black">Our Service Category</h1>
+              {profileData?.service_categories?.length > 0 ? (
+                <span className=" text-gray-700 text-md ">
+                  {JSON.parse(profileData.service_categories[0])
+                    .map(
+                      (category) =>
+                        category.charAt(0).toUpperCase() + category.slice(1)
+                    )
+                    .join(", ")}
+                </span>
+              ) : (
+                <span>No categories available</span>
+              )}
+            </div>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
               About
             </h3>
             <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed line-clamp-5">
@@ -390,16 +405,14 @@ const AdminProfile = () => {
           </div>
         </div> */}
         <div className="bg-white p-3 sm:p-4 rounded-md">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-          Our Aim
-        </h3>
-        <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed">
-          {profileData?.our_aim || "No aim description available."}
-        </p>
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+            Our Aim
+          </h3>
+          <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed">
+            {profileData?.our_aim || "No aim description available."}
+          </p>
+        </div>
       </div>
-      </div>
-
-      
     </div>
   );
 };

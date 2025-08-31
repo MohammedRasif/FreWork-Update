@@ -184,4 +184,36 @@
 }
 
 
+/* Style for pagination bullets */
+.mySwiper .swiper-pagination-bullet {
+  width: 16px; /* Larger dot size */
+  height: 16px; /* Larger dot size */
+  background: #ccc; /* Default dot color (inactive) */
+  opacity: 1; /* Ensure visibility */
+  position: relative; /* For positioning the number */
+  display: inline-block; /* Ensure proper alignment */
+  margin: 0 8px; /* Space between dots */
+}
+
+/* Style for active pagination bullet */
+.mySwiper .swiper-pagination-bullet-active {
+  background: #007bff; /* Active dot color (e.g., blue) */
+}
+
+/* Style for the number above the dot */
+.mySwiper .pagination-number {
+  position: absolute;
+  top: -3px; /* Position number above the dot */
+  left: 50%;
+  transform: translateX(-50%); /* Center the number horizontally */
+  font-size: 14px; /* Number font size */
+  color: #000; /* Number color */
+  font-weight: bold; /* Number weight */
+}
+
+/* Optional: Style for active number */
+.mySwiper .swiper-pagination-bullet-active .pagination-number {
+  color: #007bff; /* Match active dot color */
+}
+
 

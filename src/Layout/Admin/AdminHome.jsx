@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
@@ -398,13 +396,13 @@ const AdminHome = () => {
                               : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                           }
                           alt={`${plan.location_to || "Tourist spot"}`}
-                          className="lg:h-44 lg:w-56 object-cover rounded-l-lg mr-5"
+                          className="lg:h-44 lg:w-56 h-64 w-80 lg:object-cover rounded-l-lg mr-5"
                         />
                       </div>
                     </div>
 
-                    <div>
-                      <div className="flex-1">
+                    <div >
+                      <div className="flex-1 lg:-mr-0 -mr-8 pl-1">
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-5">
                           {plan.location_to}
                         </h2>
@@ -431,8 +429,8 @@ const AdminHome = () => {
                     </div>
                   </div>
                   {/* Travel Header */}
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0 mt-5 mr-3">
-                    <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0 mt-5 mr-3 lg:ml-0 ml-10">
+                    <div className="lg:flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                       <div>
                         <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
                           Budget ${plan.budget}.00
@@ -444,20 +442,20 @@ const AdminHome = () => {
                       <div className="flex flex-wrap gap-2 mt-4">
                         <button
                           onClick={() => openPopup(plan, "view")}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                          className="px-4 py-2 bg-blue-600 text-white lg:text-sm text-[14px] font-medium rounded-md hover:bg-blue-700 transition-colors"
                         >
                           View
                         </button>
                         <button
                           onClick={() => openPopup(plan, "offer")}
-                          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                          className="lg:px-4 lg:py-2 px-2 py-2 bg-green-600 text-white lg:text-sm text-[13px] font-medium rounded-md hover:bg-green-700 transition-colors"
                         >
                           Send offer
                         </button>
                         <button
                           onClick={() => handleDeclineRequest(plan.id)}
                           disabled={isDeclineRequestLoading}
-                          className={`px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                          className={`lg:px-4 lg:py-2 px-2 py-2 bg-gray-600 text-white lg:text-sm text-[12px] font-medium rounded-md hover:bg-gray-700 transition-colors ${
                             isDeclineRequestLoading
                               ? "opacity-50 cursor-not-allowed"
                               : ""

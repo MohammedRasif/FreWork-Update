@@ -25,7 +25,7 @@ export default function AdminAcceptPlan() {
 
   // Placeholder image if none is provided
   const placeholderImage =
-    "https://res.cloudinary.com/dpi0t9wfn/image/upload/v1741443119/samples/landscapes/nature-mountains.jpg";
+    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
 
   // Handle opening the modal
   const openModal = (tourId) => {

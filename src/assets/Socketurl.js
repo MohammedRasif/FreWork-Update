@@ -1,4 +1,4 @@
-const baseUrl = "wss://endlessly-unified-guppy.ngrok-free.app";
+const baseUrl = "wss://novel-fresh-spaniel.ngrok-free.app";
 const token = localStorage.getItem("access_token");
 const notification_url = `${baseUrl}/ws/notifications/?token=${token}`;
 function chat_sockit(id) {

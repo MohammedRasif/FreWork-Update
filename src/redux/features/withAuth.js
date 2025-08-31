@@ -12,7 +12,13 @@ export const sqQuery = createApi({
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
-      // The server should return public data without a token and enriched data with a token
+      if (
+         endpoint !== "adminProfile" &&
+         endpoint !== "updateTuristProfile"
+        
+       ) {
+        headers.set("Content-Type", "application/json");
+      }
 
       return headers;
     },
@@ -242,12 +248,14 @@ export const sqQuery = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Discount", "Chat"],
     }),
     acceptFinalOffer: builder.mutation({
       query: ({ id }) => ({
         url: `/chat/conversations/${id}/accept-final-offer/`,
         method: "POST",
       }),
+      invalidatesTags: ["Discount", "Chat"],
     }),
     //decline request
     declineRequest: builder.mutation({
@@ -275,8 +283,8 @@ export const sqQuery = createApi({
         method: "DELETE",
       }),
       invalidatesTags: (result, error, id) => [
-        { type: "PublishPlanDelete", id },
-        "PublishPlanDelete",
+        { type: "TourPlan", id },
+        "TourPlan",
       ],
     }),
     // Tour plan-related queries
@@ -302,6 +310,16 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["Notification"],
     }),
+    
+    adminProfile: builder.mutation({
+      query: (data) => ({
+        url: "agency/profile/",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["AgencyProfile"],
+    }),
+
   }),
 });
 
@@ -365,4 +383,6 @@ export const {
   useSeenNotificationMutation,
   // delete notification
   useDeleteNotificationMutation,
+  // admin profile
+  useAdminProfileMutation,
 } = sqQuery;

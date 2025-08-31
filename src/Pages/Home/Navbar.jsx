@@ -14,9 +14,14 @@ const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // Get user data from the query
-  const { data: userData, isLoading } = useShowUserInpormationQuery();
-  console.log(userData);
+  // Get user data from the query with refetchOnMountOrArgChange
+  const {
+    data: userData,
+    isLoading,
+    refetch,
+  } = useShowUserInpormationQuery(undefined, {
+    refetchOnMountOrArgChange: true, // Force refetch on mount or token change
+  });
 
   // Check if access_token exists in localStorage
   const isAuthenticated = !!localStorage.getItem("access_token");
@@ -28,14 +33,24 @@ const Navbar = () => {
     "/pricing": "agencies",
     "/tourPlans": "tours",
     "/contact": "contact",
+    "/user/editProfile": "profile", // Add /user/editProfile to map to profile
+    "/user/profile": "profile", // Add /user/profile to map to profile
   };
 
   // Update activeLink based on the current route
   useEffect(() => {
-    const pathname = location.pathname;
-    const newActiveLink = routeMap[pathname] || "home"; // Default to "home" if route not found
+    const pathname = location.pathname.replace(/\/$/, ""); // Normalize path by removing trailing slash
+    const newActiveLink = routeMap[pathname] || "home";
     setActiveLink(newActiveLink);
   }, [location.pathname]);
+
+  // Monitor access_token changes and refetch user data
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      refetch(); // Refetch user data when token is present
+    }
+  }, [isAuthenticated, refetch]);
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -56,14 +71,14 @@ const Navbar = () => {
 
   const handleLinkClick = (link, path) => {
     setActiveLink(link);
-    setIsOpen(false); // Close mobile menu on link click
-    navigate(path); // Navigate to the selected route
+    setIsOpen(false);
+    navigate(path);
   };
 
   // Handle profile dropdown toggle
   const toggleProfileDropdown = () => {
     setIsProfileOpen((prev) => !prev);
-    setIsOpen(false); // Close mobile menu when profile dropdown toggles
+    setIsOpen(false);
   };
 
   // Handle logout
@@ -171,7 +186,7 @@ const Navbar = () => {
           }`}
           onClick={() => handleLinkClick("agencies", "/pricing")}
         >
-          Membership Plans
+M          Membership Plans
         </NavLink>
         <NavLink
           to="/tourPlans"
@@ -230,6 +245,16 @@ const Navbar = () => {
                     >
                       Dashboard
                     </button>
+                    <NavLink
+                      to="/user/editProfile"
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
+                      onClick={() => {
+                        handleLinkClick("profile", "/user/editProfile");
+                        setIsProfileOpen(false);
+                      }}
+                    >
+                      Edit Profile
+                    </NavLink>
                     <button
                       onClick={handleLogout}
                       className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
@@ -268,6 +293,18 @@ const Navbar = () => {
             className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-lg lg:hidden z-50"
           >
             <div className="flex flex-col items-center space-y-4 py-4">
+              {isAuthenticated && userData && (
+                <div className="flex items-center space-x-2">
+                  <img
+                    src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                    alt="User profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <span className="text-gray-700 text-[18px] font-medium">
+                    {isLoading ? "Loading..." : userData.name}
+                  </span>
+                </div>
+              )}
               <NavLink
                 to="/"
                 className={`text-base text-[20px] font-medium ${
@@ -324,47 +361,21 @@ const Navbar = () => {
                 Contact
               </NavLink>
               {isAuthenticated && userData ? (
-                <div className="relative w-full text-center" ref={profileRef}>
-                  <div
-                    className="flex flex-col items-center space-y-2 cursor-pointer"
-                    onClick={toggleProfileDropdown}
+                <>
+                  <button
+                    onClick={handleDashboardClick}
+                    className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"
                   >
-                    <img
-                      src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
-                      alt="User profile"
-                      className="w-10 h-10 rounded-full object-cover mx-auto"
-                    />
-                    <span className="text-gray-700 text-[18px] font-medium">
-                      {userData.name}
-                    </span>
-                  </div>
-                  <AnimatePresence>
-                    {isProfileOpen && (
-                      <motion.div
-                        initial="closed"
-                        animate="open"
-                        exit="closed"
-                        variants={profileMenuVariants}
-                        className="w-full bg-white border-t border-gray-200 shadow-lg z-50"
-                      >
-                        <div className="flex flex-col">
-                          <button
-                            onClick={handleDashboardClick}
-                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-center"
-                          >
-                            Dashboard
-                          </button>
-                          <button
-                            onClick={handleLogout}
-                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-center"
-                          >
-                            Logout
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                    Dashboard
+                  </button>
+                
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"
+                  >
+                    Logout
+                  </button>
+                </>
               ) : (
                 <>
                   <NavLink to="/login">

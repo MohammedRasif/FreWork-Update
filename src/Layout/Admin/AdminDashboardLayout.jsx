@@ -1,4 +1,5 @@
 "use client";
+import img from "../../assets/img/removebg.png";
 
 import { useState, useEffect, useRef, createContext, useContext } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -84,13 +85,33 @@ export default function AdminDashboardLayout() {
       "/admin/accepted",
       "/admin/published",
     ];
+    const profileRoutes = ["/admin/profile", "/admin/editProfile"]; // Add /admin/editProfile to Profile routes
 
+    // Check if the current route is in myPlansRoutes
     if (myPlansRoutes.includes(normalizedLocation)) {
       setSelectedItem("My Plans");
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", "My Plans");
+      console.log(
+        "normalizedLocation:",
+        normalizedLocation,
+        "selectedItem:",
+        "My Plans"
+      );
       return;
     }
 
+    // Check if the current route is in profileRoutes
+    if (profileRoutes.includes(normalizedLocation)) {
+      setSelectedItem("Profile");
+      console.log(
+        "normalizedLocation:",
+        normalizedLocation,
+        "selectedItem:",
+        "Profile"
+      );
+      return;
+    }
+
+    // Check other menu items
     let currentItem = menuItems[0].items.find((item) => {
       const normalizedPath = item.path.replace(/\/$/, "");
       return (
@@ -103,10 +124,20 @@ export default function AdminDashboardLayout() {
 
     if (currentItem) {
       setSelectedItem(currentItem.name);
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", currentItem.name);
+      console.log(
+        "normalizedLocation:",
+        normalizedLocation,
+        "selectedItem:",
+        currentItem.name
+      );
     } else {
       setSelectedItem(null);
-      console.log("normalizedLocation:", normalizedLocation, "selectedItem:", null);
+      console.log(
+        "normalizedLocation:",
+        normalizedLocation,
+        "selectedItem:",
+        null
+      );
     }
   }, [location.pathname]);
 
@@ -228,7 +259,11 @@ export default function AdminDashboardLayout() {
           } transition-all duration-500 ease-in-out`}
         >
           <NavLink to="/">
-            <div className="h-auto flex items-center px-4">
+            <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
+              <img src={img} className="h-full" alt="Logo" />
+            </div>
+          </NavLink>
+          <div className="h-auto flex items-center px-4">
             <div className="flex flex-col w-full justify-center items-center mt-16">
               <div
                 className={`transform transition-all duration-500 ${
@@ -263,7 +298,6 @@ export default function AdminDashboardLayout() {
               </div>
             </div>
           </div>
-          </NavLink>
 
           <nav className="p-4 mt-6">
             {menuItems.map((section, idx) => (
@@ -300,6 +334,13 @@ export default function AdminDashboardLayout() {
                             {item.badge}
                           </span>
                         )}
+                        {item.name === "Notifications" &&
+                          unreadCount > 0 &&
+                          !isCollapsed && (
+                            <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
+                              {unreadCount}
+                            </span>
+                          )}
                       </NavLink>
                     </li>
                   ))}
@@ -346,9 +387,16 @@ export default function AdminDashboardLayout() {
 
           <div className="h-auto flex items-center px-4">
             <div className="flex flex-col w-full justify-center items-center mt-8">
+              <NavLink to="/" className="w-full">
+                <div className="font-bold lg:h-11 h-8 text-gray-800 mt-3 mb-5 flex items-center justify-center">
+                  <img src={img} className="h-full" alt="Logo" />
+                </div>
+              </NavLink>
               <div className="w-20 h-20 rounded-full overflow-hidden">
                 <img
-                  src={(!isLoading && agencyData?.agency_logo_url) || UserAvatar}
+                  src={
+                    (!isLoading && agencyData?.agency_logo_url) || UserAvatar
+                  }
                   alt={agencyData?.name || "User"}
                   className="w-full h-full rounded-full"
                 />
@@ -360,7 +408,9 @@ export default function AdminDashboardLayout() {
                     : agencyData?.name || "Company Profile"}
                 </h3>
                 <span className="text-center text-sm text-[#8C8C8C]">
-                  {isLoading ? "Loading..." : agencyData?.position || "username"}
+                  {isLoading
+                    ? "Loading..."
+                    : agencyData?.position || "username"}
                 </span>
               </div>
             </div>
@@ -465,7 +515,9 @@ export default function AdminDashboardLayout() {
                     <DropdownMenuContent className="w-56" align="end">
                       <NavLink to="/contact">
                         <DropdownMenuItem
-                          onClick={() => handleItemClick("Upgrade package", "/contact")}
+                          onClick={() =>
+                            handleItemClick("Upgrade package", "/contact")
+                          }
                         >
                           <CircleArrowUp size={20} />
                           Upgrade package
@@ -489,7 +541,9 @@ export default function AdminDashboardLayout() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
                       <DropdownMenuItem
-                        onClick={() => handleItemClick("Upgrade package", "/contact")}
+                        onClick={() =>
+                          handleItemClick("Upgrade package", "/contact")
+                        }
                       >
                         <CircleArrowUp size={20} />
                         Upgrade package

@@ -1,5 +1,5 @@
 "use client";
-
+import img from "../../assets/img/removebg.png";
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -310,44 +310,47 @@ export default function UserDashboardLayout() {
           isCollapsed ? "w-20" : "w-80"
         } transition-all duration-500 ease-in-out`}
       >
+        <NavLink to="/" className="w-full">
+          <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
+            <img src={img} className="h-full" alt="Logo" />
+          </div>
+        </NavLink>
         {/* Logo */}
         {!isProfileLoading && profileData && (
           <div className="h-auto flex items-center px-4">
-            <NavLink to="/" className="w-full">
-              <div className="flex flex-col w-full justify-center items-center mt-16">
-                <div className="relative">
-                  <div
-                    className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50 ${
-                      isCollapsed
-                        ? "opacity-0 -translate-x-full"
-                        : "opacity-100 translate-x-0"
-                    }`}
-                  >
-                    <img
-                      src={
-                        profileData.profile_picture_url ||
-                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                      }
-                      alt="User"
-                      className="w-16 h-16 rounded-full"
-                    />
+            <div className="flex flex-col w-full justify-center items-center mt-16">
+              <div className="relative">
+                <div
+                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50 ${
+                    isCollapsed
+                      ? "opacity-0 -translate-x-full"
+                      : "opacity-100 translate-x-0"
+                  }`}
+                >
+                  <img
+                    src={
+                      profileData.profile_picture_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    }
+                    alt="User"
+                    className="w-16 h-16 rounded-full"
+                  />
+                </div>
+                {profileData?.is_verified && (
+                  <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
+                    <MdVerified className=" w-5 h-5 z-20 text-blue-600" />
                   </div>
-                  {profileData?.is_verified && (
-                    <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                      <MdVerified className=" w-5 h-5 z-20 text-blue-600" />
-                    </div>
-                  )}
-                </div>
-                <div className="w-full flex flex-col gap-1 pl-3">
-                  <h3 className="text-2xl text-center font-normal text-[#343E4B]">
-                    {profileData.first_name + " " + profileData.last_name}
-                  </h3>
-                  <span className="text-center text-lg font-bold text-[#343E4B]">
-                    {profileData.profession || "User"}
-                  </span>
-                </div>
+                )}
               </div>
-            </NavLink>
+              <div className="w-full flex flex-col gap-1 pl-3">
+                <h3 className="text-2xl text-center font-normal text-[#343E4B]">
+                  {profileData.first_name + " " + profileData.last_name}
+                </h3>
+                <span className="text-center text-lg font-bold text-[#343E4B]">
+                  {profileData.profession || "User"}
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -387,6 +390,13 @@ export default function UserDashboardLayout() {
                           {item.badge}
                         </span>
                       )}
+                      {item.name === "Notifications" &&
+                        unreadCount > 0 &&
+                        !isCollapsed && (
+                          <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
+                            {unreadCount}
+                          </span>
+                        )}
                     </NavLink>
                   </li>
                 ))}
@@ -434,7 +444,12 @@ export default function UserDashboardLayout() {
 
         {/* Mobile Logo */}
         <div className="h-auto flex items-center px-4">
-          <div className="flex flex-col w-full justify-center items-center mt-8">
+          <div className="flex flex-col w-full justify-center items-center ">
+            <NavLink to="/" className="w-full">
+              <div className="font-bold lg:h-11 h-8 text-gray-800 mt-5 mb-5 flex items-center justify-center">
+                <img src={img} className="h-full" alt="Logo" />
+              </div>
+            </NavLink>
             <div className="relative">
               <div className="w-16 h-16 rounded-full overflow-hidden">
                 <img
