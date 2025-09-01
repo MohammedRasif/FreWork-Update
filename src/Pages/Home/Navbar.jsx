@@ -186,7 +186,7 @@ const Navbar = () => {
           }`}
           onClick={() => handleLinkClick("agencies", "/pricing")}
         >
-M          Membership Plans
+    Membership Plans
         </NavLink>
         <NavLink
           to="/tourPlans"
@@ -241,23 +241,14 @@ M          Membership Plans
                   <div className="flex flex-col">
                     <button
                       onClick={handleDashboardClick}
-                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left cursor-pointer"
                     >
                       Dashboard
                     </button>
-                    <NavLink
-                      to="/user/editProfile"
-                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
-                      onClick={() => {
-                        handleLinkClick("profile", "/user/editProfile");
-                        setIsProfileOpen(false);
-                      }}
-                    >
-                      Edit Profile
-                    </NavLink>
+                    
                     <button
                       onClick={handleLogout}
-                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left cursor-pointer"
                     >
                       Logout
                     </button>
