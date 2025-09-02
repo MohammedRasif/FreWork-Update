@@ -97,7 +97,8 @@ const Navbar = () => {
   // Handle dashboard navigation based on role
   const handleDashboardClick = () => {
     const role = userData?.role;
-    const path = role === "tourist" ? "/user" : role === "agency" ? "/admin" : "/";
+    const path =
+      role === "tourist" ? "/user" : role === "agency" ? "/admin" : "/";
     setIsProfileOpen(false);
     setIsOpen(false);
     navigate(path);
@@ -186,7 +187,7 @@ const Navbar = () => {
           }`}
           onClick={() => handleLinkClick("agencies", "/pricing")}
         >
-    Membership Plans
+          For agencies
         </NavLink>
         <NavLink
           to="/tourPlans"
@@ -221,7 +222,10 @@ const Navbar = () => {
               onClick={toggleProfileDropdown}
             >
               <img
-                src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                src={
+                  userData.image_url ||
+                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                }
                 alt="User profile"
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -245,7 +249,7 @@ const Navbar = () => {
                     >
                       Dashboard
                     </button>
-                    
+
                     <button
                       onClick={handleLogout}
                       className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left cursor-pointer"
@@ -287,7 +291,10 @@ const Navbar = () => {
               {isAuthenticated && userData && (
                 <div className="flex items-center space-x-2">
                   <img
-                    src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                    src={
+                      userData.image_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    }
                     alt="User profile"
                     className="w-10 h-10 rounded-full object-cover"
                   />
@@ -359,7 +366,7 @@ const Navbar = () => {
                   >
                     Dashboard
                   </button>
-                
+
                   <button
                     onClick={handleLogout}
                     className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"

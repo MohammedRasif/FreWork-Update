@@ -111,7 +111,6 @@ const UserAccepte = () => {
   return (
     <div className=" ">
       <Toaster />
-      {/* Header with tabs, search, and date filter */}
       <div className="flex flex-col sm:flex-row justify-between mt-6 mb-6 border-b border-gray-300">
         <div className="flex space-x-4 sm:space-x-8 mb-4 sm:mb-0">
           <button

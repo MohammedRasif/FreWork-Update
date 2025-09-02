@@ -183,79 +183,99 @@ const TourPlanDouble = () => {
   };
 
   const handleSubmitOffer = async (tourId, budget, comment, offerForm) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
+  // Check if user is authenticated
+  const token = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
 
-    if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
-      return;
-    }
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
 
-    try {
-      const payload = {
-        offered_budget: parseFloat(budget),
-        message: comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
-      };
+  // Check if user has the correct role
+  if (role !== "agency") {
+    toast.error("Only agencies can submit offers");
+    return;
+  }
 
-      const response = await offerBudgetToBack({
-        id: tourId,
-        data: payload,
-      }).unwrap();
+  // Validate inputs
+  if (!budget || isNaN(budget) || budget <= 0) {
+    toast.error("Please provide a valid budget amount");
+    return;
+  }
 
-      const newOffer = {
-        id: response?.id || `temp-${Date.now()}`,
-        offered_budget: parseFloat(budget),
-        message: comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
+  if (!comment.trim()) {
+    toast.error("Please provide a comment");
+    return;
+  }
 
-      setTours((prevTours) =>
-        prevTours.map((tour) =>
-          tour.id === tourId
-            ? {
-                ...tour,
-                offers: [...(tour.offers || []), newOffer],
-                offer_count: (tour.offer_count || 0) + 1,
-              }
-            : tour
-        )
+  if (offerForm.applyDiscount && (!offerForm.discount || isNaN(offerForm.discount) || offerForm.discount <= 0)) {
+    toast.error("Please provide a valid discount amount");
+    return;
+  }
+
+  try {
+    const payload = {
+      offered_budget: parseFloat(budget),
+      message: comment.trim(),
+      apply_discount: offerForm.applyDiscount || false,
+      discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
+    };
+
+    const response = await offerBudgetToBack({
+      id: tourId,
+      data: payload,
+    }).unwrap();
+
+    // Update tours and selectedTour state only after successful API response
+    const newOffer = {
+      id: response?.id || `temp-${Date.now()}`,
+      offered_budget: parseFloat(budget),
+      message: comment.trim(),
+      apply_discount: offerForm.applyDiscount || false,
+      discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
+
+    setTours((prevTours) =>
+      prevTours.map((tour) =>
+        tour.id === tourId
+          ? {
+              ...tour,
+              offers: [...(tour.offers || []), newOffer],
+              offer_count: (tour.offer_count || 0) + 1,
+            }
+          : tour
+      )
+    );
+
+    if (selectedTour && selectedTour.id === tourId) {
+      setSelectedTour((prev) =>
+        prev
+          ? {
+              ...prev,
+              offers: [...(prev.offers || []), newOffer],
+              offer_count: (prev.offer_count || 0) + 1,
+            }
+          : prev
       );
-
-      if (selectedTour && selectedTour.id === tourId) {
-        setSelectedTour((prev) =>
-          prev
-            ? {
-                ...prev,
-                offers: [...(prev.offers || []), newOffer],
-                offer_count: (prev.offer_count || 0) + 1,
-              }
-            : prev
-        );
-      }
-
-      toast.success("Offer submitted successfully");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      toast.error(
-        error?.data?.error
-          ? `${error.data.error} Only agency can do this.`
-          : "Something went wrong"
-      );
     }
-  };
+
+    toast.success("Offer submitted successfully!");
+  } catch (error) {
+    console.error("Failed to submit offer:", error);
+    const errorMessage =
+      error?.data?.error || error?.data?.detail || "Failed to submit offer. Please try again.";
+    toast.error(errorMessage);
+  }
+};
 
   const handleLike = async (tourId) => {
     if (!token) {
@@ -511,7 +531,7 @@ const TourPlanDouble = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl">
               {isTourPlanPublicLoading ? (
                 <div className="col-span-full">
                   <FullScreenInfinityLoader />
@@ -541,26 +561,26 @@ const TourPlanDouble = () => {
                   return (
                     <div
                       key={tour.id}
-                      className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6"
+                      className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6"
                     >
-                      <div className="relative">
-                        <div className="overflow-hidden">
+                      <div className="relative ">
+                        <div className="overflow-hidden ">
                           <img
                             src={
                               tour.spot_picture_url ||
                               "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                             }
                             alt={`${tour.location_to} destination`}
-                            className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300"
+                            className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300  rounded-t-xl"
                           />
-                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
+                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white  rounded-t-xl">
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
                               {tour.location_to}
                             </h2>
                             
                           </div>
                           {tour.offers && tour.offers.length > 0 && (
-                            <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none">
+                            <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none ">
                               {tour.offers.map((offer) => (
                                 <img
                                   key={offer.id}
@@ -572,7 +592,7 @@ const TourPlanDouble = () => {
                                     offer.agency?.agency_name ||
                                     "Unknown Agency"
                                   } logo`}
-                                  className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
+                                  className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0 "
                                 />
                               ))}
                             </div>
@@ -591,7 +611,7 @@ const TourPlanDouble = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col flex-grow p-4 space-y-1">
+                      <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
                         <div className="flex items-center justify-between">
                           <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
                             {tour.location_to}

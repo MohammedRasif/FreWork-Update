@@ -14,7 +14,9 @@ export const sqQuery = createApi({
       }
       if (
          endpoint !== "adminProfile" &&
-         endpoint !== "updateTuristProfile"
+         endpoint !== "updateTuristProfile" &&
+         endpoint !== "getPlans" && 
+         endpoint !== "createPlanOne" 
         
        ) {
         headers.set("Content-Type", "application/json");
@@ -23,7 +25,7 @@ export const sqQuery = createApi({
       return headers;
     },
   }),
-
+  
   tagTypes: [
     "TourPlan",
     "TouristProfile",
@@ -39,6 +41,7 @@ export const sqQuery = createApi({
     "Discount",
     "PublishPlanDelete",
   ],
+
   endpoints: (builder) => ({
     newPassword: builder.mutation({
       query: (data) => ({

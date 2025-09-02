@@ -25,7 +25,6 @@ export default function BannerSectionPopup({ closeForm }) {
     touristSpots: "",
     description: "",
     uploadedFile: null,
-    travelType: "",
     destinationType: "",
     typeOfAccommodation: "",
     minimumHotelStars: "",
@@ -75,7 +74,7 @@ export default function BannerSectionPopup({ closeForm }) {
       setValue("budget", state?.budget || "");
       setValue("touristSpots", state?.tourist_spots || "");
       setValue("description", state?.description || "");
-      setValue("travelType", state?.travel_type || "");
+      // setValue("travelType", state?.travel_type || "");
       setValue("destinationType", state?.destination_type || "");
       setValue("typeOfAccommodation", state?.type_of_accommodation || "");
       setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
@@ -84,40 +83,7 @@ export default function BannerSectionPopup({ closeForm }) {
     }
   }, [state?.id, setValue]);
 
-  // Populate form with data when state?.id exists
-  // useEffect(() => {
-  //   if (state?.id) {
-  //     setValue("name", state?.name || "");
-  //     setValue("email", state?.email || "");
-  //     setValue("phoneNumber", state?.phone_number || "");
-  //     setValue("locationFrom", state?.location_from || "");
-  //     setValue("locationTo", state?.location_to || "");
-  //     setValue(
-  //       "startingDate",
-  //       state?.start_date
-  //         ? new Date(state.start_date).toISOString().split("T")[0]
-  //         : ""
-  //     );
-  //     setValue(
-  //       "endingDate",
-  //       state?.end_date
-  //         ? new Date(state.end_date).toISOString().split("T")[0]
-  //         : ""
-  //     );
-  //     setValue("adults", state?.adult_count || "");
-  //     setValue("children", state?.child_count || "");
-  //     setValue("budget", state?.budget || "");
-  //     setValue("touristSpots", state?.tourist_spots || "");
-  //     setValue("description", state?.description || "");
-  //     setValue("travel_type", state?.travel_type || "");
-  //     setValue("destinationType", state?.destination_type || "");
-  //     setValue("typeOfAccommodation", state?.type_of_accommodation || "");
-  //     setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
-  //     setValue("mealPlan", state?.meal_plan || "");
-  //     setValue("includeRoundTripFlight", !!state?.include_round_trip_flight);
-  //     setValue("confirmation", !!state?.is_confirmed_request);
-  //   }
-  // }, [state?.id, setValue]);
+
 
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
@@ -167,17 +133,16 @@ const onSubmit = async (data, status) => {
   formDataToSend.append("location_to", data.locationTo);
   formDataToSend.append("start_date", data.startingDate);
   formDataToSend.append("end_date", data.endingDate);
-  formDataToSend.append("adult_count", data.adults || 0); // Fixed
-  formDataToSend.append("child_count", data.children || 0); // Fixed
-  formDataToSend.append("budget", data.budget);
-  formDataToSend.append("description", data.description);
-  formDataToSend.append("travel_type", data.travelType);
-  formDataToSend.append("destination_type", data.destinationType);
-  formDataToSend.append("type_of_accommodation", data.typeOfAccommodation);
-  formDataToSend.append("includes", data.minimumHotelStars);
-  formDataToSend.append("meal_plan", data.mealPlan);
+  formDataToSend.append("adult_count", data.adults || 0); // Default to 0 if empty
+  formDataToSend.append("child_count", data.children || 0); // Default to 0 if empty
+  formDataToSend.append("budget", data.budget || "");
+  formDataToSend.append("description", data.description || "");
+  formDataToSend.append("destination_type", data.destinationType || "");
+  formDataToSend.append("type_of_accommodation", data.typeOfAccommodation || "");
+  formDataToSend.append("minimumHotelStars", data.minimumHotelStars || "");
+  formDataToSend.append("meal_plan", data.mealPlan || "");
   formDataToSend.append("status", status);
-  formDataToSend.append("tourist_spots", data.touristSpots);
+  formDataToSend.append("tourist_spots", data.touristSpots || "");
   formDataToSend.append("is_confirmed_request", data.confirmation ? "true" : "false");
 
   if (selectedFile) {
@@ -401,7 +366,7 @@ const onSubmit = async (data, status) => {
                 <input
                   {...register("budget", { required: "Budget is required" })}
                   type="text"
-                  placeholder="Budget (USD)"
+                  placeholder="Budget (EUR)"
                   defaultValue={formData.budget}
                   onChange={(e) => updateFormData("budget", e.target.value)}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
@@ -589,7 +554,7 @@ const onSubmit = async (data, status) => {
         {currentStep === 4 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
+              {/* <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Travel Type
                 </label>
@@ -613,7 +578,7 @@ const onSubmit = async (data, status) => {
                     {errors.travelType.message}
                   </span>
                 )}
-              </div>
+              </div> */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Destination Type

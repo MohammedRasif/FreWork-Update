@@ -4,7 +4,15 @@ import { GoArrowLeft } from "react-icons/go";
 import { MdVerified } from "react-icons/md";
 import { HiDotsVertical } from "react-icons/hi";
 import { useState, useEffect, useRef } from "react";
-import { Heart, MessageCircle, Share2, ThumbsUp } from "lucide-react";
+import {
+  Heart,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Share2,
+  ThumbsUp,
+} from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
 import { IoIosSend } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +20,7 @@ import {
   useDeletePublishPlanMutation,
   useGetPlansQuery,
   useGetPublicisResponseQuery,
+  useInviteToChatMutation,
   useLikePostMutation,
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
@@ -35,11 +44,11 @@ function PublishedPlan() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showAgencyModal, setShowAgencyModal] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(null); // New state for user ID
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [showReviews, setShowReviews] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState(null);
-  const [expandedOfferMessages, setExpandedOfferMessages] = useState({}); // State for offer message truncation
+  const [expandedOfferMessages, setExpandedOfferMessages] = useState({});
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -50,11 +59,12 @@ function PublishedPlan() {
     useDeletePublishPlanMutation();
   const { data: showResponseData, isLoading: isResponseLoading } =
     useGetPublicisResponseQuery(selectedUserId, {
-      skip: !selectedUserId, // Skip query until selectedUserId is set
+      skip: !selectedUserId,
     });
   console.log(showResponseData, "showResponseData");
+  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
+    useInviteToChatMutation();
 
-  // Utility function to truncate text to a specified word limit
   const truncateText = (text, wordLimit = 30) => {
     if (!text) return { truncated: "", isTruncated: false };
     const words = text.split(/\s+/);
@@ -67,7 +77,6 @@ function PublishedPlan() {
     };
   };
 
-  // Toggle offer message expansion
   const toggleOfferMessage = (offerId) => {
     setExpandedOfferMessages((prev) => ({
       ...prev,
@@ -75,7 +84,6 @@ function PublishedPlan() {
     }));
   };
 
-  // Initialize likes and shares
   useEffect(() => {
     if (posts && currentUserId) {
       const initialLikes = {};
@@ -99,7 +107,6 @@ function PublishedPlan() {
     }
   }, [posts, currentUserId]);
 
-  // Handle like/unlike action
   const handleLike = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -122,7 +129,25 @@ function PublishedPlan() {
     }
   };
 
-  // Handle share/unshare action
+  const handleMessage = async (data) => {
+    const role = localStorage.getItem("role");
+    console.log(data); // Debug log for the data being sent
+    if (!role) {
+      navigate("/login");
+      toast.error("Please log in to send a message");
+      return;
+    }
+
+    try {
+      await invite({ ...data, other_user_id: data.other_user_id }).unwrap(); // Ensure data structure matches API expectation
+      toast.success("Chat invitation sent successfully!");
+      navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+    } catch (error) {
+      console.error("Invite to chat error:", error);
+      toast.error(error?.data?.detail || "Failed to send chat invitation");
+    }
+  };
+
   const handleShare = async (tourId) => {
     if (!token) {
       navigate("/login");
@@ -151,7 +176,6 @@ function PublishedPlan() {
     }
   };
 
-  // Handle popup for comments
   const openPopup = (tour) => {
     setSelectedTour(tour);
     setIsPopupOpen(true);
@@ -164,7 +188,6 @@ function PublishedPlan() {
     setOfferComment("");
   };
 
-  // Handle offer submission
   const handleSubmitOffer = async (tourId, budget, comment) => {
     if (!token) {
       navigate("/login");
@@ -192,7 +215,6 @@ function PublishedPlan() {
     }
   };
 
-  // Calculate interaction counts
   const getInteractionCounts = (plan) => {
     const likeCount =
       plan.interactions?.filter(
@@ -205,7 +227,6 @@ function PublishedPlan() {
     return { likeCount, shareCount };
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -218,10 +239,9 @@ function PublishedPlan() {
     };
   }, []);
 
-  // Handle response click to fetch agency details
   const handleResponseClick = (offer, userId) => {
     setSelectedAgency(offer);
-    setSelectedUserId(userId); // Set the user ID to trigger the query
+    setSelectedUserId(userId);
     setShowAgencyModal(true);
     setShowReviews(false);
     console.log(offer, userId, "offer and userId");
@@ -254,17 +274,25 @@ function PublishedPlan() {
   };
 
   if (isLoading) return <FullScreenInfinityLoader />;
-  if (isError) return <div>Error loading plans</div>;
+  if (isError)
+    return (
+      <div className="text-center text-red-600 text-base sm:text-lg">
+        Error loading plans
+      </div>
+    );
 
   const publishedPlans = posts
     ? posts.filter((plan) => plan.status === "published")
     : [];
 
-  if (!publishedPlans.length) return <div className="w-full  rounded-xl p-4  flex justify-center h-auto items-center">
-            <p className="text-[#70798F] text-lg">No published plans available</p>
-          </div> 
-
-  // handleDelete publish plan
+  if (!publishedPlans.length)
+    return (
+      <div className="w-full rounded-xl p-4 flex justify-center items-center">
+        <p className="text-[#70798F] text-base sm:text-lg">
+          No published plans available
+        </p>
+      </div>
+    );
 
   const handleDelete = async (id) => {
     try {
@@ -282,22 +310,22 @@ function PublishedPlan() {
   };
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen">
       <Toaster />
-      <div className="flex">
+      <div className="flex flex-col">
         <div className="flex-1 flex flex-col gap-3">
           {publishedPlans.map((plan) => {
             const { likeCount, shareCount } = getInteractionCounts(plan);
             return (
               <div key={plan.id}>
                 <div className="bg-white rounded-t-lg border-x border-t border-gray-200">
-                  <div className="p-6 pb-4">
-                    <div className="flex justify-between items-start mb-4">
+                  <div className="p-4 sm:p-6 pb-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
                       <div>
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
                           Tour from {plan.location_from} to {plan.location_to}
                         </h2>
-                        <div className="space-y-1 text-sm text-gray-600">
+                        <div className="space-y-1 text-xs sm:text-sm text-gray-600">
                           <p>
                             Willing to go on{" "}
                             <span className="font-medium">
@@ -316,12 +344,12 @@ function PublishedPlan() {
                           </p>
                         </div>
                       </div>
-                      <div className=" flex items-center  relative">
+                      <div className="flex items-center relative mt-4 sm:mt-0">
                         <div>
-                          <p className="text-lg font-bold text-gray-700">
+                          <p className="text-base sm:text-lg font-bold text-gray-700">
                             Budget ${plan.budget}
                           </p>
-                          <p className="text-md text-gray-800">
+                          <p className="text-xs sm:text-md text-gray-800">
                             Total {plan.total_members} person
                             {plan.total_members > 1 ? "s" : ""}
                           </p>
@@ -331,11 +359,11 @@ function PublishedPlan() {
                             e.preventDefault();
                             setIsDropdownOpen(!isDropdownOpen);
                           }}
-                          className="relative" // Ensure the button is a positioning context
+                          className="ml-2"
                         >
                           <HiDotsVertical
-                            size={22}
-                            className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors ml-2 "
+                            size={20}
+                            className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors"
                           />
                         </button>
                         {isDropdownOpen && (
@@ -357,12 +385,12 @@ function PublishedPlan() {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                         {plan.description}
                       </p>
                     </div>
-                    <div className="mb-6 flex items-center space-x-3">
-                      <p className="text-sm font-medium text-gray-700">
+                    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                      <p className="text-xs sm:text-sm font-medium text-gray-700">
                         Interested Travel Points:
                       </p>
                       <div className="flex flex-wrap gap-1">
@@ -370,7 +398,7 @@ function PublishedPlan() {
                           plan.tourist_spots.split(",").map((spot, index) => (
                             <span
                               key={index}
-                              className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                              className="text-xs sm:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                             >
                               {spot.trim()}
                               {index <
@@ -379,14 +407,14 @@ function PublishedPlan() {
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs sm:text-sm text-gray-500">
                             None specified
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="px-6 pb-6 space-y-4">
+                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
                     <div className="rounded-lg overflow-hidden">
                       <img
                         src={
@@ -394,39 +422,39 @@ function PublishedPlan() {
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                         }
                         alt="Tour destination"
-                        className="w-full h-96 object-cover"
+                        className="w-full h-64 sm:h-96 object-cover"
                       />
                     </div>
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                            <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                            <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
                           </div>
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                            <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
+                            <Heart className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
                           </div>
                         </div>
-                        <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
+                        <span className="text-xs sm:text-sm text-gray-600 ml-2">
                           {likeCount} Likes
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                         <span>{plan.offers?.length || 0} Offers</span>
                         <span>{shareCount} Shares</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="flex items-center gap-4 sm:gap-6 lg:gap-6 w-full justify-around lg:w-auto lg:justify-baseline">
+                      <div className="flex items-center gap-3 sm:gap-4 w-full justify-around sm:w-auto sm:justify-start">
                         <button
                           onClick={() => handleLike(plan.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isLiked[plan.id] ? "text-blue-600" : "text-gray-600"
                           } hover:text-blue-600 transition-colors hover:cursor-pointer`}
                         >
                           <ThumbsUp
-                            className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
                               isLiked[plan.id] ? "fill-current" : ""
                             }`}
                           />
@@ -434,22 +462,22 @@ function PublishedPlan() {
                         </button>
                         <button
                           onClick={() => openPopup(plan)}
-                          className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                         >
-                          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
+                          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>Comments</span>
                         </button>
                         <button
                           onClick={() => handleShare(plan.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isShared[plan.id]
                               ? "text-gray-600"
                               : "text-gray-600"
                           } hover:text-blue-600 transition-colors`}
                         >
                           <Share2
-                            className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
                               isShared[plan.id] ? "" : ""
                             }`}
                           />
@@ -460,45 +488,45 @@ function PublishedPlan() {
                   </div>
                 </div>
                 <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
-                  <div className="px-6 pb-4 border-b border-gray-200">
+                  <div className="px-4 sm:px-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-2xl font-semibold text-gray-600 pt-3 flex items-center space-x-2">
+                        <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 pt-3 flex items-center space-x-2">
                           <GoArrowLeft />
                           <p>All Offers</p>
                         </h3>
                       </div>
-                      <div className="flex items-center space-x-16 pt-2">
-                        <div className="text-sm text-gray-600">
+                      <div className="flex items-center space-x-8 sm:space-x-16 pt-2">
+                        <div className="text-xs sm:text-sm text-gray-600">
                           Offered Budget
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="px-6 pb-6 space-y-4 py-6">
+                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 py-4 sm:py-6">
                     {plan.offers && plan.offers.length > 0 ? (
                       plan.offers.map((offer) => {
                         const { truncated, isTruncated } = truncateText(
                           offer.message,
-                          30
+                          20
                         );
                         return (
                           <div
                             key={offer.id}
-                            className="flex items-center justify-between px-4 rounded-lg"
+                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-4 rounded-lg"
                           >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4">
                               <img
                                 src={
                                   offer.agency.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={`${offer.company} avatar`}
-                                className="w-11 h-11 rounded-full object-cover"
+                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-gray-900">
+                                  <span className="text-gray-900 text-xs sm:text-sm">
                                     {expandedOfferMessages[offer.id]
                                       ? offer.message
                                       : truncated}
@@ -508,7 +536,7 @@ function PublishedPlan() {
                                           onClick={() =>
                                             toggleOfferMessage(offer.id)
                                           }
-                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                          className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                         >
                                           See More
                                         </button>
@@ -519,7 +547,7 @@ function PublishedPlan() {
                                           onClick={() =>
                                             toggleOfferMessage(offer.id)
                                           }
-                                          className="text-blue-600 hover:underline text-sm ml-1"
+                                          className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                         >
                                           Show Less
                                         </button>
@@ -528,19 +556,19 @@ function PublishedPlan() {
                                   {offer.verified && (
                                     <div className="flex space-x-1">
                                       <span className="text-blue-500">
-                                        <MdVerified size={24} />
+                                        <MdVerified size={20} />
                                       </span>
                                       <span className="text-green-500">
-                                        <MdVerified size={24} />
+                                        <MdVerified size={20} />
                                       </span>
                                     </div>
                                   )}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold text-xl">
+                                <span className="font-semibold text-base sm:text-xl">
                                   💰 {offer.offered_budget}
                                 </span>
                               </div>
@@ -548,7 +576,7 @@ function PublishedPlan() {
                                 onClick={() =>
                                   handleResponseClick(offer, offer.agency.user)
                                 }
-                                className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                               >
                                 Response
                               </button>
@@ -557,7 +585,7 @@ function PublishedPlan() {
                         );
                       })
                     ) : (
-                      <div className="text-gray-600 text-sm">
+                      <div className="text-gray-600 text-xs sm:text-sm">
                         No offers available
                       </div>
                     )}
@@ -572,20 +600,20 @@ function PublishedPlan() {
 
       {/* Popup Modal for Comments */}
       {isPopupOpen && selectedTour && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4 sm:p-6">
+          <div className="bg-white rounded-lg w-full max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-200">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
                 Tour Details
               </h2>
               <button
                 onClick={closePopup}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               <div className="w-full">
                 <div className="rounded-lg bg-white shadow-sm border border-gray-200">
                   <div className="p-3 sm:p-4 lg:p-6">
@@ -595,7 +623,7 @@ function PublishedPlan() {
                           Tour from {selectedTour.location_from} to{" "}
                           {selectedTour.location_to}
                         </h2>
-                        <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                        <div className="space-y-1 text-xs sm:text-sm text-gray-600">
                           <p>
                             Willing to go on{" "}
                             <span className="font-medium">
@@ -621,7 +649,7 @@ function PublishedPlan() {
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
                             Budget ${selectedTour.budget}
                           </p>
-                          <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                          <p className="text-xs sm:text-sm text-gray-800">
                             Total {selectedTour.total_members} person
                             {selectedTour.total_members > 1 ? "s" : ""}
                           </p>
@@ -629,12 +657,12 @@ function PublishedPlan() {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                         {selectedTour.description}
                       </p>
                     </div>
-                    <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                      <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
+                    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                      <p className="text-xs sm:text-sm font-medium text-gray-600">
                         Interested Travel Points:
                       </p>
                       <div className="flex flex-wrap gap-1">
@@ -644,7 +672,7 @@ function PublishedPlan() {
                             .map((location, index) => (
                               <span
                                 key={index}
-                                className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                className="text-xs sm:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                               >
                                 {location.trim()}
                                 {index <
@@ -653,7 +681,7 @@ function PublishedPlan() {
                               </span>
                             ))
                         ) : (
-                          <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
+                          <span className="text-xs sm:text-sm text-gray-600">
                             None
                           </span>
                         )}
@@ -672,18 +700,18 @@ function PublishedPlan() {
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                            <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                            <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
                           </div>
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                            <Heart className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
+                            <Heart className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
                           </div>
                         </div>
-                        <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
+                        <span className="text-xs sm:text-sm text-gray-600 ml-2">
                           {getInteractionCounts(selectedTour).likeCount} Likes
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                         <span>{selectedTour.offers?.length || 0} Offers</span>
                         <span>
                           {getInteractionCounts(selectedTour).shareCount} Shares
@@ -691,18 +719,18 @@ function PublishedPlan() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="flex items-center gap-4 sm:gap-6 lg:gap-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
                         <button
                           onClick={() => handleLike(selectedTour.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isLiked[selectedTour.id]
                               ? "text-blue-600"
                               : "text-gray-600"
                           } hover:text-blue-600 transition-colors`}
                         >
                           <ThumbsUp
-                            className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
                               isLiked[selectedTour.id] ? "fill-current" : ""
                             }`}
                           />
@@ -712,22 +740,22 @@ function PublishedPlan() {
                         </button>
                         <button
                           onClick={() => openPopup(selectedTour)}
-                          className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                         >
-                          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
+                          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>Comments</span>
                         </button>
                         <button
                           onClick={() => handleShare(selectedTour.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isShared[selectedTour.id]
                               ? "text-blue-600"
                               : "text-gray-600"
                           } hover:text-blue-600 transition-colors`}
                         >
                           <Share2
-                            className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
                               isShared[selectedTour.id] ? "fill-current" : ""
                             }`}
                           />
@@ -737,8 +765,8 @@ function PublishedPlan() {
                         </button>
                       </div>
                     </div>
-                    <div className="flex flex-col justify-start sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
-                      <div className="text-gray-600 sm:mt-0 w-fit md:mt-8">
+                    <div className="flex flex-col sm:flex-row items-start gap-3 p-2 sm:p-4 rounded-lg">
+                      <div className="text-gray-600 w-fit">
                         <img
                           src={
                             localStorage.getItem("user_image") ||
@@ -749,7 +777,7 @@ function PublishedPlan() {
                         />
                       </div>
                       <div className="flex-1 w-full">
-                        <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
+                        <p className="text-base sm:text-lg font-medium text-gray-700 mb-2">
                           Place your offer
                         </p>
                         <div className="flex flex-col gap-3">
@@ -775,43 +803,43 @@ function PublishedPlan() {
                                 offerComment
                               )
                             }
-                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
+                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-2 sm:gap-3 justify-center ${
                               offerBudget && offerComment.trim()
                                 ? "bg-blue-600 text-white hover:bg-blue-700"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                             }`}
                             disabled={!offerBudget || !offerComment.trim()}
                           >
-                            <IoIosSend size={24} />
+                            <IoIosSend size={20} />
                             <span>Submit Offer</span>
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div className="px-6 pb-6 space-y-4 py-6">
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 py-4 sm:py-6">
                       {selectedTour.offers && selectedTour.offers.length > 0 ? (
                         selectedTour.offers.map((offer) => {
                           const { truncated, isTruncated } = truncateText(
                             offer.message,
-                            30
+                            20
                           );
                           return (
                             <div
                               key={offer.id}
-                              className="flex items-center justify-between px-4 rounded-lg"
+                              className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-4 rounded-lg"
                             >
-                              <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-3 sm:gap-4">
                                 <img
                                   src={
                                     offer.image ||
                                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
                                   alt={`${offer.company} avatar`}
-                                  className="w-11 h-11 rounded-full object-cover"
+                                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                                 />
                                 <div>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-gray-900">
+                                    <span className="text-gray-900 text-xs sm:text-sm">
                                       {expandedOfferMessages[offer.id]
                                         ? offer.message
                                         : truncated}
@@ -821,7 +849,7 @@ function PublishedPlan() {
                                             onClick={() =>
                                               toggleOfferMessage(offer.id)
                                             }
-                                            className="text-blue-600 hover:underline text-sm ml-1"
+                                            className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                           >
                                             See More
                                           </button>
@@ -832,7 +860,7 @@ function PublishedPlan() {
                                             onClick={() =>
                                               toggleOfferMessage(offer.id)
                                             }
-                                            className="text-blue-600 hover:underline text-sm ml-1"
+                                            className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                           >
                                             Show Less
                                           </button>
@@ -841,19 +869,19 @@ function PublishedPlan() {
                                     {offer.verified && (
                                       <div className="flex space-x-1">
                                         <span className="text-blue-500">
-                                          <MdVerified size={24} />
+                                          <MdVerified size={20} />
                                         </span>
                                         <span className="text-green-500">
-                                          <MdVerified size={24} />
+                                          <MdVerified size={20} />
                                         </span>
                                       </div>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-xl">
+                                  <span className="font-semibold text-base sm:text-xl">
                                     💰 {offer.offered_budget}
                                   </span>
                                 </div>
@@ -864,7 +892,7 @@ function PublishedPlan() {
                                       selectedTour.user
                                     )
                                   }
-                                  className="px-5 py-2 bg-[#3776E2] text-white text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                                  className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                                 >
                                   Response
                                 </button>
@@ -873,7 +901,7 @@ function PublishedPlan() {
                           );
                         })
                       ) : (
-                        <div className="text-gray-600 text-sm">
+                        <div className="text-gray-600 text-xs sm:text-sm">
                           No offers available
                         </div>
                       )}
@@ -886,18 +914,19 @@ function PublishedPlan() {
         </div>
       )}
 
+      {/* Agency Modal */}
       {showAgencyModal && selectedAgency && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-[90vh] max-h-[80vh] overflow-hidden">
-            <div className="flex h-[450px]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 sm:p-6">
+          <div className="bg-white rounded-lg w-full max-w-[95vw] sm:max-w-[90vh] max-h-[80vh] overflow-hidden">
+            <div className="flex flex-col sm:flex-row h-auto sm:h-[450px]">
               {/* Left Image & Close Button */}
-              <div className="w-1/2 relative">
+              <div className="w-full sm:w-1/2 relative">
                 <button
                   onClick={() => {
                     setShowAgencyModal(false);
                     setSelectedUserId(null);
                   }}
-                  className="absolute top-4 bg-gray-500 text-white px-4 py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
+                  className="absolute top-4 left-4 bg-gray-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
                 >
                   <GoArrowLeft className="w-4 h-4" />
                   Back
@@ -908,74 +937,122 @@ function PublishedPlan() {
                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
                   }
                   alt="Agency"
-                  className="w-full h-full object-cover"
+                  className="w-full h-48 sm:h-full object-cover"
                 />
               </div>
 
               {/* Right Content */}
-              <div className="w-1/2 p-6 flex flex-col">
+              <div className="w-full sm:w-1/2 p-4 sm:p-6 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center">
                       <img
                         src={
                           showResponseData?.agency_logo_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"
                         }
-                        className="rounded-full w-16 h-16 object-cover"
+                        className="rounded-full w-12 h-12 sm:w-16 sm:h-16 object-cover"
                         alt="Agency Logo"
                       />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-semibold text-gray-800">
-                        {showResponseData?.agency_name ||
-                          selectedAgency.company}
-                      </h2>
-                      <div className="flex items-center gap-1 mt-1">
-                        {renderStars(showResponseData?.rating || 4.5)}
-                        <span className="text-sm text-gray-600">
-                          ({showResponseData?.review_count || 0}{" "}
-                        </span>
-                        <button
-                          onClick={handleReviewsClick}
-                          className="text-sm text-blue-600 hover:underline cursor-pointer"
-                        >
-                          Reviews
-                        </button>
-                        <span className="text-sm text-gray-600">)</span>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                          {showResponseData?.agency_name || selectedAgency.company}
+                        </h2>
+                        <div className="flex items-center gap-1 mt-1">
+                          {renderStars(showResponseData?.rating || 4.5)}
+                          <span className="text-xs sm:text-sm text-gray-600">
+                            ({showResponseData?.review_count || 0}{" "}
+                          </span>
+                          <button
+                            onClick={handleReviewsClick}
+                            className="text-xs sm:text-sm text-blue-600 hover:underline cursor-pointer"
+                          >
+                            Reviews
+                          </button>
+                          <span className="text-xs sm:text-sm text-gray-600">
+                            )
+                          </span>
+                        </div>
                       </div>
+                      
                     </div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <div className="mb-6 flex-1">
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                <div className="mb-4 sm:mb-6 flex-1">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                     {showResponseData?.about ||
                       "Aspen is as close as one can get to a storybook alpine town in America..."}
                   </p>
                 </div>
 
+                <div className="mb-2">
+                  <h1 className="flex items-center">
+                    {" "}
+                    <Mail className="w-4 h-4 text-blue-600 mr-1" />{" "}
+                    {showResponseData?.contact_email}
+                  </h1>
+                  <h1 className="flex items-center">
+                    {" "}
+                    <Phone className="w-4 h-4 text-green-600 mr-1" />{" "}
+                    {showResponseData?.contact_phone}
+                  </h1>
+                  <h1 className="flex items-center">
+                    {" "}
+                    <MapPin className="w-4 h-4 text-red-600 mr-1" />{" "}
+                    {showResponseData?.address}
+                  </h1>
+                </div>
+
                 {/* Facilities */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                <div className=" flex items-center justify-between">
+                  <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
                     Facilities
                   </h3>
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      {JSON.parse(
-                        showResponseData?.facilities?.[0] || "[]"
-                      ).map((item, i) => (
-                        <span
-                          key={i}
-                          className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-1"
-                        >
-                          <FaCheckCircle className="w-3 h-3 text-blue-500" />
-                          {item}
-                        </span>
-                      ))}
+                      {JSON.parse(showResponseData?.facilities?.[0] || "[]").map(
+                        (item, i) => (
+                          <span
+                            key={i}
+                            className="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
+                          >
+                            <FaCheckCircle className="w-3 h-3 text-blue-500" />
+                            {item}
+                          </span>
+                        )
+                      )}
                     </div>
                   </div>
+                </div>
+                <div>
+                  <button
+                        onClick={() => {
+                          if (!token) {
+                            navigate("/login");
+                          } else {
+                            handleMessage({ other_user_id: selectedUserId });
+                          }
+                        }}
+                        disabled={isInviteLoading}
+                        className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+                      >
+                        {isInviteLoading ? (
+                          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        ) : (
+                          <>
+                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="text-sm sm:text-base font-medium">
+                              Message
+                            </span>
+                          </>
+                        )}
+                      </button>
+                </div>
                 </div>
               </div>
             </div>
@@ -996,24 +1073,27 @@ function PublishedPlan() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -30, opacity: 0 }}
                     transition={{ duration: 0.3, delay: 0.1 }}
-                    className="p-6 space-y-6"
+                    className="p-4 sm:p-6 space-y-4 sm:space-y-6"
                   >
                     <motion.div
                       initial={{ y: -20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ duration: 0.3, delay: 0.3 }}
                     >
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4 -mt-5">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4 -mt-5">
                         Recent Reviews
                       </h3>
                       <div className="space-y-4 max-h-56 overflow-y-auto">
-                        <div className="text-gray-600 text-sm">
+                        <div className="text-gray-600 text-xs sm:text-sm">
                           {showResponseData?.recent_reviews?.length
                             ? showResponseData.recent_reviews.map(
                                 (review, index) => (
-                                  <div className="mb-6 p-4 bg-white rounded-lg shadow-md border border-pink-200">
-                                    <div className="flex items-center gap-4">
-                                      <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-lg">
+                                  <div
+                                    key={index}
+                                    className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white rounded-lg shadow-md border border-pink-200"
+                                  >
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-base sm:text-lg">
                                         {review.tourist_name
                                           .charAt(0)
                                           .toUpperCase()}
@@ -1021,7 +1101,7 @@ function PublishedPlan() {
                                       <div className="flex-1">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-lg text-gray-800">
+                                            <span className="font-semibold text-base sm:text-lg text-gray-800">
                                               {
                                                 review.tourist_name.split(
                                                   "@"
@@ -1034,7 +1114,7 @@ function PublishedPlan() {
                                                 (_, i) => (
                                                   <svg
                                                     key={i}
-                                                    className={`w-5 h-5 ${
+                                                    className={`w-4 h-4 sm:w-5 sm:h-5 ${
                                                       i < review.rating
                                                         ? "text-yellow-400"
                                                         : "text-gray-300"
@@ -1048,7 +1128,7 @@ function PublishedPlan() {
                                               )}
                                             </div>
                                           </div>
-                                          <span className="text-sm text-gray-500 italic">
+                                          <span className="text-xs sm:text-sm text-gray-500 italic">
                                             {new Date(
                                               review.created_at
                                             ).toLocaleDateString("en-GB", {
@@ -1058,7 +1138,7 @@ function PublishedPlan() {
                                             })}
                                           </span>
                                         </div>
-                                        <p className="text-gray-600 text-base mt-2">
+                                        <p className="text-xs sm:text-base text-gray-600 mt-2">
                                           {review.comment}
                                         </p>
                                       </div>

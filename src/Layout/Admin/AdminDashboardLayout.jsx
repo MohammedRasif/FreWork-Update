@@ -57,7 +57,7 @@ export default function AdminDashboardLayout() {
           path: "/admin/admin_notification",
         },
         {
-          name: "Membership",
+          name: "For agencies",
           icon: <UserRound size={20} />,
           path: "/admin/membership",
         },
