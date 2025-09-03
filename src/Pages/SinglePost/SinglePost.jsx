@@ -44,6 +44,7 @@ function SinglePost({ prid }) {
     budget: "",
     comment: "",
     discount: "",
+    applyDiscount: false, // Initialize applyDiscount as false
   });
   const [expandedOffers, setExpandedOffers] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -105,8 +106,11 @@ function SinglePost({ prid }) {
   }, [post, postError, currentUserId, isLocalStorageLoaded]);
 
   const handleOfferChange = (e) => {
-    const { name, value } = e.target;
-    setOfferForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setOfferForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleLike = async (tourId) => {
@@ -187,7 +191,7 @@ function SinglePost({ prid }) {
         offers: [...(prev.offers || []), newOffer],
         offer_count: (prev.offer_count || 0) + 1,
       }));
-      setOfferForm({ budget: "", comment: "", discount: "" });
+      setOfferForm({ budget: "", comment: "", discount: "", applyDiscount: false });
       setIsPopupOpen(false);
       toast.success("Offer submitted successfully");
     } catch (error) {
@@ -292,7 +296,6 @@ function SinglePost({ prid }) {
     }
   };
 
-  // Determine if the "Sent Offer" button should be shown
   const showSentOfferButton = !token || role === "agency";
 
   return (
@@ -376,13 +379,13 @@ function SinglePost({ prid }) {
           </div>
 
           <div className="space-y-1 text-md text-gray-700">
-            <p>
-              <span className="font-medium">Date:</span> {tour.start_date} to{" "}
-              {tour.end_date || "N/A"} ({tour.duration || "N/A"})
+            <p className=" font-bold">
+              <span className="font-medium">Date:</span > {tour.start_date} to{" "}
+              {tour.end_date || "N/A"}
             </p>
           </div>
           <p>
-            <span className="font-medium">Categoria:</span> {tour.travel_type}
+            <span className="font-medium">Categoria:</span> { tour.travel_type || "N/A"}
           </p>
 
           <div className="">
@@ -391,15 +394,20 @@ function SinglePost({ prid }) {
             </p>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center  space-x-10">
             <span className="text-md text-gray-700">
               <span className="font-medium">Total:</span> {tour.total_members}{" "}
               {tour.total_members > 1 ? "people" : "person"}
             </span>
+
+            <div className="flex items-center space-x-4">
+              <h1 className="text-md text-gray-700"><span className="font-medium">Child :</span> {tour.child_count}</h1>
+              <h1> <span className="font-medium">Adult :</span> {tour.child_count}</h1>
+              </div>
+
           </div>
 
           <div>
-            {/* Points of travel */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MapPin className="w-6 h-5 text-gray-500" />
               <span>
@@ -408,7 +416,6 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            {/* Departure from */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <Navigation className="w-6 h-5 text-gray-500" />
               <span>
@@ -417,16 +424,14 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            {/* Includes */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaListUl className="w-6 h-5 text-gray-500" />
               <span>
-                <span className="font-medium">Includes:</span>{" "}
-                {tour.includes || "N/A"}
+                <span className="font-medium">Minimum rating:</span>{" "}
+                {tour.minimum_star_hotel || "N/A"}
               </span>
             </p>
 
-            {/* Meal plan */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <Utensils className="w-6 h-5 text-gray-500" />
               <span>
@@ -435,7 +440,6 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            {/* Accommodation */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <BedDouble className="w-6 h-5 text-gray-500" />
               <span>
@@ -444,16 +448,14 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            {/* Duration */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <Clock4 className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Duration:</span>{" "}
-                {tour.Duration || "N/A"}
+                {tour.duration || "N/A"}
               </span>
             </p>
 
-            {/* Contact Verified */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <ShieldCheck className="w-6 h-5 text-green-500" />
               <span>
@@ -529,7 +531,7 @@ function SinglePost({ prid }) {
                         type="checkbox"
                         name="applyDiscount"
                         id="applyDiscount"
-                        checked={offerForm.applyDiscount || false}
+                        checked={offerForm.applyDiscount}
                         onChange={handleOfferChange}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />

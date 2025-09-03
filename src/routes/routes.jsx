@@ -122,6 +122,7 @@ export const router = createBrowserRouter([
   { path: "/verify", element: <EmailVerification /> },
   { path: "/otp_verify", element: <OTP_Verification /> },
   { path: "/reset_password", element: <ResetPassword /> },
+  { path: "/success", element: <SubscriptionSuccess /> },
   {
     path: "/user",
     element: <UserDashboardLayout />,

@@ -183,99 +183,110 @@ const TourPlanDouble = () => {
   };
 
   const handleSubmitOffer = async (tourId, budget, comment, offerForm) => {
-  // Check if user is authenticated
-  const token = localStorage.getItem("access_token");
-  const role = localStorage.getItem("role");
+    // Check if user is authenticated
+    const token = localStorage.getItem("access_token");
+    const role = localStorage.getItem("role");
 
-  if (!token) {
-    navigate("/login");
-    toast.error("Please log in to submit an offer");
-    return;
-  }
-
-  // Check if user has the correct role
-  if (role !== "agency") {
-    toast.error("Only agencies can submit offers");
-    return;
-  }
-
-  // Validate inputs
-  if (!budget || isNaN(budget) || budget <= 0) {
-    toast.error("Please provide a valid budget amount");
-    return;
-  }
-
-  if (!comment.trim()) {
-    toast.error("Please provide a comment");
-    return;
-  }
-
-  if (offerForm.applyDiscount && (!offerForm.discount || isNaN(offerForm.discount) || offerForm.discount <= 0)) {
-    toast.error("Please provide a valid discount amount");
-    return;
-  }
-
-  try {
-    const payload = {
-      offered_budget: parseFloat(budget),
-      message: comment.trim(),
-      apply_discount: offerForm.applyDiscount || false,
-      discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
-    };
-
-    const response = await offerBudgetToBack({
-      id: tourId,
-      data: payload,
-    }).unwrap();
-
-    // Update tours and selectedTour state only after successful API response
-    const newOffer = {
-      id: response?.id || `temp-${Date.now()}`,
-      offered_budget: parseFloat(budget),
-      message: comment.trim(),
-      apply_discount: offerForm.applyDiscount || false,
-      discount: offerForm.applyDiscount ? parseFloat(offerForm.discount) : null,
-      agency: {
-        agency_name: localStorage.getItem("name") || "Unknown Agency",
-        logo_url:
-          localStorage.getItem("user_image") ||
-          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-        is_verified: false,
-      },
-    };
-
-    setTours((prevTours) =>
-      prevTours.map((tour) =>
-        tour.id === tourId
-          ? {
-              ...tour,
-              offers: [...(tour.offers || []), newOffer],
-              offer_count: (tour.offer_count || 0) + 1,
-            }
-          : tour
-      )
-    );
-
-    if (selectedTour && selectedTour.id === tourId) {
-      setSelectedTour((prev) =>
-        prev
-          ? {
-              ...prev,
-              offers: [...(prev.offers || []), newOffer],
-              offer_count: (prev.offer_count || 0) + 1,
-            }
-          : prev
-      );
+    if (!token) {
+      navigate("/login");
+      toast.error("Please log in to submit an offer");
+      return;
     }
 
-    toast.success("Offer submitted successfully!");
-  } catch (error) {
-    console.error("Failed to submit offer:", error);
-    const errorMessage =
-      error?.data?.error || error?.data?.detail || "Failed to submit offer. Please try again.";
-    toast.error(errorMessage);
-  }
-};
+    // Check if user has the correct role
+    if (role !== "agency") {
+      toast.error("Only agencies can submit offers");
+      return;
+    }
+
+    // Validate inputs
+    if (!budget || isNaN(budget) || budget <= 0) {
+      toast.error("Please provide a valid budget amount");
+      return;
+    }
+
+    if (!comment.trim()) {
+      toast.error("Please provide a comment");
+      return;
+    }
+
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount ||
+        isNaN(offerForm.discount) ||
+        offerForm.discount <= 0)
+    ) {
+      toast.error("Please provide a valid discount amount");
+      return;
+    }
+
+    try {
+      const payload = {
+        offered_budget: parseFloat(budget),
+        message: comment.trim(),
+        apply_discount: offerForm.applyDiscount || false,
+        discount: offerForm.applyDiscount
+          ? parseFloat(offerForm.discount)
+          : null,
+      };
+
+      const response = await offerBudgetToBack({
+        id: tourId,
+        data: payload,
+      }).unwrap();
+
+      // Update tours and selectedTour state only after successful API response
+      const newOffer = {
+        id: response?.id || `temp-${Date.now()}`,
+        offered_budget: parseFloat(budget),
+        message: comment.trim(),
+        apply_discount: offerForm.applyDiscount || false,
+        discount: offerForm.applyDiscount
+          ? parseFloat(offerForm.discount)
+          : null,
+        agency: {
+          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          is_verified: false,
+        },
+      };
+
+      setTours((prevTours) =>
+        prevTours.map((tour) =>
+          tour.id === tourId
+            ? {
+                ...tour,
+                offers: [...(tour.offers || []), newOffer],
+                offer_count: (tour.offer_count || 0) + 1,
+              }
+            : tour
+        )
+      );
+
+      if (selectedTour && selectedTour.id === tourId) {
+        setSelectedTour((prev) =>
+          prev
+            ? {
+                ...prev,
+                offers: [...(prev.offers || []), newOffer],
+                offer_count: (prev.offer_count || 0) + 1,
+              }
+            : prev
+        );
+      }
+
+      toast.success("Offer submitted successfully!");
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        "Failed to submit offer. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
 
   const handleLike = async (tourId) => {
     if (!token) {
@@ -577,7 +588,6 @@ const TourPlanDouble = () => {
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
                               {tour.location_to}
                             </h2>
-                            
                           </div>
                           {tour.offers && tour.offers.length > 0 && (
                             <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none ">
@@ -637,7 +647,7 @@ const TourPlanDouble = () => {
                         <div className="space-y-1 text-md text-gray-700">
                           <p>
                             <span className="font-medium">Date:</span>{" "}
-                            {tour.start_date} 
+                            {tour.start_date}
                           </p>
                           <p>
                             <span className="font-medium">Category:</span>{" "}
@@ -651,12 +661,24 @@ const TourPlanDouble = () => {
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center  space-x-10">
                           <span className="text-md text-gray-700">
                             <span className="font-medium">Total:</span>{" "}
                             {tour.total_members}{" "}
                             {tour.total_members > 1 ? "people" : "person"}
                           </span>
+
+                          <div className="flex items-center space-x-4">
+                            <h1 className="text-md text-gray-700">
+                              <span className="font-medium">Child :</span>{" "}
+                              {tour.child_count}
+                            </h1>
+                            <h1>
+                              {" "}
+                              <span className="font-medium">Adult :</span>{" "}
+                              {tour.child_count}
+                            </h1>
+                          </div>
                         </div>
 
                         <div>
@@ -686,7 +708,9 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaListUl className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Includes:</span>{" "}
+                              <span className="font-medium">
+                                Minimum rating:
+                              </span>{" "}
                               {tour.includes || "N/A"}
                             </span>
                           </p>

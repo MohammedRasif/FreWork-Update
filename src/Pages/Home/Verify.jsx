@@ -1,3 +1,4 @@
+"use client"
 
 import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
@@ -37,12 +38,12 @@ const SubscriptionSuccess = () => {
                             <div
                                 className={`w-44 h-44 rounded-full border-4 flex items-center justify-center transition-all duration-[2500ms] ${showIcon ? "animate-pulse" : ""
                                     }`}
-                                style={{ borderColor: "#3776E2" }}
+                                style={{ borderColor: "#EB5A8E" }}
                             >
                                 {/* Inner Circle */}
                                 <div
                                     className="w-36 h-36 rounded-full flex items-center justify-center relative overflow-hidden"
-                                    style={{ backgroundColor: "#3776E2" }}
+                                    style={{ backgroundColor: "#EB5A8E" }}
                                 >
                                     {/* Checkmark Icon */}
                                     <svg
@@ -70,7 +71,7 @@ const SubscriptionSuccess = () => {
                                     <div
                                         className={`absolute inset-0 rounded-full transition-all duration-1000 ${showIcon ? "scale-150 opacity-0" : "scale-100 opacity-30"
                                             }`}
-                                        style={{ backgroundColor: "#3776E2" }}
+                                        style={{ backgroundColor: "#EB5A8E" }}
                                     ></div>
                                 </div>
                             </div>
@@ -79,7 +80,7 @@ const SubscriptionSuccess = () => {
                             <div
                                 className={`absolute inset-0 rounded-full blur-xl transition-all duration-[2500ms] ${showIcon ? "scale-150 opacity-20" : "scale-100 opacity-0"
                                     }`}
-                                style={{ backgroundColor: "#3776E2" }}
+                                style={{ backgroundColor: "#EB5A8E" }}
                             ></div>
                         </div>
                     </div>
@@ -95,22 +96,22 @@ const SubscriptionSuccess = () => {
                     <p className="text-2xl font-semibold text-gray-800 mb-8">Successfully Verified</p>
 
                     {/* Continue Button */}
-                    <NavLink to="/">
+                    <NavLink to="http://localhost:5173/dashboard/membership">
                         <div className="mt-8">
                             <button
                                 className="px-8 py-3 text-white font-semibold rounded-full transition-all duration-200 transform hover:scale-105 cursor-pointer"
                                 style={{
-                                    backgroundColor: "#3776E2",
+                                    backgroundColor: "#EB5A8E",
                                     boxShadow: "0 4px 15px rgba(235, 90, 142, 0.3)",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "#3776E2"
+                                    e.target.style.backgroundColor = "#D14A7C"
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#3776E2"
+                                    e.target.style.backgroundColor = "#EB5A8E"
                                 }}
                             >
-                                Continue to Home
+                                Continue to Dashboard
                             </button>
                         </div>
                     </NavLink>
@@ -124,7 +125,7 @@ const SubscriptionSuccess = () => {
                             className={`absolute w-2 h-2 rounded-full transition-all duration-[3000ms] ${showIcon ? "animate-float" : "opacity-0"
                                 }`}
                             style={{
-                                backgroundColor: "#3776E2",
+                                backgroundColor: "#EB5A8E",
                                 left: `${20 + i * 15}%`,
                                 top: `${30 + (i % 2) * 40}%`,
                                 animationDelay: `${i * 0.5}s`,

@@ -1,5 +1,3 @@
-"use client";
-
 import { GoArrowLeft } from "react-icons/go";
 import { MdVerified } from "react-icons/md";
 import { HiDotsVertical } from "react-icons/hi";

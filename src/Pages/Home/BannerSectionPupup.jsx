@@ -139,7 +139,7 @@ const onSubmit = async (data, status) => {
   formDataToSend.append("description", data.description || "");
   formDataToSend.append("destination_type", data.destinationType || "");
   formDataToSend.append("type_of_accommodation", data.typeOfAccommodation || "");
-  formDataToSend.append("minimumHotelStars", data.minimumHotelStars || "");
+  formDataToSend.append("minimum_star_hotel", data.minimumHotelStars || "");
   formDataToSend.append("meal_plan", data.mealPlan || "");
   formDataToSend.append("status", status);
   formDataToSend.append("tourist_spots", data.touristSpots || "");
@@ -554,7 +554,7 @@ const onSubmit = async (data, status) => {
         {currentStep === 4 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {/* <div>
+              <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Travel Type
                 </label>
@@ -578,7 +578,7 @@ const onSubmit = async (data, status) => {
                     {errors.travelType.message}
                   </span>
                 )}
-              </div> */}
+              </div>
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Destination Type
@@ -593,13 +593,10 @@ const onSubmit = async (data, status) => {
                   }
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
-                  <option value="">Select Destination Type</option>
-                  <option value="beach">Beach</option>
-                  <option value="mountain">Mountain</option>
-                  <option value="city">City</option>
-                  <option value="historical">Historical</option>
-                  <option value="adventure">Adventure</option>
-                  <option value="cultural">Cultural</option>
+                  <option value="beach">Beach trips</option>
+                  <option value="mountain">Mountain adventures</option>
+                  <option value="desert">Relaxing tours</option>
+                  <option value="island">Group packages</option>
                 </select>
                 {errors.destinationType && (
                   <span className="text-red-500 text-xs mt-1">
