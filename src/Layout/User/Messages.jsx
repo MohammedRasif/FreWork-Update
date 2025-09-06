@@ -543,7 +543,7 @@ function Messages() {
       );
       pendingMessagesRef.current.delete(tempId);
       alert(
-        error.data?.detail || "Failed to send final offer. Please try again."
+        error.data?.error || "Failed to send final offer. Please try again."
       );
     }
   };

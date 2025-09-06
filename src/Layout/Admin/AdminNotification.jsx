@@ -21,7 +21,7 @@ const AdminNotification = () => {
   }, []);
 
   useEffect(() => {
-    const baseUrl = "https://novel-fresh-spaniel.ngrok-free.app/";
+    const baseUrl = "https://transeunt-noncommemoratory-valeria.ngrok-free.app/";
     const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 

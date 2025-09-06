@@ -77,6 +77,7 @@ function SinglePost({ prid }) {
   const [acceptOffer, { isLoading: isAcceptLoading }] =
     useAcceptOfferMutation();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
+  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchLocalStorage = () => {
@@ -170,59 +171,66 @@ function SinglePost({ prid }) {
   };
 
   const handleOfferSubmit = async (e) => {
-    e.preventDefault();
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
-    if (!offerForm.budget || !offerForm.comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
-      return;
-    }
-    try {
-      await offerBudgetToBack({
-        id: finalId,
-        data: {
-          offered_budget: parseFloat(offerForm.budget),
-          message: offerForm.comment,
-          discount_percentage: offerForm.discount || 0,
-        },
-      }).unwrap();
-      const newOffer = {
-        id: currentUserId,
+  e.preventDefault();
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
+  if (!offerForm.budget || !offerForm.comment.trim()) {
+    toast.error("Please provide both a budget and a comment");
+    return;
+  }
+
+  // Set loading state to true
+  setIsOfferSubmitting(true);
+
+  try {
+    await offerBudgetToBack({
+      id: finalId,
+      data: {
         offered_budget: parseFloat(offerForm.budget),
         message: offerForm.comment,
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
-      setPostData((prev) => ({
-        ...prev,
-        offers: [...(prev.offers || []), newOffer],
-        offer_count: (prev.offer_count || 0) + 1,
-      }));
-      setOfferForm({
-        budget: "",
-        comment: "",
-        discount: "",
-        applyDiscount: false,
-      });
-      setIsPopupOpen(false);
-      toast.success("Offer submitted successfully");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      toast.error(
-        error.data?.error
-          ? `${error.data.error} Only agency can do this.`
-          : "Something went wrong"
-      );
-    }
-  };
+        discount_percentage: offerForm.discount || 0,
+      },
+    }).unwrap();
+    const newOffer = {
+      id: currentUserId,
+      offered_budget: parseFloat(offerForm.budget),
+      message: offerForm.comment,
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
+    setPostData((prev) => ({
+      ...prev,
+      offers: [...(prev.offers || []), newOffer],
+      offer_count: (prev.offer_count || 0) + 1,
+    }));
+    setOfferForm({
+      budget: "",
+      comment: "",
+      discount: "",
+      applyDiscount: false,
+    });
+    setIsPopupOpen(false);
+    toast.success("Offer submitted successfully");
+  } catch (error) {
+    console.error("Failed to submit offer:", error);
+    toast.error(
+      error.data?.error
+        ? `${error.data.error} Only agency can do this.`
+        : "Something went wrong"
+    );
+  } finally {
+    // Reset loading state
+    setIsOfferSubmitting(false);
+  }
+};
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
@@ -588,21 +596,19 @@ function SinglePost({ prid }) {
                   </div>
 
                   <button
-                    type="submit"
-                    disabled={
-                      isOfferBudgetLoading ||
-                      !offerForm.budget ||
-                      !offerForm.comment.trim()
-                    }
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors ${
-                      offerForm.budget && offerForm.comment.trim()
-                        ? "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    <IoIosSend size={20} />
-                    Submit Offer
-                  </button>
+  type="submit"
+  disabled={
+    isOfferSubmitting || !offerForm.budget || !offerForm.comment.trim()
+  }
+  className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors ${
+    isOfferSubmitting || !offerForm.budget || !offerForm.comment.trim()
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
+  }`}
+>
+  <IoIosSend size={20} />
+  {isOfferSubmitting ? "Submitting..." : "Submit Offer"}
+</button>
                 </form>
                 <div className=" space-y-4">
                   {isUserLoading ? (

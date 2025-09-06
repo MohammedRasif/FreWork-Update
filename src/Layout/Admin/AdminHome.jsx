@@ -51,6 +51,8 @@ const AdminHome = () => {
   const [declineRequest, { isLoading: isDeclineRequestLoading }] =
     useDeclineRequestMutation();
 
+    const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
+
   // Initialize like, share, and like count states
   useEffect(() => {
     if (tourPlanPublic && currentUserId) {
@@ -251,80 +253,86 @@ const AdminHome = () => {
 
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
-    if (!token) {
-      toast.error("Please log in to submit an offer");
-      return;
-    }
+  if (!token) {
+    toast.error("Please log in to submit an offer");
+    return;
+  }
 
-    if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
-      return;
-    }
+  if (!budget || !comment.trim()) {
+    toast.error("Please provide both a budget and a comment");
+    return;
+  }
 
-    if (
-      offerForm.applyDiscount &&
-      (!offerForm.discount || offerForm.discount <= 0)
-    ) {
-      toast.error("Please provide a valid discount percentage");
-      return;
-    }
+  if (
+    offerForm.applyDiscount &&
+    (!offerForm.discount || offerForm.discount <= 0)
+  ) {
+    toast.error("Please provide a valid discount percentage");
+    return;
+  }
 
-    try {
-      const offerData = {
-        offered_budget: Number.parseFloat(budget),
-        message: comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
-      };
+  // Set loading state to true
+  setIsOfferSubmitting(true);
 
-      await offerBudgetToBack({
-        id: planId,
-        data: offerData,
-      }).unwrap();
+  try {
+    const offerData = {
+      offered_budget: Number.parseFloat(budget),
+      message: comment,
+      apply_discount: offerForm.applyDiscount,
+      discount: offerForm.applyDiscount
+        ? Number.parseFloat(offerForm.discount)
+        : 0,
+    };
 
-      const newOffer = {
-        id: `${currentUserId}-${Date.now()}`,
-        offered_budget: Number.parseFloat(budget),
-        message: comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
+    await offerBudgetToBack({
+      id: planId,
+      data: offerData,
+    }).unwrap();
 
-      if (selectedPlan && selectedPlan.id === planId) {
-        setSelectedPlan((prev) =>
-          prev
-            ? {
-                ...prev,
-                offers: [...(prev.offers || []), newOffer],
-                offer_count: (prev.offer_count || 0) + 1,
-              }
-            : prev
-        );
-      }
+    const newOffer = {
+      id: `${currentUserId}-${Date.now()}`,
+      offered_budget: Number.parseFloat(budget),
+      message: comment,
+      apply_discount: offerForm.applyDiscount,
+      discount: offerForm.applyDiscount
+        ? Number.parseFloat(offerForm.discount)
+        : 0,
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
 
-      setOfferBudget(0);
-      setOfferComment("");
-      setOfferForm({ applyDiscount: false, discount: "" });
-      toast.success("Offer submitted successfully");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      toast.error(
-        error.data?.error ||
-          "Failed to submit offer. Only agencies can do this."
+    if (selectedPlan && selectedPlan.id === planId) {
+      setSelectedPlan((prev) =>
+        prev
+          ? {
+              ...prev,
+              offers: [...(prev.offers || []), newOffer],
+              offer_count: (prev.offer_count || 0) + 1,
+            }
+          : prev
       );
     }
-  };
+
+    setOfferBudget(0);
+    setOfferComment("");
+    setOfferForm({ applyDiscount: false, discount: "" });
+    toast.success("Offer submitted successfully");
+  } catch (error) {
+    console.error("Failed to submit offer:", error);
+    toast.error(
+      error.data?.error ||
+        "Failed to submit offer. Only agencies can do this."
+    );
+  } finally {
+    // Reset loading state
+    setIsOfferSubmitting(false);
+  }
+};
 
   // Handle decline request
   const handleDeclineRequest = async (planId) => {
@@ -703,20 +711,20 @@ const AdminHome = () => {
                   disabled={!offerForm.applyDiscount}
                 />
               </div>
-              <button
-                onClick={() =>
-                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
-                }
-                className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-                  offerBudget && offerComment.trim()
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                disabled={!offerBudget || !offerComment.trim()}
-              >
-                <IoIosSend size={24} />
-                <span>Submit Offer</span>
-              </button>
+             <button
+  onClick={() =>
+    handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
+  }
+  className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
+    isOfferSubmitting || !offerBudget || !offerComment.trim()
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-blue-600 text-white hover:bg-blue-700"
+  }`}
+  disabled={isOfferSubmitting || !offerBudget || !offerComment.trim()}
+>
+  <IoIosSend size={24} />
+  <span>{isOfferSubmitting ? "Submitting..." : "Submit Offer"}</span>
+</button>
             </div>
           </div>
           {selectedPlan.offers && selectedPlan.offers.length > 0 && (
