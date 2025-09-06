@@ -44,10 +44,10 @@ const Published = () => {
     (p) => p.destination_type?.trim().toLowerCase() === "mountain"
   );
   const relaxTrips = publishedData.filter(
-    (p) => p.travel_type?.trim().toLowerCase() === "relax"
+    (p) => p.destination_type?.trim().toLowerCase() === "relax"
   );
   const groupTrips = publishedData.filter(
-    (p) => p.travel_type?.trim().toLowerCase() === "group"
+    (p) => p.destination_type?.trim().toLowerCase() === "group"
   );
 
   const handleCategoryClick = (category) => {
@@ -182,42 +182,42 @@ const Published = () => {
                   <GoChevronRight className="mt-[5px]" />
                 </button>
                 <div className="relative">
-  <Swiper
-    modules={[Pagination, Navigation]}
-    spaceBetween={12}
-    pagination={{
-      clickable: true,
-      renderBullet: (index, className) => {
-        return `
+                  <Swiper
+                    modules={[Pagination, Navigation]}
+                    spaceBetween={12}
+                    pagination={{
+                      clickable: true,
+                      renderBullet: (index, className) => {
+                        return `
           <span class="${className} custom-pagination-bullet">
             <span class="pagination-number">${index + 1}</span>
           </span>
         `;
-      },
-    }}
-    navigation={{
-      prevEl: beachPrevRef.current,
-      nextEl: beachNextRef.current,
-    }}
-    onBeforeInit={(swiper) => {
-      swiper.params.navigation.prevEl = beachPrevRef.current;
-      swiper.params.navigation.nextEl = beachNextRef.current;
-    }}
-    breakpoints={{
-      1024: { slidesPerView: 4, spaceBetween: 12 },
-      768: { slidesPerView: 3, spaceBetween: 10 },
-      320: { slidesPerView: 1, spaceBetween: 8 },
-    }}
-    loop={true}
-    className="mySwiper"
-  >
-    {beachTrips.slice(-6).map((p) => (
-      <SwiperSlide key={p.id} className="px-2 mb-12">
-        <BeachCard tourPlan={p} />
-      </SwiperSlide>
-    ))}
-  </Swiper>
-</div>
+                      },
+                    }}
+                    navigation={{
+                      prevEl: beachPrevRef.current,
+                      nextEl: beachNextRef.current,
+                    }}
+                    onBeforeInit={(swiper) => {
+                      swiper.params.navigation.prevEl = beachPrevRef.current;
+                      swiper.params.navigation.nextEl = beachNextRef.current;
+                    }}
+                    breakpoints={{
+                      1024: { slidesPerView: 4, spaceBetween: 12 },
+                      768: { slidesPerView: 3, spaceBetween: 10 },
+                      320: { slidesPerView: 1, spaceBetween: 8 },
+                    }}
+                    loop={true}
+                    className="mySwiper"
+                  >
+                    {beachTrips.slice(-6).map((p) => (
+                      <SwiperSlide key={p.id} className="px-2 mb-12">
+                        <BeachCard tourPlan={p} />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
               </div>
             )}
 

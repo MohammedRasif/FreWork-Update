@@ -11,6 +11,15 @@ import {
 } from "@/redux/features/withAuth";
 import AdminOfferPlan from "./AdminOfferPlan";
 import AdminAcceptPlan from "./AdminAcceptPlan";
+import {
+  FaClock,
+  FaEuroSign,
+  FaList,
+  FaLocationArrow,
+  FaLocationDot,
+} from "react-icons/fa6";
+import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
+import { IoBed } from "react-icons/io5";
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -401,7 +410,7 @@ const AdminHome = () => {
                       </div>
                     </div>
 
-                    <div >
+                    <div>
                       <div className="flex-1 lg:-mr-0 -mr-8 pl-1">
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-5">
                           {plan.location_to}
@@ -432,8 +441,9 @@ const AdminHome = () => {
                   <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0 mt-5 mr-3 lg:ml-0 ml-10">
                     <div className="lg:flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                       <div>
-                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                          Budget ${plan.budget}.00
+                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
+                          Budget <FaEuroSign /> {plan.budget}.00 
+
                         </p>
                         <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                           {plan.total_members} person
@@ -493,8 +503,8 @@ const AdminHome = () => {
                   <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                     {selectedPlan.location_to}
                   </h2>
-                  <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                    <p>
+                  <div className=" text-xs sm:text-sm lg:text-sm text-gray-600">
+                    {/* <p>
                       Willing to go on{" "}
                       <span className="font-medium">
                         {selectedPlan.start_date}
@@ -511,13 +521,76 @@ const AdminHome = () => {
                       <span className="font-medium">
                         {selectedPlan.category}
                       </span>
-                    </p>
+                    </p> */}
+
+                    <div>
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+                        <span>
+                          <span className="font-medium">Points of travel:</span>{" "}
+                          {selectedPlan.tourist_spots || "None"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <FaLocationArrow className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-medium">Departure from:</span>{" "}
+                          {selectedPlan.location_from || "N/A"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <FaList className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-medium">Minimum rating:</span>{" "}
+                          {selectedPlan.minimum_star_hotel || "N/A"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-medium">Meal plan:</span>{" "}
+                          {selectedPlan.meal_plan || "N/A"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <IoBed className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-medium">
+                            Type of accommodation:
+                          </span>{" "}
+                          {selectedPlan.type_of_accommodation || "N/A"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <FaClock className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-medium">Duration:</span>{" "}
+                          {selectedPlan.duration || "N/A"}
+                        </span>
+                      </p>
+
+                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                        <MdVerifiedUser className="w-7 h-6 text-green-500" />
+                        <span>
+                          <span className="font-medium">
+                            Contact verified via email
+                          </span>
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                   <div>
-                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                      Budget ${selectedPlan.budget}
+                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
+                      Budget <FaEuroSign /> {selectedPlan.budget}
+                      
+
                     </p>
                     <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                       Total {selectedPlan.total_members} person

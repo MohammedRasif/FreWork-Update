@@ -595,8 +595,8 @@ const onSubmit = async (data, status) => {
                 >
                   <option value="beach">Beach trips</option>
                   <option value="mountain">Mountain adventures</option>
-                  <option value="desert">Relaxing tours</option>
-                  <option value="island">Group packages</option>
+                  <option value="relax">Relaxing tours</option>
+                  <option value="group">Group packages</option>
                 </select>
                 {errors.destinationType && (
                   <span className="text-red-500 text-xs mt-1">

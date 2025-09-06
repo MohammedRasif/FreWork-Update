@@ -265,14 +265,14 @@ const CreatePlan = () => {
                   {...register("destinationType", {
                     required: "Destination Type is required",
                   })}
-                >
+                >c
                   <option value="" disabled selected>
                     Select Destination Type
                   </option>
                   <option value="beach">Beach trips</option>
                   <option value="mountain">Mountain adventures</option>
-                  <option value="desert">Relaxing tours</option>
-                  <option value="island">Group packages</option>
+                  <option value="relaxing">Relaxing tours</option>
+                  <option value="group">Group packages</option>
                 </select>
                 {errors.destinationType && (
                   <p className="text-red-500 text-[14px] mt-1">

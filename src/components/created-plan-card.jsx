@@ -24,17 +24,24 @@ import {
   DialogHeader,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Overlay } from "@radix-ui/react-dialog"; 
+import { Overlay } from "@radix-ui/react-dialog";
 import {
   useDeletePlanMutation,
   useInviteToChatMutation,
   useUpdatePlanMutation,
 } from "@/redux/features/withAuth";
 import { Link, useNavigate } from "react-router-dom";
-import { IoArrowBackSharp } from "react-icons/io5";
+import { IoArrowBackSharp, IoBed } from "react-icons/io5";
 import { FaMoneyBillWave } from "react-icons/fa";
-import { MdVerified } from "react-icons/md";
+import { MdOutlineNoMeals, MdVerified, MdVerifiedUser } from "react-icons/md";
 import { toast } from "react-toastify";
+import {
+  FaClock,
+  FaEuroSign,
+  FaList,
+  FaLocationArrow,
+  FaLocationDot,
+} from "react-icons/fa6";
 
 export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   console.log(plan);
@@ -53,7 +60,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
       return;
     }
 
-    const otherUserId = offer?.agency?.user; 
+    const otherUserId = offer?.agency?.user;
 
     if (!otherUserId) {
       toast.error("Recipient ID not found.");
@@ -194,14 +201,14 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
             </div>
 
             {/* buttons */}
-            <div className="flex items-center gap-2">
-              <Dialog>
+            <div className="flex items-center gap-2 ">
+              <Dialog className="">
                 <DialogTrigger asChild>
                   <Button variant="secondary">View</Button>
                 </DialogTrigger>
                 <Overlay className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" />
 
-                <DialogContent className="max-w-3xl">
+                <DialogContent className="max-w-3xl h-[80vh] overflow-auto">
                   <DialogClose>
                     <button className="flex justify-start hover:cursor-pointer w-10">
                       <IoArrowBackSharp size={20} />
@@ -217,7 +224,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
                     {/* Plan details */}
                     <div>
-                      <p className="text-sm text-[#70798F]">
+                      {/* <p className="text-sm text-[#70798F]">
                         Willing to go on:{" "}
                         <span className="text-[#343E4B] font-medium">
                           {new Date(plan.start_date).toLocaleDateString()}
@@ -234,14 +241,76 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         <span className="text-[#343E4B] font-medium">
                           {plan.destination_type}
                         </span>
-                      </p>
+                      </p> */}
+                      <div>
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+                          <span>
+                            <span className="font-medium">
+                              Points of travel:
+                            </span>{" "}
+                            {plan.tourist_spots || "None"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <FaLocationArrow className="w-6 h-5 text-gray-500" />
+                          <span>
+                            <span className="font-medium">Departure from:</span>{" "}
+                            {plan.location_from || "N/A"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <FaList className="w-6 h-5 text-gray-500" />
+                          <span>
+                            <span className="font-medium">Minimum rating:</span>{" "}
+                            {plan.minimum_star_hotel || "N/A"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+                          <span>
+                            <span className="font-medium">Meal plan:</span>{" "}
+                            {plan.meal_plan || "N/A"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <IoBed className="w-6 h-5 text-gray-500" />
+                          <span>
+                            <span className="font-medium">
+                              Type of accommodation:
+                            </span>{" "}
+                            {plan.type_of_accommodation || "N/A"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <FaClock className="w-6 h-5 text-gray-500" />
+                          <span>
+                            <span className="font-medium">Duration:</span>{" "}
+                            {plan.duration || "N/A"}
+                          </span>
+                        </p>
+
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          <MdVerifiedUser className="w-7 h-6 text-green-500" />
+                          <span>
+                            <span className="font-medium">
+                              Contact verified via email
+                            </span>
+                          </span>
+                        </p>
+                      </div>
                       {/* <p className="text-sm text-[#70798F]">
                         Budget: <span className="text-[#343E4B] font-medium">${plan.budget} USD</span>
                       </p>
                       <p className="text-sm text-[#70798F]">
                         Total Members: <span className="text-[#343E4B] font-medium">{plan.total_members} Person</span>
                       </p> */}
-                      <p className="text-sm text-[#70798F] mb-2">
+                      <p className="text-sm text-[#70798F] mb-2 py-5">
                         {plan.description ||
                           "Lorem Ipsum is simply dummy text... see more"}
                       </p>
@@ -296,14 +365,14 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
                           {/* Right Section: Price + Message Button */}
                           <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1 text-gray-800 font-medium">
+                            {/* <div className="flex items-center gap-1 text-gray-800 font-medium">
                               <FaMoneyBillWave className="text-orange-500" />$
                               {offer?.offered_budget}
-                            </div>
+                            </div> */}
 
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1 text-gray-800 font-medium">
-                                <FaMoneyBillWave className="text-orange-500" />$
+                                <FaEuroSign className="text-orange-500" />
                                 {offer?.offered_budget}
                               </div>
 

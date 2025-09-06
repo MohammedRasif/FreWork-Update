@@ -9,6 +9,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
+  FaClock,
+  FaList,
+  FaLocationArrow,
+  FaLocationDot,
+} from "react-icons/fa6";
+
+import {
   ThumbsUp,
   Share2,
   MapPin,
@@ -19,12 +26,17 @@ import {
   Clock4,
   ShieldCheck,
 } from "lucide-react";
-import { MdOutlineKeyboardBackspace, MdVerified } from "react-icons/md";
+import {
+  MdOutlineKeyboardBackspace,
+  MdOutlineNoMeals,
+  MdVerified,
+  MdVerifiedUser,
+} from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
+import { IoBed, IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
 
 function SinglePost({ prid }) {
@@ -85,7 +97,10 @@ function SinglePost({ prid }) {
       toast.error("Failed to load post data");
     }
     if (post && isLocalStorageLoaded) {
-      setPostData(post);
+      setPostData({
+        ...post,
+        offers: post.offers || [], // Default to empty array if offers is undefined
+      });
       if (currentUserId) {
         setIsLiked(
           post.interactions?.some(
@@ -191,7 +206,12 @@ function SinglePost({ prid }) {
         offers: [...(prev.offers || []), newOffer],
         offer_count: (prev.offer_count || 0) + 1,
       }));
-      setOfferForm({ budget: "", comment: "", discount: "", applyDiscount: false });
+      setOfferForm({
+        budget: "",
+        comment: "",
+        discount: "",
+        applyDiscount: false,
+      });
       setIsPopupOpen(false);
       toast.success("Offer submitted successfully");
     } catch (error) {
@@ -281,7 +301,7 @@ function SinglePost({ prid }) {
   }
 
   const tour = postData;
-  const hasMaxOffers = tour.offer_count >= 3;
+  const hasMaxOffers = tour.offers?.length >= 3;
 
   const handleSentOfferClick = () => {
     if (!token) {
@@ -323,9 +343,7 @@ function SinglePost({ prid }) {
               <h2 className="text-2xl md:text-4xl font-bold text-center px-4 mb-2">
                 {tour.location_to}
               </h2>
-              <p className="text-sm md:text-base opacity-90 italic">
-                Drone Shot
-              </p>
+              
             </div>
             {tour.offers && tour.offers.length > 0 && (
               <div className="absolute bottom-4 left-2/5 -translate-x-2/5 flex items-center space-x-1 overflow-x-auto px-2 scrollbar-none">
@@ -344,13 +362,13 @@ function SinglePost({ prid }) {
                 ))}
               </div>
             )}
-            {tour.offer_count < 3 ? (
-              <div></div>
-            ) : (
+            {tour.offers?.length >= 3 ? (
               <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
                 <IoCheckmarkCircleSharp className="mr-1" size={16} />
                 Offers completed
               </div>
+            ) : (
+              <div></div>
             )}
           </div>
         </div>
@@ -380,12 +398,13 @@ function SinglePost({ prid }) {
 
           <div className="space-y-1 text-md text-gray-700">
             <p className=" font-bold">
-              <span className="font-medium">Date:</span > {tour.start_date} to{" "}
+              <span className="font-medium">Date:</span> {tour.start_date} to{" "}
               {tour.end_date || "N/A"}
             </p>
           </div>
           <p>
-            <span className="font-medium">Categoria:</span> { tour.travel_type || "N/A"}
+            <span className="font-medium">Categoria:</span>{" "}
+            {tour.travel_type || "N/A"}
           </p>
 
           <div className="">
@@ -395,21 +414,25 @@ function SinglePost({ prid }) {
           </div>
 
           <div className="flex items-center  space-x-10">
-            <span className="text-md text-gray-700">
-              <span className="font-medium">Total:</span> {tour.total_members}{" "}
+            <span className="text-md text-gray-700 ">
+              <span className="font-bold">Total:</span> {tour.total_members}{" "}
               {tour.total_members > 1 ? "people" : "person"}
             </span>
 
             <div className="flex items-center space-x-4">
-              <h1 className="text-md text-gray-700"><span className="font-medium">Child :</span> {tour.child_count}</h1>
-              <h1> <span className="font-medium">Adult :</span> {tour.child_count}</h1>
-              </div>
-
+              <h1 className="text-md  text-gray-700">
+                <span className="font-bold">Child :</span> {tour.child_count}
+              </h1>
+              <h1 className="text-md  text-gray-700">
+                {" "}
+                <span className="font-bold">Adult :</span> {tour.child_count}
+              </h1>
+            </div>
           </div>
 
           <div>
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <MapPin className="w-6 h-5 text-gray-500" />
+              <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
               <span>
                 <span className="font-medium">Points of travel:</span>{" "}
                 {tour.tourist_spots || "None"}
@@ -417,7 +440,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <Navigation className="w-6 h-5 text-gray-500" />
+              <FaLocationArrow className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Departure from:</span>{" "}
                 {tour.location_from || "N/A"}
@@ -425,7 +448,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaListUl className="w-6 h-5 text-gray-500" />
+              <FaList className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Minimum rating:</span>{" "}
                 {tour.minimum_star_hotel || "N/A"}
@@ -433,7 +456,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <Utensils className="w-6 h-5 text-gray-500" />
+              <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Meal plan:</span>{" "}
                 {tour.meal_plan || "N/A"}
@@ -441,7 +464,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <BedDouble className="w-6 h-5 text-gray-500" />
+              <IoBed className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Type of accommodation:</span>{" "}
                 {tour.type_of_accommodation || "N/A"}
@@ -449,7 +472,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <Clock4 className="w-6 h-5 text-gray-500" />
+              <FaClock className="w-6 h-5 text-gray-500" />
               <span>
                 <span className="font-medium">Duration:</span>{" "}
                 {tour.duration || "N/A"}
@@ -457,7 +480,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <ShieldCheck className="w-6 h-5 text-green-500" />
+              <MdVerifiedUser className="w-7 h-6 text-green-500" />
               <span>
                 <span className="font-medium">Contact verified via email</span>
               </span>
