@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   useCreatePlanOneMutation,
@@ -9,6 +9,9 @@ import {
 } from "@/redux/features/withAuth";
 import { Toaster, toast } from "react-hot-toast";
 import FullScreenInfinityLoader from "@/lib/Loading";
+
+// গ্লোবাল ফ্ল্যাগ যাতে API একবারই লোড হয়
+let isGoogleScriptLoaded = false;
 
 const CreatePlan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -25,6 +28,9 @@ const CreatePlan = () => {
     setValue,
     reset,
   } = useForm();
+
+  const locationFromRef = useRef(null);
+  const locationToRef = useRef(null);
 
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
     state?.id,
@@ -64,6 +70,65 @@ const CreatePlan = () => {
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
   }, [state?.id, oldData, setValue]);
+
+  // Load Google Maps script and initialize autocomplete
+  useEffect(() => {
+    const initAutocomplete = () => {
+  if (!window.google || !window.google.maps || !window.google.maps.places) {
+    console.error("Google Maps Places API is not available");
+    toast.error("Google Maps Places API is not available");
+    return;
+  }
+  console.log("Initializing autocomplete...");
+  if (locationFromRef.current) {
+    const fromAutocomplete = new window.google.maps.places.Autocomplete(
+      locationFromRef.current
+    );
+    fromAutocomplete.addListener("place_changed", () => {
+      const place = fromAutocomplete.getPlace();
+      setValue("locationFrom", place.formatted_address || place.name);
+    });
+  }
+
+  if (locationToRef.current) {
+    const toAutocomplete = new window.google.maps.places.Autocomplete(
+      locationToRef.current
+    );
+    toAutocomplete.addListener("place_changed", () => {
+      const place = toAutocomplete.getPlace();
+      setValue("locationTo", place.formatted_address || place.name);
+    });
+  }
+};
+    
+
+    if (!isGoogleScriptLoaded && !window.google) {
+      isGoogleScriptLoaded = true;
+      console.log("Loading Google Maps script...");
+      const script = document.createElement("script");
+      // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
+      // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        console.log("Google Maps script loaded successfully");
+        initAutocomplete();
+      };
+      script.onerror = () => {
+        console.error("Failed to load Google Maps API");
+        toast.error("Failed to load Google Maps API");
+      };
+      document.head.appendChild(script);
+    } else if (window.google) {
+      console.log("Google Maps already loaded, initializing autocomplete...");
+      initAutocomplete();
+    }
+
+    return () => {
+      // Cleanup
+    };
+  }, [setValue]);
 
   const onSubmit = async (data, status) => {
     if (data.endingDate < data.startingDate) {
@@ -142,6 +207,14 @@ const CreatePlan = () => {
   if (isFetching && state?.id) {
     return <FullScreenInfinityLoader />;
   }
+
+  const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
+    required: "Location from is required",
+  });
+
+  const { ref: toFormRef, ...toRest } = register("locationTo", {
+    required: "Location to is required",
+  });
 
   return (
     <div className="p-6">
@@ -264,7 +337,7 @@ const CreatePlan = () => {
                   {...register("destinationType", {
                     required: "Destination Type is required",
                   })}
-                >c
+                >
                   <option value="" disabled selected>
                     Select Destination Type
                   </option>
@@ -317,9 +390,11 @@ const CreatePlan = () => {
                 type="text"
                 placeholder="Enter here"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("locationFrom", {
-                  required: "Location from is required",
-                })}
+                {...fromRest}
+                ref={(e) => {
+                  fromFormRef(e);
+                  locationFromRef.current = e;
+                }}
               />
               {errors.locationFrom && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -335,9 +410,11 @@ const CreatePlan = () => {
                 type="text"
                 placeholder="Enter here"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("locationTo", {
-                  required: "Location to is required",
-                })}
+                {...toRest}
+                ref={(e) => {
+                  toFormRef(e);
+                  locationToRef.current = e;
+                }}
               />
               {errors.locationTo && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -544,8 +621,6 @@ const CreatePlan = () => {
               )}
             </div>
           </div>
-
-          {/* Row 7: Travel Type, Destination Type, Type of Accommodation, Minimum Hotel Stars */}
 
           {/* Confirmation Checkbox */}
           <div className="flex items-start gap-3 mt-8">
