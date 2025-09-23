@@ -51,7 +51,7 @@ const AdminHome = () => {
   const [declineRequest, { isLoading: isDeclineRequestLoading }] =
     useDeclineRequestMutation();
 
-    const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
+  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
   // Initialize like, share, and like count states
   useEffect(() => {
@@ -253,86 +253,86 @@ const AdminHome = () => {
 
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
-  if (!token) {
-    toast.error("Please log in to submit an offer");
-    return;
-  }
-
-  if (!budget || !comment.trim()) {
-    toast.error("Please provide both a budget and a comment");
-    return;
-  }
-
-  if (
-    offerForm.applyDiscount &&
-    (!offerForm.discount || offerForm.discount <= 0)
-  ) {
-    toast.error("Please provide a valid discount percentage");
-    return;
-  }
-
-  // Set loading state to true
-  setIsOfferSubmitting(true);
-
-  try {
-    const offerData = {
-      offered_budget: Number.parseFloat(budget),
-      message: comment,
-      apply_discount: offerForm.applyDiscount,
-      discount: offerForm.applyDiscount
-        ? Number.parseFloat(offerForm.discount)
-        : 0,
-    };
-
-    await offerBudgetToBack({
-      id: planId,
-      data: offerData,
-    }).unwrap();
-
-    const newOffer = {
-      id: `${currentUserId}-${Date.now()}`,
-      offered_budget: Number.parseFloat(budget),
-      message: comment,
-      apply_discount: offerForm.applyDiscount,
-      discount: offerForm.applyDiscount
-        ? Number.parseFloat(offerForm.discount)
-        : 0,
-      agency: {
-        agency_name: localStorage.getItem("name") || "Unknown Agency",
-        logo_url:
-          localStorage.getItem("user_image") ||
-          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-        is_verified: false,
-      },
-    };
-
-    if (selectedPlan && selectedPlan.id === planId) {
-      setSelectedPlan((prev) =>
-        prev
-          ? {
-              ...prev,
-              offers: [...(prev.offers || []), newOffer],
-              offer_count: (prev.offer_count || 0) + 1,
-            }
-          : prev
-      );
+    if (!token) {
+      toast.error("Please log in to submit an offer");
+      return;
     }
 
-    setOfferBudget(0);
-    setOfferComment("");
-    setOfferForm({ applyDiscount: false, discount: "" });
-    toast.success("Offer submitted successfully");
-  } catch (error) {
-    console.error("Failed to submit offer:", error);
-    toast.error(
-      error.data?.error ||
-        "Failed to submit offer. Only agencies can do this."
-    );
-  } finally {
-    // Reset loading state
-    setIsOfferSubmitting(false);
-  }
-};
+    if (!budget || !comment.trim()) {
+      toast.error("Please provide both a budget and a comment");
+      return;
+    }
+
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || offerForm.discount <= 0)
+    ) {
+      toast.error("Please provide a valid discount percentage");
+      return;
+    }
+
+    // Set loading state to true
+    setIsOfferSubmitting(true);
+
+    try {
+      const offerData = {
+        offered_budget: Number.parseFloat(budget),
+        message: comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
+      };
+
+      await offerBudgetToBack({
+        id: planId,
+        data: offerData,
+      }).unwrap();
+
+      const newOffer = {
+        id: `${currentUserId}-${Date.now()}`,
+        offered_budget: Number.parseFloat(budget),
+        message: comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
+        agency: {
+          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          is_verified: false,
+        },
+      };
+
+      if (selectedPlan && selectedPlan.id === planId) {
+        setSelectedPlan((prev) =>
+          prev
+            ? {
+                ...prev,
+                offers: [...(prev.offers || []), newOffer],
+                offer_count: (prev.offer_count || 0) + 1,
+              }
+            : prev
+        );
+      }
+
+      setOfferBudget(0);
+      setOfferComment("");
+      setOfferForm({ applyDiscount: false, discount: "" });
+      toast.success("Offer submitted successfully");
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      toast.error(
+        error.data?.error ||
+          "Failed to submit offer. Only agencies can do this."
+      );
+    } finally {
+      // Reset loading state
+      setIsOfferSubmitting(false);
+    }
+  };
 
   // Handle decline request
   const handleDeclineRequest = async (planId) => {
@@ -380,6 +380,7 @@ const AdminHome = () => {
   };
 
   // Render content for different tabs
+  // Render content for different tabs
   const renderContent = () => {
     switch (activeTab) {
       case "All Plans":
@@ -400,80 +401,71 @@ const AdminHome = () => {
               key={plan.id}
               className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
             >
-              <div className="">
-                <div className="flex justify-between">
-                  <div className="flex">
-                    <div>
-                      {/* Resort Image */}
-                      <div>
-                        <img
-                          src={
-                            plan.spot_picture_url
-                              ? plan.spot_picture_url
-                              : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                          }
-                          alt={`${plan.location_to || "Tourist spot"}`}
-                          className="lg:h-44 lg:w-56 h-64 w-80 lg:object-cover rounded-l-lg mr-5"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex-1 lg:-mr-0 -mr-8 pl-1">
-                        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-5">
-                          {plan.location_to}
-                        </h2>
-                        <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                          <p>
-                            Dates:{" "}
-                            <span className="font-medium">
-                              {plan.start_date} —{" "}
-                              {plan.end_date || plan.start_date}
-                            </span>
-                          </p>
-                          <p>
-                            Total members:{" "}
-                            <span className="font-medium">
-                              {plan.total_members}
-                            </span>
-                          </p>
-                          <p>
-                            Category:{" "}
-                            <span className="font-medium">{plan.category}</span>
-                          </p>
-                        </div>
-                      </div>
+              <div className="flex flex-col lg:flex-row">
+                {/* Image Section */}
+                <div className="lg:flex">
+                  <img
+                    src={
+                      plan.spot_picture_url
+                        ? plan.spot_picture_url
+                        : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                    }
+                    alt={`${plan.location_to || "Tourist spot"}`}
+                    className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
+                  />
+                </div>
+                {/* Content and Buttons */}
+                <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
+                  <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
+                      {plan.location_to}
+                    </h2>
+                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      <p>
+                        Dates:{" "}
+                        <span className="font-medium">
+                          {plan.start_date} — {plan.end_date || plan.start_date}
+                        </span>
+                      </p>
+                      <p>
+                        Total members:{" "}
+                        <span className="font-medium">
+                          {plan.total_members}
+                        </span>
+                      </p>
+                      <p>
+                        Category:{" "}
+                        <span className="font-medium">{plan.category}</span>
+                      </p>
                     </div>
                   </div>
-                  {/* Travel Header */}
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0 mt-5 mr-3 lg:ml-0 ml-10">
-                    <div className="lg:flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
-                      <div>
-                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
-                          Budget <FaEuroSign /> {plan.budget}.00 
-
+                  <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
+                    <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
+                      <div className="text-center lg:text-right">
+                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
+                          Budget <FaEuroSign /> {plan.budget}
                         </p>
                         <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                           {plan.total_members} person
                         </p>
                       </div>
-                      <div className="flex flex-wrap gap-2 mt-4">
+                      <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
                         <button
                           onClick={() => openPopup(plan, "view")}
-                          className="px-4 py-2 bg-blue-600 text-white lg:text-sm text-[14px] font-medium rounded-md hover:bg-blue-700 transition-colors"
+                          className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                         >
                           View
                         </button>
                         <button
                           onClick={() => openPopup(plan, "offer")}
-                          className="lg:px-4 lg:py-2 px-2 py-2 bg-green-600 text-white lg:text-sm text-[13px] font-medium rounded-md hover:bg-green-700 transition-colors"
+                          className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
                         >
                           Send offer
                         </button>
                         <button
                           onClick={() => handleDeclineRequest(plan.id)}
                           disabled={isDeclineRequestLoading}
-                          className={`lg:px-4 lg:py-2 px-2 py-2 bg-gray-600 text-white lg:text-sm text-[12px] font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                          className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
                             isDeclineRequestLoading
                               ? "opacity-50 cursor-not-allowed"
                               : ""
@@ -597,8 +589,6 @@ const AdminHome = () => {
                   <div>
                     <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
                       Budget <FaEuroSign /> {selectedPlan.budget}
-                      
-
                     </p>
                     <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                       Total {selectedPlan.total_members} person
@@ -711,20 +701,24 @@ const AdminHome = () => {
                   disabled={!offerForm.applyDiscount}
                 />
               </div>
-             <button
-  onClick={() =>
-    handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
-  }
-  className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-    isOfferSubmitting || !offerBudget || !offerComment.trim()
-      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-      : "bg-blue-600 text-white hover:bg-blue-700"
-  }`}
-  disabled={isOfferSubmitting || !offerBudget || !offerComment.trim()}
->
-  <IoIosSend size={24} />
-  <span>{isOfferSubmitting ? "Submitting..." : "Submit Offer"}</span>
-</button>
+              <button
+                onClick={() =>
+                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
+                }
+                className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
+                  isOfferSubmitting || !offerBudget || !offerComment.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+                disabled={
+                  isOfferSubmitting || !offerBudget || !offerComment.trim()
+                }
+              >
+                <IoIosSend size={24} />
+                <span>
+                  {isOfferSubmitting ? "Submitting..." : "Submit Offer"}
+                </span>
+              </button>
             </div>
           </div>
           {selectedPlan.offers && selectedPlan.offers.length > 0 && (

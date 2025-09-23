@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import {
@@ -479,7 +480,7 @@ const TourPlanDouble = () => {
   const displayTours = tours;
 
   return (
-    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
+    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto ">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -490,7 +491,7 @@ const TourPlanDouble = () => {
           <span>Filters</span>
         </button>
 
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 pt-20">
           <div className="w-full md:w-3/4 lg:w-4/5 order-2 md:order-1">
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
@@ -590,7 +591,16 @@ const TourPlanDouble = () => {
                             </h2>
                           </div>
                           {tour.offers && tour.offers.length > 0 && (
-                            <div className="absolute bottom-4 flex flex-col items-center space-y-3 overflow-y-auto px-2 scrollbar-none ">
+                            <div
+                              className="
+                                absolute bottom-4
+                                flex items-center justify-center space-x-8
+                                overflow-x-auto
+                                px-2
+                                scrollbar-none
+                                w-full
+                              "
+                            >
                               {tour.offers.map((offer) => (
                                 <img
                                   key={offer.id}
@@ -602,7 +612,7 @@ const TourPlanDouble = () => {
                                     offer.agency?.agency_name ||
                                     "Unknown Agency"
                                   } logo`}
-                                  className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0 "
+                                  className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
                                 />
                               ))}
                             </div>
@@ -661,7 +671,7 @@ const TourPlanDouble = () => {
                           </p>
                         </div>
 
-                        <div className="flex items-center  space-x-10">
+                        <div className="flex items-center space-x-10">
                           <span className="text-md text-gray-700">
                             <span className="font-medium">Total:</span>{" "}
                             {tour.total_members}{" "}
@@ -674,7 +684,6 @@ const TourPlanDouble = () => {
                               {tour.child_count}
                             </h1>
                             <h1>
-                              {" "}
                               <span className="font-medium">Adult :</span>{" "}
                               {tour.child_count}
                             </h1>
@@ -791,20 +800,6 @@ const TourPlanDouble = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Search by Destination
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Search by destination"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={filters.search}
-                    onChange={(e) =>
-                      handleFilterChange("search", e.target.value)
-                    }
-                  />
-                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price Range (USD)

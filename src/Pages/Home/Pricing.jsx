@@ -106,7 +106,7 @@ const Pricing = () => {
   };
 
   return (
-    <section className="pt-5 roboto bg-gray-50">
+    <section className="pt-24 roboto bg-gray-50 ">
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-5 tracking-wider">
           PRICING

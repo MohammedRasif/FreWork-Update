@@ -552,12 +552,12 @@ export default function UserDashboardLayout() {
               >
                 <Menu size={20} />
               </button>
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col">
                 <h1 className="text-lg sm:text-2xl font-medium text-[#343E4B] flex gap-2 sm:gap-4 items-end">
                   Wednesday
                   <span className="text-xs font-normal">25 July, 2025</span>
                 </h1>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center gap-4 sm:gap-8 me-2 sm:me-10">
               <NavLink

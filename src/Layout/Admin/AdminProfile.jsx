@@ -41,18 +41,25 @@ const AdminProfile = () => {
     setToDate("");
   };
 
-  const handleReset = async () => {
-    setFromDate("");
-    setToDate("");
-    const formdata = new FormData();
-    formdata.append("start_unavailable", "");
-    formdata.append("end_unavailable", "");
-
-    // Pass formdata to the update function
-    await update(formdata).unwrap();
-    refetch(); // Refresh profile data after update
-    handleClosePopup();
+ const handleReset = async () => {
+  setFromDate("");
+  setToDate("");
+  const payload = {
+    start_unavailable: "",
+    end_unavailable: "",
   };
+
+  try {
+    await update(payload).unwrap();
+    refetch();
+    handleClosePopup();
+  } catch (err) {
+    console.error("Failed to reset unavailability:", err);
+    const errorMessage =
+      err?.data?.detail || err?.data?.message || "Failed to reset unavailability. Please try again.";
+    alert(errorMessage);
+  }
+};
 
   useEffect(() => {
     if (profileData) {
@@ -61,56 +68,41 @@ const AdminProfile = () => {
     }
   }, [profileData]);
 
-  const handleConfirm = async () => {
-    if (!fromDate || !toDate) {
-      alert("Please select both start and end dates.");
-      return;
-    }
+ const handleConfirm = async () => {
+  if (!fromDate || !toDate) {
+    alert("Please select both start and end dates.");
+    return;
+  }
 
-    const parsedFromDate = new Date(fromDate);
-    const parsedToDate = new Date(toDate);
+  const parsedFromDate = new Date(fromDate);
+  const parsedToDate = new Date(toDate);
 
-    if (isNaN(parsedFromDate) || isNaN(parsedToDate)) {
-      alert("Invalid date format. Please select valid dates.");
-      return;
-    }
+  if (isNaN(parsedFromDate) || isNaN(parsedToDate)) {
+    alert("Invalid date format. Please select valid dates.");
+    return;
+  }
 
-    if (parsedFromDate >= parsedToDate) {
-      alert("End date must be after start date.");
-      return;
-    }
+  if (parsedFromDate >= parsedToDate) {
+    alert("End date must be after start date.");
+    return;
+  }
 
-    try {
-      // Set time to match the example format (e.g., 14:36:34.327135Z)
-      // If API doesn't require specific time, you can skip this and use toISOString() directly
-      const formattedFromDate = new Date(
-        parsedFromDate.setHours(14, 36, 34, 327)
-      ).toISOString();
-      const formattedToDate = new Date(
-        parsedToDate.setHours(14, 36, 34, 327)
-      ).toISOString();
+  try {
+    const payload = {
+      start_unavailable: new Date(parsedFromDate.setHours(14, 36, 34, 327)).toISOString(),
+      end_unavailable: new Date(parsedToDate.setHours(14, 36, 34, 327)).toISOString(),
+    };
 
-      console.log("Unavailability set:", {
-        formattedFromDate,
-        formattedToDate,
-      });
-
-      const formdata = new FormData();
-      formdata.append("start_unavailable", formattedFromDate);
-      formdata.append("end_unavailable", formattedToDate);
-
-      // Pass formdata to the update function
-      await update(formdata).unwrap();
-      refetch(); // Refresh profile data after update
-      handleClosePopup();
-    } catch (err) {
-      console.error("Failed to set unavailability:", err);
-      const errorMessage =
-        err?.data?.message || "Failed to set unavailability. Please try again.";
-      alert(errorMessage);
-    }
-  };
-
+    await update(payload).unwrap();
+    refetch();
+    handleClosePopup();
+  } catch (err) {
+    console.error("Failed to set unavailability:", err);
+    const errorMessage =
+      err?.data?.detail || err?.data?.message || "Failed to set unavailability. Please try again.";
+    alert(errorMessage);
+  }
+};
   if (isProfileLoading) {
     return (
       <div className="flex items-center justify-center h-screen">

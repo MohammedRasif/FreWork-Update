@@ -123,11 +123,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between relative">
+    <nav className="w-full bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between fixed z-50 ">
       {/* Logo/Brand */}
-      <div className="font-bold lg:h-11 h-8 text-gray-800">
+      <NavLink to="/">
+        <div className="font-bold lg:h-11 h-8 text-gray-800">
         <img src={img} className="h-full" alt="Logo" />
       </div>
+      </NavLink>
 
       {/* Hamburger Icon for Mobile */}
       <div className="lg:hidden">

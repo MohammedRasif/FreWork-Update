@@ -333,14 +333,23 @@ const Published = () => {
                   <Swiper
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
-                    pagination={{ clickable: true }}
+                    pagination={{
+                      clickable: true,
+                      renderBullet: (index, className) => {
+                        return `
+          <span class="${className} custom-pagination-bullet">
+            <span class="pagination-number">${index + 1}</span>
+          </span>
+        `;
+                      },
+                    }}
                     navigation={{
-                      prevEl: groupPrevRef.current,
-                      nextEl: groupNextRef.current,
+                      prevEl: relaxPrevRef.current,
+                      nextEl: relaxNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = groupPrevRef.current;
-                      swiper.params.navigation.nextEl = groupNextRef.current;
+                      swiper.params.navigation.prevEl = relaxPrevRef.current;
+                      swiper.params.navigation.nextEl = relaxNextRef.current;
                     }}
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },

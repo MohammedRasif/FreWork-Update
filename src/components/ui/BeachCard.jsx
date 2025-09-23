@@ -71,26 +71,27 @@ export default function TourCard({ tourPlan }) {
             {localTourPlan.offers && localTourPlan.offers.length > 0 && (
               <div
                 className="
-                absolute bottom-4
-                flex flex-col items-center space-y-3
-                overflow-y-auto
-                px-2
-                scrollbar-none
-              "
+                  absolute bottom-4
+                  flex items-center justify-center space-x-8
+                  overflow-x-auto
+                  px-2
+                  scrollbar-none
+                  w-full
+                "
               >
                 {localTourPlan?.offers?.map((offer) => (
                   <img
-                    key={offer.agency?.id || Math.random()} // fallback key
+                    key={offer.agency?.id || Math.random()}
                     src={
                       offer.agency?.logo_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
                     alt={`${offer.agency?.agency_name || "Agency"} logo`}
                     className="
-                    w-12 h-12
-                    object-contain rounded-full border border-white bg-white
-                    flex-shrink-0
-                  "
+                      w-12 h-12
+                      object-contain rounded-full border border-white bg-white
+                      flex-shrink-0
+                    "
                   />
                 ))}
               </div>
@@ -103,7 +104,22 @@ export default function TourCard({ tourPlan }) {
             <h3 className="text-xl font-bold text-gray-900">
               {localTourPlan.location_to}
             </h3>
-           
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-green-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-sm text-green-600 font-medium">
+                Real Request
+              </span>
+            </div>
           </div>
 
           <div className="space-y-1 text-sm text-gray-700">
@@ -115,10 +131,6 @@ export default function TourCard({ tourPlan }) {
                 : "N/A"}{" "}
               ({localTourPlan.duration})
             </p>
-            {/* <p>
-              <span className="font-medium">Categoria:</span>{" "}
-              {localTourPlan.travel_type}
-            </p> */}
           </div>
 
           <div className="">
@@ -133,26 +145,7 @@ export default function TourCard({ tourPlan }) {
               {localTourPlan.total_members}{" "}
               {localTourPlan.total_members > 1 ? "persone" : "persona"}
             </span>
-            {/* <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              {localTourPlan.offer_count} Offer received
-            </span> */}
           </div>
-
-          {/* <p className="text-sm text-gray-600 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-500" />
-            <span>
-              <span className="font-medium">Points of travel:</span>{" "}
-              {localTourPlan.tourist_spots}
-            </span>
-          </p>
-
-          <p className="text-sm text-gray-600 flex items-center gap-2">
-            <Navigation className="w-4 h-4 text-gray-500" />
-            <span>
-              <span className="font-medium">Departure from:</span>{" "}
-              {localTourPlan.location_from}
-            </span>
-          </p> */}
 
           <div
             className={

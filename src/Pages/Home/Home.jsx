@@ -7,9 +7,9 @@ import EasyandFast from "./EasyandFast";
 
 const Home = () => {
   return (
-    <div className="roboto">
-      <Banner/>
-      <VacanzaMycost/>
+    <div className="roboto pt-16">
+      <Banner />
+      <VacanzaMycost />
       <Published/>
       <Agencies/>
       <EasyandFast/>

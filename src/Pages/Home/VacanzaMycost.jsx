@@ -5,7 +5,7 @@ import img3 from "../../assets/img/booking.png";
 
 const VacanzaMycost = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-white ">
       {/* Header Text */}
       <div className="text-center pt-1 md:pt-16">
         <p className="text-gray-700 text-[14px] md:text-lg lg:mb-4 font-medium">
@@ -72,13 +72,13 @@ const VacanzaMycost = () => {
               </p>
             </div>
             {/* Step 3 */}
-            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white">
+            <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white lg:-mt-0 -mt-4">
               <div className="relative">
                 <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
                   <img
                     src={img3}
                     alt="Free Booking"
-                    className="h-12 md:h-24"
+                    className="h-14 md:h-24"
                   />
                 </div>
               </div>

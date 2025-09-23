@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation } from "lucide-react";
@@ -48,17 +49,17 @@ export default function GroupCard({ tourPlan }) {
             <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">
               {localTourPlan.location_to}
             </h2>
-            
           </div>
           {/* Display agency logos */}
           {localTourPlan.offers && localTourPlan.offers.length > 0 && (
             <div
               className="
                 absolute bottom-4
-                flex flex-col items-center space-y-3
-                overflow-y-auto
+                flex items-center justify-center space-x-8
+                overflow-x-auto
                 px-2
                 scrollbar-none
+                w-full
               "
             >
               {localTourPlan?.offers?.map((offer) => (
@@ -86,6 +87,22 @@ export default function GroupCard({ tourPlan }) {
           <h3 className="text-xl font-bold text-gray-900">
             {localTourPlan.location_to}
           </h3>
+          <div className="flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-green-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-sm text-green-600 font-medium">
+              Real Request
+            </span>
+          </div>
         </div>
 
         <div className="space-y-1 text-sm text-gray-700">
@@ -115,28 +132,7 @@ export default function GroupCard({ tourPlan }) {
             {localTourPlan.total_members}{" "}
             {localTourPlan.total_members > 1 ? "people" : "person"}
           </span>
-          {/* {localTourPlan.offer_count > 0 && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              {localTourPlan.offer_count} Offer{localTourPlan.offer_count > 1 ? "s" : ""} received
-            </span>
-          )} */}
         </div>
-
-        {/* <p className="text-sm text-gray-600 flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-gray-500" />
-          <span>
-            <span className="font-medium">Points of travel:</span>{" "}
-            {localTourPlan.tourist_spots}
-          </span>
-        </p>
-
-        <p className="text-sm text-gray-600 flex items-center gap-2">
-          <Navigation className="w-4 h-4 text-gray-500" />
-          <span>
-            <span className="font-medium">Departure from:</span>{" "}
-            {localTourPlan.location_from}
-          </span>
-        </p> */}
 
         <div
           className={
