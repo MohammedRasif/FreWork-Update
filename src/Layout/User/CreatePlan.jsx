@@ -26,7 +26,6 @@ const CreatePlan = () => {
     reset,
   } = useForm();
 
-  // Fetch data only if state?.id exists
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
     state?.id,
     { skip: !state?.id }
