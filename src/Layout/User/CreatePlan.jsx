@@ -74,41 +74,38 @@ const CreatePlan = () => {
   // Load Google Maps script and initialize autocomplete
   useEffect(() => {
     const initAutocomplete = () => {
-  if (!window.google || !window.google.maps || !window.google.maps.places) {
-    console.error("Google Maps Places API is not available");
-    toast.error("Google Maps Places API is not available");
-    return;
-  }
-  console.log("Initializing autocomplete...");
-  if (locationFromRef.current) {
-    const fromAutocomplete = new window.google.maps.places.Autocomplete(
-      locationFromRef.current
-    );
-    fromAutocomplete.addListener("place_changed", () => {
-      const place = fromAutocomplete.getPlace();
-      setValue("locationFrom", place.formatted_address || place.name);
-    });
-  }
+      if (!window.google || !window.google.maps || !window.google.maps.places) {
+        console.error("Google Maps Places API is not available");
+        toast.error("Google Maps Places API is not available");
+        return;
+      }
+      console.log("Initializing autocomplete...");
+      if (locationFromRef.current) {
+        const fromAutocomplete = new window.google.maps.places.Autocomplete(
+          locationFromRef.current
+        );
+        fromAutocomplete.addListener("place_changed", () => {
+          const place = fromAutocomplete.getPlace();
+          setValue("locationFrom", place.formatted_address || place.name);
+        });
+      }
 
-  if (locationToRef.current) {
-    const toAutocomplete = new window.google.maps.places.Autocomplete(
-      locationToRef.current
-    );
-    toAutocomplete.addListener("place_changed", () => {
-      const place = toAutocomplete.getPlace();
-      setValue("locationTo", place.formatted_address || place.name);
-    });
-  }
-};
-    
+      if (locationToRef.current) {
+        const toAutocomplete = new window.google.maps.places.Autocomplete(
+          locationToRef.current
+        );
+        toAutocomplete.addListener("place_changed", () => {
+          const place = toAutocomplete.getPlace();
+          setValue("locationTo", place.formatted_address || place.name);
+        });
+      }
+    };
 
     if (!isGoogleScriptLoaded && !window.google) {
       isGoogleScriptLoaded = true;
       console.log("Loading Google Maps script...");
       const script = document.createElement("script");
-      // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc=places`;
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
-      // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => {

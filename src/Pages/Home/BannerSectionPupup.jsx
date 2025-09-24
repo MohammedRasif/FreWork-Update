@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useCreatePlanOneMutation,
   useUpdatePlanMutation,
@@ -7,10 +7,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 
-export default function BannerSectionPopup({ closeForm }) {
-  const totalSteps = 5; // Increased to 5 to accommodate new fields
+let isGoogleScriptLoaded = false;
 
-  const [currentStep, setCurrentStep] = useState(1);
+export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
+  const totalSteps = 5;
+
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,6 +31,7 @@ export default function BannerSectionPopup({ closeForm }) {
     typeOfAccommodation: "",
     minimumHotelStars: "",
     mealPlan: "",
+    travelType: "",
     includeRoundTripFlight: false,
     confirmation: false,
   });
@@ -48,10 +51,14 @@ export default function BannerSectionPopup({ closeForm }) {
     reset,
   } = useForm();
 
-
+  // Refs for location and tourist spots input fields
+  const locationFromRef = useRef(null);
+  const locationToRef = useRef(null);
+  const touristSpotsRef = useRef(null);
 
   useEffect(() => {
-    if (state?.id ) {
+    if (state?.id) {
+      // Load data for editing an existing plan
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
@@ -69,21 +76,146 @@ export default function BannerSectionPopup({ closeForm }) {
           ? new Date(state?.end_date).toISOString().split("T")[0]
           : ""
       );
-      setValue("adult", state?.adult_count || 0);
-      setValue("child", state?.child_count || 0);
+      setValue("adults", state?.adult_count || 0);
+      setValue("children", state?.child_count || 0);
       setValue("budget", state?.budget || "");
       setValue("touristSpots", state?.tourist_spots || "");
       setValue("description", state?.description || "");
-      // setValue("travelType", state?.travel_type || "");
       setValue("destinationType", state?.destination_type || "");
       setValue("typeOfAccommodation", state?.type_of_accommodation || "");
       setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
       setValue("mealPlan", state?.meal_plan || "");
+      setValue("travelType", state?.travel_type || "");
       setValue("confirmation", !!state?.is_confirmed_request);
+      Object.entries(state || {}).forEach(([key, value]) => {
+        const mappedKey =
+          {
+            phone_number: "phoneNumber",
+            location_from: "locationFrom",
+            location_to: "locationTo",
+            start_date: "startingDate",
+            end_date: "endingDate",
+            adult_count: "adults",
+            child_count: "children",
+            tourist_spots: "touristSpots",
+            destination_type: "destinationType",
+            type_of_accommodation: "typeOfAccommodation",
+            minimum_hotel_stars: "minimumHotelStars",
+            meal_plan: "mealPlan",
+            travel_type: "travelType",
+            is_confirmed_request: "confirmation",
+          }[key] || key;
+        updateFormData(mappedKey, value);
+      });
+    } else {
+      // Load pending plan from localStorage
+      const pendingPlan = localStorage.getItem("pendingPlan");
+      if (pendingPlan) {
+        const parsed = JSON.parse(pendingPlan);
+        Object.entries(parsed).forEach(([key, value]) => {
+          setValue(key, value);
+          updateFormData(key, value);
+        });
+      }
     }
   }, [state?.id, setValue]);
 
+  // Load Google Maps script and initialize autocomplete
+  // Replace the existing Google Maps useEffect with these two useEffect hooks
 
+  // Load Google Maps script
+  useEffect(() => {
+    const loadGoogleMaps = () => {
+      if (!isGoogleScriptLoaded && !window.google) {
+        isGoogleScriptLoaded = true;
+        console.log("Loading Google Maps script...");
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          console.log("Google Maps script loaded successfully");
+        };
+        script.onerror = () => {
+          console.error("Failed to load Google Maps API");
+          toast.error("Failed to load Google Maps API");
+        };
+        document.head.appendChild(script);
+      }
+    };
+
+    loadGoogleMaps();
+
+    return () => {
+      // Cleanup (optional: remove script if needed)
+    };
+  }, []);
+
+  // Initialize autocomplete for all fields
+  useEffect(() => {
+    const initAutocomplete = () => {
+      if (!window.google || !window.google.maps || !window.google.maps.places) {
+        console.error("Google Maps Places API is not available");
+        toast.error("Google Maps Places API is not available");
+        return;
+      }
+      console.log("Initializing autocomplete for all fields...");
+
+      if (locationFromRef.current) {
+        console.log("Setting up autocomplete for locationFrom");
+        const fromAutocomplete = new window.google.maps.places.Autocomplete(
+          locationFromRef.current
+        );
+        fromAutocomplete.addListener("place_changed", () => {
+          const place = fromAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          console.log("locationFrom selected:", locationValue);
+          setValue("locationFrom", locationValue);
+          updateFormData("locationFrom", locationValue);
+        });
+      } else {
+        console.warn("locationFromRef is null");
+      }
+
+      if (locationToRef.current) {
+        console.log("Setting up autocomplete for locationTo");
+        const toAutocomplete = new window.google.maps.places.Autocomplete(
+          locationToRef.current
+        );
+        toAutocomplete.addListener("place_changed", () => {
+          const place = toAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          console.log("locationTo selected:", locationValue);
+          setValue("locationTo", locationValue);
+          updateFormData("locationTo", locationValue);
+        });
+      } else {
+        console.warn("locationToRef is null");
+      }
+
+      // Only initialize touristSpots autocomplete when on Step 2
+      if (currentStep === 2 && touristSpotsRef.current) {
+        console.log("Setting up autocomplete for touristSpots");
+        const touristSpotsAutocomplete =
+          new window.google.maps.places.Autocomplete(touristSpotsRef.current, {
+            types: ["point_of_interest", "tourist_attraction"],
+          });
+        touristSpotsAutocomplete.addListener("place_changed", () => {
+          const place = touristSpotsAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          console.log("touristSpots selected:", locationValue);
+          setValue("touristSpots", locationValue);
+          updateFormData("touristSpots", locationValue);
+        });
+      } else if (currentStep === 2) {
+        console.warn("touristSpotsRef is null on Step 2");
+      }
+    };
+
+    if (window.google) {
+      setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
+    }
+  }, [setValue, currentStep]); // Add currentStep as a dependency
 
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
@@ -104,88 +236,103 @@ export default function BannerSectionPopup({ closeForm }) {
     }
   };
 
-const onSubmit = async (data, status) => {
-  console.log("onSubmit called with data:", data, "status:", status);
+  const onSubmit = async (data, status) => {
+    console.log("onSubmit called with data:", data, "status:", status);
 
-  const accessToken = localStorage.getItem("access_token");
-  console.log("Access Token:", accessToken);
-  if (!accessToken) {
-    toast.error("Please log in to create a plan");
-    navigate("/login");
-    return;
-  }
-
-  if (data.endingDate < data.startingDate) {
-    toast.error("End date must be after start date");
-    return;
-  }
-
-  if (!data.adults && !data.children) {
-    toast.error("At least one adult or child is required");
-    return;
-  }
-
-  const formDataToSend = new FormData();
-  formDataToSend.append("name", data.name);
-  formDataToSend.append("email", data.email);
-  formDataToSend.append("phone_number", data.phoneNumber);
-  formDataToSend.append("location_from", data.locationFrom);
-  formDataToSend.append("location_to", data.locationTo);
-  formDataToSend.append("start_date", data.startingDate);
-  formDataToSend.append("end_date", data.endingDate);
-  formDataToSend.append("adult_count", data.adults || 0); // Default to 0 if empty
-  formDataToSend.append("child_count", data.children || 0); // Default to 0 if empty
-  formDataToSend.append("budget", data.budget || "");
-  formDataToSend.append("description", data.description || "");
-  formDataToSend.append("destination_type", data.destinationType || "");
-  formDataToSend.append("type_of_accommodation", data.typeOfAccommodation || "");
-  formDataToSend.append("minimum_star_hotel", data.minimumHotelStars || "");
-  formDataToSend.append("meal_plan", data.mealPlan || "");
-  formDataToSend.append("status", status);
-  formDataToSend.append("tourist_spots", data.touristSpots || "");
-  formDataToSend.append("is_confirmed_request", data.confirmation ? "true" : "false");
-
-  if (selectedFile) {
-    formDataToSend.append("spot_picture", selectedFile);
-  }
-
-  console.log("FormData to send:");
-  for (let [key, value] of formDataToSend.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-
-  try {
-    if (status === "draft") {
-      setIsSavingDraft(true);
-    } else {
-      setIsPublishing(true);
+    const accessToken = localStorage.getItem("access_token");
+    console.log("Access Token:", accessToken);
+    if (!accessToken) {
+      // Save form data to localStorage
+      localStorage.setItem("pendingPlan", JSON.stringify(data));
+      toast.error("Please log in to create a plan");
+      navigate("/login");
+      return;
     }
 
-    if (state?.id) {
-      const response = await updatePlan({ id: state.id, updates: formDataToSend }).unwrap();
-      console.log("Update Plan Response:", response);
-      toast.success("Plan updated successfully!");
-    } else {
-      const response = await createPlan(formDataToSend).unwrap();
-      console.log("Create Plan Response:", response);
-      toast.success("Plan created successfully!");
-      reset();
-      setSelectedFile(null);
+    if (data.endingDate < data.startingDate) {
+      toast.error("End date must be after start date");
+      return;
     }
-    console.log("Navigating to /user and closing form");
-    navigate("/user");
-    closeForm();
-  } catch (error) {
-    console.error("API Error:", error);
-    toast.error(`Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`);
-  } finally {
-    if (status === "draft") {
-      setIsSavingDraft(false);
-    } else {
-      setIsPublishing(false);
+
+    if (!data.adults && !data.children) {
+      toast.error("At least one adult or child is required");
+      return;
     }
-  }
-};
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", data.name);
+    formDataToSend.append("email", data.email);
+    formDataToSend.append("phone_number", data.phoneNumber);
+    formDataToSend.append("location_from", data.locationFrom);
+    formDataToSend.append("location_to", data.locationTo);
+    formDataToSend.append("start_date", data.startingDate);
+    formDataToSend.append("end_date", data.endingDate);
+    formDataToSend.append("adult_count", data.adults || 0);
+    formDataToSend.append("child_count", data.children || 0);
+    formDataToSend.append("budget", data.budget || "");
+    formDataToSend.append("description", data.description || "");
+    formDataToSend.append("travel_type", data.travelType || "");
+    formDataToSend.append("destination_type", data.destinationType || "");
+    formDataToSend.append(
+      "type_of_accommodation",
+      data.typeOfAccommodation || ""
+    );
+    formDataToSend.append("minimum_hotel_stars", data.minimumHotelStars || "");
+    formDataToSend.append("meal_plan", data.mealPlan || "");
+    formDataToSend.append("status", status);
+    formDataToSend.append("tourist_spots", data.touristSpots || "");
+    formDataToSend.append(
+      "is_confirmed_request",
+      data.confirmation ? "true" : "false"
+    );
+
+    if (selectedFile) {
+      formDataToSend.append("spot_picture", selectedFile);
+    }
+
+    console.log("FormData to send:");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    try {
+      if (status === "draft") {
+        setIsSavingDraft(true);
+      } else {
+        setIsPublishing(true);
+      }
+
+      if (state?.id) {
+        const response = await updatePlan({
+          id: state.id,
+          updates: formDataToSend,
+        }).unwrap();
+        console.log("Update Plan Response:", response);
+        toast.success("Plan updated successfully!");
+      } else {
+        const response = await createPlan(formDataToSend).unwrap();
+        console.log("Create Plan Response:", response);
+        toast.success("Plan created successfully!");
+        reset();
+        setSelectedFile(null);
+      }
+      console.log("Navigating to /user and closing form");
+      localStorage.removeItem("pendingPlan"); // Clear pending plan after success
+      navigate("/user");
+      closeForm();
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error(
+        `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
+      );
+    } finally {
+      if (status === "draft") {
+        setIsSavingDraft(false);
+      } else {
+        setIsPublishing(false);
+      }
+    }
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -194,6 +341,20 @@ const onSubmit = async (data, status) => {
   };
 
   const progressPercentage = (currentStep / totalSteps) * 100;
+
+  // Register location and tourist spots fields with react-hook-form
+  const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
+    required: "Location (From) is required",
+  });
+  const { ref: toFormRef, ...toRest } = register("locationTo", {
+    required: "Location (To) is required",
+  });
+  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
+    "touristSpots",
+    {
+      required: "Tourist Spots are required",
+    }
+  );
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
@@ -216,7 +377,7 @@ const onSubmit = async (data, status) => {
       </div>
 
       {/* Form Content */}
-      <div className="p-3 sm:p-4 xs:p-2">
+      <div className="p-3 sm:p-4 xs:p-2 relative" style={{ zIndex: 1000 }}>
         <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 mb-3 sm:mb-4 text-center">
           Create Your Tour Plan
         </h2>
@@ -230,15 +391,18 @@ const onSubmit = async (data, status) => {
                   Location (From)
                 </label>
                 <input
-                  {...register("locationFrom", {
-                    required: "Location (From) is required",
-                  })}
+                  {...fromRest}
                   type="text"
                   placeholder="Starting location"
                   defaultValue={formData.locationFrom}
-                  onChange={(e) =>
-                    updateFormData("locationFrom", e.target.value)
-                  }
+                  onChange={(e) => {
+                    updateFormData("locationFrom", e.target.value);
+                    setValue("locationFrom", e.target.value);
+                  }}
+                  ref={(e) => {
+                    fromFormRef(e);
+                    locationFromRef.current = e;
+                  }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
                 {errors.locationFrom && (
@@ -252,13 +416,18 @@ const onSubmit = async (data, status) => {
                   Location (To)
                 </label>
                 <input
-                  {...register("locationTo", {
-                    required: "Location (To) is required",
-                  })}
+                  {...toRest}
                   type="text"
                   placeholder="Destination"
                   defaultValue={formData.locationTo}
-                  onChange={(e) => updateFormData("locationTo", e.target.value)}
+                  onChange={(e) => {
+                    updateFormData("locationTo", e.target.value);
+                    setValue("locationTo", e.target.value);
+                  }}
+                  ref={(e) => {
+                    toFormRef(e);
+                    locationToRef.current = e;
+                  }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
                 {errors.locationTo && (
@@ -383,16 +552,22 @@ const onSubmit = async (data, status) => {
                   Tourist Spots
                 </label>
                 <input
-                  {...register("touristSpots", {
-                    required: "Tourist Spots are required",
-                  })}
+                  {...touristSpotsRest}
                   type="text"
-                  placeholder="E.g., Cox's Bazar, Sundarbans"
+                  placeholder="Search for a tourist spot"
                   defaultValue={formData.touristSpots}
-                  onChange={(e) =>
-                    updateFormData("touristSpots", e.target.value)
-                  }
+                  onChange={(e) => {
+                    updateFormData("touristSpots", e.target.value);
+                    setValue("touristSpots", e.target.value);
+                    console.log("touristSpots input changed:", e.target.value);
+                  }}
+                  ref={(e) => {
+                    touristSpotsFormRef(e);
+                    touristSpotsRef.current = e;
+                    console.log("touristSpotsRef set:", !!e);
+                  }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                  style={{ zIndex: 1001 }} // Ensure input is above other elements
                 />
                 {errors.touristSpots && (
                   <span className="text-red-500 text-xs mt-1">
@@ -528,29 +703,10 @@ const onSubmit = async (data, status) => {
                 </span>
               )}
             </div>
-
-            {/* <div className="flex items-start">
-              <input
-                {...register("includeRoundTripFlight")}
-                type="checkbox"
-                id="includeRoundTripFlight"
-                checked={formData.includeRoundTripFlight}
-                onChange={(e) =>
-                  updateFormData("includeRoundTripFlight", e.target.checked)
-                }
-                className="h-4 w-4 text-[#FF6600] focus:ring-[#FF6600] border-gray-300 rounded mt-1"
-              />
-              <label
-                htmlFor="includeRoundTripFlight"
-                className="ml-2 text-xs sm:text-sm text-gray-700"
-              >
-                Include Round-Trip Flight
-              </label>
-            </div> */}
           </div>
         )}
 
-        {/* Step 4: Travel Preferences (Moved from Step 3) */}
+        {/* Step 4: Travel Preferences */}
         {currentStep === 4 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -593,6 +749,7 @@ const onSubmit = async (data, status) => {
                   }
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
+                  <option value="">Select Destination Type</option>
                   <option value="beach">Beach trips</option>
                   <option value="mountain">Mountain adventures</option>
                   <option value="relax">Relaxing tours</option>
@@ -632,6 +789,10 @@ const onSubmit = async (data, status) => {
                   {formData.budget || "Not specified"}
                 </p>
                 <p>
+                  <span className="font-medium">Tourist Spots:</span>{" "}
+                  {formData.touristSpots || "Not specified"}
+                </p>
+                <p>
                   <span className="font-medium">Accommodation:</span>{" "}
                   {formData.typeOfAccommodation || "Not specified"}
                 </p>
@@ -644,6 +805,14 @@ const onSubmit = async (data, status) => {
                   {formData.mealPlan || "Not specified"}
                 </p>
                 <p>
+                  <span className="font-medium">Travel Type:</span>{" "}
+                  {formData.travelType || "Not specified"}
+                </p>
+                <p>
+                  <span className="font-medium">Destination Type:</span>{" "}
+                  {formData.destinationType || "Not specified"}
+                </p>
+                <p>
                   <span className="font-medium">Flight:</span>{" "}
                   {formData.includeRoundTripFlight
                     ? "Included"
@@ -654,7 +823,7 @@ const onSubmit = async (data, status) => {
           </div>
         )}
 
-        {/* Step 5: Personal Information (Moved from Step 4) */}
+        {/* Step 5: Personal Information */}
         {currentStep === 5 && (
           <div className="space-y-3 sm:space-y-4">
             <div>
@@ -772,13 +941,6 @@ const onSubmit = async (data, status) => {
             >
               Cancel
             </button>
-            {/* <button
-              onClick={handleSubmit((data) => onSubmit(data, "draft"))}
-              disabled={isSavingDraft || isPublishing}
-              className="px-2 py-1 sm:px-2.1 sm:py-1 border border-[#FF6600] text-[#FF6600] rounded-lg hover:bg-[#FF6600] hover:text-white font-medium text-xs sm:text-sm transition-all duration-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed w-full sm:w-auto"
-            >
-              {isSavingDraft ? "Saving Draft..." : "Save as Draft"}
-            </button> */}
           </div>
 
           <div className="w-full sm:w-auto">
