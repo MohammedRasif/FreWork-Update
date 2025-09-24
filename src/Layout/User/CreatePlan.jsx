@@ -31,6 +31,7 @@ const CreatePlan = () => {
 
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
+  const touristSpotsRef = useRef(null);
 
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
     state?.id,
@@ -80,24 +81,52 @@ const CreatePlan = () => {
         return;
       }
       console.log("Initializing autocomplete...");
+
       if (locationFromRef.current) {
+        console.log("Setting up autocomplete for locationFrom");
         const fromAutocomplete = new window.google.maps.places.Autocomplete(
           locationFromRef.current
         );
         fromAutocomplete.addListener("place_changed", () => {
           const place = fromAutocomplete.getPlace();
-          setValue("locationFrom", place.formatted_address || place.name);
+          const locationValue = place.formatted_address || place.name;
+          console.log("locationFrom selected:", locationValue);
+          setValue("locationFrom", locationValue);
         });
+      } else {
+        console.warn("locationFromRef is null");
       }
 
       if (locationToRef.current) {
+        console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
           locationToRef.current
         );
         toAutocomplete.addListener("place_changed", () => {
           const place = toAutocomplete.getPlace();
-          setValue("locationTo", place.formatted_address || place.name);
+          const locationValue = place.formatted_address || place.name;
+          console.log("locationTo selected:", locationValue);
+          setValue("locationTo", locationValue);
         });
+      } else {
+        console.warn("locationToRef is null");
+      }
+
+      if (touristSpotsRef.current) {
+        console.log("Setting up autocomplete for touristSpots");
+        const touristSpotsAutocomplete =
+          new window.google.maps.places.Autocomplete(
+            touristSpotsRef.current,
+            { types: ["point_of_interest", "tourist_attraction"] } // Restrict to tourist spots
+          );
+        touristSpotsAutocomplete.addListener("place_changed", () => {
+          const place = touristSpotsAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          console.log("touristSpots selected:", locationValue);
+          setValue("touristSpots", locationValue);
+        });
+      } else {
+        console.warn("touristSpotsRef is null");
       }
     };
 
@@ -110,7 +139,7 @@ const CreatePlan = () => {
       script.defer = true;
       script.onload = () => {
         console.log("Google Maps script loaded successfully");
-        initAutocomplete();
+        setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
       };
       script.onerror = () => {
         console.error("Failed to load Google Maps API");
@@ -119,7 +148,7 @@ const CreatePlan = () => {
       document.head.appendChild(script);
     } else if (window.google) {
       console.log("Google Maps already loaded, initializing autocomplete...");
-      initAutocomplete();
+      setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
     }
 
     return () => {
@@ -205,13 +234,19 @@ const CreatePlan = () => {
     return <FullScreenInfinityLoader />;
   }
 
+  // Register touristSpots with react-hook-form
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: "Location from is required",
   });
-
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location to is required",
   });
+  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
+    "touristSpots",
+    {
+      required: "Tourist spots are required",
+    }
+  );
 
   return (
     <div className="p-6">
@@ -534,17 +569,21 @@ const CreatePlan = () => {
 
           {/* Row 5: Tourist Spots & Upload Picture */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            // Update the touristSpots input in the JSX
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 Tourist Spots
               </label>
               <input
                 type="text"
-                placeholder="Example: Cox's Bazar, Sundarbans, Bandarban"
+                placeholder="Search for a tourist spot"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("touristSpots", {
-                  required: "Tourist spots are required",
-                })}
+                {...touristSpotsRest}
+                ref={(e) => {
+                  touristSpotsFormRef(e);
+                  touristSpotsRef.current = e;
+                  console.log("touristSpotsRef set:", !!e);
+                }}
               />
               {errors.touristSpots && (
                 <p className="text-red-500 text-[14px] mt-1">
