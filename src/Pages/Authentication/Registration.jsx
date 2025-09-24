@@ -30,7 +30,10 @@ const register = () => {
       try {
         const parsedPlan = JSON.parse(pendingPlan);
         if (parsedPlan.email) {
-          console.log("Setting default email from pendingPlan:", parsedPlan.email);
+          console.log(
+            "Setting default email from pendingPlan:",
+            parsedPlan.email
+          );
           setValue("email", parsedPlan.email);
         }
       } catch (err) {
@@ -49,6 +52,10 @@ const register = () => {
         password: data.password,
         invitation_code: data.invitationCode || undefined,
       };
+      // Store userType in localStorage
+      localStorage.setItem("userType", data.userType);
+      console.log("Stored userType in localStorage:", data.userType);
+
       const res = await createUser(payload).unwrap();
       console.log("User created successfully:", res);
       navigate("/otp_verify", {

@@ -9,10 +9,12 @@ import {
 
 const OTP_Verification = () => {
   const [otp, setOtp] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [regVerify, { isLoading }] = useOtpVerifyMutation();
   const [reSend, { isLoading: ResendLoading }] = useReSendOtpMutation();
+
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
   };
@@ -20,12 +22,10 @@ const OTP_Verification = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate OTP input
     if (!otp || otp.length < 4) {
       return alert("Please enter a 4-digit OTP.");
     }
 
-    // Make sure we have email
     if (!location.state?.email) {
       return alert("No email found. Please try again.");
     }
@@ -36,16 +36,30 @@ const OTP_Verification = () => {
         email: location.state.email,
       }).unwrap();
 
-      console.log("OTP verify response:", res); // check the shape
-
       if (res.access && res.refresh) {
         localStorage.setItem("access_token", res.access);
         localStorage.setItem("refresh_token", res.refresh);
-        navigate(location.state?.to ? "/reset_password" : "/login", {
-          state: {
-            email: location.state.email,
-          },
-        }); // Redirect only if successful
+
+        // Get userType from localStorage
+        const userType = localStorage.getItem("userType");
+        console.log("Retrieved userType from localStorage:", userType);
+
+        // Show popup
+        setShowPopup(true);
+
+        // After 2 sec navigate based on userType
+        setTimeout(() => {
+          setShowPopup(false);
+          if (userType === "agency") {
+            navigate("/admin/editProfile", {
+              state: { email: location.state.email },
+            });
+          } else {
+            navigate("/", {
+              state: { email: location.state.email },
+            });
+          }
+        }, 7000);
       } else {
         alert("OTP verification failed. Check the code or try again.");
       }
@@ -56,8 +70,8 @@ const OTP_Verification = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left image section */}
+    <div className="min-h-screen flex flex-col md:flex-row relative">
+      {/* Left image */}
       <div className="w-full bg-blue-900 md:w-1/2 h-[30vh] md:h-screen relative">
         <img
           src={img}
@@ -66,7 +80,7 @@ const OTP_Verification = () => {
         />
       </div>
 
-      {/* Right form section */}
+      {/* Right form */}
       <div className="w-full md:w-1/2 min-h-[100vh] md:h-screen relative bg-blue-50 flex flex-col justify-center items-center p-8">
         <div className="w-full max-w-xl space-y-8">
           <form className="backdrop-blur-sm bg-white/60 p-10 mb-10 rounded-lg border border-blue-200 shadow-xl">
@@ -121,6 +135,23 @@ const OTP_Verification = () => {
           </form>
         </div>
       </div>
+
+      {/* Popup */}
+      {showPopup && (
+        <div className=" backdrop-blur-[5px] absolute inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-16 text-center max-w-xl">
+            <p className="text-blue-600 font-semibold text-2xl">
+              Please complete your profile right now
+            </p>
+            <p className="text-gray-600 mt-2 text-xl pb-1">
+              Then you can access full dashboard features.
+            </p>
+            <p className="text-gray-600 mt-2 text-xl">
+              Please wait.............
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

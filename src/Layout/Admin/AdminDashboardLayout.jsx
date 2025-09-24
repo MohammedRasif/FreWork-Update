@@ -25,7 +25,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetAgencyProfileQuery } from "@/redux/features/withAuth";
+import {
+  useGetAgencyProfileQuery,
+  useShowUserInpormationQuery,
+} from "@/redux/features/withAuth";
 
 const UnreadCountContext = createContext();
 
@@ -41,8 +44,10 @@ export default function AdminDashboardLayout() {
   const { data: agencyData, isLoading } = useGetAgencyProfileQuery();
   const ws = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { data: userData } = useShowUserInpormationQuery();
 
-  const menuItems = [
+  // Define all menu items
+  const allMenuItems = [
     {
       items: [
         {
@@ -76,6 +81,17 @@ export default function AdminDashboardLayout() {
     },
   ];
 
+  // Filter menu items based on is_profile_complete
+  const menuItems = [
+    {
+      items: userData?.is_profile_complete
+        ? allMenuItems[0].items // Show all items if profile is complete
+        : allMenuItems[0].items.filter((item) =>
+            ["Profile", "Logout"].includes(item.name)
+          ), // Show only Profile and Logout if profile is incomplete
+    },
+  ];
+
   // Sync selectedItem with current route
   useEffect(() => {
     const normalizedLocation = location.pathname.replace(/\/$/, "");
@@ -85,7 +101,7 @@ export default function AdminDashboardLayout() {
       "/admin/accepted",
       "/admin/published",
     ];
-    const profileRoutes = ["/admin/profile", "/admin/editProfile"]; // Add /admin/editProfile to Profile routes
+    const profileRoutes = ["/admin/profile", "/admin/editProfile"];
 
     // Check if the current route is in myPlansRoutes
     if (myPlansRoutes.includes(normalizedLocation)) {
@@ -139,7 +155,7 @@ export default function AdminDashboardLayout() {
         null
       );
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuItems]); // Add menuItems as a dependency
 
   // Close mobile menu when route changes
   useEffect(() => {

@@ -340,6 +340,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     updateFormData("uploadedFile", file);
   };
 
+  const handlepupupClose = () => {
+    localStorage.removeItem("pendingPlan");
+  };
+
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   // Register location and tourist spots fields with react-hook-form
@@ -936,7 +940,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </button>
             )}
             <button
-              onClick={closeForm}
+              onClick={() => {
+                closeForm();
+                localStorage.removeItem("pendingPlan");
+              }}
               className="px-2 py-1 sm:px-2.1 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
             >
               Cancel
