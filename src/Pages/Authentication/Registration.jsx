@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Mail, Lock } from "lucide-react";
 import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -22,6 +22,22 @@ const register = () => {
   } = useForm();
 
   const password = watch("password");
+
+  // Load email from localStorage pendingPlan
+  useEffect(() => {
+    const pendingPlan = localStorage.getItem("pendingPlan");
+    if (pendingPlan) {
+      try {
+        const parsedPlan = JSON.parse(pendingPlan);
+        if (parsedPlan.email) {
+          console.log("Setting default email from pendingPlan:", parsedPlan.email);
+          setValue("email", parsedPlan.email);
+        }
+      } catch (err) {
+        console.error("Error parsing pendingPlan from localStorage:", err);
+      }
+    }
+  }, [setValue]);
 
   const userTypes = ["tourist", "agency"];
 
@@ -242,7 +258,7 @@ const register = () => {
 
           {/* Login Link */}
           <div className="text-center mt-6">
-            <NavLink to="/login" className="text-sm text-gray-600 ">
+            <NavLink to="/login" className="text-sm text-gray-600">
               Already have an account?{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
                 Login

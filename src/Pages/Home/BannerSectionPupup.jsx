@@ -245,7 +245,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       // Save form data to localStorage
       localStorage.setItem("pendingPlan", JSON.stringify(data));
       toast.error("Please log in to create a plan");
-      navigate("/login");
+      navigate("/register");
       return;
     }
 
