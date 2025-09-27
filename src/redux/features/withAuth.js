@@ -40,6 +40,7 @@ export const sqQuery = createApi({
     "Discount",
     "PublishPlanDelete",
     "Chat",
+    "Offer"
   ],
 
   endpoints: (builder) => ({
@@ -331,6 +332,19 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["Chat"],
     }),
+
+    // delete offerplan
+    deleteOfferPlan: builder.mutation({
+      query: (id) => ({
+        url: `no-agreement-reached/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Offer"],
+    }),
+
+
+
+
   }),
 });
 
@@ -399,4 +413,7 @@ export const {
 
   //archived user
   useArchivedUserMutation,
+  // delete offer plan
+  useDeleteOfferPlanMutation,
+
 } = sqQuery;

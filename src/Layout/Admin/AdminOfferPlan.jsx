@@ -1,4 +1,3 @@
-"use client";
 
 import { GoArrowLeft } from "react-icons/go";
 import { MdVerified } from "react-icons/md";
@@ -7,19 +6,23 @@ import { HiDotsVertical } from "react-icons/hi";
 import { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import {
+  useDeleteOfferPlanMutation,
   useGetOfferedPlanQuery,
   useLikePostMutation,
 } from "@/redux/features/withAuth";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function AdminOfferPlan() {
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudgets, setOfferBudgets] = useState({});
   const [isLiked, setIsLiked] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState({});
+  const [isDeleting, setIsDeleting] = useState({});
   const dropdownRefs = useRef({});
   const { data: offeredPlans, isLoading, isError } = useGetOfferedPlanQuery();
   console.log(offeredPlans);
+  const [deleteOfferPlan] = useDeleteOfferPlanMutation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -37,6 +40,20 @@ function AdminOfferPlan() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Handle deletion of offer
+  const handleDelete = async (tourPlanId) => {
+    setIsDeleting((prev) => ({ ...prev, [tourPlanId]: true }));
+    try {
+      await deleteOfferPlan(tourPlanId).unwrap();
+      toast.success("Offer deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete offer:", error);
+      toast.error("Failed to delete offer");
+    } finally {
+      setIsDeleting((prev) => ({ ...prev, [tourPlanId]: false }));
+    }
+  };
 
   // Handle loading and error states
   if (isLoading)
@@ -204,14 +221,24 @@ function AdminOfferPlan() {
                           <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                             <NavLink to="/admin/chat">
                               <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-blue-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-blue-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
-                              Start conversation
-                            </button>
+                                Start conversation
+                              </button>
                             </NavLink>
                             <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
                               Confirm the deal
                             </button>
-                            <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-yellow-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-yellow-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
-                              No agreement
+                            <button
+                              onClick={() => handleDelete(tourPlan.id)}
+                              disabled={isDeleting[tourPlan.id]}
+                              className={`px-3 sm:px-5 py-2 sm:py-[5px] font-semibold text-white text-sm sm:text-[17px] rounded-md hover:cursor-pointer transition-colors w-full sm:w-auto ${
+                                isDeleting[tourPlan.id]
+                                  ? "bg-yellow-300 cursor-not-allowed"
+                                  : "bg-yellow-500 hover:bg-yellow-600"
+                              }`}
+                            >
+                              {isDeleting[tourPlan.id]
+                                ? "Deleting..."
+                                : "No agreement"}
                             </button>
                           </div>
                         </div>
