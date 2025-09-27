@@ -17,8 +17,10 @@ import {
   EyeOff,
   Eye,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import UserAvatar from "../../assets/img/bruce-mars.png";
 import { SlDiamond } from "react-icons/sl";
+import { MdVerified } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -30,24 +32,25 @@ import {
   useChangePasswordMutation,
   useGetTuristProfileQuery,
 } from "@/redux/features/withAuth";
-import { notification_url } from "@/assets/Socketurl";
-import { MdVerified } from "react-icons/md";
 import { toast, ToastContainer } from "react-toastify";
+import AdminNotification from "../Admin/AdminNotification";
 
 export default function UserDashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false); // New state for popup
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { data: profileData, isLoading: isProfileLoading } =
     useGetTuristProfileQuery();
-  let ws = useRef(null);
-  console.log(profileData);
   const [changePassword, { isLoading: isChangePasswordLoading }] =
     useChangePasswordMutation();
+  const notificationRef = useRef(null);
+  const ws = useRef(null);
 
   const [showPasswords, setShowPasswords] = useState({
     current_password: false,
@@ -60,7 +63,6 @@ export default function UserDashboardLayout() {
     new_password: "",
     confirm_password: "",
   });
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
@@ -79,20 +81,16 @@ export default function UserDashboardLayout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.new_password !== formData.confirm_password) {
       toast.error("New password and confirm password do not match!");
       return;
     }
-
     try {
       await changePassword({
         current_password: formData.current_password,
         new_password: formData.new_password,
       }).unwrap();
-
       toast.success("Password changed successfully!");
-
       setFormData({
         current_password: "",
         new_password: "",
@@ -104,9 +102,41 @@ export default function UserDashboardLayout() {
     }
   };
 
+  const toggleNotificationDropdown = () => {
+    setIsNotificationOpen((prev) => !prev);
+  };
+
+  const handleClosePopup = () => {
+    setIsChangePasswordOpen(false);
+  };
+
+  const handleItemClick = (itemName, path) => {
+    if (itemName === "Logout") {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("name");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("user_image");
+      navigate(path);
+    } else if (itemName === "Change password") {
+      setIsChangePasswordOpen(true);
+    } else {
+      setSelectedItem(itemName);
+      navigate(path);
+      setIsMobileMenuOpen(false);
+      setIsNotificationOpen(false);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsNotificationOpen(false);
+  };
+
+  // WebSocket setup
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    console.log("Token:", token);
     if (!token) {
       console.error("No token found, WebSocket connection aborted");
       return;
@@ -114,17 +144,19 @@ export default function UserDashboardLayout() {
     const baseUrl = "transeunt-noncommemoratory-valeria.ngrok-free.app";
     const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
+
     ws.current.onopen = () => {
       console.log("WebSocket connected successfully");
     };
+
     ws.current.onmessage = (event) => {
-      console.log("Raw message received:", event.data); // Debug raw data
+      console.log("Raw message received:", event.data);
       try {
         const messageData = JSON.parse(event.data);
-        console.log("Parsed message:", messageData); // Debug parsed data
+        console.log("Parsed message:", messageData);
         if (messageData.unread_count !== undefined) {
           setUnreadCount(messageData.unread_count);
-          console.log("Updated unreadCount:", messageData.unread_count); // Debug state update
+          console.log("Updated unreadCount:", messageData.unread_count);
         } else {
           console.warn("unread_count not found in message:", messageData);
         }
@@ -150,11 +182,7 @@ export default function UserDashboardLayout() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(notifications);
-  }, [notifications]);
-
-  // Inside UserDashboardLayout component
+  // Sync selectedItem with current route
   useEffect(() => {
     const normalizedLocation = location.pathname.replace(/\/$/, "");
     const myPlansRoutes = [
@@ -214,12 +242,13 @@ export default function UserDashboardLayout() {
     }
   }, [location.pathname]);
 
-  // Close mobile menu when route changes
+  // Close mobile menu and notification dropdown when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsNotificationOpen(false);
   }, [location.pathname]);
 
-  // Close mobile menu when clicking outside
+  // Close mobile menu and notification dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -229,10 +258,17 @@ export default function UserDashboardLayout() {
       ) {
         setIsMobileMenuOpen(false);
       }
+      if (
+        isNotificationOpen &&
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setIsNotificationOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isNotificationOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -261,40 +297,16 @@ export default function UserDashboardLayout() {
           icon: <MessageCircle size={20} />,
           path: "/user/chat",
         },
-        {
-          name: "Notifications",
-          icon: <Bell size={20} />,
-          path: "/user/notification",
-        },
+
         { name: "Logout", icon: <LogOut size={20} />, path: "/" },
       ],
     },
   ];
 
-  const handleItemClick = (itemName, path) => {
-    if (itemName === "Logout") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("name");
-      localStorage.removeItem("role");
-      localStorage.removeItem("user_id");
-      localStorage.removeItem("user_image");
-      navigate(path);
-    } else if (itemName === "Change password") {
-      setIsChangePasswordOpen(true);
-    } else {
-      setSelectedItem(itemName);
-      navigate(path);
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const handleClosePopup = () => {
-    setIsChangePasswordOpen(false);
+  // Dropdown animation variants
+  const dropdownVariants = {
+    closed: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+    open: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
   };
 
   return (
@@ -315,7 +327,6 @@ export default function UserDashboardLayout() {
             <img src={img} className="h-full" alt="Logo" />
           </div>
         </NavLink>
-        {/* Logo */}
         {!isProfileLoading && profileData && (
           <div className="h-auto flex items-center px-4">
             <div className="flex flex-col w-full justify-center items-center mt-16">
@@ -338,7 +349,7 @@ export default function UserDashboardLayout() {
                 </div>
                 {profileData?.is_verified && (
                   <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                    <MdVerified className=" w-5 h-5 z-20 text-blue-600" />
+                    <MdVerified className="w-5 h-5 z-20 text-blue-600" />
                   </div>
                 )}
               </div>
@@ -353,8 +364,6 @@ export default function UserDashboardLayout() {
             </div>
           </div>
         )}
-
-        {/* Navigation */}
         <nav className="p-4 mt-6">
           {menuItems.map((section, idx) => (
             <div key={idx} className="mb-8">
@@ -431,7 +440,6 @@ export default function UserDashboardLayout() {
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Mobile Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-[#343E4B]">Menu</h2>
           <button
@@ -441,10 +449,8 @@ export default function UserDashboardLayout() {
             <X size={20} />
           </button>
         </div>
-
-        {/* Mobile Logo */}
         <div className="h-auto flex items-center px-4">
-          <div className="flex flex-col w-full justify-center items-center ">
+          <div className="flex flex-col w-full justify-center items-center">
             <NavLink to="/" className="w-full">
               <div className="font-bold lg:h-11 h-8 text-gray-800 mt-5 mb-5 flex items-center justify-center">
                 <img src={img} className="h-full" alt="Logo" />
@@ -463,7 +469,7 @@ export default function UserDashboardLayout() {
               </div>
               {profileData?.is_verified && (
                 <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                  <MdVerified className=" w-5 h-5 z-20 text-blue-600" />
+                  <MdVerified className="w-5 h-5 z-20 text-blue-600" />
                 </div>
               )}
             </div>
@@ -482,8 +488,6 @@ export default function UserDashboardLayout() {
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
         <nav className="p-4 mt-6">
           {menuItems.map((section, idx) => (
             <div key={idx} className="mb-8">
@@ -511,6 +515,11 @@ export default function UserDashboardLayout() {
                       {item.badge && (
                         <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
                           {item.badge}
+                        </span>
+                      )}
+                      {item.name === "Notifications" && unreadCount > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
+                          {unreadCount}
                         </span>
                       )}
                     </NavLink>
@@ -542,7 +551,6 @@ export default function UserDashboardLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Navbar */}
         <header className="h-16 bg-[#F8F9FA]">
           <div className="h-full px-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -552,28 +560,34 @@ export default function UserDashboardLayout() {
               >
                 <Menu size={20} />
               </button>
-              {/* <div className="flex flex-col">
-                <h1 className="text-lg sm:text-2xl font-medium text-[#343E4B] flex gap-2 sm:gap-4 items-end">
-                  Wednesday
-                  <span className="text-xs font-normal">25 July, 2025</span>
-                </h1>
-              </div> */}
             </div>
             <div className="flex items-center gap-4 sm:gap-8 me-2 sm:me-10">
-              <NavLink
-                to="/user/notification"
-                className={({ isActive }) =>
-                  `p-2 rounded-full relative z-10 ${isActive ? " " : ""}`
-                }
-              >
-                <Bell size={20} className="sm:w-6 sm:h-6  " />
-              </NavLink>
-              {unreadCount > 0 && (
-                <h1 className="-ml-11 font-bold -mt-5 z-30 hover:cursor-pointer">
-                  {unreadCount}
-                </h1>
-              )}
-
+              <div className="relative" ref={notificationRef}>
+                <button
+                  onClick={toggleNotificationDropdown}
+                  className="p-2 rounded-full relative z-10 hover:bg-gray-200 transition-colors duration-200"
+                >
+                  <Bell size={20} className="sm:w-6 sm:h-6" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                <AnimatePresence>
+                  {isNotificationOpen && (
+                    <motion.div
+                      initial="closed"
+                      animate="open"
+                      exit="closed"
+                      variants={dropdownVariants}
+                      className="absolute right-0 mt-2 w-[60vw] max-w-[600px] h-96 bg-white border border-gray-200 shadow-lg rounded-md z-50 overflow-y-auto"
+                    >
+                      <AdminNotification />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <div className="hidden sm:flex items-center justify-center gap-5">
                 <h4 className="text-xl font-medium">Settings</h4>
                 <DropdownMenu>
@@ -637,12 +651,10 @@ export default function UserDashboardLayout() {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-auto bg-[#F5F5F6] p-4 sm:p-6">
           <Outlet />
         </main>
 
-        {/* Change Password Popup */}
         {isChangePasswordOpen && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">

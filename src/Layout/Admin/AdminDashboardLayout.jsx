@@ -16,6 +16,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import UserAvatar from "../../assets/img/bruce-mars.png";
 import { SlDiamond } from "react-icons/sl";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import {
   useGetAgencyProfileQuery,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
+import AdminNotification from "./AdminNotification";
 
 const UnreadCountContext = createContext();
 
@@ -39,12 +41,14 @@ export default function AdminDashboardLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { data: agencyData, isLoading } = useGetAgencyProfileQuery();
   const ws = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const { data: userData } = useShowUserInpormationQuery();
+  const notificationRef = useRef(null);
 
   // Define all menu items
   const allMenuItems = [
@@ -56,11 +60,7 @@ export default function AdminDashboardLayout() {
           path: "/admin",
           exact: true,
         },
-        {
-          name: "Notifications",
-          icon: <Bell size={20} />,
-          path: "/admin/admin_notification",
-        },
+       
         {
           name: "For agencies",
           icon: <UserRound size={20} />,
@@ -155,14 +155,15 @@ export default function AdminDashboardLayout() {
         null
       );
     }
-  }, [location.pathname, menuItems]); // Add menuItems as a dependency
+  }, [location.pathname, menuItems]);
 
-  // Close mobile menu when route changes
+  // Close mobile menu and notification dropdown when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsNotificationOpen(false);
   }, [location.pathname]);
 
-  // Close mobile menu when clicking outside
+  // Close mobile menu and notification dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -172,10 +173,17 @@ export default function AdminDashboardLayout() {
       ) {
         setIsMobileMenuOpen(false);
       }
+      if (
+        isNotificationOpen &&
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setIsNotificationOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isNotificationOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -184,6 +192,11 @@ export default function AdminDashboardLayout() {
       document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
+
+  // Toggle notification dropdown
+  const toggleNotificationDropdown = () => {
+    setIsNotificationOpen((prev) => !prev);
+  };
 
   const handleItemClick = (itemName, path) => {
     if (itemName === "Logout") {
@@ -200,11 +213,13 @@ export default function AdminDashboardLayout() {
       setSelectedItem(itemName);
       navigate(path);
       setIsMobileMenuOpen(false);
+      setIsNotificationOpen(false);
     }
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsNotificationOpen(false); // Close notification dropdown when mobile menu toggles
   };
 
   const handleClosePopup = () => {
@@ -220,8 +235,7 @@ export default function AdminDashboardLayout() {
       return;
     }
     const baseUrl = "//10.10.13.59:8008";
-    // http://10.10.13.59:8008/
-    const socketUrl = `ws://${baseUrl}/ws/notification-count/?token=${token}`;
+    const socketUrl = `ws:${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
     ws.current.onopen = () => {
@@ -260,6 +274,12 @@ export default function AdminDashboardLayout() {
       }
     };
   }, []);
+
+  // Dropdown animation variants
+  const dropdownVariants = {
+    closed: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+    open: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+  };
 
   return (
     <UnreadCountContext.Provider value={{ unreadCount, setUnreadCount }}>
@@ -462,6 +482,11 @@ export default function AdminDashboardLayout() {
                             {item.badge}
                           </span>
                         )}
+                        {item.name === "Notifications" && unreadCount > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
+                            {unreadCount}
+                          </span>
+                        )}
                       </NavLink>
                     </li>
                   ))}
@@ -500,27 +525,34 @@ export default function AdminDashboardLayout() {
                 >
                   <Menu size={20} />
                 </button>
-                {/* <div className="flex flex-col">
-                  <h1 className="text-lg sm:text-2xl font-medium text-[#343E4B] flex gap-2 sm:gap-4 items-end">
-                    Thursday
-                    <span className="text-xs font-normal">28 August, 2025</span>
-                  </h1>
-                </div> */}
               </div>
               <div className="flex items-center gap-4 sm:gap-8 me-2 sm:me-10">
-                <NavLink
-                  to="/admin/admin_notification"
-                  className={({ isActive }) =>
-                    `p-2 rounded-full relative z-10 ${isActive ? " " : ""}`
-                  }
-                >
-                  <Bell size={20} className="sm:w-6 sm:h-6 relative z-10" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </NavLink>
+                <div className="relative" ref={notificationRef}>
+                  <button
+                    onClick={toggleNotificationDropdown}
+                    className="p-2 rounded-full relative z-10 hover:cursor-pointer"
+                  >
+                    <Bell size={20} className="sm:w-6 sm:h-6 relative z-10" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  <AnimatePresence>
+                    {isNotificationOpen && (
+                      <motion.div
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={dropdownVariants}
+                        className="absolute right-0 mt-2 w-[60vh] h-96 bg-white border border-gray-200 shadow-lg rounded-md z-50 overflow-y-auto"
+                      >
+                        <AdminNotification />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
                 <div className="hidden sm:flex items-center justify-center gap-5">
                   <h4 className="text-xl font-medium">Settings</h4>
                   <DropdownMenu>

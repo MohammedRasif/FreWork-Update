@@ -270,6 +270,7 @@ const TourPlanWithPopup = () => {
       setOfferComment("");
       setOfferForm({ applyDiscount: false, discount: "" });
       toast.success("Offer submitted successfully");
+      navigate("/admin/chat")
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(

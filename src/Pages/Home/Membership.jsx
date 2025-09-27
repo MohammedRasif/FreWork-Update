@@ -311,7 +311,7 @@ const Membership = () => {
                       </div>
                     </div>
 
-                    <button
+                    {/* <button
                       onClick={() => {
                         if (!token) {
                           navigate("/login");
@@ -327,7 +327,7 @@ const Membership = () => {
                       <span className="text-sm sm:text-base font-medium">
                         Message
                       </span>
-                    </button>
+                    </button> */}
                   </div>
                   <div className="pb-5">
                     <h1 className="text-2xl font-semibold text-black">

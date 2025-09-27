@@ -13,19 +13,18 @@ export const sqQuery = createApi({
         headers.set("Authorization", `Bearer ${token}`);
       }
       if (
-         endpoint !== "adminProfile" &&
-         endpoint !== "updateTuristProfile" &&
-         endpoint !== "getPlans" && 
-         endpoint !== "createPlanOne" 
-        
-       ) {
+        endpoint !== "adminProfile" &&
+        endpoint !== "updateTuristProfile" &&
+        endpoint !== "getPlans" &&
+        endpoint !== "createPlanOne"
+      ) {
         headers.set("Content-Type", "application/json");
       }
 
       return headers;
     },
   }),
-  
+
   tagTypes: [
     "TourPlan",
     "TouristProfile",
@@ -40,6 +39,7 @@ export const sqQuery = createApi({
     "UserProfile",
     "Discount",
     "PublishPlanDelete",
+    "Chat",
   ],
 
   endpoints: (builder) => ({
@@ -313,7 +313,7 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["Notification"],
     }),
-    
+
     adminProfile: builder.mutation({
       query: (data) => ({
         url: "agency/profile/",
@@ -323,6 +323,14 @@ export const sqQuery = createApi({
       invalidatesTags: ["AgencyProfile"],
     }),
 
+    // archived functoin
+    archivedUser: builder.mutation({
+      query: (id) => ({
+        url: `chat/archive-conversation/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Chat"],
+    }),
   }),
 });
 
@@ -388,4 +396,7 @@ export const {
   useDeleteNotificationMutation,
   // admin profile
   useAdminProfileMutation,
+
+  //archived user
+  useArchivedUserMutation,
 } = sqQuery;

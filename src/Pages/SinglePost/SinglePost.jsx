@@ -219,6 +219,7 @@ function SinglePost({ prid }) {
       });
       setIsPopupOpen(false);
       toast.success("Offer submitted successfully");
+      navigate("/admin/chat")
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(

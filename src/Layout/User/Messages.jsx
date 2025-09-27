@@ -1,8 +1,12 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { SendIcon, ClockIcon, CheckIcon, XIcon } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
+  useArchivedUserMutation,
   useGetChatHsitoryQuery,
+  useGetChatListQuery,
   useGetPlansQuery,
   useInviteToChatMutation,
 } from "@/redux/features/withAuth";
@@ -20,6 +24,12 @@ function Messages() {
   const wsRef = useRef(null);
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
+  const [archivedUser] = useArchivedUserMutation();
+  const {
+    data: chatList,
+    isLoading: isChatListLoading,
+    refetch: refetchChatList,
+  } = useGetChatListQuery();
 
   // Fetch chat history and plans
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
@@ -29,6 +39,9 @@ function Messages() {
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
+
+  // State for tracking archive status
+  const [isConversationArchived, setIsConversationArchived] = useState(false);
 
   // Set initial tour plan from agency.tour_plan_id
   useEffect(() => {
@@ -41,6 +54,14 @@ function Messages() {
       }
     }
   }, [agency, plansData]);
+
+  // Update isConversationArchived based on chatList
+  useEffect(() => {
+    if (chatList && Array.isArray(chatList)) {
+      const currentChat = chatList.find((chat) => chat.id?.toString() === id);
+      setIsConversationArchived(currentChat?.is_archived || false);
+    }
+  }, [chatList, id]);
 
   const dropdownOptions = (plansData || [])
     .filter((plan) => plan.status === "published")
@@ -362,6 +383,35 @@ function Messages() {
     setIsButtonVisible(false);
   };
 
+  // Handle archiving or unarchiving the conversation
+  const handleArchiveConversation = async () => {
+    try {
+      await archivedUser({ id, is_archived: !isConversationArchived }).unwrap();
+      setMenuOpen(false);
+      alert(
+        isConversationArchived
+          ? "Conversation unarchived successfully"
+          : "Conversation archived successfully"
+      );
+      await refetchChatList(); // Refetch chat list to update is_archived status
+      navigate(
+        location.pathname.includes("/admin/") ? "/admin/chat" : "/user/chat"
+      ); // Navigate back to chat list
+    } catch (err) {
+      console.error(
+        `Failed to ${
+          isConversationArchived ? "unarchive" : "archive"
+        } conversation:`,
+        err
+      );
+      alert(
+        `Failed to ${
+          isConversationArchived ? "unarchive" : "archive"
+        } conversation`
+      );
+    }
+  };
+
   // Render message based on message_type
   const renderMessageContent = (message) => {
     switch (message.message_type) {
@@ -403,23 +453,6 @@ function Messages() {
     <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        {/* {userType === "tourist" ? (
-          <select
-            className="bg-gray-100 dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded px-3 py-2 focus:outline-none"
-            value={selectedDropdown}
-            onChange={handleDropdownChange}
-            disabled={plansLoading}
-          >
-            <option value="">Select Option</option>
-            {dropdownOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <div>{agency.tour_plan_title || "No tour plan selected"}</div>
-        )} */}
         <div></div>
         <div className="flex items-center space-x-2">
           <div className="relative" ref={menuRef}>
@@ -440,9 +473,11 @@ function Messages() {
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
-                  onClick={handleViewDetails}
+                  onClick={handleArchiveConversation}
                 >
-                  Archived
+                  {isConversationArchived
+                    ? "Unarchive Conversation"
+                    : "Archive Conversation"}
                 </button>
               </div>
             )}

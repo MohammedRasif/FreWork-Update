@@ -13,12 +13,19 @@ export default function ChatInterface() {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [chatsList, setChatsList] = useState([]);
-  const [activeTab, setActiveTab] = useState("inbox"); // New state for tab
+  // Initialize activeTab from localStorage or default to "inbox"
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("activeChatTab") || "inbox";
+  });
   const {
     data: chatList,
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
+
+  useEffect(() => {
+    localStorage.setItem("activeChatTab", activeTab);
+  }, [activeTab]);
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -57,7 +64,7 @@ export default function ChatInterface() {
         other_user_id: chat.other_user_id || null,
         tour_plan_title: chat.tour_plan_title || "No Tour Plan",
         tour_plan_id: chat.tour_plan_id || null,
-        is_archived: chat.is_archived || false, // Add is_archived to mapped data
+        is_archived: chat.is_archived || false,
       }));
 
       setChatsList(mappedChats);
@@ -74,19 +81,50 @@ export default function ChatInterface() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Update selectedAgencyId based on current route
+  // Update selectedAgencyId based on current route and tab
   useEffect(() => {
     const pathParts = location.pathname.split("/");
     const agencyIdFromPath = pathParts[pathParts.length - 1];
+    const basePath = location.pathname.includes("/admin/")
+      ? "/admin/chat"
+      : "/user/chat";
+
+    // Check if the current route is a conversation route and the ID is valid
     if (
       pathParts.includes("chat") &&
-      chatsList.some((agency) => agency.id === agencyIdFromPath)
+      chatsList.some((agency) => agency.id === agencyIdFromPath) &&
+      location.pathname !== basePath
     ) {
-      setSelectedAgencyId(agencyIdFromPath);
+      // Ensure the conversation matches the active tab's filter
+      const selectedChat = chatsList.find(
+        (agency) => agency.id === agencyIdFromPath
+      );
+      if (
+        selectedChat &&
+        ((activeTab === "inbox" && !selectedChat.is_archived) ||
+          (activeTab === "archived" && selectedChat.is_archived))
+      ) {
+        setSelectedAgencyId(agencyIdFromPath);
+      } else {
+        // If the conversation doesn't match the tab, reset to base route
+        setSelectedAgencyId(null);
+        navigate(basePath);
+      }
     } else {
+      // If on base route or invalid ID, reset selection
       setSelectedAgencyId(null);
     }
-  }, [location.pathname, chatsList]);
+  }, [location.pathname, chatsList, activeTab, navigate]);
+
+  // Reset to base route when switching tabs
+  useEffect(() => {
+    const basePath = location.pathname.includes("/admin/")
+      ? "/admin/chat"
+      : "/user/chat";
+    if (!isBaseRoute) {
+      navigate(basePath);
+    }
+  }, [activeTab, navigate]);
 
   const handleAgencyClick = (agency) => {
     if (!agency.id) return;
@@ -131,8 +169,8 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("inbox")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "inbox"
-                  ? "bg-blue-500 text-white "
-                  : "bg-gray-200 text-gray-700 "
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
               Inbox
@@ -141,8 +179,8 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("archived")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "archived"
-                  ? "bg-blue-500 text-white "
-                  : "bg-gray-200 text-gray-700 "
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
               Archived
@@ -300,7 +338,6 @@ export default function ChatInterface() {
                         </span>
                       )}
                     </div>
-
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {agency.lastMessage || "No messages yet"}
                     </p>
