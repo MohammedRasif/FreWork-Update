@@ -1,7 +1,6 @@
-"use client";
 
 import { useState, useRef, useEffect } from "react";
-import { SendIcon, ClockIcon, CheckIcon, XIcon } from "lucide-react";
+import { SendIcon, ClockIcon, CheckIcon, XIcon, PaperclipIcon } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   useArchivedUserMutation,
@@ -19,8 +18,10 @@ function Messages() {
   const agency = location.state?.agency;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
   const wsRef = useRef(null);
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
@@ -74,6 +75,7 @@ function Messages() {
   useEffect(() => {
     setMessages([]);
     pendingMessagesRef.current.clear();
+    setSelectedFile(null);
   }, [id]);
 
   // Initialize WebSocket
@@ -103,7 +105,7 @@ function Messages() {
 
         const serverMessage = {
           id: inner.id,
-          message_type: "text",
+          message_type: inner.message_type || "text",
           text: inner.text,
           data: null,
           tour_plan_id: inner.tour_plan_id || null,
@@ -203,9 +205,18 @@ function Messages() {
     scrollToBottom();
   }, [messages]);
 
-  // Handle sending text message
-  const handleSendMessage = () => {
-    if (newMessage.trim() === "") return;
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setNewMessage(file.name); // Display file name in input field
+    }
+  };
+
+  // Handle sending message (text or file)
+  const handleSendMessage = async () => {
+    if (newMessage.trim() === "" && !selectedFile) return;
     if (!selectedDropdown && !agency?.tour_plan_id) {
       alert("Please select a tour plan first");
       return;
@@ -216,25 +227,58 @@ function Messages() {
     const tourPlan = dropdownOptions.find(
       (opt) => opt.value === selectedDropdown
     );
-    const messageObj = {
-      type: "chat_message",
-      message: newMessage.trim(),
-      tempId,
-    };
 
-    const localMessage = {
-      id: messageId,
-      message_type: "text",
-      text: newMessage.trim(),
-      data: null,
-      tour_plan_id: selectedDropdown,
-      tour_plan_title: tourPlan?.label || null,
-      isUser: true,
-      timestamp: new Date(),
-      is_read: false,
-      status: "sending",
-      tempId,
-    };
+    let messageObj;
+    let localMessage;
+
+    if (selectedFile) {
+      // Placeholder for file upload to backend API
+      // Replace with actual API call to upload file and get file_url
+      const file_url = `/uploads/${selectedFile.name}`; // Example URL, replace with actual uploaded file URL
+      messageObj = {
+        type: "chat_message",
+        message: selectedFile.name,
+        message_type: "file",
+        file_url,
+        tempId,
+      };
+      localMessage = {
+        id: messageId,
+        message_type: "file",
+        text: selectedFile.name,
+        data: null,
+        tour_plan_id: selectedDropdown,
+        tour_plan_title: tourPlan?.label || null,
+        file_url,
+        isUser: true,
+        timestamp: new Date(),
+        is_read: false,
+        status: "sending",
+        tempId,
+      };
+    } else {
+      messageObj = {
+        type: "chat_message",
+        message: newMessage.trim(),
+        message_type: "text",
+        tempId,
+      };
+      localMessage = {
+        id: messageId,
+        message_type: "text",
+        text: newMessage.trim(),
+        data: null,
+        tour_plan_id: selectedDropdown,
+        tour_plan_title: tourPlan?.label || null,
+        file_url: null,
+        isUser: true,
+        timestamp: new Date(),
+        is_read: false,
+        status: "sending",
+        tempId,
+      };
+    }
+
     setMessages((prev) => [...prev, localMessage]);
     pendingMessagesRef.current.set(tempId, localMessage);
 
@@ -249,7 +293,12 @@ function Messages() {
       pendingMessagesRef.current.delete(tempId);
     }
 
+    // Reset input and file selection
     setNewMessage("");
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     inputRef.current?.focus();
   };
 
@@ -274,6 +323,8 @@ function Messages() {
     const messageObj = {
       type: "chat_message",
       message: message.text,
+      message_type: message.message_type,
+      file_url: message.file_url || null,
       tempId,
     };
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -317,6 +368,7 @@ function Messages() {
           data: new Date(),
           tour_plan_id: selectedId,
           tour_plan_title: tourPlan?.label || null,
+          file_url: null,
           isUser: true,
           timestamp: new Date(),
           is_read: false,
@@ -417,6 +469,13 @@ function Messages() {
     switch (message.message_type) {
       case "text":
         return <p>{message.text}</p>;
+      case "file":
+        return (
+          <p className="text-blue-600">
+            File: {message.text}{" "}
+            {message.tour_plan_title && `(${message.tour_plan_title})`}
+          </p>
+        );
       case "start_conversation":
         return (
           <p className="text-blue-600 italic">
@@ -453,7 +512,23 @@ function Messages() {
     <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        <div></div>
+        {userType === "tourist" ? (
+          <select
+            className="bg-gray-100 dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded px-3 py-2 focus:outline-none"
+            value={selectedDropdown}
+            onChange={handleDropdownChange}
+            disabled={plansLoading}
+          >
+            <option value="">Select Option</option>
+            {dropdownOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div>{agency.tour_plan_title || "No tour plan selected"}</div>
+        )}
         <div className="flex items-center space-x-2">
           <div className="relative" ref={menuRef}>
             <button
@@ -548,12 +623,30 @@ function Messages() {
       {/* Message input area */}
       <div className="border-t border-gray-200 p-3 bg-white">
         <div className="flex items-center bg-gray-100 rounded-full px-4 py-3">
+          <button
+            type="button"
+            className="text-gray-500 hover:text-gray-700"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <PaperclipIcon className="h-5 w-5 cursor-pointer" />
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*,.pdf,.doc,.docx"
+            onChange={handleFileChange}
+          />
           <input
             type="text"
-            placeholder="Type a message"
+            placeholder="Type a message or select a file"
             className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={(e) => {
+              if (!selectedFile) {
+                setNewMessage(e.target.value);
+              }
+            }}
             onKeyDown={handleKeyPress}
             ref={inputRef}
           />
