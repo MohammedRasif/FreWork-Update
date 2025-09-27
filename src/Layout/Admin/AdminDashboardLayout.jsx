@@ -219,8 +219,9 @@ export default function AdminDashboardLayout() {
       console.error("No token found, WebSocket connection aborted");
       return;
     }
-    const baseUrl = "transeunt-noncommemoratory-valeria.ngrok-free.app";
-    const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
+    const baseUrl = "//10.10.13.59:8008";
+    // http://10.10.13.59:8008/
+    const socketUrl = `ws://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
     ws.current.onopen = () => {

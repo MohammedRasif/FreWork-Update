@@ -13,19 +13,21 @@ export default function ChatInterface() {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [chatsList, setChatsList] = useState([]);
+  const [activeTab, setActiveTab] = useState("inbox"); // New state for tab
   const {
     data: chatList,
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
-  useEffect(()=>{
+
+  useEffect(() => {
     const timeout = setInterval(() => {
-      refetchChatList()
+      refetchChatList();
     }, 3000);
-    return ()=>{
-      return clearInterval(timeout)
-    }
-  },[])
+    return () => {
+      clearInterval(timeout);
+    };
+  }, [refetchChatList]);
 
   // Update and sort chatsList when chatList data is fetched
   useEffect(() => {
@@ -37,23 +39,25 @@ export default function ChatInterface() {
         const timeB = b.last_message_time
           ? new Date(b.last_message_time)
           : new Date(b.updated_at);
-        // Improved date handling with fallback
         if (!timeA || isNaN(timeA.getTime())) return 1;
         if (!timeB || isNaN(timeB.getTime())) return -1;
-        return timeB - timeA; // Sort in descending order
+        return timeB - timeA;
       });
 
       const mappedChats = sortedChats.map((chat) => ({
         id: chat.id?.toString() || "",
         name: chat.other_participant_name || "Unknown User",
-        image: chat.other_participant_image || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        image:
+          chat.other_participant_image ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
         lastMessage: chat.last_message || null,
         unreadCount: chat.unread_count || 0,
-        active: chat.active || false, // Backend support needed for active status
+        active: chat.active || false,
         tourist_is_verified: chat.tourist_is_verified || false,
         other_user_id: chat.other_user_id || null,
         tour_plan_title: chat.tour_plan_title || "No Tour Plan",
-        tour_plan_id:chat.tour_plan_id || null
+        tour_plan_id: chat.tour_plan_id || null,
+        is_archived: chat.is_archived || false, // Add is_archived to mapped data
       }));
 
       setChatsList(mappedChats);
@@ -85,7 +89,6 @@ export default function ChatInterface() {
   }, [location.pathname, chatsList]);
 
   const handleAgencyClick = (agency) => {
-    console.log(agency,"adlkgjfldsjljdfslore olsdlk")
     if (!agency.id) return;
     setSelectedAgencyId(agency.id);
     const basePath = location.pathname.includes("/admin/")
@@ -97,11 +100,14 @@ export default function ChatInterface() {
   const isBaseRoute =
     location.pathname === "/user/chat" || location.pathname === "/admin/chat";
 
-  // Filter agencies based on search term, including tour_plan_title
+  // Filter agencies based on search term and active tab
   const filteredAgencies = chatsList.filter(
     (agency) =>
-      agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agency.tour_plan_title.toLowerCase().includes(searchTerm.toLowerCase())
+      (agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        agency.tour_plan_title
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())) &&
+      (activeTab === "inbox" ? !agency.is_archived : agency.is_archived)
   );
 
   // Mobile Layout
@@ -120,6 +126,28 @@ export default function ChatInterface() {
             />
             <IoMdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
+          <div className="flex mt-2">
+            <button
+              onClick={() => setActiveTab("inbox")}
+              className={`flex-1 py-2 text-center hover:cursor-pointer ${
+                activeTab === "inbox"
+                  ? "bg-blue-500 text-white "
+                  : "bg-gray-200 text-gray-700 "
+              } rounded-l-lg`}
+            >
+              Inbox
+            </button>
+            <button
+              onClick={() => setActiveTab("archived")}
+              className={`flex-1 py-2 text-center hover:cursor-pointer ${
+                activeTab === "archived"
+                  ? "bg-blue-500 text-white "
+                  : "bg-gray-200 text-gray-700 "
+              } rounded-r-lg`}
+            >
+              Archived
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {isChatListLoading ? (
@@ -130,7 +158,7 @@ export default function ChatInterface() {
             filteredAgencies.map((agency) => (
               <div
                 key={agency.id}
-                onClick={() => handleAgencyClick(agency,"llllllllllllllllllllllllllllllllll")}
+                onClick={() => handleAgencyClick(agency)}
                 className={`flex items-center px-4 py-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200 ${
                   selectedAgencyId === agency.id ? "bg-gray-200" : ""
                 }`}
@@ -140,7 +168,10 @@ export default function ChatInterface() {
                     src={agency.image}
                     alt={agency.name}
                     className="w-12 h-12 rounded-full object-cover"
-                    onError={(e) => (e.target.src = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")}
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")
+                    }
                   />
                   {agency.active && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
@@ -198,6 +229,28 @@ export default function ChatInterface() {
             />
             <IoMdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
+          <div className="flex m-3">
+            <button
+              onClick={() => setActiveTab("inbox")}
+              className={`flex-1 py-2 text-center hover:cursor-pointer ${
+                activeTab === "inbox"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } rounded-l-lg`}
+            >
+              Inbox
+            </button>
+            <button
+              onClick={() => setActiveTab("archived")}
+              className={`flex-1 py-2 text-center hover:cursor-pointer ${
+                activeTab === "archived"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } rounded-r-lg`}
+            >
+              Archived
+            </button>
+          </div>
           <div className="overflow-y-auto flex-1">
             {isChatListLoading ? (
               <div className="p-4 text-center">Loading...</div>
@@ -207,7 +260,7 @@ export default function ChatInterface() {
               filteredAgencies.map((agency) => (
                 <div
                   key={agency.id}
-                  onClick={() => handleAgencyClick(agency,"....................................")}
+                  onClick={() => handleAgencyClick(agency)}
                   className={`flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252c3b] text-gray-700 dark:text-gray-200 transition-colors border-b border-gray-200 dark:border-gray-300 ${
                     selectedAgencyId === agency.id
                       ? "bg-blue-100 dark:bg-[#2F80A9]"
@@ -219,7 +272,10 @@ export default function ChatInterface() {
                       src={agency.image}
                       alt={agency.name}
                       className="w-10 h-10 rounded-full object-cover"
-                      onError={(e) => (e.target.src = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")}
+                      onError={(e) =>
+                        (e.target.src =
+                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")
+                      }
                     />
                     {agency.active && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
@@ -234,6 +290,9 @@ export default function ChatInterface() {
                         {agency.tourist_is_verified && (
                           <MdVerified className="ml-1 w-4 h-4 text-blue-600" />
                         )}
+                        <span className="pl-1 font-semibold">
+                          ({agency.tour_plan_title})
+                        </span>
                       </div>
                       {agency.unreadCount > 0 && (
                         <span className="text-[12px] bg-blue-500 text-white px-2 py-1 rounded-full ml-2">
@@ -241,9 +300,7 @@ export default function ChatInterface() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 truncate">
-                      {agency.tour_plan_title}
-                    </p>
+
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {agency.lastMessage || "No messages yet"}
                     </p>
