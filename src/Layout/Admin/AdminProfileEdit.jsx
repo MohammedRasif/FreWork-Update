@@ -61,7 +61,7 @@ const AdminProfileEdit = () => {
           vatNumber: profileData.invitation_code || "",
           email: profileData.contact_email || "",
           phoneNumber: profileData.contact_phone || "",
-          description: profileData.our_aim || "",
+          description: profileData.about || "",
           categories: categories,
           terms: false, // Terms should not be pre-checked
         });
@@ -84,7 +84,7 @@ const AdminProfileEdit = () => {
       formData.append("invitation_code", data.vatNumber);
       formData.append("contact_email", data.email);
       formData.append("contact_phone", data.phoneNumber);
-      formData.append("our_aim", data.description);
+      formData.append("about", data.description);
       formData.append("service_categories", JSON.stringify(mappedCategories));
       if (logoFile) formData.append("agency_logo", logoFile);
       if (coverPhotoFile) formData.append("cover_photo", coverPhotoFile);

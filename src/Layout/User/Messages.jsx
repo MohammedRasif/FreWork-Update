@@ -53,7 +53,7 @@ function Messages() {
   };
 
   // Fetch chat history and plans
-  const { data, isLoading, error } = useGetChatHsitoryQuery(id);
+  const { data, isLoading, error, refetch } = useGetChatHsitoryQuery(id);
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   console.log(plansData,"plans data")
 
@@ -93,35 +93,60 @@ function Messages() {
 
     wsRef.current.onmessage = (event) => {
       try {
-        const message = JSON.parse(event.data);
-        console.log("Received WebSocket message:", message);
+        const received = JSON.parse(event.data);
+        console.log("Received WebSocket message:", received);
+
+        if (received.type === 'message_history') {
+          // Handle initial history if needed, but we use API
+          return;
+        }
+
+        if (received.type !== 'chat_message') {
+          return;
+        }
+
+        const inner = received.message;
+        const tempId = received.tempId; 
+
         const serverMessage = {
-          id: message.id,
-          message_type: message.message_type,
-          text: message.text,
-          data: message.data || null,
-          tour_plan_id: message.tour_plan_id || null,
-          tour_plan_title: message.tour_plan_title || null,
-          isUser: false,
-          timestamp: new Date(message.timestamp),
-          is_read: message.is_read,
+          id: inner.id,
+          message_type: 'text', // Default to text
+          text: inner.text,
+          data: null,
+          tour_plan_id: inner.tour_plan_id || null,
+          tour_plan_title: inner.tour_plan_title || null,
+          file_url: inner.file_url || null,
+          isUser: String(inner.sender?.user_id) === userId,
+          timestamp: new Date(inner.timestamp),
+          is_read: inner.is_read,
           status: "sent",
         };
 
-        // Check if this is a confirmation of a pending message
-        const tempId = message.tempId;
-        if (tempId && pendingMessagesRef.current.has(tempId)) {
-          setMessages((prev) =>
-            prev.map((msg) =>
+        setMessages((prev) => {
+          // Check for duplicate by server ID
+          if (prev.some((msg) => msg.id === serverMessage.id)) {
+            return prev;
+          }
+
+          if (serverMessage.isUser && tempId && pendingMessagesRef.current.has(tempId)) {
+            // Update pending own message
+            const updated = prev.map((msg) =>
               msg.tempId === tempId
-                ? { ...serverMessage, tempId: msg.tempId }
+                ? { ...serverMessage, tempId: undefined }
                 : msg
-            )
-          );
-          pendingMessagesRef.current.delete(tempId);
-        } else {
-          setMessages((prev) => [...prev, serverMessage]);
-        }
+            );
+            pendingMessagesRef.current.delete(tempId);
+            return updated;
+          } else if (!serverMessage.isUser) {
+            // Add new message from other
+            return [...prev, serverMessage];
+          } else {
+            // If own but no tempId match, perhaps don't add to avoid dupe
+            return prev;
+          }
+        });
+
+        // refetch(); // Commented out to prevent potential race conditions causing duplicates
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
       }
@@ -154,18 +179,28 @@ function Messages() {
     if (data && Array.isArray(data.messages) && userId) {
       const formattedMessages = data.messages.map((msg) => ({
         id: msg.id,
-        message_type: msg.message_type,
+        message_type: msg.message_type || "text",
         text: msg.text,
         data: msg.data || null,
         tour_plan_id: msg.tour_plan_id || null,
         tour_plan_title: msg.tour_plan_title || null,
-        isUser: msg.sender.user_id == userId,
+        file_url: msg.file_url || null,
+        isUser: String(msg.sender.user_id) === userId,
         timestamp: new Date(msg.timestamp),
         is_read: msg.is_read,
         status: "sent",
-        data: msg.data || null,
       }));
-      setMessages(formattedMessages);
+      setMessages((prev) => {
+        // Merge with existing, remove duplicates by id
+        const allMsgs = [...prev, ...formattedMessages];
+        const uniqueMsgs = allMsgs.reduce((acc, msg) => {
+          if (!acc[msg.id]) {
+            acc[msg.id] = msg;
+          }
+          return acc;
+        }, {});
+        return Object.values(uniqueMsgs).sort((a, b) => a.timestamp - b.timestamp);
+      });
     }
   }, [data, userId]);
 
@@ -191,9 +226,8 @@ function Messages() {
       (opt) => opt.value === selectedDropdown
     );
     const messageObj = {
-      id: messageId,
+      type: 'chat_message',
       message: newMessage.trim(),
-      data: null,
       tempId,
     };
 
@@ -247,12 +281,8 @@ function Messages() {
     );
 
     const messageObj = {
-      id: message.id,
-      message_type: message.message_type,
-      tour_plan_id: message.tour_plan_id,
-      tour_plan_title: message.tour_plan_title,
-      text: message.text,
-      data: message.data,
+      type: 'chat_message',
+      message: message.text,
       tempId,
     };
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -305,14 +335,16 @@ function Messages() {
         setMessages((prev) => [...prev, localMessage]);
         pendingMessagesRef.current.set(tempId, localMessage);
 
-        // if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        //   wsRef.current.send(JSON.stringify(messageObj));
-        // }
-
-        await inviteToChat({
+        const res = await inviteToChat({
           tour_plan_id: Number(selectedId),
           other_user_id: agency.agency.other_user_id,
         }).unwrap();
+
+        // Update local message with server ID after success
+        setMessages((prev) => prev.map((msg) =>
+          msg.tempId === tempId ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined } : msg
+        ));
+        pendingMessagesRef.current.delete(tempId);
       } catch (err) {
         console.error("Failed to send start conversation:", err);
         setMessages((prev) =>
@@ -349,7 +381,6 @@ function Messages() {
     const tempId = uuidv4();
     const messageId = uuidv4();
     const tourPlan = dropdownOptions.find((opt) => opt.value === planid);
-    const userEmail = localStorage.getItem("email") || "User";
     const messageObj = {
       id: messageId,
       message_type: "discount_request",
@@ -379,11 +410,14 @@ function Messages() {
     pendingMessagesRef.current.set(tempId, localMessage);
 
     try {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify(messageObj));
-      }
       const res = await askDiscount({ planid: planid, chatid: id }).unwrap();
       console.log("Discount request sent:", res);
+
+      // Update local with server ID
+      setMessages((prev) => prev.map((msg) =>
+        msg.tempId === tempId ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined } : msg
+      ));
+      pendingMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Error sending discount request:", error);
       setMessages((prev) =>
@@ -440,9 +474,6 @@ function Messages() {
     pendingMessagesRef.current.set(tempId, localMessage);
 
     try {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify(messageObj));
-      }
       const res = await offerDiscount({
         id,
         data: {
@@ -453,6 +484,13 @@ function Messages() {
         },
       }).unwrap();
       console.log("Discount offer sent successfully:", res);
+
+      // Update local with server ID
+      setMessages((prev) => prev.map((msg) =>
+        msg.tempId === tempId ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined } : msg
+      ));
+      pendingMessagesRef.current.delete(tempId);
+
       setIsDiscountPopupOpen(false);
       setDiscountType("percent");
       setDiscountValue("");
@@ -484,12 +522,10 @@ function Messages() {
       id: messageId,
       message_type: "final_offer",
       message: `Final offer for tour plan ${planTitle || "Unknown"}`,
-      // data: {
       starting_date: startingDate,
       ending_date: endingDate,
       total_members: totalMembers,
       amount: amount,
-      // },
       tempId,
     };
 
@@ -515,9 +551,6 @@ function Messages() {
     pendingMessagesRef.current.set(tempId, localMessage);
 
     try {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify(messageObj));
-      }
       const res = await finalOffer({
         id,
         data: {
@@ -529,6 +562,13 @@ function Messages() {
         },
       }).unwrap();
       console.log("Final offer sent successfully:", res);
+
+      // Update local with server ID
+      setMessages((prev) => prev.map((msg) =>
+        msg.tempId === tempId ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined } : msg
+      ));
+      pendingMessagesRef.current.delete(tempId);
+
       setIsPopupOpen(false);
       setStartingDate("");
       setEndingDate("");
@@ -551,14 +591,14 @@ function Messages() {
   const navigate = useNavigate();
   const [isButtonVisible, setIsButtonVisible] = useState(true);
 
-const handleViewDetails = () => {
-  if (!agency?.agency?.tour_plan_id) {
-    alert("Tourist has not provided a tour plan.");
-    return;
-  }
-  navigate(`/tour-plans/${agency.agency.tour_plan_id}`);
-  setIsButtonVisible(false);
-};
+  const handleViewDetails = () => {
+    if (!agency?.agency?.tour_plan_id) {
+      alert("Tourist has not provided a tour plan.");
+      return;
+    }
+    navigate(`/tour-plans/${agency.agency.tour_plan_id}`);
+    setIsButtonVisible(false);
+  };
 
 
 
@@ -598,20 +638,16 @@ const handleViewDetails = () => {
     pendingMessagesRef.current.set(tempId, localMessage);
 
     try {
-      // if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      //   wsRef.current.send(JSON.stringify(messageObj));
-      // }
-      // const res = await acceptFinalOffer({
-      //   id,
-      //   data: {
-      //     tour_plan_id: planid,
-      //     message_id: messageId,
-      //   },
-      // }).unwrap();
       const res = await acceptFinalOffer({
         id
       }).unwrap();
       console.log("Final offer accepted successfully:", res);
+
+      // Update local with server ID
+      setMessages((prev) => prev.map((msg) =>
+        msg.tempId === tempId ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined } : msg
+      ));
+      pendingMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Error accepting final offer:", error);
       setMessages((prev) =>
@@ -627,7 +663,7 @@ const handleViewDetails = () => {
   };
 
   // Handle offer accepted (for discount_offer)
-  const handleOfferAccepted = (planid, messageId) => {
+  const handleOfferAccepted = async (planid, messageId) => {
     if (!planid || !id) {
       alert("Please select a plan first");
       return;
@@ -659,9 +695,21 @@ const handleViewDetails = () => {
     setMessages((prev) => [...prev, localMessage]);
     pendingMessagesRef.current.set(tempId, localMessage);
 
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(messageObj));
-    } else {
+    try {
+      // Assuming there's an API for accepting discount offer, similar to final offer
+      // If not, implement it or use WS
+      // For now, using WS
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify(messageObj));
+      }
+
+      // If API, await and update ID
+      setMessages((prev) => prev.map((msg) =>
+        msg.tempId === tempId ? { ...msg, status: "sent", tempId: undefined } : msg
+      ));
+      pendingMessagesRef.current.delete(tempId);
+    } catch (error) {
+      console.error("Error accepting offer:", error);
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg
@@ -743,9 +791,8 @@ const handleViewDetails = () => {
         return (
           <div>
             <p className="text-purple-600">
-              To : {message.text}{" "}
+              {message.text}{" "}
               {message.tour_plan_title && `(${message.tour_plan_title})`}
-              {/* {console.log(message, message.data, "final message")} */}
             </p>
             {message.data && (
               <>
@@ -764,7 +811,6 @@ const handleViewDetails = () => {
                   className="mt-2 bg-green-500 hover:bg-green-400 hover:cursor-pointer text-white px-2 py-1 rounded text-sm disabled:bg-gray-600 disabled:text-gray-300 disabled:hover:cursor-not-allowed"
                 >
                   Accept Final Offer
-                  {console.log(agency.agency.tour_plan_id == selectedDropdown)}
                 </button>
               )}
           </div>
@@ -777,7 +823,7 @@ const handleViewDetails = () => {
           </p>
         );
       default:
-        return <p>Unknown message type</p>;
+        return <p>Unknown message type: {message.text}</p>;
     }
   };
 
@@ -826,16 +872,18 @@ const handleViewDetails = () => {
         )}
         <div className="flex items-center space-x-2">
           {userType === "tourist" ? (
-            <button
+            <div>
+              {/* <button
               onClick={() => askForDiscountHandler(selectedDropdown)}
               className="bg-blue-500 hover:bg-blue-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm"
               disabled={askDiscountLoading}
             >
               Ask for Discount
-            </button>
+            </button> */}
+            </div>
           ) : (
             <>
-              <button
+              {/* <button
                 onClick={openDiscountModal}
                 className="bg-blue-500 hover:bg-blue-400 hover:cursor-pointer text-white px-4 py-2 rounded font-medium text-sm"
                 disabled={offerDiscountLoading || finalOfferLoading}
@@ -848,7 +896,7 @@ const handleViewDetails = () => {
                 disabled={offerDiscountLoading || finalOfferLoading}
               >
                 Final Offer
-              </button>
+              </button> */}
             </>
           )}
           <div className="relative" ref={menuRef}>
