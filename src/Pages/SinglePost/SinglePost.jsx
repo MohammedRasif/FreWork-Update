@@ -571,9 +571,7 @@ function SinglePost({ prid }) {
                       </span>
                     </label>
                     <p className="text-xs text-gray-500 mt-1">
-                      The site automatically suggests to visitors to request an
-                      additional discount, increasing conversions by 30%. If you
-                      want to offer more, do so by checking this.
+                    Website suggests extra discount, increases conversions by 30%. Check to offer more.
                     </p>
                   </div>
 

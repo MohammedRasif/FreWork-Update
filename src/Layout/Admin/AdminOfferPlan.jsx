@@ -1,4 +1,3 @@
-
 import { GoArrowLeft } from "react-icons/go";
 import { MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
@@ -42,16 +41,16 @@ function AdminOfferPlan() {
   }, []);
 
   // Handle deletion of offer
-  const handleDelete = async (tourPlanId) => {
-    setIsDeleting((prev) => ({ ...prev, [tourPlanId]: true }));
+  const handleDelete = async (offerId) => {
+    setIsDeleting((prev) => ({ ...prev, [offerId]: true }));
     try {
-      await deleteOfferPlan(tourPlanId).unwrap();
+      await deleteOfferPlan(offerId).unwrap();
       toast.success("Offer deleted successfully");
     } catch (error) {
       console.error("Failed to delete offer:", error);
       toast.error("Failed to delete offer");
     } finally {
-      setIsDeleting((prev) => ({ ...prev, [tourPlanId]: false }));
+      setIsDeleting((prev) => ({ ...prev, [offerId]: false }));
     }
   };
 
@@ -228,15 +227,15 @@ function AdminOfferPlan() {
                               Confirm the deal
                             </button>
                             <button
-                              onClick={() => handleDelete(tourPlan.id)}
-                              disabled={isDeleting[tourPlan.id]}
+                              onClick={() => handleDelete(offer.id)} // Changed to offer.id
+                              disabled={isDeleting[offer.id]}
                               className={`px-3 sm:px-5 py-2 sm:py-[5px] font-semibold text-white text-sm sm:text-[17px] rounded-md hover:cursor-pointer transition-colors w-full sm:w-auto ${
-                                isDeleting[tourPlan.id]
+                                isDeleting[offer.id]
                                   ? "bg-yellow-300 cursor-not-allowed"
                                   : "bg-yellow-500 hover:bg-yellow-600"
                               }`}
                             >
-                              {isDeleting[tourPlan.id]
+                              {isDeleting[offer.id]
                                 ? "Deleting..."
                                 : "No agreement"}
                             </button>

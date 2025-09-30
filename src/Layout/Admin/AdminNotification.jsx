@@ -181,14 +181,14 @@ const AdminNotification = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handleViewClick(item)}
-                    className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200"
+                    className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
                     title="View Notification"
                   >
                     <IoEyeOutline size={20} />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(item.id)}
-                    className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors duration-200"
+                    className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors duration-200 cursor-pointer"
                     title="Delete Notification"
                   >
                     <RiDeleteBin6Line size={20} />
