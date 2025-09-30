@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import {
   useDeleteOfferPlanMutation,
+  useFinalOfferSentMutation,
   useGetOfferedPlanQuery,
   useLikePostMutation,
 } from "@/redux/features/withAuth";
@@ -18,10 +19,13 @@ function AdminOfferPlan() {
   const [isLiked, setIsLiked] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState({});
   const [isDeleting, setIsDeleting] = useState({});
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const [isConfirming, setIsConfirming] = useState({});
   const dropdownRefs = useRef({});
   const { data: offeredPlans, isLoading, isError } = useGetOfferedPlanQuery();
-  console.log(offeredPlans);
   const [deleteOfferPlan] = useDeleteOfferPlanMutation();
+  const [finalOfferSent] = useFinalOfferSentMutation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -52,6 +56,35 @@ function AdminOfferPlan() {
     } finally {
       setIsDeleting((prev) => ({ ...prev, [offerId]: false }));
     }
+  };
+
+  // Handle confirm deal (open popup)
+  const handleConfirmDeal = (offerId) => {
+    setSelectedOfferId(offerId);
+    setIsPopupOpen(true);
+  };
+
+  // Handle confirm action in popup
+  const handleConfirmFinalOffer = async () => {
+    if (!selectedOfferId) return;
+    setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: true }));
+    try {
+      await finalOfferSent(selectedOfferId).unwrap();
+      toast.success("Final offer sent successfully");
+      setIsPopupOpen(false);
+      setSelectedOfferId(null);
+    } catch (error) {
+      console.error("Failed to send final offer:", error);
+      toast.error("Failed to send final offer");
+    } finally {
+      setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: false }));
+    }
+  };
+
+  // Handle cancel action in popup
+  const handleCancel = () => {
+    setIsPopupOpen(false);
+    setSelectedOfferId(null);
   };
 
   // Handle loading and error states
@@ -223,11 +256,14 @@ function AdminOfferPlan() {
                                 Start conversation
                               </button>
                             </NavLink>
-                            <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
+                            <button
+                              onClick={() => handleConfirmDeal(offer.id)}
+                              className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto"
+                            >
                               Confirm the deal
                             </button>
                             <button
-                              onClick={() => handleDelete(offer.id)} // Changed to offer.id
+                              onClick={() => handleDelete(offer.id)}
                               disabled={isDeleting[offer.id]}
                               className={`px-3 sm:px-5 py-2 sm:py-[5px] font-semibold text-white text-sm sm:text-[17px] rounded-md hover:cursor-pointer transition-colors w-full sm:w-auto ${
                                 isDeleting[offer.id]
@@ -250,6 +286,39 @@ function AdminOfferPlan() {
           })}
         </div>
       </div>
+
+      {/* Popup for Confirm Deal */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 backdrop-blur-[5px] bg-black/10 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white  dark:bg-[#252c3b] rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+              Confirm Deal
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to confirm this deal? This will send the final offer.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmFinalOffer}
+                disabled={isConfirming[selectedOfferId]}
+                className={`px-4 py-2 text-white rounded-md transition-colors cursor-pointer ${
+                  isConfirming[selectedOfferId]
+                    ? "bg-green-300 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                }`}
+              >
+                {isConfirming[selectedOfferId] ? "Confirming..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

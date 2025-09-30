@@ -1,12 +1,11 @@
 import {
   useGetOneDetailQuery,
-  useLikePostMutation,
   useOfferBudgetMutation,
   useAcceptOfferMutation,
   useInviteToChatMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FaClock,
@@ -14,24 +13,8 @@ import {
   FaLocationArrow,
   FaLocationDot,
 } from "react-icons/fa6";
-
-import {
-  ThumbsUp,
-  Share2,
-  MapPin,
-  Navigation,
-  X,
-  Utensils,
-  BedDouble,
-  Clock4,
-  ShieldCheck,
-} from "lucide-react";
-import {
-  MdOutlineKeyboardBackspace,
-  MdOutlineNoMeals,
-  MdVerified,
-  MdVerifiedUser,
-} from "react-icons/md";
+import { X, Utensils, BedDouble, Clock4, ShieldCheck } from "lucide-react";
+import { MdOutlineKeyboardBackspace, MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
@@ -50,14 +33,13 @@ function SinglePost({ prid }) {
   const [isLocalStorageLoaded, setIsLocalStorageLoaded] = useState(false);
 
   const [postData, setPostData] = useState({});
-  const [isLiked, setIsLiked] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   const [offerForm, setOfferForm] = useState({
     budget: "",
     comment: "",
     discount: "",
-    applyDiscount: false, // Initialize applyDiscount as false
+    applyDiscount: false,
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [expandedOffers, setExpandedOffers] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
@@ -71,7 +53,6 @@ function SinglePost({ prid }) {
   });
   const { data: userData, isLoading: isUserLoading } =
     useShowUserInpormationQuery();
-  const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
   const [acceptOffer, { isLoading: isAcceptLoading }] =
@@ -100,26 +81,10 @@ function SinglePost({ prid }) {
     if (post && isLocalStorageLoaded) {
       setPostData({
         ...post,
-        offers: post.offers || [], // Default to empty array if offers is undefined
+        offers: post.offers || [],
       });
-      if (currentUserId) {
-        setIsLiked(
-          post.interactions?.some(
-            (interaction) =>
-              String(interaction.user) === String(currentUserId) &&
-              interaction.interaction_type === "like"
-          )
-        );
-        setIsShared(
-          post.interactions?.some(
-            (interaction) =>
-              String(interaction.user) === String(currentUserId) &&
-              interaction.interaction_type === "share"
-          )
-        );
-      }
     }
-  }, [post, postError, currentUserId, isLocalStorageLoaded]);
+  }, [post, postError, isLocalStorageLoaded]);
 
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -129,45 +94,9 @@ function SinglePost({ prid }) {
     }));
   };
 
-  const handleLike = async (tourId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to like the post");
-      return;
-    }
-    try {
-      await interact({
-        id: tourId,
-        data: { interaction_type: "like" },
-      }).unwrap();
-      setIsLiked((prev) => !prev);
-      toast.success(isLiked ? "Post unliked" : "Post liked");
-    } catch (error) {
-      console.error("Failed to update like:", error);
-      toast.error("Failed to update like");
-    }
-  };
-
-  const handleShare = async (tourId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to share the post");
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(
-        `http://localhost:5173/tour-plans/${tourId}`
-      );
-      toast.success("Post link copied to clipboard");
-      await interact({
-        id: tourId,
-        data: { interaction_type: "share" },
-      }).unwrap();
-      setIsShared((prev) => !prev);
-    } catch (error) {
-      console.error("Failed to update share:", error);
-      toast.error("Failed to copy link or update share");
-    }
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
   };
 
   const handleOfferSubmit = async (e) => {
@@ -177,27 +106,43 @@ function SinglePost({ prid }) {
       toast.error("Please log in to submit an offer");
       return;
     }
-    if (!offerForm.budget || !offerForm.comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
+    if (!offerForm.budget || !offerForm.comment.trim() || !selectedFile) {
+      toast.error("Please provide a budget, a comment, and upload a file");
+      return;
+    }
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || Number(offerForm.discount) <= 0)
+    ) {
+      toast.error("Please provide a valid discount percentage");
       return;
     }
 
-    // Set loading state to true
     setIsOfferSubmitting(true);
 
     try {
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(offerForm.budget));
+      formData.append("message", offerForm.comment);
+      formData.append("apply_discount", offerForm.applyDiscount);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      formData.append("file", selectedFile);
+
       await offerBudgetToBack({
         id: finalId,
-        data: {
-          offered_budget: parseFloat(offerForm.budget),
-          message: offerForm.comment,
-          discount_percentage: offerForm.discount || 0,
-        },
+        data: formData,
       }).unwrap();
+
       const newOffer = {
-        id: currentUserId,
-        offered_budget: parseFloat(offerForm.budget),
+        id: `${currentUserId}-${Date.now()}`,
+        offered_budget: Number.parseFloat(offerForm.budget),
         message: offerForm.comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
+        file_name: selectedFile.name,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -217,9 +162,10 @@ function SinglePost({ prid }) {
         discount: "",
         applyDiscount: false,
       });
+      setSelectedFile(null);
       setIsPopupOpen(false);
       toast.success("Offer submitted successfully");
-      navigate("/admin/chat")
+      navigate("/admin/chat");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
@@ -228,7 +174,6 @@ function SinglePost({ prid }) {
           : "Something went wrong"
       );
     } finally {
-      // Reset loading state
       setIsOfferSubmitting(false);
     }
   };
@@ -272,18 +217,6 @@ function SinglePost({ prid }) {
       toast.error(error.data?.detail || "Failed to initiate chat");
     }
   };
-
-  const getInteractionCounts = (tour) => {
-    const likeCount =
-      tour.interactions?.filter((i) => i.interaction_type === "like").length ||
-      0;
-    const shareCount =
-      tour.interactions?.filter((i) => i.interaction_type === "share").length ||
-      0;
-    return { likeCount, shareCount };
-  };
-
-  const { likeCount, shareCount } = getInteractionCounts(postData);
 
   if (!isLocalStorageLoaded || isUserLoading) {
     return (
@@ -421,17 +354,17 @@ function SinglePost({ prid }) {
             </p>
           </div>
 
-          <div className="flex items-center  space-x-10">
+          <div className="flex items-center space-x-10">
             <span className="text-md text-gray-700 ">
               <span className="font-bold">Total:</span> {tour.total_members}{" "}
               {tour.total_members > 1 ? "people" : "person"}
             </span>
 
             <div className="flex items-center space-x-4">
-              <h1 className="text-md  text-gray-700">
+              <h1 className="text-md text-gray-700">
                 <span className="font-bold">Child :</span> {tour.child_count}
               </h1>
-              <h1 className="text-md  text-gray-700">
+              <h1 className="text-md text-gray-700">
                 {" "}
                 <span className="font-bold">Adult :</span> {tour.child_count}
               </h1>
@@ -495,7 +428,13 @@ function SinglePost({ prid }) {
             </p>
           </div>
           <div className="pt-2 w-full">
-            <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
+            <Dialog open={isPopupOpen} onOpenChange={(open) => {
+              setIsPopupOpen(open);
+              if (!open) {
+                setOfferForm({ budget: "", comment: "", discount: "", applyDiscount: false });
+                setSelectedFile(null);
+              }
+            }}>
               {showSentOfferButton && (
                 <DialogTrigger className="backdrop-blur-2xl" asChild>
                   <button
@@ -514,7 +453,7 @@ function SinglePost({ prid }) {
                 >
                   <X size={24} />
                 </button>
-                <h3 className="text-lg font-semibold text-gray-800 ">
+                <h3 className="text-lg font-semibold text-gray-800">
                   Place Your Offer
                 </h3>
                 <form onSubmit={handleOfferSubmit} className="space-y-2">
@@ -556,7 +495,28 @@ function SinglePost({ prid }) {
                     />
                   </div>
 
-                  <div className="">
+                  <div>
+                    <label
+                      htmlFor="file"
+                      className="block text-md font-medium text-gray-700 mb-1"
+                    >
+                      Upload File
+                    </label>
+                    <input
+                      type="file"
+                      id="file"
+                      onChange={handleFileChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      accept="image/*,.pdf,.doc,.docx"
+                    />
+                    {selectedFile && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        Selected: {selectedFile.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
@@ -571,11 +531,11 @@ function SinglePost({ prid }) {
                       </span>
                     </label>
                     <p className="text-xs text-gray-500 mt-1">
-                    Website suggests extra discount, increases conversions by 30%. Check to offer more.
+                      Website suggests extra discount, increases conversions by 30%. Check to offer more.
                     </p>
                   </div>
 
-                  <div className="">
+                  <div>
                     <label
                       htmlFor="discount"
                       className="block text-md font-medium text-gray-700 mb-1"
@@ -586,10 +546,11 @@ function SinglePost({ prid }) {
                       type="number"
                       name="discount"
                       id="discount"
-                      value={offerForm.discount || ""}
+                      value={offerForm.discount}
                       onChange={handleOfferChange}
                       placeholder="Enter discount percentage"
-                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      disabled={!offerForm.applyDiscount}
                     />
                   </div>
 
@@ -598,12 +559,14 @@ function SinglePost({ prid }) {
                     disabled={
                       isOfferSubmitting ||
                       !offerForm.budget ||
-                      !offerForm.comment.trim()
+                      !offerForm.comment.trim() ||
+                      !selectedFile
                     }
                     className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors ${
                       isOfferSubmitting ||
                       !offerForm.budget ||
-                      !offerForm.comment.trim()
+                      !offerForm.comment.trim() ||
+                      !selectedFile
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
                     }`}
@@ -612,7 +575,7 @@ function SinglePost({ prid }) {
                     {isOfferSubmitting ? "Submitting..." : "Submit Offer"}
                   </button>
                 </form>
-                <div className=" space-y-4">
+                <div className="space-y-4">
                   {isUserLoading ? (
                     <div>Loading user data...</div>
                   ) : tour.offers && tour.offers.length > 0 ? (
@@ -639,6 +602,24 @@ function SinglePost({ prid }) {
                                 } avatar`}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
+                              <div>
+                                <span className="font-medium text-gray-900">
+                                  {offer.agency?.agency_name || "Unknown Agency"}
+                                </span>
+                                <p className="text-xs sm:text-sm text-gray-600">
+                                  {offer.message}
+                                </p>
+                                {offer.file_name && (
+                                  <p className="text-xs sm:text-sm text-gray-600">
+                                    File: {offer.file_name}
+                                  </p>
+                                )}
+                                {offer.apply_discount && offer.discount > 0 && (
+                                  <p className="text-xs sm:text-sm text-green-600">
+                                    Discount: {offer.discount}% off
+                                  </p>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center justify-between sm:justify-end gap-3">
                               <span className="font-semibold text-lg sm:text-xl">
@@ -651,14 +632,12 @@ function SinglePost({ prid }) {
                                   }
                                   disabled={
                                     isInviteLoading ||
-                                    isInteractLoading ||
                                     isOfferBudgetLoading ||
                                     isAcceptLoading ||
                                     !offer.agency?.user
                                   }
                                   className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
                                     isInviteLoading ||
-                                    isInteractLoading ||
                                     isOfferBudgetLoading ||
                                     isAcceptLoading ||
                                     !offer.agency?.user

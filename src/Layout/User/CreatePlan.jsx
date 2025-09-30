@@ -569,7 +569,7 @@ const CreatePlan = () => {
 
           {/* Row 5: Tourist Spots & Upload Picture */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            // Update the touristSpots input in the JSX
+           
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 Tourist Spots

@@ -317,7 +317,7 @@ export default function AdminDashboardLayout() {
                         agencyData?.agency_logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                   }
-                  alt={agencyData?.profile_handler_name || "User"}
+                  alt={agencyData?.agency_name || "User"}
                   className="w-16 h-16 rounded-full"
                 />
               </div>
@@ -325,13 +325,13 @@ export default function AdminDashboardLayout() {
                 <h3 className="text-2xl text-center font-normal text-[#343E4B]">
                   {isLoading
                     ? "Loading..."
-                    : agencyData?.profile_handler_name || "Company Profile"}
+                    : agencyData?.agency_name || "Company Profile"}
                 </h3>
-                <span className="text-center text-md text-[#8C8C8C]">
+                {/* <span className="text-center text-md text-[#8C8C8C]">
                   {isLoading
                     ? "Loading..."
                     : agencyData?.profile_handler_position || "username"}
-                </span>
+                </span> */}
               </div>
             </div>
           </div>
@@ -534,7 +534,7 @@ export default function AdminDashboardLayout() {
                   >
                     <Bell size={20} className="sm:w-6 sm:h-6 relative z-10" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      <span className="absolute top-2 left-2/3 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {unreadCount}
                       </span>
                     )}

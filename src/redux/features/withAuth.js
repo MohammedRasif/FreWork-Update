@@ -16,7 +16,9 @@ export const sqQuery = createApi({
         endpoint !== "adminProfile" &&
         endpoint !== "updateTuristProfile" &&
         endpoint !== "getPlans" &&
-        endpoint !== "createPlanOne"
+        endpoint !== "createPlanOne" &&
+        endpoint !== "offerBudget" &&
+        endpoint !== "messageSent"
       ) {
         headers.set("Content-Type", "application/json");
       }
@@ -40,7 +42,10 @@ export const sqQuery = createApi({
     "Discount",
     "PublishPlanDelete",
     "Chat",
-    "Offer"
+    "Offer",
+    "final",
+    "final_confrimation",
+    "SentMessage",
   ],
 
   endpoints: (builder) => ({
@@ -342,6 +347,33 @@ export const sqQuery = createApi({
       invalidatesTags: ["Offer"],
     }),
 
+    // final offer
+    finalOfferSent: builder.mutation({
+      query: (id) => ({
+        url: `final-offer/${id}/`,
+        method: "PATCH",
+      }),
+      invalidatesTags: "final",
+    }),
+
+    // final offer response
+    finalOfferResponse: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `accept-or-decline/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: "final_confrimation",
+    }),
+
+    messageSent:builder.mutation({
+       query: ({ id, data }) => ({
+        url: `chat/conversations/${id}/message/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: "SentMessage",
+    }),
 
 
 
@@ -415,5 +447,10 @@ export const {
   useArchivedUserMutation,
   // delete offer plan
   useDeleteOfferPlanMutation,
-
+  // final offer sent
+  useFinalOfferSentMutation,
+  // final offer confarmation
+  useFinalOfferResponseMutation,
+  // sentMessage
+  useMessageSentMutation,
 } = sqQuery;

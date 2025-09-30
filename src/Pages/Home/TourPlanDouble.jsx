@@ -1,11 +1,6 @@
-
 import { useEffect, useRef, useState, useCallback } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import {
-  ThumbsUp,
-  Heart,
-  MessageCircle,
-  Share2,
   Menu,
   MapPin,
   Navigation,
@@ -23,7 +18,6 @@ import {
   useAcceptOfferMutation,
   useGetTourPlanPublicQuery,
   useInviteToChatMutation,
-  useLikePostMutation,
   useOfferBudgetMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
@@ -40,8 +34,6 @@ const FullScreenInfinityLoader = () => (
 
 const TourPlanDouble = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
-  const [isLiked, setIsLiked] = useState({});
-  const [isShared, setIsShared] = useState({});
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState(null);
@@ -74,7 +66,6 @@ const TourPlanDouble = () => {
 
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
-  const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
   const [acceptOffer, { isLoading: isAcceptLoading }] =
@@ -129,24 +120,10 @@ const TourPlanDouble = () => {
     setTours(filteredData);
 
     if (filteredData && currentUserId) {
-      const initialLikes = {};
-      const initialShares = {};
       const tourUsers = {};
       filteredData.forEach((tour) => {
-        initialLikes[tour.id] = tour.interactions.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "like"
-        );
-        initialShares[tour.id] = tour.interactions.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "share"
-        );
         tourUsers[tour.id] = tour.user;
       });
-      setIsLiked(initialLikes);
-      setIsShared(initialShares);
       setTourPlanPublicUser(tourUsers);
     }
   }, [tourPlanPublic, filters, currentUserId]);
@@ -183,8 +160,7 @@ const TourPlanDouble = () => {
     setSelectedTour(null);
   };
 
-  const handleSubmitOffer = async (tourId, budget, comment, offerForm) => {
-    // Check if user is authenticated
+  const handleSubmitOffer = async (tourId, budget, comment, offerForm, file) => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
 
@@ -194,13 +170,11 @@ const TourPlanDouble = () => {
       return;
     }
 
-    // Check if user has the correct role
     if (role !== "agency") {
       toast.error("Only agencies can submit offers");
       return;
     }
 
-    // Validate inputs
     if (!budget || isNaN(budget) || budget <= 0) {
       toast.error("Please provide a valid budget amount");
       return;
@@ -211,40 +185,42 @@ const TourPlanDouble = () => {
       return;
     }
 
+    if (!file) {
+      toast.error("Please upload a file");
+      return;
+    }
+
     if (
       offerForm.applyDiscount &&
-      (!offerForm.discount ||
-        isNaN(offerForm.discount) ||
-        offerForm.discount <= 0)
+      (!offerForm.discount || isNaN(offerForm.discount) || offerForm.discount <= 0)
     ) {
-      toast.error("Please provide a valid discount amount");
+      toast.error("Please provide a valid discount percentage");
       return;
     }
 
     try {
-      const payload = {
-        offered_budget: parseFloat(budget),
-        message: comment.trim(),
-        apply_discount: offerForm.applyDiscount || false,
-        discount: offerForm.applyDiscount
-          ? parseFloat(offerForm.discount)
-          : null,
-      };
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(budget));
+      formData.append("message", comment.trim());
+      formData.append("apply_discount", offerForm.applyDiscount || false);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      formData.append("file", file);
 
       const response = await offerBudgetToBack({
         id: tourId,
-        data: payload,
+        data: formData,
       }).unwrap();
 
-      // Update tours and selectedTour state only after successful API response
       const newOffer = {
-        id: response?.id || `temp-${Date.now()}`,
-        offered_budget: parseFloat(budget),
+        id: response?.id || `${currentUserId}-${Date.now()}`,
+        offered_budget: Number.parseFloat(budget),
         message: comment.trim(),
         apply_discount: offerForm.applyDiscount || false,
-        discount: offerForm.applyDiscount
-          ? parseFloat(offerForm.discount)
-          : null,
+        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
+        file_name: file.name,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -279,6 +255,7 @@ const TourPlanDouble = () => {
       }
 
       toast.success("Offer submitted successfully!");
+      navigate("/admin/chat");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       const errorMessage =
@@ -286,146 +263,6 @@ const TourPlanDouble = () => {
         error?.data?.detail ||
         "Failed to submit offer. Please try again.";
       toast.error(errorMessage);
-    }
-  };
-
-  const handleLike = async (tourId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to like the post");
-      return;
-    }
-
-    try {
-      await interact({
-        id: tourId,
-        data: { interaction_type: "like" },
-      }).unwrap();
-      setIsLiked((prev) => {
-        const newIsLiked = { ...prev, [tourId]: !prev[tourId] };
-        setTours((prevTours) =>
-          prevTours.map((tour) =>
-            tour.id === tourId
-              ? {
-                  ...tour,
-                  interactions: newIsLiked[tourId]
-                    ? [
-                        ...tour.interactions.filter(
-                          (i) =>
-                            String(i.user) !== String(currentUserId) ||
-                            i.interaction_type !== "like"
-                        ),
-                        { user: currentUserId, interaction_type: "like" },
-                      ]
-                    : tour.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "like"
-                      ),
-                }
-              : tour
-          )
-        );
-        if (selectedTour && selectedTour.id === tourId) {
-          setSelectedTour((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  interactions: newIsLiked[tourId]
-                    ? [
-                        ...prev.interactions.filter(
-                          (i) =>
-                            String(i.user) !== String(currentUserId) ||
-                            i.interaction_type !== "like"
-                        ),
-                        { user: currentUserId, interaction_type: "like" },
-                      ]
-                    : prev.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "like"
-                      ),
-                }
-              : prev
-          );
-        }
-        return newIsLiked;
-      });
-    } catch (error) {
-      console.error("Failed to update like:", error);
-      toast.error("Failed to update like");
-    }
-  };
-
-  const handleShare = async (tourId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to share the post");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(
-        `http://localhost:5173/post?postid=${tourId}`
-      );
-      toast.success("Post link copied to clipboard");
-      await interact({
-        id: tourId,
-        data: { interaction_type: "share" },
-      }).unwrap();
-      setIsShared((prev) => {
-        const newIsShared = { ...prev, [tourId]: !prev[tourId] };
-        setTours((prevTours) =>
-          prevTours.map((tour) =>
-            tour.id === tourId
-              ? {
-                  ...tour,
-                  interactions: newIsShared[tourId]
-                    ? [
-                        ...tour.interactions.filter(
-                          (i) =>
-                            String(i.user) !== String(currentUserId) ||
-                            i.interaction_type !== "share"
-                        ),
-                        { user: currentUserId, interaction_type: "share" },
-                      ]
-                    : tour.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "share"
-                      ),
-                }
-              : tour
-          )
-        );
-        if (selectedTour && selectedTour.id === tourId) {
-          setSelectedTour((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  interactions: newIsShared[tourId]
-                    ? [
-                        ...prev.interactions.filter(
-                          (i) =>
-                            String(i.user) !== String(currentUserId) ||
-                            i.interaction_type !== "share"
-                        ),
-                        { user: currentUserId, interaction_type: "share" },
-                      ]
-                    : prev.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "share"
-                      ),
-                }
-              : prev
-          );
-        }
-        return newIsShared;
-      });
-    } catch (error) {
-      console.error("Failed to update share:", error);
-      toast.error("Failed to copy link or update share");
     }
   };
 
@@ -467,20 +304,10 @@ const TourPlanDouble = () => {
     }
   };
 
-  const getInteractionCounts = (tour) => {
-    const likeCount = tour.interactions.filter(
-      (interaction) => interaction.interaction_type === "like"
-    ).length;
-    const shareCount = tour.interactions.filter(
-      (interaction) => interaction.interaction_type === "share"
-    ).length;
-    return { likeCount, shareCount };
-  };
-
   const displayTours = tours;
 
   return (
-    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto ">
+    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -495,7 +322,7 @@ const TourPlanDouble = () => {
           <div className="w-full md:w-3/4 lg:w-4/5 order-2 md:order-1">
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-600 mb-2 sm:mb-0">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-600">
                   Published Tour Plans
                 </h1>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
@@ -550,7 +377,6 @@ const TourPlanDouble = () => {
                 </div>
               ) : displayTours && displayTours.length > 0 ? (
                 displayTours.map((tour) => {
-                  const { likeCount, shareCount } = getInteractionCounts(tour);
                   const hasMaxOffers = tour.offer_count >= 3;
                   const role = localStorage.getItem("role");
                   const showSentOfferButton = !token || role === "agency";
@@ -575,17 +401,17 @@ const TourPlanDouble = () => {
                       key={tour.id}
                       className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6"
                     >
-                      <div className="relative ">
-                        <div className="overflow-hidden ">
+                      <div className="relative">
+                        <div className="overflow-hidden">
                           <img
                             src={
                               tour.spot_picture_url ||
                               "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                             }
                             alt={`${tour.location_to} destination`}
-                            className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300  rounded-t-xl"
+                            className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300 rounded-t-xl"
                           />
-                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white  rounded-t-xl">
+                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white rounded-t-xl">
                             <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
                               {tour.location_to}
                             </h2>
@@ -691,40 +517,30 @@ const TourPlanDouble = () => {
                         </div>
 
                         <div>
-                          {/* Points of travel */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MapPin className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">
-                                Points of travel:
-                              </span>{" "}
+                              <span className="font-medium">Points of travel:</span>{" "}
                               {tour.tourist_spots || "None"}
                             </span>
                           </p>
 
-                          {/* Departure from */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <Navigation className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">
-                                Departure from:
-                              </span>{" "}
+                              <span className="font-medium">Departure from:</span>{" "}
                               {tour.location_from || "N/A"}
                             </span>
                           </p>
 
-                          {/* Includes */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaListUl className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">
-                                Minimum rating:
-                              </span>{" "}
+                              <span className="font-medium">Minimum rating:</span>{" "}
                               {tour.includes || "N/A"}
                             </span>
                           </p>
 
-                          {/* Meal plan */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <Utensils className="w-6 h-5 text-gray-500" />
                             <span>
@@ -733,18 +549,14 @@ const TourPlanDouble = () => {
                             </span>
                           </p>
 
-                          {/* Accommodation */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <BedDouble className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">
-                                Type of accommodation:
-                              </span>{" "}
+                              <span className="font-medium">Type of accommodation:</span>{" "}
                               {tour.type_of_accommodation || "N/A"}
                             </span>
                           </p>
 
-                          {/* Duration */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <Clock4 className="w-6 h-5 text-gray-500" />
                             <span>
@@ -753,13 +565,10 @@ const TourPlanDouble = () => {
                             </span>
                           </p>
 
-                          {/* Contact Verified */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <ShieldCheck className="w-6 h-5 text-green-500" />
                             <span>
-                              <span className="font-medium">
-                                Contact verified via email
-                              </span>
+                              <span className="font-medium">Contact verified via email</span>
                             </span>
                           </p>
                         </div>
@@ -871,17 +680,13 @@ const TourPlanDouble = () => {
         <TourPlanPopup
           tour={selectedTour}
           onClose={closePopup}
-          isLiked={isLiked}
-          isShared={isShared}
-          handleLike={handleLike}
-          handleShare={handleShare}
           handleMessage={handleMessage}
           handleAcceptOffer={acceptOfferHandler}
-          isInteractLoading={isInteractLoading}
           isAcceptLoading={isAcceptLoading}
           userData={userData}
           tourPlanPublicUser={tourPlanPublicUser}
           handleSubmitOffer={handleSubmitOffer}
+          isOfferBudgetLoading={isOfferBudgetLoading}
         />
       )}
     </div>

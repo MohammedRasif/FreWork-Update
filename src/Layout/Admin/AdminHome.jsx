@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
@@ -6,7 +7,6 @@ import toast, { Toaster } from "react-hot-toast";
 import {
   useDeclineRequestMutation,
   useGetTourPlanPublicQuery,
-  useLikePostMutation,
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
 import AdminOfferPlan from "./AdminOfferPlan";
@@ -22,71 +22,32 @@ import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 
 const token = localStorage.getItem("access_token");
-const currentUserId = localStorage.getItem("user_id");
 
 const AdminHome = () => {
   const [activeTab, setActiveTab] = useState("All Plans");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("All"); // New state for filter: "All" or "Offered"
+  const [filter, setFilter] = useState("All");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [modalType, setModalType] = useState("view"); // "view" or "offer"
+  const [modalType, setModalType] = useState("view");
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [isLiked, setIsLiked] = useState({});
-  const [isShared, setIsShared] = useState({});
-  const [likeCounts, setLikeCounts] = useState({});
   const [offerBudget, setOfferBudget] = useState(0);
   const [offerComment, setOfferComment] = useState("");
   const [offerForm, setOfferForm] = useState({
     applyDiscount: false,
     discount: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
 
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
-  const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
   const [declineRequest, { isLoading: isDeclineRequestLoading }] =
     useDeclineRequestMutation();
 
   const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
-
-  // Initialize like, share, and like count states
-  useEffect(() => {
-    if (tourPlanPublic && currentUserId) {
-      const initialLikes = {};
-      const initialShares = {};
-      const initialLikeCounts = {};
-      tourPlanPublic.forEach((plan) => {
-        initialLikes[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "like"
-        );
-        initialShares[plan.id] = plan.interactions?.some(
-          (interaction) =>
-            String(interaction.user) === String(currentUserId) &&
-            interaction.interaction_type === "share"
-        );
-        initialLikeCounts[plan.id] =
-          plan.interactions?.filter(
-            (interaction) => interaction.interaction_type === "like"
-          ).length || 0;
-      });
-      setIsLiked(initialLikes);
-      setIsShared(initialShares);
-      setLikeCounts(initialLikeCounts);
-    }
-  }, [tourPlanPublic, currentUserId]);
-
-  // Force re-render of selectedPlan when likeCounts change
-  useEffect(() => {
-    if (selectedPlan) {
-      setSelectedPlan((prev) => ({ ...prev }));
-    }
-  }, [likeCounts]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -97,6 +58,7 @@ const AdminHome = () => {
         setOfferBudget(0);
         setOfferComment("");
         setOfferForm({ applyDiscount: false, discount: "" });
+        setSelectedFile(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -110,137 +72,9 @@ const AdminHome = () => {
       .includes(searchQuery.toLowerCase());
     const matchesFilter =
       filter === "All" ||
-      (filter === "Offered" && plan.offered_status === true); // Filter by offered_status
+      (filter === "Offered" && plan.offered_status === true);
     return matchesSearch && matchesFilter;
   });
-
-  // Handle like/unlike action
-  const handleLike = async (planId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to like a plan");
-      return;
-    }
-
-    const wasLiked = isLiked[planId];
-    const optimisticLikeCounts = {
-      ...likeCounts,
-      [planId]: wasLiked ? likeCounts[planId] - 1 : likeCounts[planId] + 1,
-    };
-    const optimisticIsLiked = { ...isLiked, [planId]: !wasLiked };
-
-    // Optimistically update UI
-    setLikeCounts(optimisticLikeCounts);
-    setIsLiked(optimisticIsLiked);
-
-    // Update selectedPlan if open
-    if (selectedPlan && selectedPlan.id === planId) {
-      setSelectedPlan((prev) =>
-        prev
-          ? {
-              ...prev,
-              interactions: optimisticIsLiked[planId]
-                ? [
-                    ...prev.interactions.filter(
-                      (i) =>
-                        String(i.user) !== String(currentUserId) ||
-                        i.interaction_type !== "like"
-                    ),
-                    { user: currentUserId, interaction_type: "like" },
-                  ]
-                : prev.interactions.filter(
-                    (i) =>
-                      String(i.user) !== String(currentUserId) ||
-                      i.interaction_type !== "like"
-                  ),
-            }
-          : prev
-      );
-    }
-
-    try {
-      await interact({
-        id: planId,
-        data: { interaction_type: "like" },
-      }).unwrap();
-      // Success is handled optimistically, no additional toast needed here
-    } catch (error) {
-      console.error("Failed to update like:", error);
-      // Revert optimistic updates on error
-      setLikeCounts({ ...likeCounts, [planId]: likeCounts[planId] });
-      setIsLiked({ ...isLiked, [planId]: wasLiked });
-      if (selectedPlan && selectedPlan.id === planId) {
-        setSelectedPlan((prev) =>
-          prev
-            ? {
-                ...prev,
-                interactions: wasLiked
-                  ? [
-                      ...prev.interactions,
-                      { user: currentUserId, interaction_type: "like" },
-                    ]
-                  : prev.interactions.filter(
-                      (i) =>
-                        String(i.user) !== String(currentUserId) ||
-                        i.interaction_type !== "like"
-                    ),
-              }
-            : prev
-        );
-      }
-      toast.error("Failed to like the plan");
-    }
-  };
-
-  // Handle share/unshare action
-  const handleShare = async (planId) => {
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to share a plan");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(
-        `http://localhost:5173/post?postid=${planId}`
-      );
-      await interact({
-        id: planId,
-        data: { interaction_type: "share" },
-      }).unwrap();
-      setIsShared((prev) => {
-        const newIsShared = { ...prev, [planId]: !prev[planId] };
-        if (selectedPlan && selectedPlan.id === planId) {
-          setSelectedPlan((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  interactions: newIsShared[planId]
-                    ? [
-                        ...prev.interactions.filter(
-                          (i) =>
-                            String(i.user) !== String(currentUserId) ||
-                            i.interaction_type !== "share"
-                        ),
-                        { user: currentUserId, interaction_type: "share" },
-                      ]
-                    : prev.interactions.filter(
-                        (i) =>
-                          String(i.user) !== String(currentUserId) ||
-                          i.interaction_type !== "share"
-                      ),
-                }
-              : prev
-          );
-        }
-        return newIsShared;
-      });
-      toast.success("Link copied and shared");
-    } catch (error) {
-      console.error("Failed to update share:", error);
-      toast.error("Failed to share plan");
-    }
-  };
 
   // Handle offer form changes
   const handleOfferChange = (e) => {
@@ -251,6 +85,12 @@ const AdminHome = () => {
     }));
   };
 
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
     if (!token) {
@@ -258,8 +98,8 @@ const AdminHome = () => {
       return;
     }
 
-    if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
+    if (!budget || !comment.trim() || !selectedFile) {
+      toast.error("Please provide a budget, a comment, and upload a file");
       return;
     }
 
@@ -271,32 +111,34 @@ const AdminHome = () => {
       return;
     }
 
-    // Set loading state to true
     setIsOfferSubmitting(true);
 
     try {
-      const offerData = {
-        offered_budget: Number.parseFloat(budget),
-        message: comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
-      };
+      // Create FormData to include all required fields
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(budget));
+      formData.append("message", comment);
+      formData.append("apply_discount", offerForm.applyDiscount);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      formData.append("file", selectedFile);
 
       await offerBudgetToBack({
         id: planId,
-        data: offerData,
+        data: formData,
       }).unwrap();
 
       const newOffer = {
-        id: `${currentUserId}-${Date.now()}`,
+        id: `${localStorage.getItem("user_id")}-${Date.now()}`,
         offered_budget: Number.parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
         discount: offerForm.applyDiscount
           ? Number.parseFloat(offerForm.discount)
           : 0,
+        file_name: selectedFile.name,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -321,8 +163,9 @@ const AdminHome = () => {
       setOfferBudget(0);
       setOfferComment("");
       setOfferForm({ applyDiscount: false, discount: "" });
+      setSelectedFile(null);
       toast.success("Offer submitted successfully");
-      navigate("/admin/chat")
+      navigate("/admin/chat");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
@@ -330,7 +173,6 @@ const AdminHome = () => {
           "Failed to submit offer. Only agencies can do this."
       );
     } finally {
-      // Reset loading state
       setIsOfferSubmitting(false);
     }
   };
@@ -343,18 +185,17 @@ const AdminHome = () => {
     }
 
     try {
-      const res = await declineRequest({ id: planId }).unwrap();
-
+      await declineRequest({ id: planId }).unwrap();
       toast.success("Request declined successfully");
     } catch (error) {
       toast.error(error?.data?.error || "Failed to decline request");
     }
   };
+
   // Open/close popup
   const openPopup = (plan, type = "view") => {
     setSelectedPlan({
       ...plan,
-      interactions: plan.interactions || [],
       offers: plan.offers || [],
     });
     setModalType(type);
@@ -368,19 +209,9 @@ const AdminHome = () => {
     setOfferBudget(0);
     setOfferComment("");
     setOfferForm({ applyDiscount: false, discount: "" });
+    setSelectedFile(null);
   };
 
-  // Calculate interaction counts
-  const getInteractionCounts = (plan) => {
-    const likeCount = likeCounts[plan.id] || 0;
-    const shareCount =
-      plan.interactions?.filter(
-        (interaction) => interaction.interaction_type === "share"
-      ).length || 0;
-    return { likeCount, shareCount };
-  };
-
-  // Render content for different tabs
   // Render content for different tabs
   const renderContent = () => {
     switch (activeTab) {
@@ -395,95 +226,90 @@ const AdminHome = () => {
             <div className="text-center text-gray-600">No plans found.</div>
           );
         }
-        return filteredPlans.map((plan) => {
-          const { likeCount, shareCount } = getInteractionCounts(plan);
-          return (
-            <div
-              key={plan.id}
-              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
-            >
-              <div className="flex flex-col lg:flex-row">
-                {/* Image Section */}
-                <div className="lg:flex">
-                  <img
-                    src={
-                      plan.spot_picture_url
-                        ? plan.spot_picture_url
-                        : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                    }
-                    alt={`${plan.location_to || "Tourist spot"}`}
-                    className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
-                  />
+        return filteredPlans.map((plan) => (
+          <div
+            key={plan.id}
+            className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
+          >
+            <div className="flex flex-col lg:flex-row">
+              <div className="lg:flex">
+                <img
+                  src={
+                    plan.spot_picture_url
+                      ? plan.spot_picture_url
+                      : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                  }
+                  alt={`${plan.location_to || "Tourist spot"}`}
+                  className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
+                />
+              </div>
+              <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
+                <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
+                    {plan.location_to}
+                  </h2>
+                  <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                    <p>
+                      Dates:{" "}
+                      <span className="font-medium">
+                        {plan.start_date} — {plan.end_date || plan.start_date}
+                      </span>
+                    </p>
+                    <p>
+                      Total members:{" "}
+                      <span className="font-medium">
+                        {plan.total_members}
+                      </span>
+                    </p>
+                    <p>
+                      Category:{" "}
+                      <span className="font-medium">{plan.category}</span>
+                    </p>
+                  </div>
                 </div>
-                {/* Content and Buttons */}
-                <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
-                  <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
-                      {plan.location_to}
-                    </h2>
-                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                      <p>
-                        Dates:{" "}
-                        <span className="font-medium">
-                          {plan.start_date} — {plan.end_date || plan.start_date}
-                        </span>
+                <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
+                  <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
+                    <div className="text-center lg:text-right">
+                      <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
+                        Budget <FaEuroSign /> {plan.budget}
                       </p>
-                      <p>
-                        Total members:{" "}
-                        <span className="font-medium">
-                          {plan.total_members}
-                        </span>
-                      </p>
-                      <p>
-                        Category:{" "}
-                        <span className="font-medium">{plan.category}</span>
+                      <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                        {plan.total_members} person
                       </p>
                     </div>
-                  </div>
-                  <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
-                    <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
-                      <div className="text-center lg:text-right">
-                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
-                          Budget <FaEuroSign /> {plan.budget}
-                        </p>
-                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                          {plan.total_members} person
-                        </p>
-                      </div>
-                      <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
-                        <button
-                          onClick={() => openPopup(plan, "view")}
-                          className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => openPopup(plan, "offer")}
-                          className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                        >
-                          Send offer
-                        </button>
-                        <button
-                          onClick={() => handleDeclineRequest(plan.id)}
-                          disabled={isDeclineRequestLoading}
-                          className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                            isDeclineRequestLoading
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
-                        >
-                          {isDeclineRequestLoading
-                            ? "Declining..."
-                            : "Decline request"}
-                        </button>
-                      </div>
+                    <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
+                      <button
+                        onClick={() => openPopup(plan, "view")}
+                        className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => openPopup(plan, "offer")}
+                        className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                      >
+                        Send offer
+                      </button>
+                      <button
+                        onClick={() => handleDeclineRequest(plan.id)}
+                        disabled={isDeclineRequestLoading}
+                        className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                          isDeclineRequestLoading
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        {isDeclineRequestLoading
+                          ? "Declining..."
+                          : "Decline request"}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          );
-        });
+          </div>
+        ));
       case "Offered Plans":
         return <AdminOfferPlan />;
       case "Accepted Plans":
@@ -504,26 +330,7 @@ const AdminHome = () => {
                   <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                     {selectedPlan.location_to}
                   </h2>
-                  <div className=" text-xs sm:text-sm lg:text-sm text-gray-600">
-                    {/* <p>
-                      Willing to go on{" "}
-                      <span className="font-medium">
-                        {selectedPlan.start_date}
-                      </span>
-                    </p>
-                    <p>
-                      Include:{" "}
-                      <span className="font-medium">
-                        {selectedPlan.duration}
-                      </span>
-                    </p>
-                    <p>
-                      Category:{" "}
-                      <span className="font-medium">
-                        {selectedPlan.category}
-                      </span>
-                    </p> */}
-
+                  <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                     <div>
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
@@ -532,7 +339,6 @@ const AdminHome = () => {
                           {selectedPlan.tourist_spots || "None"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-500" />
                         <span>
@@ -540,7 +346,6 @@ const AdminHome = () => {
                           {selectedPlan.location_from || "N/A"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <FaList className="w-6 h-5 text-gray-500" />
                         <span>
@@ -548,7 +353,6 @@ const AdminHome = () => {
                           {selectedPlan.minimum_star_hotel || "N/A"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
                         <span>
@@ -556,7 +360,6 @@ const AdminHome = () => {
                           {selectedPlan.meal_plan || "N/A"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-500" />
                         <span>
@@ -566,7 +369,6 @@ const AdminHome = () => {
                           {selectedPlan.type_of_accommodation || "N/A"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-500" />
                         <span>
@@ -574,7 +376,6 @@ const AdminHome = () => {
                           {selectedPlan.duration || "N/A"}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
@@ -665,6 +466,21 @@ const AdminHome = () => {
                 rows="4"
               />
               <div className="mt-4">
+                <label className="block lg:text-md font-medium text-gray-700 mb-1">
+                  Upload File
+                </label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                />
+                {selectedFile && (
+                  <p className="text-xs text-gray-600 mt-1">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+              <div className="mt-4">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -705,12 +521,18 @@ const AdminHome = () => {
                   handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
                 }
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-                  isOfferSubmitting || !offerBudget || !offerComment.trim()
+                  isOfferSubmitting ||
+                  !offerBudget ||
+                  !offerComment.trim() ||
+                  !selectedFile
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
                 disabled={
-                  isOfferSubmitting || !offerBudget || !offerComment.trim()
+                  isOfferSubmitting ||
+                  !offerBudget ||
+                  !offerComment.trim() ||
+                  !selectedFile
                 }
               >
                 <IoIosSend size={24} />
@@ -743,6 +565,11 @@ const AdminHome = () => {
                       <p className="text-xs sm:text-sm text-gray-600">
                         {offer.message}
                       </p>
+                      {offer.file_name && (
+                        <p className="text-xs sm:text-sm text-gray-600">
+                          File: {offer.file_name}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -768,9 +595,7 @@ const AdminHome = () => {
     <div className="min-h-screen">
       <Toaster />
       <div className="flex flex-col lg:flex-row">
-        {/* Main Content */}
         <div className="w-full lg:w-4/5">
-          {/* Header */}
           <div className="mb-4 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
               Welcome,{" "}
@@ -778,7 +603,6 @@ const AdminHome = () => {
                 Choose perfect offer for you
               </span>
             </h1>
-            {/* Search and Filter fields */}
             {activeTab === "All Plans" && (
               <div className="flex items-center space-x-4">
                 <div className="relative w-full lg:max-w-[30vh]">
@@ -815,12 +639,8 @@ const AdminHome = () => {
               </div>
             )}
           </div>
-
-          {/* Dynamic Content */}
           {renderContent()}
         </div>
-
-        {/* Sidebar */}
         <div className="w-full lg:w-1/5 p-3 sm:p-4 lg:p-6 lg:mt-[7.6vh] order-first lg:order-last">
           <div className="space-y-4 lg:space-y-6">
             <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center">
@@ -872,7 +692,6 @@ const AdminHome = () => {
           </div>
         </div>
       </div>
-
       {isPopupOpen && selectedPlan && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
           <div

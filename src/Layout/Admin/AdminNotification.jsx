@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { IoClose, IoEyeOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AdminNotification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -17,6 +18,7 @@ const AdminNotification = () => {
   const [seenNotification] = useSeenNotificationMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
 
   // Request notification permission on component mount
   useEffect(() => {
@@ -27,7 +29,8 @@ const AdminNotification = () => {
 
   // WebSocket for real-time notifications
   useEffect(() => {
-    const baseUrl = "https://transeunt-noncommemoratory-valeria.ngrok-free.app/";
+    const baseUrl =
+      "https://transeunt-noncommemoratory-valeria.ngrok-free.app/";
     const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
@@ -100,8 +103,11 @@ const AdminNotification = () => {
   // Handle view notification
   const handleViewClick = (notification) => {
     console.log("Viewing notification:", notification);
-    // Optionally, open a modal or navigate to a details page
-    // Example: navigate(`/admin/notification/${notification.id}`);
+    if (notification.target_url) {
+      navigate(notification.target_url);
+    } else {
+      toast.error("No target URL available for this notification");
+    }
   };
 
   // Handle delete notification
@@ -158,12 +164,14 @@ const AdminNotification = () => {
         {isNotificationsLoading ? (
           <p className="text-gray-600 text-center">Loading notifications...</p>
         ) : notifications.length === 0 ? (
-          <p className="text-gray-600 text-center">No notifications available.</p>
+          <p className="text-gray-600 text-center">
+            No notifications available.
+          </p>
         ) : (
           notifications.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-lg shadow-sm px-4 py-2 flex flex-col  hover:shadow-md transition-shadow duration-200"
+              className="bg-white rounded-lg shadow-sm px-4 py-2 flex flex-col hover:shadow-md transition-shadow duration-200"
             >
               <p className="text-sm sm:text-[15px] text-gray-700 font-medium">
                 {item.message}
