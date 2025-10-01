@@ -139,7 +139,7 @@ function Messages() {
               (pm) =>
                 pm.message_type === serverMessage.message_type &&
                 (pm.text === serverMessage.text ||
-                  (pm.text === null && serverMessage.text === null)) && 
+                  (pm.text === null && serverMessage.text === null)) &&
                 Math.abs(
                   pm.timestamp.getTime() - serverMessage.timestamp.getTime()
                 ) < 2000
@@ -227,93 +227,114 @@ function Messages() {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Auto-send the file
-      if (!selectedDropdown && !agency?.tour_plan_id) {
-        alert("Please select a tour plan first");
+        // Auto-send the file
+        if (!selectedDropdown && !agency?.tour_plan_id) {
+            alert("Please select a tour plan first");
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+            return;
+        }
+
+        const tempId = uuidv4();
+        const messageId = uuidv4();
+        const tourPlan = dropdownOptions.find(
+            (opt) => opt.value === selectedDropdown
+        );
+
+        // --- START OF FIX ---
+
+        // Create a local preview URL for ALL file types
+        const filePreviewUrl = URL.createObjectURL(file);
+
+        // Determine if it's an image
+        const isImage = file.type.startsWith("image/");
+        
+        // Use the actual file object or its name for local rendering
+        const localFileName = file.name;
+
+        // --- END OF FIX ---
+
+
+        const localMessage = {
+            id: messageId,
+            message_type: "file",
+            text: null,
+            data: null,
+            tour_plan_id: selectedDropdown,
+            tour_plan_title: tourPlan?.label || null,
+            // Use the local object URL for preview (image or generic file link)
+            file: filePreviewUrl,
+            // Store the original file object or name for temporary display
+            localFileName: localFileName, // <-- NEW
+            isUser: true,
+            timestamp: new Date(),
+            is_read: false,
+            status: "sending",
+            tempId,
+        };
+        
+        // Remove the existing 'setSelectedFile' usage as it only supports one file
+
+        setMessages((prev) => [...prev, localMessage]);
+        pendingMessagesRef.current.set(tempId, localMessage);
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await sentMessage({
+                id: Number(id),
+                data: formData,
+            }).unwrap();
+
+            // Clean up preview URL
+            if (filePreviewUrl) {
+                URL.revokeObjectURL(filePreviewUrl);
+            }
+
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.tempId === tempId
+                        ? {
+                              ...msg,
+                              id: response.id || msg.id,
+                              file: response.file
+                                  ? response.file.startsWith("http")
+                                      ? response.file
+                                      : `${FILE_BASE_URL}${response.file}`
+                                  : null,
+                              text: response.text || null,
+                              status: "sent",
+                              tempId: undefined,
+                              localFileName: undefined, // <-- NEW: Clean up local file name
+                          }
+                        : msg
+                )
+            );
+            pendingMessagesRef.current.delete(tempId);
+        } catch (error) {
+            console.error("Failed to send file message:", error);
+            toast.error("Failed to send file message");
+            // Clean up preview URL on failure
+            if (filePreviewUrl) {
+                URL.revokeObjectURL(filePreviewUrl);
+            }
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.tempId === tempId ? { ...msg, status: "failed", localFileName: undefined } : msg
+                )
+            );
+            pendingMessagesRef.current.delete(tempId);
+        }
+
         if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+            fileInputRef.current.value = "";
         }
-        return;
-      }
-
-      const tempId = uuidv4();
-      const messageId = uuidv4();
-      const tourPlan = dropdownOptions.find(
-        (opt) => opt.value === selectedDropdown
-      );
-
-      // Create preview URL for image
-      const filePreviewUrl = file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : null;
-
-      const localMessage = {
-        id: messageId,
-        message_type: "file",
-        text: null,
-        data: null,
-        tour_plan_id: selectedDropdown,
-        tour_plan_title: tourPlan?.label || null,
-        file: filePreviewUrl,
-        isUser: true,
-        timestamp: new Date(),
-        is_read: false,
-        status: "sending",
-        tempId,
-      };
-      setMessages((prev) => [...prev, localMessage]);
-      pendingMessagesRef.current.set(tempId, localMessage);
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await sentMessage({
-          id: Number(id),
-          data: formData,
-        }).unwrap();
-
-        // Clean up preview URL
-        if (filePreviewUrl) {
-          URL.revokeObjectURL(filePreviewUrl);
-        }
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.tempId === tempId
-              ? {
-                  ...msg,
-                  id: response.id || msg.id,
-                  file: response.file
-                    ? response.file.startsWith("http")
-                      ? response.file
-                      : `${FILE_BASE_URL}${response.file}`
-                    : null,
-                  text: response.text || null,
-                  status: "sent",
-                  tempId: undefined,
-                }
-              : msg
-          )
-        );
-        pendingMessagesRef.current.delete(tempId);
-      } catch (error) {
-        console.error("Failed to send file message:", error);
-        toast.error("Failed to send file message");
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.tempId === tempId ? { ...msg, status: "failed" } : msg
-          )
-        );
-        pendingMessagesRef.current.delete(tempId);
-      }
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-      inputRef.current?.focus();
+        inputRef.current?.focus();
     }
-  };
+};
+
 
   // Handle sending text message
   const handleSendMessage = async () => {
