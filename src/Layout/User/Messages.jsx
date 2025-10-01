@@ -20,7 +20,6 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
-
 function Messages() {
   const { id } = useParams();
   console.log(id);
@@ -45,7 +44,7 @@ function Messages() {
     refetch: refetchChatList,
   } = useGetChatListQuery();
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
-  
+
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
@@ -108,9 +107,10 @@ function Messages() {
           return;
         }
 
-        const inner = received;
+        // IMPORTANT: message data আসছে received.message এর ভিতরে
+        const inner = received.message || received;
 
-        // Determine message type based on file presence
+        // Determine message type
         let messageType = "text";
         if (inner.file) {
           messageType = "file";
@@ -125,18 +125,14 @@ function Messages() {
           data: null,
           tour_plan_id: inner.tour_plan_id || null,
           tour_plan_title: inner.tour_plan_title || null,
-          file: inner.file
-            ? inner.file.startsWith("http")
-              ? inner.file
-              : `${FILE_BASE_URL}${inner.file}`
-            : null,
+          file: inner.file || inner.file_url || null, // file অথবা file_url যেটা আসবে
           isUser: String(inner.sender?.user_id) === userId,
           timestamp: new Date(inner.timestamp),
           is_read: inner.is_read,
           status: "sent",
         };
 
-        // Add message to state, avoiding duplicates
+        // Add message avoiding duplicates
         setMessages((prev) => {
           const exists = prev.some((msg) => msg.id === serverMessage.id);
           if (exists) {
