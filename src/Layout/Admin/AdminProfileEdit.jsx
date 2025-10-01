@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useMemo } from "react";
 import { GoArrowLeft } from "react-icons/go";
@@ -69,7 +70,7 @@ const AdminProfileEdit = () => {
         console.error("Error parsing service_categories:", err);
       }
     }
-  }, [profileData, reset]); // Removed reverseCategoryMap from dependencies
+  }, [profileData, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -93,6 +94,7 @@ const AdminProfileEdit = () => {
       const response = await adminProfile(formData).unwrap();
       console.log("Profile Updated:", response);
       alert("Agency profile updated successfully!");
+      window.location.reload(); // Reload the page once after alert is dismissed
     } catch (err) {
       console.error("Failed to update profile:", err);
       alert("Failed to update agency profile. Please try again.");

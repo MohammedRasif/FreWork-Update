@@ -10,8 +10,27 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import FullScreenInfinityLoader from "@/lib/Loading";
 
-// গ্লোবাল ফ্ল্যাগ যাতে API একবারই লোড হয়
+// Global flag to ensure Google Maps script loads only once
 let isGoogleScriptLoaded = false;
+
+// Loading Popup Component
+const LoadingPopup = () => {
+  return (
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-[5px] bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
+        {/* AI-themed loading animation */}
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-2 border-4 border-blue-300 border-t-transparent rounded-full animate-spin animation-delay-200"></div>
+          <div className="absolute inset-4 border-4 border-blue-100 border-t-transparent rounded-full animate-spin animation-delay-400"></div>
+        </div>
+        <p className="text-lg font-semibold text-gray-700">
+          Please wait, AI is generating your travel image...
+        </p>
+      </div>
+    </div>
+  );
+};
 
 const CreatePlan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -115,10 +134,9 @@ const CreatePlan = () => {
       if (touristSpotsRef.current) {
         console.log("Setting up autocomplete for touristSpots");
         const touristSpotsAutocomplete =
-          new window.google.maps.places.Autocomplete(
-            touristSpotsRef.current,
-            { types: ["point_of_interest", "tourist_attraction"] } // Restrict to tourist spots
-          );
+          new window.google.maps.places.Autocomplete(touristSpotsRef.current, {
+            types: ["point_of_interest", "tourist_attraction"],
+          });
         touristSpotsAutocomplete.addListener("place_changed", () => {
           const place = touristSpotsAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
@@ -139,7 +157,7 @@ const CreatePlan = () => {
       script.defer = true;
       script.onload = () => {
         console.log("Google Maps script loaded successfully");
-        setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
+        setTimeout(initAutocomplete, 100);
       };
       script.onerror = () => {
         console.error("Failed to load Google Maps API");
@@ -148,7 +166,7 @@ const CreatePlan = () => {
       document.head.appendChild(script);
     } else if (window.google) {
       console.log("Google Maps already loaded, initializing autocomplete...");
-      setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
+      setTimeout(initAutocomplete, 100);
     }
 
     return () => {
@@ -186,10 +204,7 @@ const CreatePlan = () => {
     formData.append("meal_plan", data.mealPlan);
     formData.append("status", status);
     formData.append("tourist_spots", data.touristSpots);
-    formData.append(
-      "is_confirmed_request",
-      data.confirmation ? "true" : "false"
-    );
+    formData.append("is_confirmed_request", data.confirmation ? "true" : "false");
 
     if (selectedFile) {
       formData.append("spot_picture", selectedFile);
@@ -213,9 +228,7 @@ const CreatePlan = () => {
       }
       navigate("/user");
     } catch (error) {
-      toast.error(
-        `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
-      );
+      toast.error(`Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`);
     } finally {
       if (status === "draft") {
         setIsSavingDraft(false);
@@ -241,17 +254,16 @@ const CreatePlan = () => {
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location to is required",
   });
-  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
-    "touristSpots",
-    {
-      required: "Tourist spots are required",
-    }
-  );
+  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register("touristSpots", {
+    required: "Tourist spots are required",
+  });
 
   return (
     <div className="p-6">
       <div className="mx-auto">
         <Toaster />
+        {/* Show loading popup when saving or publishing */}
+        {(isSavingDraft || isPublishing) && <LoadingPopup />}
         {/* Header */}
         <div className="flex items-center mb-8">
           <NavLink to="/user">
@@ -282,9 +294,7 @@ const CreatePlan = () => {
                 {...register("name", { required: "Name is required" })}
               />
               {errors.name && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.name.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.name.message}</p>
               )}
             </div>
             <div>
@@ -304,9 +314,7 @@ const CreatePlan = () => {
                 })}
               />
               {errors.email && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.email.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.email.message}</p>
               )}
             </div>
           </div>
@@ -329,9 +337,7 @@ const CreatePlan = () => {
                 })}
               />
               {errors.phoneNumber && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.phoneNumber.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.phoneNumber.message}</p>
               )}
             </div>
             <div className="flex flex-row gap-4">
@@ -429,9 +435,7 @@ const CreatePlan = () => {
                 }}
               />
               {errors.locationFrom && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.locationFrom.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.locationFrom.message}</p>
               )}
             </div>
             <div>
@@ -449,9 +453,7 @@ const CreatePlan = () => {
                 }}
               />
               {errors.locationTo && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.locationTo.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.locationTo.message}</p>
               )}
             </div>
           </div>
@@ -473,9 +475,7 @@ const CreatePlan = () => {
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
               {errors.startingDate && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.startingDate.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.startingDate.message}</p>
               )}
             </div>
             <div>
@@ -493,9 +493,7 @@ const CreatePlan = () => {
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
               {errors.endingDate && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.endingDate.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.endingDate.message}</p>
               )}
             </div>
           </div>
@@ -519,9 +517,7 @@ const CreatePlan = () => {
                   })}
                 />
                 {errors.adult && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.adult.message}
-                  </p>
+                  <p className="text-red-500 text-[14px] mt-1">{errors.adult.message}</p>
                 )}
               </div>
               <div className="flex-1">
@@ -540,9 +536,7 @@ const CreatePlan = () => {
                   })}
                 />
                 {errors.child && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.child.message}
-                  </p>
+                  <p className="text-red-500 text-[14px] mt-1">{errors.child.message}</p>
                 )}
               </div>
             </div>
@@ -560,16 +554,13 @@ const CreatePlan = () => {
                 })}
               />
               {errors.budget && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.budget.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.budget.message}</p>
               )}
             </div>
           </div>
 
-          {/* Row 5: Tourist Spots & Upload Picture */}
+          {/* Row 5: Tourist Spots & Meal Plan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 Tourist Spots
@@ -586,50 +577,7 @@ const CreatePlan = () => {
                 }}
               />
               {errors.touristSpots && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.touristSpots.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Upload Picture (Optional)
-              </label>
-              <div className="flex items-center bg-white gap-3">
-                <label className="bg-gray-200 px-4 py-2 rounded-l-md cursor-pointer transition-colors border border-gray-300">
-                  <span className="text-[14px] text-gray-600">Choose file</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                  />
-                </label>
-                <span className="text-[14px] text-gray-500 flex-1">
-                  {selectedFile ? selectedFile.name : "No file chosen"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 6: Description & Meal Plan */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                placeholder="Enter here"
-                rows={4}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                {...register("description", {
-                  required: "Description is required",
-                })}
-              />
-              {errors.description && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.description.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.touristSpots.message}</p>
               )}
             </div>
             <div>
@@ -645,15 +593,31 @@ const CreatePlan = () => {
                 </option>
                 <option value="none">No Meals</option>
                 <option value="breakfast">Breakfast</option>
-                <option value="half-board">
-                  Half-Board (Breakfast & Dinner)
-                </option>
+                <option value="half-board">Half-Board (Breakfast & Dinner)</option>
                 <option value="full-board">Full-Board (All Meals)</option>
               </select>
               {errors.mealPlan && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.mealPlan.message}
-                </p>
+                <p className="text-red-500 text-[14px] mt-1">{errors.mealPlan.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Row 6: Description */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                placeholder="Enter here"
+                rows={4}
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                {...register("description", {
+                  required: "Description is required",
+                })}
+              />
+              {errors.description && (
+                <p className="text-red-500 text-[14px] mt-1">{errors.description.message}</p>
               )}
             </div>
           </div>
@@ -668,18 +632,12 @@ const CreatePlan = () => {
                 required: "Please confirm the information",
               })}
             />
-            <label
-              htmlFor="confirmation"
-              className="text-[15px] text-gray-600 leading-relaxed"
-            >
-              I confirm this is a travel request, and all provided information
-              is valid and does not include any third party.
+            <label htmlFor="confirmation" className="text-[15px] text-gray-600 leading-relaxed">
+              I confirm this is a travel request, and all provided information is valid and does not include any third party.
             </label>
           </div>
           {errors.confirmation && (
-            <p className="text-red-500 text-[14px] mt-1">
-              {errors.confirmation.message}
-            </p>
+            <p className="text-red-500 text-[14px] mt-1">{errors.confirmation.message}</p>
           )}
 
           {/* Action Buttons */}

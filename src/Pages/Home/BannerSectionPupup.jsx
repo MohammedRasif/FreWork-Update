@@ -9,6 +9,25 @@ import { useForm } from "react-hook-form";
 
 let isGoogleScriptLoaded = false;
 
+// Loading Popup Component
+const LoadingPopup = () => {
+  return (
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-[5px] bg-opacity-50 flex items-center justify-center z-[1002]">
+      <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
+        {/* AI-themed loading animation */}
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-[#FF6600] border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-2 border-4 border-[#e55600] border-t-transparent rounded-full animate-spin animation-delay-200"></div>
+          <div className="absolute inset-4 border-4 border-[#ff8c40] border-t-transparent rounded-full animate-spin animation-delay-400"></div>
+        </div>
+        <p className="text-lg font-semibold text-gray-700">
+          Please wait, AI is generating your travel image...
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const totalSteps = 5;
 
@@ -21,8 +40,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     locationTo: "",
     startingDate: "",
     endingDate: "",
-    adults: "",
-    children: "",
+    adults: 0, // Changed to 0 for safety
+    children: 0, // Changed to 0 for safety
     budget: "",
     touristSpots: "",
     description: "",
@@ -120,9 +139,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
   }, [state?.id, setValue]);
 
-  // Load Google Maps script and initialize autocomplete
-  // Replace the existing Google Maps useEffect with these two useEffect hooks
-
   // Load Google Maps script
   useEffect(() => {
     const loadGoogleMaps = () => {
@@ -215,7 +231,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (window.google) {
       setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
     }
-  }, [setValue, currentStep]); // Add currentStep as a dependency
+  }, [setValue, currentStep]);
 
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
@@ -362,6 +378,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
+      {/* Show loading popup when saving or publishing */}
+      {(isSavingDraft || isPublishing) && <LoadingPopup />}
       {/* Progress Bar */}
       <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
         <div className="flex justify-between items-center mb-2 sm:mb-3">
@@ -389,59 +407,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         {/* Step 1: Basic Information */}
         {currentStep === 1 && (
           <div className="space-y-3 sm:space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Location (From)
-                </label>
-                <input
-                  {...fromRest}
-                  type="text"
-                  placeholder="Starting location"
-                  defaultValue={formData.locationFrom}
-                  onChange={(e) => {
-                    updateFormData("locationFrom", e.target.value);
-                    setValue("locationFrom", e.target.value);
-                  }}
-                  ref={(e) => {
-                    fromFormRef(e);
-                    locationFromRef.current = e;
-                  }}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.locationFrom && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.locationFrom.message}
-                  </span>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Location (To)
-                </label>
-                <input
-                  {...toRest}
-                  type="text"
-                  placeholder="Destination"
-                  defaultValue={formData.locationTo}
-                  onChange={(e) => {
-                    updateFormData("locationTo", e.target.value);
-                    setValue("locationTo", e.target.value);
-                  }}
-                  ref={(e) => {
-                    toFormRef(e);
-                    locationToRef.current = e;
-                  }}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.locationTo && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.locationTo.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
@@ -531,6 +496,58 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         {/* Step 2: Details */}
         {currentStep === 2 && (
           <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Location (From)
+                </label>
+                <input
+                  {...fromRest}
+                  type="text"
+                  placeholder="Starting location"
+                  defaultValue={formData.locationFrom}
+                  onChange={(e) => {
+                    updateFormData("locationFrom", e.target.value);
+                    setValue("locationFrom", e.target.value);
+                  }}
+                  ref={(e) => {
+                    fromFormRef(e);
+                    locationFromRef.current = e;
+                  }}
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                />
+                {errors.locationFrom && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.locationFrom.message}
+                  </span>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Location (To)
+                </label>
+                <input
+                  {...toRest}
+                  type="text"
+                  placeholder="Destination"
+                  defaultValue={formData.locationTo}
+                  onChange={(e) => {
+                    updateFormData("locationTo", e.target.value);
+                    setValue("locationTo", e.target.value);
+                  }}
+                  ref={(e) => {
+                    toFormRef(e);
+                    locationToRef.current = e;
+                  }}
+                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                />
+                {errors.locationTo && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {errors.locationTo.message}
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
@@ -571,7 +588,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     console.log("touristSpotsRef set:", !!e);
                   }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                  style={{ zIndex: 1001 }} // Ensure input is above other elements
+                  style={{ zIndex: 1001 }}
                 />
                 {errors.touristSpots && (
                   <span className="text-red-500 text-xs mt-1">
@@ -600,25 +617,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   {errors.description.message}
                 </span>
               )}
-            </div>
-
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                Upload Picture (Optional)
-              </label>
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-3 sm:p-4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="w-full text-xs sm:text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 sm:file:py-2 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-[#FF6600] file:text-white hover:file:bg-[#e55600] transition-all duration-200"
-                />
-                {selectedFile && (
-                  <p className="mt-2 text-xs sm:text-sm text-gray-600">
-                    Selected: {selectedFile.name}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -782,11 +780,17 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </p>
                 <p>
                   <span className="font-medium">Dates:</span>{" "}
-                  {formData.startingDate} to {formData.endingDate}
+                  {formData.startingDate && formData.endingDate
+                    ? `${formData.startingDate} to ${formData.endingDate}`
+                    : "Not specified"}
                 </p>
                 <p>
                   <span className="font-medium">Travelers:</span>{" "}
-                  {formData.adults} adults, {formData.children} children
+                  {formData.adults || formData.children
+                    ? `${formData.adults || 0} adults, ${
+                        formData.children || 0
+                      } children`
+                    : "Not specified"}
                 </p>
                 <p>
                   <span className="font-medium">Budget:</span>{" "}

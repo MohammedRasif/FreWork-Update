@@ -1,4 +1,4 @@
-const baseUrl = "ws://10.10.13.59:8008";
+const baseUrl = "ws://well-anteater-happy.ngrok-free.app";
 const token = localStorage.getItem("access_token");
 const notification_url = `${baseUrl}/ws/notifications/?token=${token}`;
 function chat_sockit(id) {

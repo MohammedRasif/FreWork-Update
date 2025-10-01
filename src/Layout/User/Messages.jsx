@@ -20,8 +20,6 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
-// NOTE: FILE_BASE_URL is assumed to be defined elsewhere (e.g., in a config file)
-const FILE_BASE_URL = "https://your-api-base-url";
 
 function Messages() {
   const { id } = useParams();
@@ -47,6 +45,7 @@ function Messages() {
     refetch: refetchChatList,
   } = useGetChatListQuery();
   const { data, isLoading, error } = useGetChatHsitoryQuery(id);
+  
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);

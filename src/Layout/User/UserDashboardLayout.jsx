@@ -141,7 +141,7 @@ export default function UserDashboardLayout() {
       console.error("No token found, WebSocket connection aborted");
       return;
     }
-    const baseUrl = "transeunt-noncommemoratory-valeria.ngrok-free.app";
+    const baseUrl = "well-anteater-happy.ngrok-free.app";
     const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
