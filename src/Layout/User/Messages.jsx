@@ -133,14 +133,13 @@ function Messages() {
 
         setMessages((prev) => {
           if (serverMessage.isUser) {
-            // Check for matching pending message (text/file content, type, and timestamp within 2 seconds)
             const matchingPending = Array.from(
               pendingMessagesRef.current.values()
             ).find(
               (pm) =>
                 pm.message_type === serverMessage.message_type &&
                 (pm.text === serverMessage.text ||
-                  (pm.text === null && serverMessage.text === null)) && // Handles text or file (null text)
+                  (pm.text === null && serverMessage.text === null)) && 
                 Math.abs(
                   pm.timestamp.getTime() - serverMessage.timestamp.getTime()
                 ) < 2000
@@ -262,7 +261,6 @@ function Messages() {
         status: "sending",
         tempId,
       };
-
       setMessages((prev) => [...prev, localMessage]);
       pendingMessagesRef.current.set(tempId, localMessage);
 
