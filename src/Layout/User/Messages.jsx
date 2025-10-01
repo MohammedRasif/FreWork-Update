@@ -1,5 +1,3 @@
-
-
 import { useState, useRef, useEffect } from "react";
 import {
   SendIcon,
@@ -22,8 +20,8 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
-// Base URL for file hosting (replace with your actual server URL)
-const FILE_BASE_URL = "https://your-server.com";
+// NOTE: FILE_BASE_URL is assumed to be defined elsewhere (e.g., in a config file)
+const FILE_BASE_URL = "https://your-api-base-url";
 
 function Messages() {
   const { id } = useParams();
@@ -466,20 +464,14 @@ function Messages() {
         const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
         const messageId = uuidv4();
         const tempId = uuidv4();
-        const messageObj = {
-          id: messageId,
-          message_type: "start_conversation",
-          message: `Conversation started regarding tour plan: ${
-            tourPlan?.label || "Unknown"
-          }`,
-          data: null,
-          tempId,
-        };
+        const messageText = `Conversation started regarding tour plan: ${
+          tourPlan?.label || "Unknown"
+        }`;
 
         const localMessage = {
           id: messageId,
           message_type: "start_conversation",
-          text: messageObj.message,
+          text: messageText,
           data: new Date(),
           tour_plan_id: selectedId,
           tour_plan_title: tourPlan?.label || null,
@@ -647,13 +639,6 @@ function Messages() {
             )}
           </div>
         );
-      case "start_conversation":
-        return (
-          <p className="text-blue-600 italic">
-            {message.text}{" "}
-            {message.tour_plan_title && `(${message.tour_plan_title})`}
-          </p>
-        );
       default:
         return <p>Unknown message type: {message.text}</p>;
     }
@@ -718,55 +703,81 @@ function Messages() {
       </div>
       {/* Messages Section */}
       <div className="flex-1 p-4 space-y-4 overflow-y-auto relative">
-        {messages.map((message) => (
-          <div key={message.id || message.tempId}>
-            {message.isUser ? (
-              <div className="flex justify-end space-x-2">
-                <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium">
-                  {renderMessageContent(message)}
-                  <div className="flex items-center justify-end mt-1 space-x-1">
-                    {message.status === "sending" && (
-                      <ClockIcon className="h-3 w-3 text-gray-300" />
-                    )}
-                    {message.status === "sent" && (
-                      <CheckIcon className="h-3 w-3 text-green-300" />
-                    )}
-                    {message.status === "failed" && (
-                      <button
-                        onClick={() => handleRetryMessage(message.tempId)}
-                        className="text-red-300 hover:text-red-400"
-                      >
-                        <XIcon className="h-3 w-3" />
-                      </button>
-                    )}
-                    <span className="text-[8px] text-gray-300">
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+        {messages.map((message) => {
+          // FIX: Don't render empty message bubbles
+          if (
+            !message.text &&
+            !message.file &&
+            message.message_type !== "start_conversation"
+          ) {
+            return null;
+          }
+
+          // Render 'start_conversation' as a system message
+          if (message.message_type === "start_conversation") {
+            return (
+              <div
+                key={message.id || message.tempId}
+                className="flex justify-center w-full"
+              >
+                <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full italic max-w-sm text-center">
+                  {message.text}
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div key={message.id || message.tempId}>
+              {message.isUser ? (
+                <div className="flex justify-end space-x-2">
+                  <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium">
+                    {renderMessageContent(message)}
+                    <div className="flex items-center justify-end mt-1 space-x-1">
+                      {message.status === "sending" && (
+                        <ClockIcon className="h-3 w-3 text-gray-300" />
+                      )}
+                      {message.status === "sent" && (
+                        <CheckIcon className="h-3 w-3 text-green-300" />
+                      )}
+                      {message.status === "failed" && (
+                        <button
+                          onClick={() => handleRetryMessage(message.tempId)}
+                          className="text-red-300 hover:text-red-400"
+                        >
+                          <XIcon className="h-3 w-3" />
+                        </button>
+                      )}
+                      <span className="text-[8px] text-gray-300">
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">You</span>
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-xs text-gray-600">You</span>
+              ) : (
+                <div className="flex items-start space-x-2">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={agency.image}
+                      alt={agency.name}
+                    />
+                  </div>
+                  <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
+                    {renderMessageContent(message)}
+                    {/* Time removed */}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-start space-x-2">
-                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  <img
-                    className="w-full h-full object-cover"
-                    src={agency.image}
-                    alt={agency.name}
-                  />
-                </div>
-                <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
-                  {renderMessageContent(message)}
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
         {currentChat?.final_offer_sent === null && (
           <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
