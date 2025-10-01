@@ -107,7 +107,6 @@ function Messages() {
           return;
         }
 
-        // IMPORTANT: message data আসছে received.message এর ভিতরে
         const inner = received.message || received;
 
         // Determine message type
@@ -125,15 +124,44 @@ function Messages() {
           data: null,
           tour_plan_id: inner.tour_plan_id || null,
           tour_plan_title: inner.tour_plan_title || null,
-          file: inner.file || inner.file_url || null, // file অথবা file_url যেটা আসবে
+          file: inner.file || inner.file_url || null,
           isUser: String(inner.sender?.user_id) === userId,
           timestamp: new Date(inner.timestamp),
           is_read: inner.is_read,
           status: "sent",
         };
 
-        // Add message avoiding duplicates
         setMessages((prev) => {
+          if (serverMessage.isUser) {
+            // Check for matching pending message (text/file content, type, and timestamp within 2 seconds)
+            const matchingPending = Array.from(
+              pendingMessagesRef.current.values()
+            ).find(
+              (pm) =>
+                pm.message_type === serverMessage.message_type &&
+                (pm.text === serverMessage.text ||
+                  (pm.text === null && serverMessage.text === null)) && // Handles text or file (null text)
+                Math.abs(
+                  pm.timestamp.getTime() - serverMessage.timestamp.getTime()
+                ) < 2000
+            );
+
+            if (matchingPending) {
+              // Update the pending message with server ID and status, don't add new
+              return prev.map((msg) =>
+                msg.tempId === matchingPending.tempId
+                  ? {
+                      ...msg,
+                      id: serverMessage.id,
+                      status: "sent",
+                      tempId: undefined,
+                    }
+                  : msg
+              );
+            }
+          }
+
+          // If no match or not user's message, add if it doesn't exist
           const exists = prev.some((msg) => msg.id === serverMessage.id);
           if (exists) {
             return prev;
