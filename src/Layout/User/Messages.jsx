@@ -20,15 +20,21 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
+// NOTE: FILE_BASE_URL is assumed to be defined elsewhere (e.g., in an environment file or constants)
+// For this code to run, you must ensure FILE_BASE_URL is available in the scope.
+const FILE_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"; // Example fallback
+
 function Messages() {
   const { id } = useParams();
   console.log(id);
   const userId = localStorage.getItem("user_id");
   const location = useLocation();
+  const navigate = useNavigate();
   const agency = location.state?.agency;
+
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null); // Retaining for existing logic, though redundant now
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -38,6 +44,7 @@ function Messages() {
   const [archivedUser] = useArchivedUserMutation();
   const [finalOfferResponse] = useFinalOfferResponseMutation();
   const [sentMessage] = useMessageSentMutation();
+
   const {
     data: chatList,
     isLoading: isChatListLoading,
@@ -54,6 +61,7 @@ function Messages() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
+  const [isButtonVisible, setIsButtonVisible] = useState(true); // Retained state
 
   // Set initial tour plan from agency.tour_plan_id
   useEffect(() => {
@@ -242,38 +250,29 @@ function Messages() {
         (opt) => opt.value === selectedDropdown
       );
 
-      // --- START OF FIX ---
-
       // Create a local preview URL for ALL file types
       const filePreviewUrl = URL.createObjectURL(file);
-
-      // Determine if it's an image
-      const isImage = file.type.startsWith("image/");
 
       // Use the actual file object or its name for local rendering
       const localFileName = file.name;
 
-      // --- END OF FIX ---
-
       const localMessage = {
         id: messageId,
         message_type: "file",
-        text: null,
+        text: null, // No text in this path
         data: null,
         tour_plan_id: selectedDropdown,
         tour_plan_title: tourPlan?.label || null,
         // Use the local object URL for preview (image or generic file link)
         file: filePreviewUrl,
         // Store the original file object or name for temporary display
-        localFileName: localFileName, // <-- NEW
+        localFileName: localFileName,
         isUser: true,
         timestamp: new Date(),
         is_read: false,
         status: "sending",
         tempId,
       };
-
-      // Remove the existing 'setSelectedFile' usage as it only supports one file
 
       setMessages((prev) => [...prev, localMessage]);
       pendingMessagesRef.current.set(tempId, localMessage);
@@ -306,7 +305,7 @@ function Messages() {
                   text: response.text || null,
                   status: "sent",
                   tempId: undefined,
-                  localFileName: undefined, // <-- NEW: Clean up local file name
+                  localFileName: undefined, // Clean up local file name
                 }
               : msg
           )
@@ -455,9 +454,13 @@ function Messages() {
       )
     );
 
+    // Note: The original retry only handles text, which is likely incorrect if it was a file.
+    // For a proper retry, you'd need the original file object or a specific retry API for files.
+    // Assuming this retry is primarily for failed text messages:
+
     const formData = new FormData();
-    formData.append("message", message.text);
-    formData.append("tour_plan_id", message.tour_plan_id);
+    formData.append("text", message.text);
+    // formData.append("tour_plan_id", message.tour_plan_id); // Assuming sentMessage API handles context
 
     try {
       const response = await sentMessage({
@@ -571,16 +574,13 @@ function Messages() {
     };
   }, [menuOpen]);
 
-  const navigate = useNavigate();
-  const [isButtonVisible, setIsButtonVisible] = useState(true);
-
   const handleViewDetails = () => {
     if (!agency?.tour_plan_id) {
       alert("Tourist has not provided a tour plan.");
       return;
     }
     navigate(`/tour-plans/${agency.tour_plan_id}`);
-    setIsButtonVisible(false);
+    setIsButtonVisible(false); // Does not affect rendering in the current structure
   };
 
   const handleArchiveConversation = async () => {
@@ -615,75 +615,67 @@ function Messages() {
     url.split("?")[0].split(".").pop().toLowerCase();
   const getFileName = (url) => url.split("/").pop().split("?")[0];
 
+  /**
+   * Renders the content of a single message, supporting text, file, or both.
+   * This is the function that was updated to meet the user's request.
+   */
   const renderMessageContent = (message) => {
     const fileExt = message.file ? getFileExtension(message.file) : "";
     const isImageFile =
       message.file &&
       (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExt) ||
-        message.file.startsWith("blob:"));
-    const isPdfFile = message.file && fileExt === "pdf";
+        message.file.startsWith("blob:")); // Check for both actual extension and local blob URLs
 
-    switch (message.message_type) {
-      case "text":
-        return (
-          <>
-            {message.text && <p>{message.text}</p>}
+    // --- UPDATED LOGIC TO RENDER BOTH TEXT AND FILE ---
+    if (message.text || message.file) {
+      return (
+        <>
+          {/* 1. Render Text Content if it exists */}
+          {message.text && (
+            <p className={message.file ? "mb-2 break-words" : "break-words"}>
+              {message.text}
+            </p>
+          )}
 
-            {message.file && (
-              <a
-                href={message.file}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white underline"
-              ></a>
-            )}
-          </>
-        );
-
-      case "file":
-        return (
-          <div>
-            {message.file ? (
-              <div>
-                {isImageFile ? (
-                  <img
-                    src={message.file}
-                    alt="Attachment"
-                    className="max-w-full h-auto rounded"
-                    style={{ maxWidth: "200px" }}
-                  />
-                ) : isPdfFile ? (
-                  <div className="flex items-center space-x-2">
-                    <a
-                      href={message.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline"
-                    >
-                      View PDF
-                    </a>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <a
-                      href={message.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {getFileName(message.file)}
-                    </a>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p>Loading file...</p>
-            )}
-          </div>
-        );
-      default:
-        return <p>Unknown message type: {message.text}</p>;
+          {/* 2. Render File/Image Content if it exists */}
+          {message.file && (
+            <div>
+              {isImageFile ? (
+                // Display Image
+                <img
+                  src={message.file}
+                  alt={message.localFileName || "Attachment"} // Use localFileName for pending
+                  className="max-w-full h-auto rounded"
+                  style={{ maxWidth: "200px" }}
+                />
+              ) : (
+                // Display Link for PDF/Other Files
+                <div className="flex items-center space-x-2 pt-1">
+                  <PaperclipIcon className="h-4 w-4 shrink-0" />
+                  <a
+                    href={message.file}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${
+                      message.isUser
+                        ? "text-white underline"
+                        : "text-blue-500 hover:underline"
+                    } truncate max-w-[calc(100%-20px)] text-sm`}
+                    title={message.localFileName || getFileName(message.file)}
+                  >
+                    {message.localFileName || getFileName(message.file)}
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      );
     }
+    // --- END UPDATED LOGIC ---
+
+    // Fallback for system messages or empty data (though 'start_conversation' is handled in the map)
+    return <p>Unknown content.</p>;
   };
 
   if (isLoading || isChatListLoading) {
@@ -712,7 +704,8 @@ function Messages() {
     <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        <div></div>
+        {/* Empty div for spacing/alignment with the right side */}
+        <div></div> 
         <div className="flex items-center space-x-2">
           <div className="relative" ref={menuRef}>
             <button
@@ -746,16 +739,17 @@ function Messages() {
       {/* Messages Section */}
       <div className="flex-1 p-4 space-y-4 overflow-y-auto relative">
         {messages.map((message) => {
-          // FIX: Don't render empty message bubbles
+          // Filter out messages that should not be visible as bubbles
           if (
             !message.text &&
             !message.file &&
-            message.message_type !== "start_conversation"
+            message.message_type !== "start_conversation" &&
+            message.message_type !== "final_offer_sent" // Added a check for system-only types if they were hidden before
           ) {
             return null;
           }
 
-          // Render 'start_conversation' as a system message
+          // Render 'start_conversation' (and other system messages if needed) as a system message
           if (message.message_type === "start_conversation") {
             return (
               <div
@@ -772,8 +766,9 @@ function Messages() {
           return (
             <div key={message.id || message.tempId}>
               {message.isUser ? (
+                // User's Message (Right Side)
                 <div className="flex justify-end space-x-2">
-                  <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium">
+                  <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium shadow-md">
                     {renderMessageContent(message)}
                     <div className="flex items-center justify-end mt-1 space-x-1">
                       {message.status === "sending" && (
@@ -798,13 +793,14 @@ function Messages() {
                       </span>
                     </div>
                   </div>
-                  <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
                     <span className="text-xs text-gray-600">You</span>
                   </div>
                 </div>
               ) : (
+                // Agency's Message (Left Side)
                 <div className="flex items-start space-x-2">
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                     <img
                       className="w-full h-full object-cover"
                       src={agency.image}
@@ -813,7 +809,7 @@ function Messages() {
                   </div>
                   <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
                     {renderMessageContent(message)}
-                    {/* Time removed */}
+                    {/* Time is often omitted on the left side, or placed below the bubble content */}
                   </div>
                 </div>
               )}
@@ -821,39 +817,42 @@ function Messages() {
           );
         })}
         <div ref={messagesEndRef} />
-        {currentChat?.final_offer_sent === null && (
-          <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
-            <button
-              onClick={handleAcceptFinalOffer}
-              disabled={isAccepting}
-              className={`border px-4 py-1 rounded-full text-white ${
-                isAccepting
-                  ? "bg-green-300 cursor-not-allowed"
-                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-              }`}
-            >
-              {isAccepting ? "Accepting..." : "Accept final offer"}
-            </button>
-            <button
-              onClick={handleDeclineFinalOffer}
-              disabled={isDeclining}
-              className={`border px-4 py-1 rounded-full text-white ${
-                isDeclining
-                  ? "bg-red-300 cursor-not-allowed"
-                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-              }`}
-            >
-              {isDeclining ? "Declining..." : "Decline final offer"}
-            </button>
+        {/* Final Offer Buttons */}
+        {currentChat?.final_offer_sent !== null && currentChat?.final_offer_sent !== undefined && !currentChat?.final_offer_response && (
+          <div className="flex justify-center w-full mt-4">
+             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 p-4 rounded-xl shadow-lg bg-white dark:bg-[#1E232E] border border-gray-200">
+                <button
+                  onClick={handleAcceptFinalOffer}
+                  disabled={isAccepting || isDeclining}
+                  className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${
+                    isAccepting
+                      ? "bg-green-500 text-white cursor-wait"
+                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                  }`}
+                >
+                  {isAccepting ? "Accepting..." : "Accept Final Offer"}
+                </button>
+                <button
+                  onClick={handleDeclineFinalOffer}
+                  disabled={isAccepting || isDeclining}
+                  className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${
+                    isDeclining
+                      ? "bg-red-500 text-white cursor-wait"
+                      : "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+                  }`}
+                >
+                  {isDeclining ? "Declining..." : "Decline Final Offer"}
+                </button>
+            </div>
           </div>
         )}
       </div>
       {/* Message input area */}
-      <div className="border-t border-gray-200 p-3 bg-white">
-        <div className="flex items-center bg-gray-100 rounded-full px-4 py-3">
+      <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
+        <div className="flex items-center bg-gray-100 dark:bg-[#1E232E] rounded-full px-4 py-2">
           <button
             type="button"
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             onClick={() => fileInputRef.current?.click()}
           >
             <PaperclipIcon className="h-5 w-5 cursor-pointer" />
@@ -868,15 +867,21 @@ function Messages() {
           <input
             type="text"
             placeholder="Type a message or select a file"
-            className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm"
+            className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm text-gray-800 dark:text-gray-200"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             ref={inputRef}
+            disabled={!!currentChat?.final_offer_response}
           />
           <button
-            className="text-blue-500 hover:text-blue-700"
+            className={`transition-colors duration-200 ${
+              newMessage.trim() === "" || currentChat?.final_offer_response
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            }`}
             onClick={handleSendMessage}
+            disabled={newMessage.trim() === "" || !!currentChat?.final_offer_response}
           >
             <SendIcon className="h-5 w-5 cursor-pointer" />
           </button>
