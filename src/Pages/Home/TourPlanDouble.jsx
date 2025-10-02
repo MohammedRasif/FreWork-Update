@@ -22,7 +22,7 @@ import {
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import toast, { Toaster } from "react-hot-toast";
-import TourPlanPopup from "../Home/TourPlanpopup";
+import TourPlanPopup from "./TourPlanpopup";
 import { FaListUl } from "react-icons/fa";
 
 // Temporary fallback for FullScreenInfinityLoader

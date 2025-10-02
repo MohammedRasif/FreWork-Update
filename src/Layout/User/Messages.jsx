@@ -20,8 +20,6 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
-// NOTE: FILE_BASE_URL is assumed to be defined elsewhere (e.g., in an environment file or constants)
-// For this code to run, you must ensure FILE_BASE_URL is available in the scope.
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app"; // Example fallback
 
@@ -813,38 +811,33 @@ function Messages() {
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
-        {/* Final Offer Buttons */}
-        {currentChat?.final_offer_sent !== null &&
-          currentChat?.final_offer_sent !== undefined &&
-          !currentChat?.final_offer_response && (
-            <div className="flex justify-center w-full mt-4">
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 p-4 rounded-xl shadow-lg bg-white dark:bg-[#1E232E] border border-gray-200">
-                <button
-                  onClick={handleAcceptFinalOffer}
-                  disabled={isAccepting || isDeclining}
-                  className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${
-                    isAccepting
-                      ? "bg-green-500 text-white cursor-wait"
-                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                  }`}
-                >
-                  {isAccepting ? "Accepting..." : "Accept Final Offer"}
-                </button>
-                <button
-                  onClick={handleDeclineFinalOffer}
-                  disabled={isAccepting || isDeclining}
-                  className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${
-                    isDeclining
-                      ? "bg-red-500 text-white cursor-wait"
-                      : "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                  }`}
-                >
-                  {isDeclining ? "Declining..." : "Decline Final Offer"}
-                </button>
-              </div>
-            </div>
-          )}
+       <div ref={messagesEndRef} />
+        {currentChat?.final_offer_sent === null && (
+          <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
+            <button
+              onClick={handleAcceptFinalOffer}
+              disabled={isAccepting}
+              className={`border px-4 py-1 rounded-full text-white ${
+                isAccepting
+                  ? "bg-green-300 cursor-not-allowed"
+                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+              }`}
+            >
+              {isAccepting ? "Accepting..." : "Accept final offer"}
+            </button>
+            <button
+              onClick={handleDeclineFinalOffer}
+              disabled={isDeclining}
+              className={`border px-4 py-1 rounded-full text-white ${
+                isDeclining
+                  ? "bg-red-300 cursor-not-allowed"
+                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+              }`}
+            >
+              {isDeclining ? "Declining..." : "Decline final offer"}
+            </button>
+          </div>
+        )}
       </div>
       {/* Message input area */}
       <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
