@@ -44,8 +44,10 @@ const OTP_Verification = () => {
         const userType = localStorage.getItem("userType");
         console.log("Retrieved userType from localStorage:", userType);
 
-        // Show popup
-        setShowPopup(true);
+        // Show popup only if userType is 'agency'
+        if (userType === "agency") {
+          setShowPopup(true);
+        }
 
         // After 2 sec navigate based on userType
         setTimeout(() => {

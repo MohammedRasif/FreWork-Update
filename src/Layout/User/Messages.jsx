@@ -22,7 +22,8 @@ import { toast } from "react-toastify";
 
 // NOTE: FILE_BASE_URL is assumed to be defined elsewhere (e.g., in an environment file or constants)
 // For this code to run, you must ensure FILE_BASE_URL is available in the scope.
-const FILE_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"; // Example fallback
+const FILE_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app"; // Example fallback
 
 function Messages() {
   const { id } = useParams();
@@ -454,10 +455,6 @@ function Messages() {
       )
     );
 
-    // Note: The original retry only handles text, which is likely incorrect if it was a file.
-    // For a proper retry, you'd need the original file object or a specific retry API for files.
-    // Assuming this retry is primarily for failed text messages:
-
     const formData = new FormData();
     formData.append("text", message.text);
     // formData.append("tour_plan_id", message.tour_plan_id); // Assuming sentMessage API handles context
@@ -705,7 +702,7 @@ function Messages() {
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
         {/* Empty div for spacing/alignment with the right side */}
-        <div></div> 
+        <div></div>
         <div className="flex items-center space-x-2">
           <div className="relative" ref={menuRef}>
             <button
@@ -818,9 +815,11 @@ function Messages() {
         })}
         <div ref={messagesEndRef} />
         {/* Final Offer Buttons */}
-        {currentChat?.final_offer_sent !== null && currentChat?.final_offer_sent !== undefined && !currentChat?.final_offer_response && (
-          <div className="flex justify-center w-full mt-4">
-             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 p-4 rounded-xl shadow-lg bg-white dark:bg-[#1E232E] border border-gray-200">
+        {currentChat?.final_offer_sent !== null &&
+          currentChat?.final_offer_sent !== undefined &&
+          !currentChat?.final_offer_response && (
+            <div className="flex justify-center w-full mt-4">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 p-4 rounded-xl shadow-lg bg-white dark:bg-[#1E232E] border border-gray-200">
                 <button
                   onClick={handleAcceptFinalOffer}
                   disabled={isAccepting || isDeclining}
@@ -843,9 +842,9 @@ function Messages() {
                 >
                   {isDeclining ? "Declining..." : "Decline Final Offer"}
                 </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
       {/* Message input area */}
       <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
@@ -881,7 +880,9 @@ function Messages() {
                 : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             }`}
             onClick={handleSendMessage}
-            disabled={newMessage.trim() === "" || !!currentChat?.final_offer_response}
+            disabled={
+              newMessage.trim() === "" || !!currentChat?.final_offer_response
+            }
           >
             <SendIcon className="h-5 w-5 cursor-pointer" />
           </button>
