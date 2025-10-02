@@ -413,7 +413,7 @@ function PublishedPlan() {
                     </div>
                   </div>
                   <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
-                    <div className="rounded-lg overflow-hidden">
+                    <div className="rounded-lg overflow-hidden relative">
                       <img
                         src={
                           plan.spot_picture_url ||
@@ -422,6 +422,7 @@ function PublishedPlan() {
                         alt="Tour destination"
                         className="w-full h-64 sm:h-96 object-cover"
                       />
+                      <h1 className="text-[20px] left-2/6 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1>
                     </div>
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">

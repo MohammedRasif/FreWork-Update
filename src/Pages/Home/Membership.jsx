@@ -16,33 +16,30 @@ import {
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
+import { FaAward } from "react-icons/fa6";
+import { RiAwardLine } from "react-icons/ri";
 
 const Membership = () => {
   const [agency, setAgency] = useState([]);
   const [topAgencie, setTopAgency] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [favorites, setFavorites] = useState([]); // Track agency user IDs that the current user has favorited
+  const [favorites, setFavorites] = useState([]);
   const token = localStorage.getItem("access_token");
-  const currentUserId = parseInt(localStorage.getItem("user_id"), 10); // Get current user ID from localStorage
+  const currentUserId = parseInt(localStorage.getItem("user_id"), 10);
   const navigate = useNavigate();
 
   const { data: AgencyAll, isLoading: isAgencyDataLoading } =
     useGetAllAgencyQuery();
-
-  console.log(AgencyAll, "AgencyAll");
   const { data: TopAgencies, isLoading: isTopAgencyLoading } =
     useGetTopAgencyQuery();
   const { data: SearchAgencies, isLoading: isSearchLoading } =
     useSearchAgencyQuery(searchTerm, { skip: !searchTerm });
   const [addToFavo, { isLoading: isAddFevLoading }] = useAddToFavoritMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
-  console.log(userData, "hello ");
-
-  // invite to chat
+  
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
     useInviteToChatMutation();
 
-  // Debounced search function
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchTerm(value);
@@ -50,10 +47,10 @@ const Membership = () => {
     []
   );
 
-  // Handle search input change
   const handleSearch = (e) => {
     debouncedSearch(e.target.value);
   };
+
   const handleFavoriteToggle = async (agencyUserId) => {
     if (!token || !currentUserId) {
       navigate("/login");
@@ -64,14 +61,12 @@ const Membership = () => {
     const prevAgency = [...agency];
     const isAdding = !favorites.includes(agencyUserId);
 
-    // Optimistically update favorites state
     setFavorites((prev) =>
       isAdding
         ? [...prev, agencyUserId]
         : prev.filter((id) => id !== agencyUserId)
     );
 
-    // Optimistically update agency state to reflect favorite_users
     setAgency((prev) =>
       prev.map((item) =>
         item.user === agencyUserId
@@ -84,14 +79,12 @@ const Membership = () => {
           : item
       )
     );
+
     try {
       await addToFavo(agencyUserId).unwrap();
     } catch (error) {
-      // Revert state on failure
       setFavorites(prevFavorites);
       setAgency(prevAgency);
-
-      // Show error message from response
       const errorMessage =
         error?.data?.detail ||
         error?.detail ||
@@ -100,7 +93,6 @@ const Membership = () => {
     }
   };
 
-  // Set agency data to state when fetched (all agencies or search results)
   useEffect(() => {
     if (searchTerm && SearchAgencies) {
       setAgency(
@@ -119,9 +111,9 @@ const Membership = () => {
           logo_url: item.logo_url || "",
           user: item.user || null,
           favorite_users: item.favorite_users || [],
+          badge_count: item.badge_count || 0,
         }))
       );
-      // Initialize favorites for the current user
       if (currentUserId) {
         setFavorites(
           SearchAgencies.filter((item) =>
@@ -146,9 +138,9 @@ const Membership = () => {
           logo_url: item.logo_url || "",
           user: item.user || null,
           favorite_users: item.favorite_users || [],
+          badge_count: item.badge_count || 0,
         }))
       );
-      // Initialize favorites for the current user
       if (currentUserId) {
         setFavorites(
           AgencyAll.filter((item) =>
@@ -159,7 +151,6 @@ const Membership = () => {
     }
   }, [AgencyAll, SearchAgencies, searchTerm, currentUserId]);
 
-  // Set top agencies data to state when fetched
   useEffect(() => {
     if (TopAgencies) {
       setTopAgency(
@@ -180,7 +171,6 @@ const Membership = () => {
 
   const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
-    console.log(data);
     if (role) {
       try {
         await invite(data);
@@ -193,9 +183,7 @@ const Membership = () => {
 
   return (
     <div className="flex flex-col sm:flex-row bg-gray-50 px-4 sm:px-10 pb-16 font-roboto pt-16">
-      {/* Main Content - Tour Plans */}
       <div className="w-full sm:w-4/5 p-4 sm:p-6">
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold sm:font-medium text-gray-600 mb-3 sm:mb-5">
             Search for Tour Planner (Agencies)
@@ -205,7 +193,6 @@ const Membership = () => {
           </p>
         </div>
 
-        {/* Search Bar */}
         <div className="relative mb-6 sm:mb-8 w-full sm:w-96">
           <div className="flex">
             <input
@@ -224,7 +211,6 @@ const Membership = () => {
           </div>
         </div>
 
-        {/* Loading State */}
         {isAgencyDataLoading || isSearchLoading ? (
           <div className="text-center text-gray-600">
             <FullScreenInfinityLoader />
@@ -234,14 +220,12 @@ const Membership = () => {
             <div className="min-h-[400px]">No tour plans available</div>
           </div>
         ) : (
-          /* Tour Plans */
           <div className="space-y-6">
             {agency.map((plan) => (
               <div
                 key={plan.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col sm:flex-row"
               >
-                {/* Image */}
                 <div className="w-full sm:w-72 h-48 sm:h-56 relative">
                   <img
                     src={
@@ -278,12 +262,10 @@ const Membership = () => {
                   </button>
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 p-4">
-                  {/* Agency Header */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
                     <div className="flex items-center space-x-3 mb-3 sm:mb-0">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10  rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
                         <div className="w-10 h-10 rounded-full overflow-hidden">
                           <img
                             className=""
@@ -310,24 +292,14 @@ const Membership = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* <button
-                      onClick={() => {
-                        if (!token) {
-                          navigate("/login");
-                        } else {
-                          handleMessage({ other_user_id: plan.user });
-                        }
-                      }}
-                      disabled={isAddFevLoading}
-                      className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
-                      aria-label={`Message ${plan.agency}`}
-                    >
-                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="text-sm sm:text-base font-medium">
-                        Message
-                      </span>
-                    </button> */}
+                    {plan.badge_count > 0 && (
+                      <div className="relative">
+                        <RiAwardLine size={40} className="text-yellow-500" />
+                        <h1 className="absolute top-[3px] left-[15px] font-bold">
+                          {plan.badge_count}
+                        </h1>
+                      </div>
+                    )}
                   </div>
                   <div className="pb-5">
                     <h1 className="text-2xl font-semibold text-black">
@@ -353,7 +325,6 @@ const Membership = () => {
                       <span>No categories available</span>
                     )}
                   </div>
-                  {/* About Section */}
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-800 mb-2 text-base">
                       About
@@ -369,7 +340,6 @@ const Membership = () => {
         )}
       </div>
 
-      {/* Top Agencies */}
       <div className="w-full sm:w-1/5 bg-white border border-gray-200 p-4 sm:p-6 sm:ml-5 sm:mt-20 rounded-xl lg:mt-52">
         <h2 className="font-semibold text-gray-800 mb-6 text-center text-lg sm:text-xl">
           TOP AGENCIES

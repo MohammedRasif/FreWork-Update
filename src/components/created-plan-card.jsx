@@ -110,9 +110,9 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-xl p-4 shadow-[0_3px_7.3px_0px_#0000001A] flex flex-col md:flex-row gap-4">
+    <div className="w-full bg-white rounded-xl p-4 shadow-[0_3px_7.3px_0px_#0000001A] flex flex-col md:flex-row gap-4 ">
       {/* left image */}
-      <div className="w-full md:w-[168px] h-[200px] md:h-[147px] rounded-md overflow-hidden">
+      <div className="w-full md:w-[168px] h-[200px] md:h-[147px] rounded-md overflow-hidden relative">
         <img
           src={
             plan.spot_picture_url ||
@@ -121,6 +121,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
           alt="Plan Image"
           className="w-full h-full object-cover object-center"
         />
+        <h1 className="text-[11px] left-1 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1>
       </div>
 
       {/* right content */}

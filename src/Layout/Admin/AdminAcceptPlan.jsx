@@ -57,11 +57,15 @@ export default function AdminAcceptPlan() {
       {/* Grid layout for tour cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {toursData.map((tour) => {
-          const description = tour.tour_plan.description || "Explore this amazing destination!";
+          const description =
+            tour.tour_plan.description || "Explore this amazing destination!";
           const words = description.split(" ");
           const isLong = words.length > 15;
           const isExpanded = expanded[tour.id] || false;
-          const shownText = isLong && !isExpanded ? words.slice(0, 15).join(" ") + "..." : description;
+          const shownText =
+            isLong && !isExpanded
+              ? words.slice(0, 15).join(" ") + "..."
+              : description;
 
           return (
             <div
@@ -76,13 +80,19 @@ export default function AdminAcceptPlan() {
                   alt={`${tour.tour_plan.location_to} destination`}
                   className="w-full h-44 rounded-md object-cover"
                 />
+                <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">
+                  Image generated automatically
+                </h1>
               </div>
 
               {/* Card Content */}
               <div className="p-4 flex flex-col flex-grow">
                 {/* Date Range */}
                 <div className="text-sm text-gray-600 mb-2">
-                  {formatDateRange(tour.tour_plan.start_date, tour.tour_plan.end_date)}
+                  {formatDateRange(
+                    tour.tour_plan.start_date,
+                    tour.tour_plan.end_date
+                  )}
                 </div>
 
                 {/* Tour Title */}
@@ -99,7 +109,10 @@ export default function AdminAcceptPlan() {
                 {isLong && (
                   <button
                     onClick={() =>
-                      setExpanded((prev) => ({ ...prev, [tour.id]: !isExpanded }))
+                      setExpanded((prev) => ({
+                        ...prev,
+                        [tour.id]: !isExpanded,
+                      }))
                     }
                     className="text-blue-500 text-sm mb-3 hover:underline"
                   >

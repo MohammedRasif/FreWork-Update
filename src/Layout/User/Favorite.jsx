@@ -56,6 +56,7 @@ const Favorite = () => {
                       alt={`${agency.agency_name} cover`}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
+                    <h1 className="text-[12px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1>
                     <div className="w-20 h-20 rounded-full mr-4 absolute -bottom-6 left-5 overflow-hidden">
                       <img
                         src={agency.logo_url}

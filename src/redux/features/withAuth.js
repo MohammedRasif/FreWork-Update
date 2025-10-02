@@ -287,7 +287,7 @@ export const sqQuery = createApi({
     // delete publish plan
 
     deletePublishPlan: builder.mutation({
-      query: (id) => ({
+      query: ({id}) => ({
         url: `tour-plans/${id}/`,
         method: "DELETE",
       }),

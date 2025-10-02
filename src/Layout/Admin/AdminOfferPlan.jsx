@@ -198,7 +198,7 @@ function AdminOfferPlan() {
 
                   {/* Tour Image with Buttons */}
                   <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6 space-y-4 relative">
-                    <div className="rounded-lg overflow-hidden">
+                    <div className="rounded-lg  overflow-hidden">
                       <img
                         src={
                           tourPlan.spot_picture_url ||
@@ -207,6 +207,9 @@ function AdminOfferPlan() {
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-72 object-cover"
                       />
+                      <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
+                        Image generated automatically
+                      </h1>
                     </div>
                   </div>
                 </div>
@@ -295,7 +298,8 @@ function AdminOfferPlan() {
               Confirm Deal
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to confirm this deal? This will send the final offer.
+              Are you sure you want to confirm this deal? This will send the
+              final offer.
             </p>
             <div className="flex justify-end gap-4">
               <button

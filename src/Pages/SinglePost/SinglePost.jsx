@@ -301,6 +301,7 @@ function SinglePost({ prid }) {
                     className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
                   />
                 ))}
+                
               </div>
             )}
             {tour.offers?.length >= 3 ? (
@@ -311,6 +312,8 @@ function SinglePost({ prid }) {
             ) : (
               <div></div>
             )}
+                       <h1 className="text-[16px] left-32 absolute top-10  font-semibold text-white ">Image generated automatically</h1>
+
           </div>
         </div>
 
@@ -602,6 +605,7 @@ function SinglePost({ prid }) {
                                 } avatar`}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
+                              
                               <div>
                                 <span className="font-medium text-gray-900">
                                   {offer.agency?.agency_name || "Unknown Agency"}

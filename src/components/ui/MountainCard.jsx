@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Navigation } from "lucide-react";
@@ -80,6 +79,9 @@ export default function MountainCard({ tourPlan }) {
             </div>
           )}
         </div>
+        <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">
+          Image generated automatically
+        </h1>
       </div>
 
       <div className="flex flex-col flex-grow p-4 space-y-1">

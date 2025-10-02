@@ -54,7 +54,8 @@ export default function TourCard({ tourPlan }) {
       <div className="flex flex-col shadow-lg w-72 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
-            <img
+           <div className="relative">
+             <img
               src={
                 localTourPlan.spot_picture_url ||
                 "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
@@ -62,6 +63,8 @@ export default function TourCard({ tourPlan }) {
               alt={`${localTourPlan.location_to} destination`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
+           
+           </div>
             <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
               <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">
                 {localTourPlan.location_to}
@@ -94,12 +97,14 @@ export default function TourCard({ tourPlan }) {
                     "
                   />
                 ))}
+                 
               </div>
             )}
           </div>
+           <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1>
         </div>
 
-        <div className="flex flex-col flex-grow p-4 space-y-1">
+        <div className="flex flex-col flex-grow p-4 space-y-1 relative">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold text-gray-900">
               {localTourPlan.location_to}
@@ -170,6 +175,7 @@ export default function TourCard({ tourPlan }) {
               </div>
             )}
           </div>
+         
         </div>
       </div>
 
