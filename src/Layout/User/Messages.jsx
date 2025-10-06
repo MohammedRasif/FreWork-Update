@@ -21,8 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
 const FILE_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app"; // Example fallback
-
+  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app"; 
 function Messages() {
   const { id } = useParams();
   console.log(id);
@@ -812,32 +811,36 @@ function Messages() {
           );
         })}
        <div ref={messagesEndRef} />
-        {currentChat?.final_offer_sent === null && (
-          <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
-            <button
-              onClick={handleAcceptFinalOffer}
-              disabled={isAccepting}
-              className={`border px-4 py-1 rounded-full text-white ${
-                isAccepting
-                  ? "bg-green-300 cursor-not-allowed"
-                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-              }`}
-            >
-              {isAccepting ? "Accepting..." : "Accept final offer"}
-            </button>
-            <button
-              onClick={handleDeclineFinalOffer}
-              disabled={isDeclining}
-              className={`border px-4 py-1 rounded-full text-white ${
-                isDeclining
-                  ? "bg-red-300 cursor-not-allowed"
-                  : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-              }`}
-            >
-              {isDeclining ? "Declining..." : "Decline final offer"}
-            </button>
-          </div>
-        )}
+        {currentChat?.final_offer_sent === true &&
+  currentChat?.deal_status !== null &&
+  currentChat?.deal_status === false && (
+    <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
+      <button
+        onClick={handleAcceptFinalOffer}
+        disabled={isAccepting}
+        className={`border px-4 py-1 rounded-full text-white ${
+          isAccepting
+            ? "bg-green-300 cursor-not-allowed"
+            : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+        }`}
+      >
+        {isAccepting ? "Accepting..." : "Accept final offer"}
+      </button>
+
+      <button
+        onClick={handleDeclineFinalOffer}
+        disabled={isDeclining}
+        className={`border px-4 py-1 rounded-full text-white ${
+          isDeclining
+            ? "bg-red-300 cursor-not-allowed"
+            : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+        }`}
+      >
+        {isDeclining ? "Declining..." : "Decline final offer"}
+      </button>
+    </div>
+  )}
+
       </div>
       {/* Message input area */}
       <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">

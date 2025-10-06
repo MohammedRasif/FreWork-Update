@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
@@ -8,6 +7,7 @@ import {
   useDeclineRequestMutation,
   useGetTourPlanPublicQuery,
   useOfferBudgetMutation,
+  useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import AdminOfferPlan from "./AdminOfferPlan";
 import AdminAcceptPlan from "./AdminAcceptPlan";
@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa6";
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
+import AdminDecline from "./AdminDecline";
 
 const token = localStorage.getItem("access_token");
 
@@ -39,6 +40,8 @@ const AdminHome = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const { data: userData } = useShowUserInpormationQuery();
+  console.log(userData);
 
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
@@ -242,8 +245,9 @@ const AdminHome = () => {
                   alt={`${plan.location_to || "Tourist spot"}`}
                   className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
                 />
-                           <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">Image generated automatically</h1>
-
+                <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">
+                  Image generated automatically
+                </h1>
               </div>
               <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
                 <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
@@ -259,9 +263,7 @@ const AdminHome = () => {
                     </p>
                     <p>
                       Total members:{" "}
-                      <span className="font-medium">
-                        {plan.total_members}
-                      </span>
+                      <span className="font-medium">{plan.total_members}</span>
                     </p>
                     <p>
                       Category:{" "}
@@ -312,6 +314,8 @@ const AdminHome = () => {
             </div>
           </div>
         ));
+      case "Decline Plans":
+        return <AdminDecline />;
       case "Offered Plans":
         return <AdminOfferPlan />;
       case "Accepted Plans":
@@ -440,8 +444,9 @@ const AdminHome = () => {
                   alt="Tour destination"
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                 />
-                           <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">Image generated automatically</h1>
-
+                <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
+                  Image generated automatically
+                </h1>
               </div>
             </div>
           </div>
@@ -499,7 +504,8 @@ const AdminHome = () => {
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1">
-                  Website suggests extra discount, increases conversions by 30%. Check to offer more.
+                  Website suggests extra discount, increases conversions by 30%.
+                  Check to offer more.
                 </p>
               </div>
               <div className="mt-4 mb-2">
@@ -660,6 +666,16 @@ const AdminHome = () => {
                 }`}
               >
                 All Plans
+              </button>
+              <button
+                onClick={() => setActiveTab("Decline Plans")}
+                className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer ${
+                  activeTab === "Decline Plans"
+                    ? "bg-white shadow-md"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                Decline Plans
               </button>
               <button
                 onClick={() => setActiveTab("Offered Plans")}

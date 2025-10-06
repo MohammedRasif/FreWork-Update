@@ -2,8 +2,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    // baseUrl: "http://10.10.13.59:8008/",
+    // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
+    baseUrl: "http://10.10.13.59:8008/",
+
     prepareHeaders: (headers, { endpoint }) => {
       headers.set("ngrok-skip-browser-warning", "true");
 
@@ -46,6 +47,8 @@ export const sqQuery = createApi({
     "final",
     "final_confrimation",
     "SentMessage",
+    "declineOffer",
+    "restore",
   ],
 
   endpoints: (builder) => ({
@@ -272,7 +275,7 @@ export const sqQuery = createApi({
         url: `declined-request/${id}`,
         method: "POST",
       }),
-      invalidatesTags: ["Discount", "Chat"],
+      invalidatesTags: ["TourPlan", "declineOffer"],
     }),
 
     changePassword: builder.mutation({
@@ -287,7 +290,7 @@ export const sqQuery = createApi({
     // delete publish plan
 
     deletePublishPlan: builder.mutation({
-      query: ({id}) => ({
+      query: ({ id }) => ({
         url: `tour-plans/${id}/`,
         method: "DELETE",
       }),
@@ -331,7 +334,7 @@ export const sqQuery = createApi({
 
     // archived functoin
     archivedUser: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `chat/archive-conversation/${id}`,
         method: "POST",
       }),
@@ -366,8 +369,8 @@ export const sqQuery = createApi({
       invalidatesTags: "final_confrimation",
     }),
 
-    messageSent:builder.mutation({
-       query: ({ id, data }) => ({
+    messageSent: builder.mutation({
+      query: ({ id, data }) => ({
         url: `chat/conversations/${id}/message/`,
         method: "POST",
         body: data,
@@ -375,8 +378,18 @@ export const sqQuery = createApi({
       invalidatesTags: "SentMessage",
     }),
 
+    declineOffer: builder.query({
+      query: () => "declined-requests",
+      providesTags: ["declineOffer"],
+    }),
 
-
+    restore: builder.mutation({
+      query: (id) => ({
+        url: `declined-request/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["TourPlan", "declineOffer"],
+    }),
   }),
 });
 
@@ -453,4 +466,9 @@ export const {
   useFinalOfferResponseMutation,
   // sentMessage
   useMessageSentMutation,
+  // decline offer
+
+  useDeclineOfferQuery,
+
+  useRestoreMutation,
 } = sqQuery;
