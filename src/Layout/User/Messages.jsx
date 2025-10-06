@@ -814,7 +814,7 @@ function Messages() {
         {currentChat?.final_offer_sent === true &&
   currentChat?.deal_status !== null &&
   currentChat?.deal_status === false && (
-    <div className="absolute bottom-5 right-3/7 flex flex-col space-y-2">
+    <div className="absolute -bottom-24 right-3/7 flex flex-col space-y-2">
       <button
         onClick={handleAcceptFinalOffer}
         disabled={isAccepting}
