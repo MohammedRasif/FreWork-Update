@@ -148,11 +148,10 @@ function Messages() {
                   (pm.text === null && serverMessage.text === null)) &&
                 Math.abs(
                   pm.timestamp.getTime() - serverMessage.timestamp.getTime()
-                ) < 2000
+                ) < 10000
             );
 
             if (matchingPending) {
-              // Update the pending message with server ID and status, don't add new
               return prev.map((msg) =>
                 msg.tempId === matchingPending.tempId
                   ? {
