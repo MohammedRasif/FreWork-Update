@@ -30,8 +30,8 @@ const AdminNotification = () => {
   // WebSocket for real-time notifications
   useEffect(() => {
     const baseUrl =
-      "https://well-anteater-happy.ngrok-free.app/";
-    const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
+      "31.97.39.215";
+    const socketUrl = `ws://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
     socket.onopen = () => {

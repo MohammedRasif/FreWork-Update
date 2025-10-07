@@ -234,7 +234,7 @@ export default function AdminDashboardLayout() {
       console.error("No token found, WebSocket connection aborted");
       return;
     }
-    const baseUrl = "//well-anteater-happy.ngrok-free.app";
+    const baseUrl = "//31.97.39.215";
     const socketUrl = `ws:${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 

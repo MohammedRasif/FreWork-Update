@@ -422,9 +422,11 @@ function PublishedPlan() {
                         alt="Tour destination"
                         className="w-full h-64 sm:h-96 object-cover"
                       />
-                      <h1 className="text-[20px] left-2/6 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1>
+                      <h1 className="text-[20px] left-2/6 absolute bottom-2  font-semibold text-white ">
+                        Image generated automatically
+                      </h1>
                     </div>
-                    <div className="flex items-center justify-between py-3">
+                    {/* <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
                           <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
@@ -442,8 +444,8 @@ function PublishedPlan() {
                         <span>{plan.offers?.length || 0} Offers</span>
                         <span>{shareCount} Shares</span>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    </div> */}
+                    {/* <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <div className="flex items-center gap-3 sm:gap-4 w-full justify-around sm:w-auto sm:justify-start">
                         <button
                           onClick={() => handleLike(plan.id)}
@@ -483,7 +485,7 @@ function PublishedPlan() {
                           <span>{isShared[plan.id] ? "Share" : "Share"}</span>
                         </button>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
@@ -957,7 +959,8 @@ function PublishedPlan() {
                     <div>
                       <div>
                         <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-                          {showResponseData?.agency_name || selectedAgency.company}
+                          {showResponseData?.agency_name ||
+                            selectedAgency.company}
                         </h2>
                         <div className="flex items-center gap-1 mt-1">
                           {renderStars(showResponseData?.rating || 4.5)}
@@ -975,7 +978,6 @@ function PublishedPlan() {
                           </span>
                         </div>
                       </div>
-                      
                     </div>
                   </div>
                 </div>
@@ -1009,13 +1011,14 @@ function PublishedPlan() {
                 {/* Facilities */}
                 <div className=" flex items-center justify-between">
                   <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
-                    Facilities
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      {JSON.parse(showResponseData?.facilities?.[0] || "[]").map(
-                        (item, i) => (
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                      Facilities
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        {JSON.parse(
+                          showResponseData?.facilities?.[0] || "[]"
+                        ).map((item, i) => (
                           <span
                             key={i}
                             className="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
@@ -1023,35 +1026,34 @@ function PublishedPlan() {
                             <FaCheckCircle className="w-3 h-3 text-blue-500" />
                             {item}
                           </span>
-                        )
-                      )}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <button
-                        onClick={() => {
-                          if (!token) {
-                            navigate("/login");
-                          } else {
-                            handleMessage({ other_user_id: selectedUserId });
-                          }
-                        }}
-                        disabled={isInviteLoading}
-                        className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
-                      >
-                        {isInviteLoading ? (
-                          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        ) : (
-                          <>
-                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-sm sm:text-base font-medium">
-                              Message
-                            </span>
-                          </>
-                        )}
-                      </button>
-                </div>
+                  <div>
+                    <button
+                      onClick={() => {
+                        if (!token) {
+                          navigate("/login");
+                        } else {
+                          handleMessage({ other_user_id: selectedUserId });
+                        }
+                      }}
+                      disabled={isInviteLoading}
+                      className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+                    >
+                      {isInviteLoading ? (
+                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <span className="text-sm sm:text-base font-medium">
+                            Message
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

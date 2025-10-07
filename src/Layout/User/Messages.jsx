@@ -21,7 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
 const FILE_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app"; 
+  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app" ; 
 function Messages() {
   const { id } = useParams();
   console.log(id);
