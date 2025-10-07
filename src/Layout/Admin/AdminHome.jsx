@@ -101,8 +101,8 @@ const AdminHome = () => {
       return;
     }
 
-    if (!budget || !comment.trim() || !selectedFile) {
-      toast.error("Please provide a budget, a comment, and upload a file");
+    if (!budget || !comment.trim()) {
+      toast.error("Please provide a budget and a comment");
       return;
     }
 
@@ -126,7 +126,9 @@ const AdminHome = () => {
         "discount",
         offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
       );
-      formData.append("file", selectedFile);
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
 
       await offerBudgetToBack({
         id: planId,
@@ -141,7 +143,7 @@ const AdminHome = () => {
         discount: offerForm.applyDiscount
           ? Number.parseFloat(offerForm.discount)
           : 0,
-        file_name: selectedFile.name,
+        file_name: selectedFile ? selectedFile.name : null,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -476,7 +478,7 @@ const AdminHome = () => {
               />
               <div className="mt-4">
                 <label className="block lg:text-md font-medium text-gray-700 mb-1">
-                  Upload File
+                  Upload File (Optional)
                 </label>
                 <input
                   type="file"
@@ -533,16 +535,14 @@ const AdminHome = () => {
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
                   isOfferSubmitting ||
                   !offerBudget ||
-                  !offerComment.trim() ||
-                  !selectedFile
+                  !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
                 disabled={
                   isOfferSubmitting ||
                   !offerBudget ||
-                  !offerComment.trim() ||
-                  !selectedFile
+                  !offerComment.trim()
                 }
               >
                 <IoIosSend size={24} />

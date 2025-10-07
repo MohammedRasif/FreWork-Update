@@ -107,7 +107,7 @@ const TourPlanPopup = ({
                   htmlFor="file"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Upload File
+                  Upload File (Optional)
                 </label>
                 <input
                   type="file"
@@ -167,15 +167,13 @@ const TourPlanPopup = ({
                   isOfferSubmitting ||
                   isOfferBudgetLoading ||
                   !offerForm.budget ||
-                  !offerForm.comment.trim() ||
-                  !selectedFile
+                  !offerForm.comment.trim()
                 }
                 className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors ${
                   isOfferSubmitting ||
                   isOfferBudgetLoading ||
                   !offerForm.budget ||
-                  !offerForm.comment.trim() ||
-                  !selectedFile
+                  !offerForm.comment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
                 }`}

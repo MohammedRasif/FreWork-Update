@@ -106,8 +106,8 @@ function SinglePost({ prid }) {
       toast.error("Please log in to submit an offer");
       return;
     }
-    if (!offerForm.budget || !offerForm.comment.trim() || !selectedFile) {
-      toast.error("Please provide a budget, a comment, and upload a file");
+    if (!offerForm.budget || !offerForm.comment.trim()) {
+      toast.error("Please provide a budget and a comment");
       return;
     }
     if (
@@ -129,7 +129,9 @@ function SinglePost({ prid }) {
         "discount",
         offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
       );
-      formData.append("file", selectedFile);
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
 
       await offerBudgetToBack({
         id: finalId,
@@ -142,7 +144,7 @@ function SinglePost({ prid }) {
         message: offerForm.comment,
         apply_discount: offerForm.applyDiscount,
         discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
-        file_name: selectedFile.name,
+        file_name: selectedFile ? selectedFile.name : null,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
           logo_url:
@@ -503,7 +505,7 @@ function SinglePost({ prid }) {
                       htmlFor="file"
                       className="block text-md font-medium text-gray-700 mb-1"
                     >
-                      Upload File
+                      Upload File (Optional)
                     </label>
                     <input
                       type="file"
@@ -562,14 +564,12 @@ function SinglePost({ prid }) {
                     disabled={
                       isOfferSubmitting ||
                       !offerForm.budget ||
-                      !offerForm.comment.trim() ||
-                      !selectedFile
+                      !offerForm.comment.trim()
                     }
                     className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors ${
                       isOfferSubmitting ||
                       !offerForm.budget ||
-                      !offerForm.comment.trim() ||
-                      !selectedFile
+                      !offerForm.comment.trim()
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
                     }`}

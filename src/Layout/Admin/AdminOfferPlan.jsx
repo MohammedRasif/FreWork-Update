@@ -259,12 +259,14 @@ function AdminOfferPlan() {
                                 Start conversation
                               </button>
                             </NavLink>
-                            <button
-                              onClick={() => handleConfirmDeal(offer.id)}
-                              className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto"
-                            >
-                              Confirm the deal
-                            </button>
+                            {!offer.is_final && (
+                              <button
+                                onClick={() => handleConfirmDeal(offer.id)}
+                                className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto"
+                              >
+                                Confirm the deal
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDelete(offer.id)}
                               disabled={isDeleting[offer.id]}
