@@ -21,7 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 
 const FILE_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app" ; 
+  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
 function Messages() {
   const { id } = useParams();
   console.log(id);
@@ -673,7 +673,7 @@ function Messages() {
 
   if (isLoading || isChatListLoading) {
     return (
-      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center">
+      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">Loading...</h1>
       </div>
     );
@@ -681,7 +681,7 @@ function Messages() {
 
   if (error || !agency) {
     return (
-      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center">
+      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">
           {error
             ? "Error loading chat history"
@@ -694,7 +694,7 @@ function Messages() {
   const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
 
   return (
-    <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
+    <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col ">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
         {/* Empty div for spacing/alignment with the right side */}
@@ -730,7 +730,7 @@ function Messages() {
         </div>
       </div>
       {/* Messages Section */}
-      <div className="flex-1 p-4 space-y-4 overflow-y-auto relative">
+      <div className="flex-1 p-4 space-y-4 overflow-y-auto ">
         {messages.map((message) => {
           // Filter out messages that should not be visible as bubbles
           if (
@@ -809,37 +809,36 @@ function Messages() {
             </div>
           );
         })}
-       <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} />
         {currentChat?.final_offer_sent === true &&
-  currentChat?.deal_status !== null &&
-  currentChat?.deal_status === false && (
-    <div className="absolute -bottom-24 right-3/7 flex flex-col space-y-2">
-      <button
-        onClick={handleAcceptFinalOffer}
-        disabled={isAccepting}
-        className={`border px-4 py-1 rounded-full text-white ${
-          isAccepting
-            ? "bg-green-300 cursor-not-allowed"
-            : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-        }`}
-      >
-        {isAccepting ? "Accepting..." : "Accept final offer"}
-      </button>
+          currentChat?.deal_status !== null &&
+          currentChat?.deal_status === false && (
+            <div className="absolute bottom-30 right-2/8 flex flex-col space-y-2">
+              <button
+                onClick={handleAcceptFinalOffer}
+                disabled={isAccepting}
+                className={`border px-4 py-1 rounded-full text-white ${
+                  isAccepting
+                    ? "bg-green-300 cursor-not-allowed"
+                    : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+                }`}
+              >
+                {isAccepting ? "Accepting..." : "Accept final offer"}
+              </button>
 
-      <button
-        onClick={handleDeclineFinalOffer}
-        disabled={isDeclining}
-        className={`border px-4 py-1 rounded-full text-white ${
-          isDeclining
-            ? "bg-red-300 cursor-not-allowed"
-            : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-        }`}
-      >
-        {isDeclining ? "Declining..." : "Decline final offer"}
-      </button>
-    </div>
-  )}
-
+              <button
+                onClick={handleDeclineFinalOffer}
+                disabled={isDeclining}
+                className={`border px-4 py-1 rounded-full text-white ${
+                  isDeclining
+                    ? "bg-red-300 cursor-not-allowed"
+                    : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
+                }`}
+              >
+                {isDeclining ? "Declining..." : "Decline final offer"}
+              </button>
+            </div>
+          )}
       </div>
       {/* Message input area */}
       <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
