@@ -573,9 +573,9 @@ const AdminHome = () => {
                       <span className="font-medium text-gray-900">
                         {offer.agency.agency_name}
                       </span>
-                      <p className="text-xs sm:text-sm text-gray-600">
+                      {/* <p className="text-xs sm:text-sm text-gray-600">
                         {offer.message}
-                      </p>
+                      </p> */}
                       {offer.file_name && (
                         <p className="text-xs sm:text-sm text-gray-600">
                           File: {offer.file_name}

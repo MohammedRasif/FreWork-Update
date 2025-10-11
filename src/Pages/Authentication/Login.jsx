@@ -4,6 +4,8 @@ import { ChevronDown, Mail, Lock } from "lucide-react";
 import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useLogInMutation } from "@/redux/features/baseApi";
+import img1 from "../../assets/img/removebg.png";
+
 
 const login = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -69,7 +71,11 @@ const login = () => {
         <div className="w-full max-w-xl">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="text-gray-400 text-sm mb-6">Logo here</div>
+             <NavLink to="/">
+                         <div className=" flex items-center justify-center mb-6">
+                          <img src={img1} className="h-20" alt="" />
+                        </div>
+                       </NavLink>
             <h1 className="text-4xl font-semibold text-gray-700">
               Welcome to Frework
             </h1>

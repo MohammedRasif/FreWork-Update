@@ -8,7 +8,7 @@ import BannerSectionPopup from "./BannerSectionPupup";
 const Banner = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const accessToken = localStorage.getItem("access_token");
-  const role = localStorage.getItem("userType");
+  const role = localStorage.getItem("role");
   const showCreateRequestButton = !accessToken || role === "tourist";
   const navigate = useNavigate();
 
