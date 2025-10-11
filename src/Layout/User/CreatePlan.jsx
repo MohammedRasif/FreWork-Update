@@ -254,9 +254,9 @@ const CreatePlan = () => {
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location to is required",
   });
-  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register("touristSpots", {
-    required: "Tourist spots are required",
-  });
+  // const { ref: touristSpotsFormRef, ...touristSpotsRest } = register("touristSpots", {
+  //   required: "Tourist spots are required",
+  // });
 
   return (
     <div className="p-6">
@@ -569,12 +569,12 @@ const CreatePlan = () => {
                 type="text"
                 placeholder="Search for a tourist spot"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...touristSpotsRest}
-                ref={(e) => {
-                  touristSpotsFormRef(e);
-                  touristSpotsRef.current = e;
-                  console.log("touristSpotsRef set:", !!e);
-                }}
+                // {...touristSpotsRest}
+                // ref={(e) => {
+                //   touristSpotsFormRef(e);
+                //   touristSpotsRef.current = e;
+                //   console.log("touristSpotsRef set:", !!e);
+                // }}
               />
               {errors.touristSpots && (
                 <p className="text-red-500 text-[14px] mt-1">{errors.touristSpots.message}</p>

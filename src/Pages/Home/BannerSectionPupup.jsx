@@ -388,12 +388,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location (To) is required",
   });
-  const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
-    "touristSpots",
-    {
-      required: "Tourist Spots are required",
-    }
-  );
+  // const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
+  //   "touristSpots",
+  //   {
+  //     required: "Tourist Spots are required",
+  //   }
+  // );
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
@@ -590,20 +590,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   Tourist Spots
                 </label>
                 <input
-                  {...touristSpotsRest}
+                  // {...touristSpotsRest}
                   type="text"
-                  placeholder="Search for a tourist spot"
+                  placeholder="Mare, Monumenti, Ristorante..."
                   defaultValue={formData.touristSpots}
                   onChange={(e) => {
                     updateFormData("touristSpots", e.target.value);
                     setValue("touristSpots", e.target.value);
                     console.log("touristSpots input changed:", e.target.value);
                   }}
-                  ref={(e) => {
-                    touristSpotsFormRef(e);
-                    touristSpotsRef.current = e;
-                    console.log("touristSpotsRef set:", !!e);
-                  }}
+                  // ref={(e) => {
+                  //   touristSpotsFormRef(e);
+                  //   touristSpotsRef.current = e;
+                  //   console.log("touristSpotsRef set:", !!e);
+                  // }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                   style={{ zIndex: 1001 }}
                 />
