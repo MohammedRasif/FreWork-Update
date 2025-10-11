@@ -219,19 +219,21 @@ const AdminHome = () => {
 
   // Render content for different tabs
   const renderContent = () => {
-    switch (activeTab) {
-      case "All Plans":
-        if (isTourPlanPublicLoading) {
-          return (
-            <div className="text-center text-gray-600">Loading plans...</div>
-          );
-        }
-        if (!filteredPlans.length) {
-          return (
-            <div className="text-center text-gray-600">No plans found.</div>
-          );
-        }
-        return filteredPlans.map((plan) => (
+  switch (activeTab) {
+    case "All Plans":
+      if (isTourPlanPublicLoading) {
+        return (
+          <div className="text-center text-gray-600">Loading plans...</div>
+        );
+      }
+      if (!filteredPlans.length) {
+        return (
+          <div className="text-center text-gray-600">No plans found.</div>
+        );
+      }
+      return filteredPlans
+        .filter((plan) => !plan.offered_status) // Only include plans where offered_status is false or undefined
+        .map((plan) => (
           <div
             key={plan.id}
             className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
@@ -247,9 +249,9 @@ const AdminHome = () => {
                   alt={`${plan.location_to || "Tourist spot"}`}
                   className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
                 />
-                <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">
+                {/* <h1 className="text-[14px] left-3 absolute top-2 font-semibold text-white ">
                   Image generated automatically
-                </h1>
+                </h1> */}
               </div>
               <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
                 <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
@@ -316,17 +318,16 @@ const AdminHome = () => {
             </div>
           </div>
         ));
-      case "Decline Plans":
-        return <AdminDecline />;
-      case "Offered Plans":
-        return <AdminOfferPlan />;
-      case "Accepted Plans":
-        return <AdminAcceptPlan />;
-      default:
-        return null;
-    }
-  };
-
+    case "Decline Plans":
+      return <AdminDecline />;
+    case "Offered Plans":
+      return <AdminOfferPlan />;
+    case "Accepted Plans":
+      return <AdminAcceptPlan />;
+    default:
+      return null;
+  }
+};
   const renderModalContent = () => {
     if (modalType === "view") {
       return (
@@ -446,9 +447,9 @@ const AdminHome = () => {
                   alt="Tour destination"
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                 />
-                <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
+                {/* <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
                   Image generated automatically
-                </h1>
+                </h1> */}
               </div>
             </div>
           </div>

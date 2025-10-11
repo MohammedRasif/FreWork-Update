@@ -207,9 +207,9 @@ function AdminOfferPlan() {
                         alt="Tour destination"
                         className="w-full h-48 sm:h-64 lg:h-72 object-cover"
                       />
-                      <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
+                      {/* <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
                         Image generated automatically
-                      </h1>
+                      </h1> */}
                     </div>
                   </div>
                 </div>

@@ -80,7 +80,7 @@ export default function GroupCard({ tourPlan }) {
             </div>
           )}
         </div>
-                   <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1>
+                   {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
 
       </div>
 

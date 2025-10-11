@@ -314,8 +314,6 @@ function SinglePost({ prid }) {
             ) : (
               <div></div>
             )}
-                       <h1 className="text-[16px] left-32 absolute top-10  font-semibold text-white ">Image generated automatically</h1>
-
           </div>
         </div>
 
@@ -432,6 +430,9 @@ function SinglePost({ prid }) {
                 <span className="font-medium">Contact verified via email</span>
               </span>
             </p>
+
+             <h1 className="text-[16px]   py-2 pl-9 font-bold ">Image generated automatically</h1>
+
           </div>
           <div className="pt-2 w-full">
             <Dialog open={isPopupOpen} onOpenChange={(open) => {
