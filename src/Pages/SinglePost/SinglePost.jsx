@@ -393,13 +393,7 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaList className="w-6 h-5 text-gray-500" />
-              <span>
-                <span className="font-medium">Minimum rating:</span>{" "}
-                {tour.minimum_star_hotel || "N/A"}
-              </span>
-            </p>
+            
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
@@ -414,6 +408,13 @@ function SinglePost({ prid }) {
               <span>
                 <span className="font-medium">Type of accommodation:</span>{" "}
                 {tour.type_of_accommodation || "N/A"}
+              </span>
+            </p>
+            <p className="text-md text-gray-600 flex items-center gap-2">
+              <FaList className="w-6 h-5 text-gray-500" />
+              <span>
+                <span className="font-medium">Minimum rating:</span>{" "}
+                {tour.minimum_star_hotel || "N/A"}
               </span>
             </p>
 
