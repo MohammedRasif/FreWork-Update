@@ -343,7 +343,7 @@ function SinglePost({ prid }) {
           <div className="space-y-1 text-md text-gray-700">
             <p className=" font-bold">
               <span className="font-medium">Date:</span> {tour.start_date} to{" "}
-              {tour.end_date || "N/A"}
+              {tour.end_date || "N/A"}  ({tour.duration })days
             </p>
           </div>
           <p>

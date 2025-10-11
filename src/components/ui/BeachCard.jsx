@@ -136,7 +136,7 @@ export default function TourCard({ tourPlan }) {
               {localTourPlan.offers.length > 0
                 ? localTourPlan.offers[0].tour_plan.end_date
                 : "N/A"}{" "}
-              ({localTourPlan.duration})
+             
             </p>
           </div>
 

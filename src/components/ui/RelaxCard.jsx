@@ -117,7 +117,7 @@ export default function BeachCard({ tourPlan }) {
             {localTourPlan.offers.length > 0
               ? localTourPlan.offers[0].tour_plan.end_date
               : localTourPlan.end_date || "N/A"}{" "}
-            ({localTourPlan.duration})
+           
           </p>
           <p>
             <span className="font-medium">Category:</span>{" "}
