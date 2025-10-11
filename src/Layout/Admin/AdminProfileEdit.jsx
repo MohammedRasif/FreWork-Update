@@ -59,7 +59,7 @@ const AdminProfileEdit = () => {
           : [];
         reset({
           agencyName: profileData.agency_name || "",
-          vatNumber: profileData.invitation_code || "",
+          vatNumber: profileData.vat_id || "",
           email: profileData.contact_email || "",
           phoneNumber: profileData.contact_phone || "",
           description: profileData.about || "",
@@ -82,7 +82,7 @@ const AdminProfileEdit = () => {
       // Create FormData object to handle text and file uploads
       const formData = new FormData();
       formData.append("agency_name", data.agencyName);
-      formData.append("invitation_code", data.vatNumber);
+      formData.append("vat_id", data.vat_id);
       formData.append("contact_email", data.email);
       formData.append("contact_phone", data.phoneNumber);
       formData.append("about", data.description);

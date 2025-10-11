@@ -14,7 +14,6 @@ const LoadingPopup = () => {
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-[5px] bg-opacity-50 flex items-center justify-center z-[1002]">
       <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
-        {/* AI-themed loading animation */}
         <div className="relative w-16 h-16">
           <div className="absolute inset-0 border-4 border-[#FF6600] border-t-transparent rounded-full animate-spin"></div>
           <div className="absolute inset-2 border-4 border-[#e55600] border-t-transparent rounded-full animate-spin animation-delay-200"></div>
@@ -40,8 +39,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     locationTo: "",
     startingDate: "",
     endingDate: "",
-    adults: 0, // Changed to 0 for safety
-    children: 0, // Changed to 0 for safety
+    adults: 0,
+    children: 0,
     budget: "",
     touristSpots: "",
     description: "",
@@ -68,16 +67,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formState: { errors },
     setValue,
     reset,
+    trigger,
   } = useForm();
 
-  // Refs for location and tourist spots input fields
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
 
   useEffect(() => {
     if (state?.id) {
-      // Load data for editing an existing plan
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
@@ -127,7 +125,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         updateFormData(mappedKey, value);
       });
     } else {
-      // Load pending plan from localStorage
       const pendingPlan = localStorage.getItem("pendingPlan");
       if (pendingPlan) {
         const parsed = JSON.parse(pendingPlan);
@@ -139,7 +136,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
   }, [state?.id, setValue]);
 
-  // Load Google Maps script
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (!isGoogleScriptLoaded && !window.google) {
@@ -162,12 +158,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
     loadGoogleMaps();
 
-    return () => {
-      // Cleanup (optional: remove script if needed)
-    };
+    return () => {};
   }, []);
 
-  // Initialize autocomplete for all fields
   useEffect(() => {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
@@ -209,7 +202,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.warn("locationToRef is null");
       }
 
-      // Only initialize touristSpots autocomplete when on Step 2
       if (currentStep === 2 && touristSpotsRef.current) {
         console.log("Setting up autocomplete for touristSpots");
         const touristSpotsAutocomplete =
@@ -229,7 +221,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     };
 
     if (window.google) {
-      setTimeout(initAutocomplete, 100); // Delay to ensure DOM is ready
+      setTimeout(initAutocomplete, 100);
     }
   }, [setValue, currentStep]);
 
@@ -240,8 +232,37 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }));
   };
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
+  const validateStep = async (step) => {
+    let fieldsToValidate = [];
+    switch (step) {
+      case 1:
+        fieldsToValidate = ["startingDate", "endingDate", "adults", "children"];
+        break;
+      case 2:
+        fieldsToValidate = ["locationFrom", "locationTo", "budget", "touristSpots"];
+        break;
+      case 3:
+        fieldsToValidate = ["typeOfAccommodation", "minimumHotelStars", "mealPlan"];
+        break;
+      case 4:
+        fieldsToValidate = ["travelType", "destinationType"];
+        break;
+      case 5:
+        fieldsToValidate = ["name", "email", "phoneNumber", "confirmation"];
+        break;
+      default:
+        return true;
+    }
+    const result = await trigger(fieldsToValidate);
+    if (!result) {
+      toast.error("Please fill all required fields before proceeding.");
+    }
+    return result;
+  };
+
+  const nextStep = async () => {
+    const isValid = await validateStep(currentStep);
+    if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -258,7 +279,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     const accessToken = localStorage.getItem("access_token");
     console.log("Access Token:", accessToken);
     if (!accessToken) {
-      // Save form data to localStorage
       localStorage.setItem("pendingPlan", JSON.stringify(data));
       toast.error("Please log in to create a plan");
       navigate("/register");
@@ -333,7 +353,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         setSelectedFile(null);
       }
       console.log("Navigating to /user and closing form");
-      localStorage.removeItem("pendingPlan"); // Clear pending plan after success
+      localStorage.removeItem("pendingPlan");
       navigate("/user");
       closeForm();
     } catch (error) {
@@ -362,7 +382,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
   const progressPercentage = (currentStep / totalSteps) * 100;
 
-  // Register location and tourist spots fields with react-hook-form
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: "Location (From) is required",
   });
@@ -378,9 +397,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
-      {/* Show loading popup when saving or publishing */}
       {(isSavingDraft || isPublishing) && <LoadingPopup />}
-      {/* Progress Bar */}
       <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
         <div className="flex justify-between items-center mb-2 sm:mb-3">
           <span className="text-xs sm:text-sm font-semibold text-white">
@@ -398,13 +415,11 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         </div>
       </div>
 
-      {/* Form Content */}
       <div className="p-3 sm:p-4 xs:p-2 relative" style={{ zIndex: 1000 }}>
         <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 mb-3 sm:mb-4 text-center">
           Create Your Tour Plan
         </h2>
 
-        {/* Step 1: Basic Information */}
         {currentStep === 1 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -458,6 +473,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <input
                   {...register("adults", {
                     required: "At least one adult or child is required",
+                    min: { value: 0, message: "Adults cannot be negative" },
                   })}
                   type="number"
                   placeholder="Adults"
@@ -476,7 +492,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   Children
                 </label>
                 <input
-                  {...register("children")}
+                  {...register("children", {
+                    min: { value: 0, message: "Children cannot be negative" },
+                  })}
                   type="number"
                   placeholder="Children"
                   defaultValue={formData.children}
@@ -493,7 +511,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
 
-        {/* Step 2: Details */}
         {currentStep === 2 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -600,28 +617,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                Description
+                Description (Optional)
               </label>
               <textarea
-                {...register("description", {
-                  required: "Description is required",
-                })}
+                {...register("description")}
                 placeholder="Describe your trip"
                 rows="4"
                 defaultValue={formData.description}
                 onChange={(e) => updateFormData("description", e.target.value)}
                 className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent resize-none text-xs sm:text-sm transition-all duration-200"
               ></textarea>
-              {errors.description && (
-                <span className="text-red-500 text-xs mt-1">
-                  {errors.description.message}
-                </span>
-              )}
             </div>
           </div>
         )}
 
-        {/* Step 3: Accommodation Preferences */}
         {currentStep === 3 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -708,7 +717,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
 
-        {/* Step 4: Travel Preferences */}
         {currentStep === 4 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -831,7 +839,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
 
-        {/* Step 5: Personal Information */}
         {currentStep === 5 && (
           <div className="space-y-3 sm:space-y-4">
             <div>
@@ -898,7 +905,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               />
               {errors.phoneNumber && (
                 <span className="text-red-500 text-xs mt-1">
-                  {errors.phoneNumber.message}
+                    {errors.phoneNumber.message}
                 </span>
               )}
             </div>
@@ -932,7 +939,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
 
-        {/* Navigation Buttons */}
         <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 sm:mb-0 w-full sm:w-auto">
             {currentStep > 1 && (

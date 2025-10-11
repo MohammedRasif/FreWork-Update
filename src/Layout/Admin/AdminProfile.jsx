@@ -267,7 +267,7 @@ const AdminProfile = () => {
           </button>
         </div>
         <h1 className="text-sm sm:text-md font-semibold text-gray-700 text-center mt-2">
-          VAT ID : {profileData?.invitation_code || "N/A"}
+          VAT ID : {profileData?.vat_id || "N/A"}
         </h1>
       </div>
 
