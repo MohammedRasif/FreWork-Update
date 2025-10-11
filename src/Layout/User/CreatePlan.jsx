@@ -85,7 +85,7 @@ const CreatePlan = () => {
       setValue("travelType", oldData.travel_type || "");
       setValue("destinationType", oldData.destination_type || "");
       setValue("typeOfAccommodation", oldData.type_of_accommodation || "");
-      setValue("minimumHotelStars", oldData.minimum_hotel_stars || "");
+      setValue("minimum_star_hotel", oldData.minimum_star_hotel || "");
       setValue("mealPlan", oldData.meal_plan || "");
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
@@ -200,7 +200,7 @@ const CreatePlan = () => {
     formData.append("travel_type", data.travelType);
     formData.append("destination_type", data.destinationType);
     formData.append("type_of_accommodation", data.typeOfAccommodation);
-    formData.append("includes", data.minimumHotelStars);
+    formData.append("minimum_star_hotel", data.minimumHotelStars);
     formData.append("meal_plan", data.mealPlan);
     formData.append("status", status);
     formData.append("tourist_spots", data.touristSpots);
@@ -409,9 +409,9 @@ const CreatePlan = () => {
                   <option value="4">4 Stars</option>
                   <option value="5">5 Stars</option>
                 </select>
-                {errors.minimumHotelStars && (
+                {errors.minimum_star_hotel && (
                   <p className="text-red-500 text-[14px] mt-1">
-                    {errors.minimumHotelStars.message}
+                    {errors.minimum_star_hotel.message}
                   </p>
                 )}
               </div>

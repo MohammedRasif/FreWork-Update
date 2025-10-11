@@ -100,7 +100,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setValue("description", state?.description || "");
       setValue("destinationType", state?.destination_type || "");
       setValue("typeOfAccommodation", state?.type_of_accommodation || "");
-      setValue("minimumHotelStars", state?.minimum_hotel_stars || "");
+      setValue("minimumHotelStars", state?.minimum_star_hotel || "");
       setValue("mealPlan", state?.meal_plan || "");
       setValue("travelType", state?.travel_type || "");
       setValue("confirmation", !!state?.is_confirmed_request);
@@ -117,7 +117,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             tourist_spots: "touristSpots",
             destination_type: "destinationType",
             type_of_accommodation: "typeOfAccommodation",
-            minimum_hotel_stars: "minimumHotelStars",
+            minimum_star_hotel: "minimumHotelStars",
             meal_plan: "mealPlan",
             travel_type: "travelType",
             is_confirmed_request: "confirmation",
@@ -313,7 +313,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       "type_of_accommodation",
       data.typeOfAccommodation || ""
     );
-    formDataToSend.append("minimum_hotel_stars", data.minimumHotelStars || "");
+    formDataToSend.append("minimum_star_hotel", data.minimumHotelStars || "");
     formDataToSend.append("meal_plan", data.mealPlan || "");
     formDataToSend.append("status", status);
     formDataToSend.append("tourist_spots", data.touristSpots || "");
