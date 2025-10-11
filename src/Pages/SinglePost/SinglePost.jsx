@@ -431,7 +431,7 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-             <h1 className="text-[16px]   py-2 pl-9 font-bold ">Image generated automatically</h1>
+             <h1 className="text-[16px]   py-2 font-bold ">* Image generated automatically</h1>
 
           </div>
           <div className="pt-2 w-full">

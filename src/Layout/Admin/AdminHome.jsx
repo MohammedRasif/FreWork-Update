@@ -576,17 +576,17 @@ const AdminHome = () => {
                       {/* <p className="text-xs sm:text-sm text-gray-600">
                         {offer.message}
                       </p> */}
-                      {offer.file_name && (
+                      {/* {offer.file_name && (
                         <p className="text-xs sm:text-sm text-gray-600">
                           File: {offer.file_name}
                         </p>
-                      )}
+                      )} */}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-lg sm:text-xl">
+                    {/* <span className="font-semibold text-lg sm:text-xl">
                       ${offer.offered_budget}
-                    </span>
+                    </span> */}
                     {offer.apply_discount && offer.discount > 0 && (
                       <span className="text-sm text-green-600">
                         ({offer.discount}% off)
