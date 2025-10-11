@@ -121,7 +121,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
           alt="Plan Image"
           className="w-full h-full object-cover object-center"
         />
-        <h1 className="text-[11px] left-1 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1>
+        {/* <h1 className="text-[11px] left-1 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1> */}
       </div>
 
       {/* right content */}

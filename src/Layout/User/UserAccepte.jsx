@@ -181,7 +181,7 @@ const UserAccepte = () => {
                     alt={`Tour to ${offer.tour_plan.location_to}`}
                     className="w-full h-48 md:h-full object-cover"
                   />
-                  <h1 className="text-[11px] left-2 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1>
+                  {/* <h1 className="text-[11px] left-2 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1> */}
                 </div>
 
                 <div className="w-full p-4 sm:p-6">
