@@ -41,25 +41,27 @@ const AdminProfile = () => {
     setToDate("");
   };
 
- const handleReset = async () => {
-  setFromDate("");
-  setToDate("");
-  const payload = {
-    start_unavailable: "",
-    end_unavailable: "",
-  };
+  const handleReset = async () => {
+    setFromDate("");
+    setToDate("");
+    const payload = {
+      start_unavailable: "",
+      end_unavailable: "",
+    };
 
-  try {
-    await update(payload).unwrap();
-    refetch();
-    handleClosePopup();
-  } catch (err) {
-    console.error("Failed to reset unavailability:", err);
-    const errorMessage =
-      err?.data?.detail || err?.data?.message || "Failed to reset unavailability. Please try again.";
-    alert(errorMessage);
-  }
-};
+    try {
+      await update(payload).unwrap();
+      refetch();
+      handleClosePopup();
+    } catch (err) {
+      console.error("Failed to reset unavailability:", err);
+      const errorMessage =
+        err?.data?.detail ||
+        err?.data?.message ||
+        "Failed to reset unavailability. Please try again.";
+      alert(errorMessage);
+    }
+  };
 
   useEffect(() => {
     if (profileData) {
@@ -68,41 +70,47 @@ const AdminProfile = () => {
     }
   }, [profileData]);
 
- const handleConfirm = async () => {
-  if (!fromDate || !toDate) {
-    alert("Please select both start and end dates.");
-    return;
-  }
+  const handleConfirm = async () => {
+    if (!fromDate || !toDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
 
-  const parsedFromDate = new Date(fromDate);
-  const parsedToDate = new Date(toDate);
+    const parsedFromDate = new Date(fromDate);
+    const parsedToDate = new Date(toDate);
 
-  if (isNaN(parsedFromDate) || isNaN(parsedToDate)) {
-    alert("Invalid date format. Please select valid dates.");
-    return;
-  }
+    if (isNaN(parsedFromDate) || isNaN(parsedToDate)) {
+      alert("Invalid date format. Please select valid dates.");
+      return;
+    }
 
-  if (parsedFromDate >= parsedToDate) {
-    alert("End date must be after start date.");
-    return;
-  }
+    if (parsedFromDate >= parsedToDate) {
+      alert("End date must be after start date.");
+      return;
+    }
 
-  try {
-    const payload = {
-      start_unavailable: new Date(parsedFromDate.setHours(14, 36, 34, 327)).toISOString(),
-      end_unavailable: new Date(parsedToDate.setHours(14, 36, 34, 327)).toISOString(),
-    };
+    try {
+      const payload = {
+        start_unavailable: new Date(
+          parsedFromDate.setHours(14, 36, 34, 327)
+        ).toISOString(),
+        end_unavailable: new Date(
+          parsedToDate.setHours(14, 36, 34, 327)
+        ).toISOString(),
+      };
 
-    await update(payload).unwrap();
-    refetch();
-    handleClosePopup();
-  } catch (err) {
-    console.error("Failed to set unavailability:", err);
-    const errorMessage =
-      err?.data?.detail || err?.data?.message || "Failed to set unavailability. Please try again.";
-    alert(errorMessage);
-  }
-};
+      await update(payload).unwrap();
+      refetch();
+      handleClosePopup();
+    } catch (err) {
+      console.error("Failed to set unavailability:", err);
+      const errorMessage =
+        err?.data?.detail ||
+        err?.data?.message ||
+        "Failed to set unavailability. Please try again.";
+      alert(errorMessage);
+    }
+  };
   if (isProfileLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -259,7 +267,7 @@ const AdminProfile = () => {
           </button>
         </div>
         <h1 className="text-sm sm:text-md font-semibold text-gray-700 text-center mt-2">
-          Invitation code: {profileData?.invitation_code || "N/A"}
+          VAT ID : {profileData?.invitation_code || "N/A"}
         </h1>
       </div>
 
@@ -304,7 +312,9 @@ const AdminProfile = () => {
           </div>
           <div>
             <div className="pb-5">
-              <h1 className="text-2xl font-semibold text-black">Our Service Category</h1>
+              <h1 className="text-2xl font-semibold text-black">
+                Our Service Category
+              </h1>
               {profileData?.service_categories?.length > 0 ? (
                 <span className=" text-gray-700 text-md ">
                   {JSON.parse(profileData.service_categories[0])

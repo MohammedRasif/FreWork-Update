@@ -371,7 +371,7 @@ function SinglePost({ prid }) {
               </h1>
               <h1 className="text-md text-gray-700">
                 {" "}
-                <span className="font-bold">Adult :</span> {tour.child_count}
+                <span className="font-bold">Adult :</span> {tour.adult_count}
               </h1>
             </div>
           </div>

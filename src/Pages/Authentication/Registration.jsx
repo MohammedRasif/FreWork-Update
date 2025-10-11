@@ -5,7 +5,7 @@ import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "@/redux/features/baseApi";
 
-const register = () => {
+const Register = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [createUser, { isLoading, isError, error, isSuccess }] =
@@ -22,6 +22,7 @@ const register = () => {
   } = useForm();
 
   const password = watch("password");
+  const userType = watch("userType");
 
   // Load email from localStorage pendingPlan
   useEffect(() => {
@@ -51,6 +52,7 @@ const register = () => {
         role: data.userType,
         password: data.password,
         invitation_code: data.invitationCode || undefined,
+        vat_id: data.vatId || undefined, // Add vat_id to payload
       };
       // Store userType in localStorage
       localStorage.setItem("userType", data.userType);
@@ -185,6 +187,32 @@ const register = () => {
               )}
             </div>
 
+            {/* VAT ID Field (Conditional) */}
+            {userType === "agency" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  VAT ID
+                </label>
+                <input
+                  {...register("vatId", {
+                    required: "VAT ID is required for agency",
+                    pattern: {
+                      value: /^\d{11}$/,
+                      message: "VAT ID must be exactly 11 digits",
+                    },
+                  })}
+                  type="text"
+                  placeholder="Enter 11-digit VAT ID"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.vatId && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.vatId.message}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -278,4 +306,4 @@ const register = () => {
   );
 };
 
-export default register;
+export default Register;

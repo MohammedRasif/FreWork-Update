@@ -107,8 +107,10 @@ export default function TourCard({ tourPlan }) {
         <div className="flex flex-col flex-grow p-4 space-y-1 relative">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold text-gray-900">
-              {localTourPlan.location_to}
-            </h3>
+            {localTourPlan.location_to.length > 8
+              ? `${localTourPlan.location_to.slice(0, 8)}...`
+              : localTourPlan.location_to}
+          </h3>
             <div className="flex items-center gap-2">
               <svg
                 className="w-5 h-5 text-green-500"
