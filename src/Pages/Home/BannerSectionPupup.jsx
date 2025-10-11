@@ -621,7 +621,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </label>
               <textarea
                 {...register("description")}
-                placeholder="Describe your trip"
+                placeholder="Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
                 rows="4"
                 defaultValue={formData.description}
                 onChange={(e) => updateFormData("description", e.target.value)}
