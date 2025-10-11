@@ -160,7 +160,13 @@ const TourPlanDouble = () => {
     setSelectedTour(null);
   };
 
-  const handleSubmitOffer = async (tourId, budget, comment, offerForm, file) => {
+  const handleSubmitOffer = async (
+    tourId,
+    budget,
+    comment,
+    offerForm,
+    file
+  ) => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
 
@@ -192,7 +198,9 @@ const TourPlanDouble = () => {
 
     if (
       offerForm.applyDiscount &&
-      (!offerForm.discount || isNaN(offerForm.discount) || offerForm.discount <= 0)
+      (!offerForm.discount ||
+        isNaN(offerForm.discount) ||
+        offerForm.discount <= 0)
     ) {
       toast.error("Please provide a valid discount percentage");
       return;
@@ -219,7 +227,9 @@ const TourPlanDouble = () => {
         offered_budget: Number.parseFloat(budget),
         message: comment.trim(),
         apply_discount: offerForm.applyDiscount || false,
-        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
         file_name: file.name,
         agency: {
           agency_name: localStorage.getItem("name") || "Unknown Agency",
@@ -455,14 +465,17 @@ const TourPlanDouble = () => {
                             </div>
                           )}
                         </div>
-                                   <h1 className="text-[16px] left-[70px] absolute top-2  font-semibold text-white ">Image generated automatically</h1>
-
+                        <h1 className="text-[16px] left-[70px] absolute top-2  font-semibold text-white ">
+                          Image generated automatically
+                        </h1>
                       </div>
 
                       <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
                         <div className="flex items-center justify-between">
                           <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
-                            {tour.location_to}
+                            {tour.location_to.length > 8
+                              ? `${tour.location_to.slice(0, 8)}...`
+                              : tour.location_to}
                           </h3>
                           <div className="flex items-center gap-2">
                             <svg
@@ -522,15 +535,21 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MapPin className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Points of travel:</span>{" "}
-                              {tour.tourist_spots || "None"}
+                              <span className="font-medium">
+                                Points of travel:
+                              </span>{" "}
+                              {tour.tourist_spots.length > 14
+                                ? `${tour.tourist_spots.slice(0, 14)}...`
+                                : tour.tourist_spots}
                             </span>
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <Navigation className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Departure from:</span>{" "}
+                              <span className="font-medium">
+                                Departure from:
+                              </span>{" "}
                               {tour.location_from || "N/A"}
                             </span>
                           </p>
@@ -538,7 +557,9 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaListUl className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Minimum rating:</span>{" "}
+                              <span className="font-medium">
+                                Minimum rating:
+                              </span>{" "}
                               {tour.includes || "N/A"}
                             </span>
                           </p>
@@ -554,7 +575,9 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <BedDouble className="w-6 h-5 text-gray-500" />
                             <span>
-                              <span className="font-medium">Type of accommodation:</span>{" "}
+                              <span className="font-medium">
+                                Type of accommodation:
+                              </span>{" "}
                               {tour.type_of_accommodation || "N/A"}
                             </span>
                           </p>
@@ -570,7 +593,9 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <ShieldCheck className="w-6 h-5 text-green-500" />
                             <span>
-                              <span className="font-medium">Contact verified via email</span>
+                              <span className="font-medium">
+                                Contact verified via email
+                              </span>
                             </span>
                           </p>
                         </div>
