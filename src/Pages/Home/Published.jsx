@@ -337,10 +337,10 @@ const Published = () => {
                       clickable: true,
                       renderBullet: (index, className) => {
                         return `
-          <span class="${className} custom-pagination-bullet">
-            <span class="pagination-number">${index + 1}</span>
-          </span>
-        `;
+                        <span class="${className} custom-pagination-bullet">
+                          <span class="pagination-number">${index + 1}</span>
+                        </span>
+                      `;
                       },
                     }}
                     navigation={{

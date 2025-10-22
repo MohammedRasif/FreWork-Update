@@ -93,7 +93,6 @@ const EasyandFast = () => {
             </div>
           </div>
 
-          {/* Trip Card */}
           <div
               className="relative w-full lg:w-auto min-w-[280px] sm:min-w-[320px] lg:min-w-[430px] px-4 sm:px-6"
             // className="relative w-full max-w-full sm:min-w-[320px] lg:min-w-[360px] px-4 sm:px-6"
