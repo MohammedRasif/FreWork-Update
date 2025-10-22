@@ -10,11 +10,11 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   useArchivedUserMutation,
   useFinalOfferResponseMutation,
-  useGetChatHsitoryQuery,
   useGetChatListQuery,
   useGetPlansQuery,
   useInviteToChatMutation,
   useMessageSentMutation,
+  useShowMessagesQuery,
 } from "@/redux/features/withAuth";
 import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
@@ -22,17 +22,20 @@ import { toast } from "react-toastify";
 
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
+
 function Messages() {
   const { id } = useParams();
-  console.log(id);
+  console.log("Conversation ID:", id);
   const userId = localStorage.getItem("user_id");
+  console.log("User ID:", userId);
   const location = useLocation();
   const navigate = useNavigate();
   const agency = location.state?.agency;
+  console.log("Agency:", agency);
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null); // Retaining for existing logic, though redundant now
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -43,13 +46,19 @@ function Messages() {
   const [finalOfferResponse] = useFinalOfferResponseMutation();
   const [sentMessage] = useMessageSentMutation();
 
+  // Fetch messages using useShowMessagesQuery with the conversation id
+  const {
+    data: messagesData,
+    isLoading: isMessagesLoading,
+    error: messagesError,
+  } = useShowMessagesQuery(id);
+  console.log("Messages Data:", messagesData);
+
   const {
     data: chatList,
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
-  const { data, isLoading, error } = useGetChatHsitoryQuery(id);
-
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
@@ -59,7 +68,37 @@ function Messages() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
-  const [isButtonVisible, setIsButtonVisible] = useState(true); // Retained state
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
+
+  useEffect(() => {
+    // যদি agency স্টেটে না থাকে কিন্তু URL-এ ID থাকে, তাহলে chatList থেকে খুঁজুন
+    if (!agency && id && chatList && !isChatListLoading) {
+      const currentChat = chatList.find((chat) => chat.id?.toString() === id);
+      if (currentChat) {
+        // Navigate with the agency data to populate the state
+        const basePath = location.pathname.includes("/admin/")
+          ? "/admin/chat"
+          : "/user/chat";
+
+        const agencyData = {
+          id: currentChat.id?.toString() || "",
+          name: currentChat.other_participant_name || "Unknown User",
+          image:
+            currentChat.other_participant_image ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          other_user_id: currentChat.other_user_id || null,
+          tour_plan_id: currentChat.tour_plan_id || null,
+          tour_plan_title: currentChat.tour_plan_title || "No Tour Plan",
+          is_archived: currentChat.is_archived || false,
+        };
+
+        navigate(`${basePath}/${id}`, {
+          state: { agency: agencyData },
+          replace: true,
+        });
+      }
+    }
+  }, [agency, id, chatList, isChatListLoading, navigate, location.pathname]);
 
   // Set initial tour plan from agency.tour_plan_id
   useEffect(() => {
@@ -95,7 +134,7 @@ function Messages() {
     setSelectedFile(null);
   }, [id]);
 
-  // Initialize WebSocket
+  // Initialize WebSocket for real-time messages
   useEffect(() => {
     const chat_url = chat_sockit(id);
     wsRef.current = new WebSocket(chat_url);
@@ -105,10 +144,7 @@ function Messages() {
         const received = JSON.parse(event.data);
         console.log("Received WebSocket message:", received);
 
-        if (received.type === "message_history") {
-          return;
-        }
-
+        // Skip message_history since we're using useShowMessagesQuery
         if (received.type !== "chat_message") {
           return;
         }
@@ -186,25 +222,34 @@ function Messages() {
     };
   }, [id, userId]);
 
+  // Process messages from useShowMessagesQuery
   useEffect(() => {
-    if (data && Array.isArray(data.messages) && userId) {
-      const formattedMessages = data.messages.map((msg) => ({
+    if (
+      messagesData?.messages &&
+      Array.isArray(messagesData.messages) &&
+      userId
+    ) {
+      console.log("Processing messages:", messagesData.messages);
+      const formattedMessages = messagesData.messages.map((msg) => ({
         id: msg.id,
-        message_type: msg.message_type || (msg.file ? "file" : "text"),
-        text: msg.text,
+        message_type:
+          msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
+        text: msg.text || null,
         data: msg.data || null,
         tour_plan_id: msg.tour_plan_id || null,
         tour_plan_title: msg.tour_plan_title || null,
-        file: msg.file
-          ? msg.file.startsWith("http")
-            ? msg.file
-            : `${FILE_BASE_URL}${msg.file}`
-          : null,
-        isUser: String(msg.sender.user_id) === userId,
+        file:
+          msg.file || msg.file_url
+            ? (msg.file || msg.file_url).startsWith("http")
+              ? msg.file || msg.file_url
+              : `${FILE_BASE_URL}${msg.file || msg.file_url}`
+            : null,
+        isUser: String(msg.sender?.user_id) === userId,
         timestamp: new Date(msg.timestamp),
         is_read: msg.is_read,
         status: "sent",
       }));
+      console.log("Formatted messages:", formattedMessages);
       setMessages((prev) => {
         const allMsgs = [...prev, ...formattedMessages];
         const uniqueMsgs = allMsgs.reduce((acc, msg) => {
@@ -213,12 +258,16 @@ function Messages() {
           }
           return acc;
         }, {});
-        return Object.values(uniqueMsgs).sort(
+        const sortedMessages = Object.values(uniqueMsgs).sort(
           (a, b) => a.timestamp - b.timestamp
         );
+        console.log("Updated messages state:", sortedMessages);
+        return sortedMessages;
       });
+    } else {
+      console.log("No messages to process:", { messagesData, userId });
     }
-  }, [data, userId, id]);
+  }, [messagesData, userId, id]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -232,7 +281,6 @@ function Messages() {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Auto-send the file
       if (!selectedDropdown && !agency?.tour_plan_id) {
         alert("Please select a tour plan first");
         if (fileInputRef.current) {
@@ -247,22 +295,17 @@ function Messages() {
         (opt) => opt.value === selectedDropdown
       );
 
-      // Create a local preview URL for ALL file types
       const filePreviewUrl = URL.createObjectURL(file);
-
-      // Use the actual file object or its name for local rendering
       const localFileName = file.name;
 
       const localMessage = {
         id: messageId,
         message_type: "file",
-        text: null, // No text in this path
+        text: null,
         data: null,
         tour_plan_id: selectedDropdown,
         tour_plan_title: tourPlan?.label || null,
-        // Use the local object URL for preview (image or generic file link)
         file: filePreviewUrl,
-        // Store the original file object or name for temporary display
         localFileName: localFileName,
         isUser: true,
         timestamp: new Date(),
@@ -283,7 +326,6 @@ function Messages() {
           data: formData,
         }).unwrap();
 
-        // Clean up preview URL
         if (filePreviewUrl) {
           URL.revokeObjectURL(filePreviewUrl);
         }
@@ -302,7 +344,7 @@ function Messages() {
                   text: response.text || null,
                   status: "sent",
                   tempId: undefined,
-                  localFileName: undefined, // Clean up local file name
+                  localFileName: undefined,
                 }
               : msg
           )
@@ -311,7 +353,6 @@ function Messages() {
       } catch (error) {
         console.error("Failed to send file message:", error);
         toast.error("Failed to send file message");
-        // Clean up preview URL on failure
         if (filePreviewUrl) {
           URL.revokeObjectURL(filePreviewUrl);
         }
@@ -453,7 +494,6 @@ function Messages() {
 
     const formData = new FormData();
     formData.append("text", message.text);
-    // formData.append("tour_plan_id", message.tour_plan_id); // Assuming sentMessage API handles context
 
     try {
       const response = await sentMessage({
@@ -573,7 +613,7 @@ function Messages() {
       return;
     }
     navigate(`/tour-plans/${agency.tour_plan_id}`);
-    setIsButtonVisible(false); // Does not affect rendering in the current structure
+    setIsButtonVisible(false);
   };
 
   const handleArchiveConversation = async () => {
@@ -605,44 +645,34 @@ function Messages() {
   };
 
   const getFileExtension = (url) =>
-    url.split("?")[0].split(".").pop().toLowerCase();
-  const getFileName = (url) => url.split("/").pop().split("?")[0];
+    url?.split("?")[0].split(".").pop().toLowerCase();
+  const getFileName = (url) => url?.split("/").pop().split("?")[0];
 
-  /**
-   * Renders the content of a single message, supporting text, file, or both.
-   * This is the function that was updated to meet the user's request.
-   */
   const renderMessageContent = (message) => {
     const fileExt = message.file ? getFileExtension(message.file) : "";
     const isImageFile =
       message.file &&
       (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExt) ||
-        message.file.startsWith("blob:")); // Check for both actual extension and local blob URLs
+        message.file.startsWith("blob:"));
 
-    // --- UPDATED LOGIC TO RENDER BOTH TEXT AND FILE ---
     if (message.text || message.file) {
       return (
         <>
-          {/* 1. Render Text Content if it exists */}
           {message.text && (
             <p className={message.file ? "mb-2 break-words" : "break-words"}>
               {message.text}
             </p>
           )}
-
-          {/* 2. Render File/Image Content if it exists */}
           {message.file && (
             <div>
               {isImageFile ? (
-                // Display Image
                 <img
                   src={message.file}
-                  alt={message.localFileName || "Attachment"} // Use localFileName for pending
+                  alt={message.localFileName || "Attachment"}
                   className="max-w-full h-auto rounded"
                   style={{ maxWidth: "200px" }}
                 />
               ) : (
-                // Display Link for PDF/Other Files
                 <div className="flex items-center space-x-2 pt-1">
                   <PaperclipIcon className="h-4 w-4 shrink-0" />
                   <a
@@ -665,27 +695,35 @@ function Messages() {
         </>
       );
     }
-    // --- END UPDATED LOGIC ---
-
-    // Fallback for system messages or empty data (though 'start_conversation' is handled in the map)
     return <p>Unknown content.</p>;
   };
 
-  if (isLoading || isChatListLoading) {
+  // Replace the loading check at the end of Messages component
+  if (isMessagesLoading) {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
-        <h1 className="text-lg text-gray-800 dark:text-gray-100">Loading...</h1>
+        <h1 className="text-lg text-gray-800 dark:text-gray-100">
+          Loading messages...
+        </h1>
       </div>
     );
   }
 
-  if (error || !agency) {
+  if (isChatListLoading && !agency) {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          {error
-            ? "Error loading chat history"
-            : "Select an agency to start chatting"}
+          Loading chat...
+        </h1>
+      </div>
+    );
+  }
+
+  if (messagesError || (!agency && !isChatListLoading)) {
+    return (
+      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
+        <h1 className="text-lg text-gray-800 dark:text-gray-100">
+          {messagesError ? "Error loading chat history" : "Chat not found"}
         </h1>
       </div>
     );
@@ -694,10 +732,9 @@ function Messages() {
   const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
 
   return (
-    <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col ">
+    <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
       {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        {/* Empty div for spacing/alignment with the right side */}
         <div></div>
         <div className="flex items-center space-x-2">
           <div className="relative" ref={menuRef}>
@@ -730,19 +767,22 @@ function Messages() {
         </div>
       </div>
       {/* Messages Section */}
-      <div className="flex-1 p-4 space-y-4 overflow-y-auto ">
+      <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+        {messages.length === 0 && (
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            No messages to display.
+          </div>
+        )}
         {messages.map((message) => {
-          // Filter out messages that should not be visible as bubbles
           if (
             !message.text &&
             !message.file &&
             message.message_type !== "start_conversation" &&
-            message.message_type !== "final_offer_sent" // Added a check for system-only types if they were hidden before
+            message.message_type !== "final_offer_sent"
           ) {
             return null;
           }
 
-          // Render 'start_conversation' (and other system messages if needed) as a system message
           if (message.message_type === "start_conversation") {
             return (
               <div
@@ -759,7 +799,6 @@ function Messages() {
           return (
             <div key={message.id || message.tempId}>
               {message.isUser ? (
-                // User's Message (Right Side)
                 <div className="flex justify-end space-x-2">
                   <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium shadow-md">
                     {renderMessageContent(message)}
@@ -791,7 +830,6 @@ function Messages() {
                   </div>
                 </div>
               ) : (
-                // Agency's Message (Left Side)
                 <div className="flex items-start space-x-2">
                   <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                     <img
@@ -802,7 +840,6 @@ function Messages() {
                   </div>
                   <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
                     {renderMessageContent(message)}
-                    {/* Time is often omitted on the left side, or placed below the bubble content */}
                   </div>
                 </div>
               )}
@@ -825,7 +862,6 @@ function Messages() {
               >
                 {isAccepting ? "Accepting..." : "Accept final offer"}
               </button>
-
               <button
                 onClick={handleDeclineFinalOffer}
                 disabled={isDeclining}

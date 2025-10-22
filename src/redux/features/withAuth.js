@@ -49,6 +49,7 @@ export const sqQuery = createApi({
     "SentMessage",
     "declineOffer",
     "restore",
+    "SentMessages",
   ],
 
   endpoints: (builder) => ({
@@ -390,6 +391,18 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["TourPlan", "declineOffer"],
     }),
+
+
+    showMessages: builder.query({
+      query: (id) => `chat/conversations/${id}/messages/`,
+      providesTags: ["SentMessages"],
+    }),
+
+
+
+
+
+
   }),
 });
 
@@ -471,4 +484,7 @@ export const {
   useDeclineOfferQuery,
 
   useRestoreMutation,
+
+  // show messages
+  useShowMessagesQuery,
 } = sqQuery;

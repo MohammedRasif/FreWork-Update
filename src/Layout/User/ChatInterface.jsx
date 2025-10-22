@@ -4,19 +4,21 @@ import { useGetChatListQuery } from "@/redux/features/withAuth";
 import { useState, useEffect } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 
 export default function ChatInterface() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id: urlChatId } = useParams(); // URL থেকে chat ID নিন
   const [selectedAgencyId, setSelectedAgencyId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [chatsList, setChatsList] = useState([]);
-  // Initialize activeTab from localStorage or default to "inbox"
+  
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("activeChatTab") || "inbox";
   });
+  
   const {
     data: chatList,
     isLoading: isChatListLoading,
@@ -81,50 +83,63 @@ export default function ChatInterface() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Update selectedAgencyId based on current route and tab
+  // Handle URL-based chat ID selection
   useEffect(() => {
-    const pathParts = location.pathname.split("/");
-    const agencyIdFromPath = pathParts[pathParts.length - 1];
-    const basePath = location.pathname.includes("/admin/")
-      ? "/admin/chat"
-      : "/user/chat";
+    if (urlChatId) {
+      // URL-এ chat ID আছে
+      if (isChatListLoading || chatsList.length === 0) {
+        // chatList এখনো লোড হচ্ছে, ID সেট করে রাখুন
+        setSelectedAgencyId(urlChatId);
+        return;
+      }
 
-    // Check if the current route is a conversation route and the ID is valid
-    if (
-      pathParts.includes("chat") &&
-      chatsList.some((agency) => agency.id === agencyIdFromPath) &&
-      location.pathname !== basePath
-    ) {
-      // Ensure the conversation matches the active tab's filter
-      const selectedChat = chatsList.find(
-        (agency) => agency.id === agencyIdFromPath
-      );
-      if (
-        selectedChat &&
-        ((activeTab === "inbox" && !selectedChat.is_archived) ||
-          (activeTab === "archived" && selectedChat.is_archived))
-      ) {
-        setSelectedAgencyId(agencyIdFromPath);
-      } else {
-        // If the conversation doesn't match the tab, reset to base route
+      // chatList থেকে chat খুঁজুন
+      const selectedChat = chatsList.find((chat) => chat.id === urlChatId);
+
+      if (selectedChat) {
+        setSelectedAgencyId(urlChatId);
+        
+        // সঠিক tab-এ switch করুন
+        const correctTab = selectedChat.is_archived ? "archived" : "inbox";
+        if (activeTab !== correctTab) {
+          setActiveTab(correctTab);
+        }
+      } else if (!isChatListLoading) {
+        // Chat পাওয়া যায়নি এবং loading complete
+        const basePath = location.pathname.includes("/admin/")
+          ? "/admin/chat"
+          : "/user/chat";
+        navigate(basePath, { replace: true });
         setSelectedAgencyId(null);
-        navigate(basePath);
       }
     } else {
-      // If on base route or invalid ID, reset selection
+      // URL-এ কোনো chat ID নেই
       setSelectedAgencyId(null);
     }
-  }, [location.pathname, chatsList, activeTab, navigate]);
+  }, [urlChatId, chatsList, isChatListLoading, activeTab]);
 
-  // Reset to base route when switching tabs
+  // Tab change করলে base route-এ redirect করুন (শুধুমাত্র যদি কোনো chat selected না থাকে)
   useEffect(() => {
     const basePath = location.pathname.includes("/admin/")
       ? "/admin/chat"
       : "/user/chat";
-    if (!isBaseRoute) {
-      navigate(basePath);
+    
+    // যদি selected chat এর archive status tab এর সাথে match না করে
+    if (selectedAgencyId) {
+      const selectedChat = chatsList.find((chat) => chat.id === selectedAgencyId);
+      if (selectedChat) {
+        const shouldBeInArchived = selectedChat.is_archived;
+        const isInArchivedTab = activeTab === "archived";
+        
+        if (shouldBeInArchived !== isInArchivedTab) {
+          // Tab change হয়েছে কিন্তু chat এর archive status match করছে না
+          // Base route-এ redirect করুন
+          navigate(basePath, { replace: true });
+          setSelectedAgencyId(null);
+        }
+      }
     }
-  }, [activeTab, navigate]);
+  }, [activeTab, selectedAgencyId, chatsList, navigate, location.pathname]);
 
   const handleAgencyClick = (agency) => {
     if (!agency.id) return;
