@@ -9,7 +9,7 @@ import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 export default function ChatInterface() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id: urlChatId } = useParams(); // URL থেকে chat ID নিন
+  const { id: urlChatId } = useParams();
   const [selectedAgencyId, setSelectedAgencyId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +71,7 @@ export default function ChatInterface() {
 
       setChatsList(mappedChats);
     }
-  }, [isChatListLoading, chatList]);
+  }, [chatList, isChatListLoading]);
 
   // Check for mobile layout
   useEffect(() => {
@@ -86,26 +86,15 @@ export default function ChatInterface() {
   // Handle URL-based chat ID selection
   useEffect(() => {
     if (urlChatId) {
-      // URL-এ chat ID আছে
       if (isChatListLoading || chatsList.length === 0) {
-        // chatList এখনো লোড হচ্ছে, ID সেট করে রাখুন
         setSelectedAgencyId(urlChatId);
         return;
       }
 
-      // chatList থেকে chat খুঁজুন
       const selectedChat = chatsList.find((chat) => chat.id === urlChatId);
-
       if (selectedChat) {
         setSelectedAgencyId(urlChatId);
-        
-        // সঠিক tab-এ switch করুন
-        const correctTab = selectedChat.is_archived ? "archived" : "inbox";
-        if (activeTab !== correctTab) {
-          setActiveTab(correctTab);
-        }
       } else if (!isChatListLoading) {
-        // Chat পাওয়া যায়নি এবং loading complete
         const basePath = location.pathname.includes("/admin/")
           ? "/admin/chat"
           : "/user/chat";
@@ -113,33 +102,9 @@ export default function ChatInterface() {
         setSelectedAgencyId(null);
       }
     } else {
-      // URL-এ কোনো chat ID নেই
       setSelectedAgencyId(null);
     }
-  }, [urlChatId, chatsList, isChatListLoading, activeTab]);
-
-  // Tab change করলে base route-এ redirect করুন (শুধুমাত্র যদি কোনো chat selected না থাকে)
-  useEffect(() => {
-    const basePath = location.pathname.includes("/admin/")
-      ? "/admin/chat"
-      : "/user/chat";
-    
-    // যদি selected chat এর archive status tab এর সাথে match না করে
-    if (selectedAgencyId) {
-      const selectedChat = chatsList.find((chat) => chat.id === selectedAgencyId);
-      if (selectedChat) {
-        const shouldBeInArchived = selectedChat.is_archived;
-        const isInArchivedTab = activeTab === "archived";
-        
-        if (shouldBeInArchived !== isInArchivedTab) {
-          // Tab change হয়েছে কিন্তু chat এর archive status match করছে না
-          // Base route-এ redirect করুন
-          navigate(basePath, { replace: true });
-          setSelectedAgencyId(null);
-        }
-      }
-    }
-  }, [activeTab, selectedAgencyId, chatsList, navigate, location.pathname]);
+  }, [urlChatId, chatsList, isChatListLoading, navigate, location.pathname]);
 
   const handleAgencyClick = (agency) => {
     if (!agency.id) return;

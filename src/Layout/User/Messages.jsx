@@ -75,7 +75,6 @@ function Messages() {
     if (!agency && id && chatList && !isChatListLoading) {
       const currentChat = chatList.find((chat) => chat.id?.toString() === id);
       if (currentChat) {
-        // Navigate with the agency data to populate the state
         const basePath = location.pathname.includes("/admin/")
           ? "/admin/chat"
           : "/user/chat";
@@ -144,14 +143,12 @@ function Messages() {
         const received = JSON.parse(event.data);
         console.log("Received WebSocket message:", received);
 
-        // Skip message_history since we're using useShowMessagesQuery
         if (received.type !== "chat_message") {
           return;
         }
 
         const inner = received.message || received;
 
-        // Determine message type
         let messageType = "text";
         if (inner.file) {
           messageType = "file";
@@ -201,7 +198,6 @@ function Messages() {
             }
           }
 
-          // If no match or not user's message, add if it doesn't exist
           const exists = prev.some((msg) => msg.id === serverMessage.id);
           if (exists) {
             return prev;
@@ -626,9 +622,7 @@ function Messages() {
           : "Conversation archived successfully"
       );
       await refetchChatList();
-      navigate(
-        location.pathname.includes("/admin/") ? "/admin/chat" : "/user/chat"
-      );
+      // Do not navigate away; let the chat remain visible in the inbox tab
     } catch (err) {
       console.error(
         `Failed to ${
@@ -698,7 +692,6 @@ function Messages() {
     return <p>Unknown content.</p>;
   };
 
-  // Replace the loading check at the end of Messages component
   if (isMessagesLoading) {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
