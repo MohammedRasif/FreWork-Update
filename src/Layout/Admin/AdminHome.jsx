@@ -95,6 +95,7 @@ const AdminHome = () => {
   };
 
   // Handle offer submission
+  // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
     if (!token) {
       toast.error("Please log in to submit an offer");
@@ -103,6 +104,19 @@ const AdminHome = () => {
 
     if (!budget || !comment.trim()) {
       toast.error("Please provide a budget and a comment");
+      return;
+    }
+
+    // Budget validation: Check if offered budget is within $500 of plan.budget
+    const offeredBudget = Number.parseFloat(budget);
+    const planBudget = Number.parseFloat(selectedPlan.budget);
+    if (offeredBudget < planBudget - 500) {
+      toast.error(
+        `Offered budget is too low. It must be within $${
+          planBudget - 500
+        } of the plan budget ($${planBudget}).`,
+        { duration: 3000 }
+      );
       return;
     }
 
@@ -119,7 +133,7 @@ const AdminHome = () => {
     try {
       // Create FormData to include all required fields
       const formData = new FormData();
-      formData.append("offered_budget", Number.parseFloat(budget));
+      formData.append("offered_budget", offeredBudget);
       formData.append("message", comment);
       formData.append("apply_discount", offerForm.applyDiscount);
       formData.append(
@@ -137,7 +151,7 @@ const AdminHome = () => {
 
       const newOffer = {
         id: `${localStorage.getItem("user_id")}-${Date.now()}`,
-        offered_budget: Number.parseFloat(budget),
+        offered_budget: offeredBudget,
         message: comment,
         apply_discount: offerForm.applyDiscount,
         discount: offerForm.applyDiscount
@@ -219,115 +233,117 @@ const AdminHome = () => {
 
   // Render content for different tabs
   const renderContent = () => {
-  switch (activeTab) {
-    case "All Plans":
-      if (isTourPlanPublicLoading) {
-        return (
-          <div className="text-center text-gray-600">Loading plans...</div>
-        );
-      }
-      if (!filteredPlans.length) {
-        return (
-          <div className="text-center text-gray-600">No plans found.</div>
-        );
-      }
-      return filteredPlans
-        .filter((plan) => !plan.offered_status) // Only include plans where offered_status is false or undefined
-        .map((plan) => (
-          <div
-            key={plan.id}
-            className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
-          >
-            <div className="flex flex-col lg:flex-row">
-              <div className="lg:flex relative">
-                <img
-                  src={
-                    plan.spot_picture_url
-                      ? plan.spot_picture_url
-                      : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                  }
-                  alt={`${plan.location_to || "Tourist spot"}`}
-                  className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
-                />
-                {/* <h1 className="text-[14px] left-3 absolute top-2 font-semibold text-white ">
+    switch (activeTab) {
+      case "All Plans":
+        if (isTourPlanPublicLoading) {
+          return (
+            <div className="text-center text-gray-600">Loading plans...</div>
+          );
+        }
+        if (!filteredPlans.length) {
+          return (
+            <div className="text-center text-gray-600">No plans found.</div>
+          );
+        }
+        return filteredPlans
+          .filter((plan) => !plan.offered_status) // Only include plans where offered_status is false or undefined
+          .map((plan) => (
+            <div
+              key={plan.id}
+              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
+            >
+              <div className="flex flex-col lg:flex-row">
+                <div className="lg:flex relative">
+                  <img
+                    src={
+                      plan.spot_picture_url
+                        ? plan.spot_picture_url
+                        : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                    }
+                    alt={`${plan.location_to || "Tourist spot"}`}
+                    className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
+                  />
+                  {/* <h1 className="text-[14px] left-3 absolute top-2 font-semibold text-white ">
                   Image generated automatically
                 </h1> */}
-              </div>
-              <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
-                <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
-                    {plan.location_to}
-                  </h2>
-                  <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                    <p>
-                      Dates:{" "}
-                      <span className="font-medium">
-                        {plan.start_date} — {plan.end_date || plan.start_date}
-                      </span>
-                    </p>
-                    <p>
-                      Total members:{" "}
-                      <span className="font-medium">{plan.total_members}</span>
-                    </p>
-                    <p>
-                      Category:{" "}
-                      <span className="font-medium">{plan.category}</span>
-                    </p>
-                  </div>
                 </div>
-                <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
-                  <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
-                    <div className="text-center lg:text-right">
-                      <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
-                        Budget <FaEuroSign /> {plan.budget}
+                <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
+                  <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
+                      {plan.location_to}
+                    </h2>
+                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      <p>
+                        Dates:{" "}
+                        <span className="font-medium">
+                          {plan.start_date} — {plan.end_date || plan.start_date}
+                        </span>
                       </p>
-                      <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                        {plan.total_members} person
+                      <p>
+                        Total members:{" "}
+                        <span className="font-medium">
+                          {plan.total_members}
+                        </span>
+                      </p>
+                      <p>
+                        Category:{" "}
+                        <span className="font-medium">{plan.category}</span>
                       </p>
                     </div>
-                    <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
-                      <button
-                        onClick={() => openPopup(plan, "view")}
-                        className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => openPopup(plan, "offer")}
-                        className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                      >
-                        Send offer
-                      </button>
-                      <button
-                        onClick={() => handleDeclineRequest(plan.id)}
-                        disabled={isDeclineRequestLoading}
-                        className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                          isDeclineRequestLoading
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        {isDeclineRequestLoading
-                          ? "Declining..."
-                          : "Decline request"}
-                      </button>
+                  </div>
+                  <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
+                    <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
+                      <div className="text-center lg:text-right">
+                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
+                          Budget <FaEuroSign /> {plan.budget}
+                        </p>
+                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                          {plan.total_members} person
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
+                        <button
+                          onClick={() => openPopup(plan, "view")}
+                          className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => openPopup(plan, "offer")}
+                          className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                        >
+                          Send offer
+                        </button>
+                        <button
+                          onClick={() => handleDeclineRequest(plan.id)}
+                          disabled={isDeclineRequestLoading}
+                          className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                            isDeclineRequestLoading
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                        >
+                          {isDeclineRequestLoading
+                            ? "Declining..."
+                            : "Decline request"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ));
-    case "Decline Plans":
-      return <AdminDecline />;
-    case "Offered Plans":
-      return <AdminOfferPlan />;
-    case "Accepted Plans":
-      return <AdminAcceptPlan />;
-    default:
-      return null;
-  }
-};
+          ));
+      case "Decline Plans":
+        return <AdminDecline />;
+      case "Offered Plans":
+        return <AdminOfferPlan />;
+      case "Accepted Plans":
+        return <AdminAcceptPlan />;
+      default:
+        return null;
+    }
+  };
   const renderModalContent = () => {
     if (modalType === "view") {
       return (
@@ -534,16 +550,12 @@ const AdminHome = () => {
                   handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
                 }
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-                  isOfferSubmitting ||
-                  !offerBudget ||
-                  !offerComment.trim()
+                  isOfferSubmitting || !offerBudget || !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
                 disabled={
-                  isOfferSubmitting ||
-                  !offerBudget ||
-                  !offerComment.trim()
+                  isOfferSubmitting || !offerBudget || !offerComment.trim()
                 }
               >
                 <IoIosSend size={24} />

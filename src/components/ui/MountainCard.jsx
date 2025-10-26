@@ -69,11 +69,15 @@ export default function MountainCard({ tourPlan }) {
                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                   }
                   alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                  className="
-                    w-12 h-12
-                    object-contain rounded-full border border-white bg-white
-                    flex-shrink-0
-                  "
+                  className={`
+                  ${
+                    offer.status === "accepted"
+                      ? "w-14 h-14 border-gray-200 border-2"
+                      : "w-12 h-12 border-white"
+                  }
+                  object-contain rounded-full border bg-white
+                  flex-shrink-0
+                `}
                 />
               ))}
             </div>
@@ -116,7 +120,6 @@ export default function MountainCard({ tourPlan }) {
             {localTourPlan.offers.length > 0
               ? localTourPlan.offers[0].tour_plan.end_date
               : localTourPlan.end_date || "N/A"}{" "}
-            
           </p>
           <p>
             <span className="font-medium">Category:</span>{" "}

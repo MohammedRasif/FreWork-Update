@@ -1030,7 +1030,7 @@ function PublishedPlan() {
                       </div>
                     </div>
                   </div>
-                  <div>
+                  {/* <div>
                     <button
                       onClick={() => {
                         if (!token) {
@@ -1053,7 +1053,7 @@ function PublishedPlan() {
                         </>
                       )}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

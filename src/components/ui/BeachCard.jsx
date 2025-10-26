@@ -54,17 +54,16 @@ export default function TourCard({ tourPlan }) {
       <div className="flex flex-col shadow-lg w-72 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
-           <div className="relative">
-             <img
-              src={
-                localTourPlan.spot_picture_url ||
-                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-              }
-              alt={`${localTourPlan.location_to} destination`}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
-           
-           </div>
+            <div className="relative">
+              <img
+                src={
+                  localTourPlan.spot_picture_url ||
+                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                }
+                alt={`${localTourPlan.location_to} destination`}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </div>
             <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
               <h2 className="text-2xl md:text-3xl font-bold text-center px-4 mb-2">
                 {localTourPlan.location_to}
@@ -90,27 +89,30 @@ export default function TourCard({ tourPlan }) {
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
                     alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                    className="
-                      w-12 h-12
-                      object-contain rounded-full border border-white bg-white
-                      flex-shrink-0
-                    "
+                    className={`
+                  ${
+                    offer.status === "accepted"
+                      ? "w-14 h-14 border-gray-200 border-2"
+                      : "w-12 h-12 border-white"
+                  }
+                  object-contain rounded-full border bg-white
+                  flex-shrink-0
+                `}
                   />
                 ))}
-                 
               </div>
             )}
           </div>
-           {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
+          {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
         </div>
 
         <div className="flex flex-col flex-grow p-4 space-y-1 relative">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold text-gray-900">
-            {localTourPlan.location_to.length > 8
-              ? `${localTourPlan.location_to.slice(0, 8)}...`
-              : localTourPlan.location_to}
-          </h3>
+              {localTourPlan.location_to.length > 8
+                ? `${localTourPlan.location_to.slice(0, 8)}...`
+                : localTourPlan.location_to}
+            </h3>
             <div className="flex items-center gap-2">
               <svg
                 className="w-5 h-5 text-green-500"
@@ -136,7 +138,6 @@ export default function TourCard({ tourPlan }) {
               {localTourPlan.offers.length > 0
                 ? localTourPlan.offers[0].tour_plan.end_date
                 : "N/A"}{" "}
-             
             </p>
           </div>
 
@@ -177,7 +178,6 @@ export default function TourCard({ tourPlan }) {
               </div>
             )}
           </div>
-         
         </div>
       </div>
 

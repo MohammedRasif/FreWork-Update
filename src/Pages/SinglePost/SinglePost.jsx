@@ -14,7 +14,11 @@ import {
   FaLocationDot,
 } from "react-icons/fa6";
 import { X, Utensils, BedDouble, Clock4, ShieldCheck } from "lucide-react";
-import { MdOutlineKeyboardBackspace, MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
+import {
+  MdOutlineKeyboardBackspace,
+  MdOutlineNoMeals,
+  MdVerifiedUser,
+} from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
@@ -99,86 +103,99 @@ function SinglePost({ prid }) {
     setSelectedFile(file);
   };
 
-  const handleOfferSubmit = async (e) => {
-    e.preventDefault();
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
-    if (!offerForm.budget || !offerForm.comment.trim()) {
-      toast.error("Please provide a budget and a comment");
-      return;
-    }
-    if (
-      offerForm.applyDiscount &&
-      (!offerForm.discount || Number(offerForm.discount) <= 0)
-    ) {
-      toast.error("Please provide a valid discount percentage");
-      return;
+const handleOfferSubmit = async (e) => {
+  e.preventDefault();
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
+  if (!offerForm.budget || !offerForm.comment.trim()) {
+    toast.error("Please provide a budget and a comment");
+    return;
+  }
+  if (
+    offerForm.applyDiscount &&
+    (!offerForm.discount || Number(offerForm.discount) <= 0)
+  ) {
+    toast.error("Please provide a valid discount percentage");
+    return;
+  }
+
+  // Budget validation: Check if offered budget is within $500 of tour.budget
+  const offeredBudget = Number.parseFloat(offerForm.budget);
+  const tourBudget = Number.parseFloat(tour.budget);
+  if (offeredBudget < tourBudget - 500) {
+    toast.error(
+      `Offered budget is too low. It must be within $${tourBudget - 500} of the tour budget ($${tourBudget}).`,
+      { duration: 5000 }
+    );
+    return;
+  }
+
+  setIsOfferSubmitting(true);
+
+  try {
+    const formData = new FormData();
+    formData.append("offered_budget", offeredBudget);
+    formData.append("message", offerForm.comment);
+    formData.append("apply_discount", offerForm.applyDiscount);
+    formData.append(
+      "discount",
+      offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+    );
+    if (selectedFile) {
+      formData.append("file", selectedFile);
     }
 
-    setIsOfferSubmitting(true);
+    await offerBudgetToBack({
+      id: finalId,
+      data: formData,
+    }).unwrap();
 
-    try {
-      const formData = new FormData();
-      formData.append("offered_budget", Number.parseFloat(offerForm.budget));
-      formData.append("message", offerForm.comment);
-      formData.append("apply_discount", offerForm.applyDiscount);
-      formData.append(
-        "discount",
-        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
-      );
-      if (selectedFile) {
-        formData.append("file", selectedFile);
-      }
-
-      await offerBudgetToBack({
-        id: finalId,
-        data: formData,
-      }).unwrap();
-
-      const newOffer = {
-        id: `${currentUserId}-${Date.now()}`,
-        offered_budget: Number.parseFloat(offerForm.budget),
-        message: offerForm.comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
-        file_name: selectedFile ? selectedFile.name : null,
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
-      setPostData((prev) => ({
-        ...prev,
-        offers: [...(prev.offers || []), newOffer],
-        offer_count: (prev.offer_count || 0) + 1,
-      }));
-      setOfferForm({
-        budget: "",
-        comment: "",
-        discount: "",
-        applyDiscount: false,
-      });
-      setSelectedFile(null);
-      setIsPopupOpen(false);
-      toast.success("Offer submitted successfully");
-      navigate("/admin/chat");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      toast.error(
-        error.data?.error
-          ? `${error.data.error} Only agency can do this.`
-          : "Something went wrong"
-      );
-    } finally {
-      setIsOfferSubmitting(false);
-    }
-  };
+    const newOffer = {
+      id: `${currentUserId}-${Date.now()}`,
+      offered_budget: offeredBudget,
+      message: offerForm.comment,
+      apply_discount: offerForm.applyDiscount,
+      discount: offerForm.applyDiscount
+        ? Number.parseFloat(offerForm.discount)
+        : 0,
+      file_name: selectedFile ? selectedFile.name : null,
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
+    setPostData((prev) => ({
+      ...prev,
+      offers: [...(prev.offers || []), newOffer],
+      offer_count: (prev.offer_count || 0) + 1,
+    }));
+    setOfferForm({
+      budget: "",
+      comment: "",
+      discount: "",
+      applyDiscount: false,
+    });
+    setSelectedFile(null);
+    setIsPopupOpen(false);
+    toast.success("Offer submitted successfully");
+    navigate("/admin/chat");
+  } catch (error) {
+    console.error("Failed to submit offer:", error);
+    toast.error(
+      error.data?.error
+        ? `${error.data.error} Only agency can do this.`
+        : "Something went wrong"
+    );
+  } finally {
+    setIsOfferSubmitting(false);
+  }
+};
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
@@ -292,18 +309,23 @@ function SinglePost({ prid }) {
               <div className="absolute bottom-4 left-3/7 -translate-x-2/5 flex items-center lg:space-x-20 space-x-10 overflow-x-auto px-2 scrollbar-none">
                 {tour.offers.map((offer) => (
                   <img
-                    key={offer.id}
+                    key={offer.agency?.id || Math.random()}
                     src={
                       offer.agency?.logo_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={`${
-                      offer.agency?.agency_name || "Unknown Agency"
-                    } logo`}
-                    className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
+                    alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                    className={`
+                                  ${
+                                    offer.status === "accepted"
+                                      ? "w-[72px] h-[72px] border-gray-200 border-2"
+                                      : "w-16 h-16 border-white"
+                                  }
+                                  object-contain rounded-full border bg-white
+                                  flex-shrink-0
+                                `}
                   />
                 ))}
-                
               </div>
             )}
             {tour.offers?.length >= 3 ? (
@@ -343,7 +365,7 @@ function SinglePost({ prid }) {
           <div className="space-y-1 text-md text-gray-700">
             <p className=" font-bold">
               <span className="font-medium">Date:</span> {tour.start_date} to{" "}
-              {tour.end_date || "N/A"}  ({tour.duration })days
+              {tour.end_date || "N/A"} ({tour.duration})days
             </p>
           </div>
           <p>
@@ -391,8 +413,6 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            
-
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
               <span>
@@ -431,17 +451,26 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-             <h1 className="text-[16px]   py-2 font-bold ">* Image generated automatically</h1>
-
+            <h1 className="text-[16px]   py-2 font-bold ">
+              * Image generated automatically
+            </h1>
           </div>
           <div className="pt-2 w-full">
-            <Dialog open={isPopupOpen} onOpenChange={(open) => {
-              setIsPopupOpen(open);
-              if (!open) {
-                setOfferForm({ budget: "", comment: "", discount: "", applyDiscount: false });
-                setSelectedFile(null);
-              }
-            }}>
+            <Dialog
+              open={isPopupOpen}
+              onOpenChange={(open) => {
+                setIsPopupOpen(open);
+                if (!open) {
+                  setOfferForm({
+                    budget: "",
+                    comment: "",
+                    discount: "",
+                    applyDiscount: false,
+                  });
+                  setSelectedFile(null);
+                }
+              }}
+            >
               {showSentOfferButton && (
                 <DialogTrigger className="backdrop-blur-2xl" asChild>
                   <button
@@ -538,7 +567,8 @@ function SinglePost({ prid }) {
                       </span>
                     </label>
                     <p className="text-xs text-gray-500 mt-1">
-                      Website suggests extra discount, increases conversions by 30%. Check to offer more.
+                      Website suggests extra discount, increases conversions by
+                      30%. Check to offer more.
                     </p>
                   </div>
 
@@ -607,10 +637,11 @@ function SinglePost({ prid }) {
                                 } avatar`}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
-                              
+
                               <div>
                                 <span className="font-medium text-gray-900">
-                                  {offer.agency?.agency_name || "Unknown Agency"}
+                                  {offer.agency?.agency_name ||
+                                    "Unknown Agency"}
                                 </span>
                                 <p className="text-xs sm:text-sm text-gray-600">
                                   {offer.message}

@@ -439,16 +439,23 @@ const TourPlanDouble = () => {
                             >
                               {tour.offers.map((offer) => (
                                 <img
-                                  key={offer.id}
+                                  key={offer.agency?.id || Math.random()}
                                   src={
                                     offer.agency?.logo_url ||
                                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
                                   alt={`${
-                                    offer.agency?.agency_name ||
-                                    "Unknown Agency"
+                                    offer.agency?.agency_name || "Agency"
                                   } logo`}
-                                  className="w-16 h-16 object-contain rounded-full border border-white bg-white flex-shrink-0"
+                                  className={`
+                                  ${
+                                    offer.status === "accepted"
+                                      ? "w-[72px] h-[72px] border-gray-200 border-2"
+                                      : "w-16 h-16 border-white"
+                                  }
+                                  object-contain rounded-full border bg-white
+                                  flex-shrink-0
+                                `}
                                 />
                               ))}
                             </div>

@@ -46,7 +46,6 @@ function Messages() {
   const [finalOfferResponse] = useFinalOfferResponseMutation();
   const [sentMessage] = useMessageSentMutation();
 
-  // Fetch messages using useShowMessagesQuery with the conversation id
   const {
     data: messagesData,
     isLoading: isMessagesLoading,
@@ -71,7 +70,6 @@ function Messages() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
 
   useEffect(() => {
-    // যদি agency স্টেটে না থাকে কিন্তু URL-এ ID থাকে, তাহলে chatList থেকে খুঁজুন
     if (!agency && id && chatList && !isChatListLoading) {
       const currentChat = chatList.find((chat) => chat.id?.toString() === id);
       if (currentChat) {

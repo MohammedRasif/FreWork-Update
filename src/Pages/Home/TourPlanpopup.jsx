@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FaListUl } from "react-icons/fa";
-import { MapPin, Navigation, Utensils, BedDouble, Clock4, ShieldCheck, X } from "lucide-react";
+import {
+  MapPin,
+  Navigation,
+  Utensils,
+  BedDouble,
+  Clock4,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { IoIosSend } from "react-icons/io";
@@ -41,10 +49,35 @@ const TourPlanPopup = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Budget validation: Check if offered budget is within $500 of tour.budget
+    const offeredBudget = Number.parseFloat(offerForm.budget);
+    const tourBudget = Number.parseFloat(tour.budget);
+    if (offeredBudget < tourBudget - 500) {
+      toast.error(
+        `Offered budget is too low. It must be within $${
+          tourBudget - 500
+        } of the tour budget ($${tourBudget}).`,
+        { duration: 5000 }
+      );
+      return;
+    }
+
     setIsOfferSubmitting(true);
-    await handleSubmitOffer(tour.id, offerForm.budget, offerForm.comment, offerForm, selectedFile);
+    await handleSubmitOffer(
+      tour.id,
+      offerForm.budget,
+      offerForm.comment,
+      offerForm,
+      selectedFile
+    );
     setIsOfferSubmitting(false);
-    setOfferForm({ budget: "", comment: "", discount: "", applyDiscount: false });
+    setOfferForm({
+      budget: "",
+      comment: "",
+      discount: "",
+      applyDiscount: false,
+    });
     setSelectedFile(null);
   };
 
@@ -62,7 +95,9 @@ const TourPlanPopup = ({
         </div>
         <div className="p-4">
           <div className="flex-1 w-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Place Your Offer</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Place Your Offer
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label
@@ -138,7 +173,8 @@ const TourPlanPopup = ({
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1">
-                  Website suggests extra discount, increases conversions by 30%. Check to offer more.
+                  Website suggests extra discount, increases conversions by 30%.
+                  Check to offer more.
                 </p>
               </div>
 
@@ -179,14 +215,18 @@ const TourPlanPopup = ({
                 }`}
               >
                 <IoIosSend size={20} />
-                {isOfferSubmitting || isOfferBudgetLoading ? "Submitting..." : "Submit Offer"}
+                {isOfferSubmitting || isOfferBudgetLoading
+                  ? "Submitting..."
+                  : "Submit Offer"}
               </button>
             </form>
           </div>
 
           {tour.offers && tour.offers.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3">Offers</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                Offers
+              </h3>
               {tour.offers.map((offer) => (
                 <div
                   key={offer.id}
@@ -198,7 +238,9 @@ const TourPlanPopup = ({
                         offer.agency?.logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                       }
-                      alt={`${offer.agency?.agency_name || "Unknown Agency"} avatar`}
+                      alt={`${
+                        offer.agency?.agency_name || "Unknown Agency"
+                      } avatar`}
                       className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                     />
                     <div>
@@ -226,7 +268,9 @@ const TourPlanPopup = ({
                     </span>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleMessage({ other_user_id: offer.agency?.user })}
+                        onClick={() =>
+                          handleMessage({ other_user_id: offer.agency?.user })
+                        }
                         disabled={
                           isOfferBudgetLoading ||
                           isAcceptLoading ||
