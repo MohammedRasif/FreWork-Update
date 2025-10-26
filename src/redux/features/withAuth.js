@@ -346,7 +346,7 @@ export const sqQuery = createApi({
     deleteOfferPlan: builder.mutation({
       query: (id) => ({
         url: `no-agreement-reached/${id}`,
-        method: "DELETE",
+        method: "PATCH",
       }),
       invalidatesTags: ["Offer"],
     }),

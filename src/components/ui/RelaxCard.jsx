@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation } from "lucide-react";
@@ -73,7 +72,7 @@ export default function BeachCard({ tourPlan }) {
                   className={`
                   ${
                     offer.status === "accepted"
-                      ? "w-14 h-14 border-gray-200 border-2"
+                      ? "w-14 h-14 border-gray-400 border-4"
                       : "w-12 h-12 border-white"
                   }
                   object-contain rounded-full border bg-white
@@ -83,10 +82,8 @@ export default function BeachCard({ tourPlan }) {
               ))}
             </div>
           )}
-
         </div>
-                   {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
-
+        {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
       </div>
 
       <div className="flex flex-col flex-grow p-4 space-y-1">
@@ -121,7 +118,6 @@ export default function BeachCard({ tourPlan }) {
             {localTourPlan.offers.length > 0
               ? localTourPlan.offers[0].tour_plan.end_date
               : localTourPlan.end_date || "N/A"}{" "}
-           
           </p>
           <p>
             <span className="font-medium">Category:</span>{" "}
