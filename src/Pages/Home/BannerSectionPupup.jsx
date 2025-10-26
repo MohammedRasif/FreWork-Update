@@ -6,30 +6,10 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-
 let isGoogleScriptLoaded = false;
-
-// Loading Popup Component
-const LoadingPopup = () => {
-  return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-[5px] bg-opacity-50 flex items-center justify-center z-[1002]">
-      <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-[#FF6600] border-t-transparent rounded-full animate-spin"></div>
-          <div className="absolute inset-2 border-4 border-[#e55600] border-t-transparent rounded-full animate-spin animation-delay-200"></div>
-          <div className="absolute inset-4 border-4 border-[#ff8c40] border-t-transparent rounded-full animate-spin animation-delay-400"></div>
-        </div>
-        <p className="text-lg font-semibold text-gray-700">
-          Please wait, AI is generating your travel image...
-        </p>
-      </div>
-    </div>
-  );
-};
 
 export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const totalSteps = 5;
-
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [formData, setFormData] = useState({
     name: "",
@@ -59,12 +39,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const [showBudgetMessage, setShowBudgetMessage] = useState(false); // Local state for session
   const budgetRef = useRef(null);
   const [isPopupOpened, setIsPopupOpened] = useState(false); // Track popup open state
-
   const [createPlan] = useCreatePlanOneMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { state } = useLocation();
   const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -73,27 +51,22 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     reset,
     trigger,
   } = useForm();
-
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
-
   // Define the event handlers
   const handleBudgetClick = () => {
     if (isPopupOpened && !showBudgetMessage) {
       setShowBudgetMessage(true);
     }
   };
-
   const handleOkClick = () => {
     setShowBudgetMessage(false);
   };
-
   useEffect(() => {
     // Reset the budget message state when popup is opened
     setIsPopupOpened(true);
     setShowBudgetMessage(false); // Reset for new session
-
     if (state?.id) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
@@ -154,7 +127,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       }
     }
   }, [state?.id, setValue]);
-
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (!isGoogleScriptLoaded && !window.google) {
@@ -174,12 +146,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         document.head.appendChild(script);
       }
     };
-
     loadGoogleMaps();
-
     return () => {};
   }, []);
-
   useEffect(() => {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
@@ -188,7 +157,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         return;
       }
       console.log("Initializing autocomplete for all fields...");
-
       if (locationFromRef.current) {
         console.log("Setting up autocomplete for locationFrom");
         const fromAutocomplete = new window.google.maps.places.Autocomplete(
@@ -204,7 +172,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       } else {
         console.warn("locationFromRef is null");
       }
-
       if (locationToRef.current) {
         console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
@@ -220,7 +187,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       } else {
         console.warn("locationToRef is null");
       }
-
       if (currentStep === 2 && touristSpotsRef.current) {
         console.log("Setting up autocomplete for touristSpots");
         const touristSpotsAutocomplete =
@@ -238,19 +204,16 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.warn("touristSpotsRef is null on Step 2");
       }
     };
-
     if (window.google) {
       setTimeout(initAutocomplete, 100);
     }
   }, [setValue, currentStep]);
-
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
   const validateStep = async (step) => {
     let fieldsToValidate = [];
     switch (step) {
@@ -287,23 +250,19 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     return result;
   };
-
   const nextStep = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
-
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
-
   const onSubmit = async (data, status) => {
     console.log("onSubmit called with data:", data, "status:", status);
-
     const accessToken = localStorage.getItem("access_token");
     console.log("Access Token:", accessToken);
     if (!accessToken) {
@@ -312,17 +271,14 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       navigate("/register");
       return;
     }
-
     if (data.endingDate < data.startingDate) {
       toast.error("End date must be after start date");
       return;
     }
-
     if (!data.adults && !data.children) {
       toast.error("At least one adult or child is required");
       return;
     }
-
     const formDataToSend = new FormData();
     formDataToSend.append("name", data.name);
     formDataToSend.append("email", data.email);
@@ -349,34 +305,30 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       "is_confirmed_request",
       data.confirmation ? "true" : "false"
     );
-
     if (selectedFile) {
       formDataToSend.append("spot_picture", selectedFile);
     }
-
     console.log("FormData to send:");
     for (let [key, value] of formDataToSend.entries()) {
       console.log(`${key}: ${value}`);
     }
-
     try {
       if (status === "draft") {
         setIsSavingDraft(true);
       } else {
         setIsPublishing(true);
       }
-
       if (state?.id) {
         const response = await updatePlan({
           id: state.id,
           updates: formDataToSend,
         }).unwrap();
         console.log("Update Plan Response:", response);
-        toast.success("Plan updated successfully!");
+        toast.success(response.message || "Plan updated successfully!");
       } else {
         const response = await createPlan(formDataToSend).unwrap();
         console.log("Create Plan Response:", response);
-        toast.success("Plan created successfully!");
+        toast.success(response.message || "Plan created successfully!");
         reset();
         setSelectedFile(null);
       }
@@ -397,29 +349,23 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       }
     }
   };
-
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
     updateFormData("uploadedFile", file);
   };
-
   const handlepupupClose = () => {
     localStorage.removeItem("pendingPlan");
   };
-
   const progressPercentage = (currentStep / totalSteps) * 100;
-
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: "Location (From) is required",
   });
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location (To) is required",
   });
-
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
-      {(isSavingDraft || isPublishing) && <LoadingPopup />}
       <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
         <div className="flex justify-between items-center mb-2 sm:mb-3">
           <span className="text-xs sm:text-sm font-semibold text-white">
@@ -436,12 +382,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           ></div>
         </div>
       </div>
-
       <div className="p-3 sm:p-4 xs:p-2 relative" style={{ zIndex: 1000 }}>
         <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 mb-3 sm:mb-4 text-center">
           Create Your Tour Plan
         </h2>
-
         {currentStep === 1 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -486,7 +430,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
@@ -532,7 +475,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
-
         {currentStep === 2 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -593,11 +535,19 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   Budget
                 </label>
                 <input
-                  {...register("budget", { required: "Budget is required" })}
+                  {...register("budget", {
+                    required: "Budget is required",
+                    validate: (value) =>
+                      value.trim() !== "" || "Budget cannot be empty",
+                  })}
                   type="text"
                   placeholder="Budget (EUR)"
                   defaultValue={formData.budget}
-                  onChange={(e) => updateFormData("budget", e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateFormData("budget", value);
+                    setValue("budget", value, { shouldValidate: true }); // Force validation on change
+                  }}
                   onClick={handleBudgetClick}
                   ref={budgetRef}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
@@ -608,9 +558,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   </span>
                 )}
                 {showBudgetMessage && isPopupOpened && (
-                  <div className="fixed inset-x-0 top-0  flex items-center justify-center z-50 pt-4">
+                  <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
                     <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 lg:w-96 w-72">
-                      <p className="lg:text-[15px] text-[13px]  text-gray-700">
+                      <p className="lg:text-[15px] text-[13px] text-gray-700">
                         Ensure a reasonable price is entered to aid agencies in
                         making appropriate offers. Users entering
                         unrealistically low prices may be restricted or
@@ -626,13 +576,11 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   </div>
                 )}
               </div>
-
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Tourist Spots
                 </label>
                 <input
-                  // {...touristSpotsRest}
                   type="text"
                   placeholder="Mare, Monumenti, Ristorante..."
                   defaultValue={formData.touristSpots}
@@ -641,11 +589,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     setValue("touristSpots", e.target.value);
                     console.log("touristSpots input changed:", e.target.value);
                   }}
-                  // ref={(e) => {
-                  //   touristSpotsFormRef(e);
-                  //   touristSpotsRef.current = e;
-                  //   console.log("touristSpotsRef set:", !!e);
-                  // }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                   style={{ zIndex: 1001 }}
                 />
@@ -656,7 +599,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
             </div>
-
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Description (Optional)
@@ -672,7 +614,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
-
         {currentStep === 3 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -731,7 +672,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
             </div>
-
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Meal Plan
@@ -758,7 +698,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
-
         {currentStep === 4 && (
           <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -814,7 +753,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
             </div>
-
             <div className="bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm">
               <h3 className="font-semibold text-gray-800 mb-2 sm:mb-3 text-sm sm:text-base">
                 Review Your Information
@@ -880,7 +818,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
-
         {currentStep === 5 && (
           <div className="space-y-3 sm:space-y-4">
             <div>
@@ -901,7 +838,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </span>
               )}
             </div>
-
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -926,7 +862,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </span>
               )}
             </div>
-
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Phone Number
@@ -951,7 +886,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </span>
               )}
             </div>
-
             <div className="flex items-start">
               <input
                 {...register("confirmation", {
@@ -980,7 +914,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
-
         <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 sm:mb-0 w-full sm:w-auto">
             {currentStep > 1 && (
@@ -1001,7 +934,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               Cancel
             </button>
           </div>
-
           <div className="w-full sm:w-auto">
             {currentStep < totalSteps ? (
               <button

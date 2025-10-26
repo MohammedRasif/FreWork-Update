@@ -13,25 +13,6 @@ import FullScreenInfinityLoader from "@/lib/Loading";
 // Global flag to ensure Google Maps script loads only once
 let isGoogleScriptLoaded = false;
 
-// Loading Popup Component
-const LoadingPopup = () => {
-  return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-[5px] bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
-        {/* AI-themed loading animation */}
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <div className="absolute inset-2 border-4 border-blue-300 border-t-transparent rounded-full animate-spin animation-delay-200"></div>
-          <div className="absolute inset-4 border-4 border-blue-100 border-t-transparent rounded-full animate-spin animation-delay-400"></div>
-        </div>
-        <p className="text-lg font-semibold text-gray-700">
-          Please wait, AI is generating your travel image...
-        </p>
-      </div>
-    </div>
-  );
-};
-
 const CreatePlan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -135,22 +116,6 @@ const CreatePlan = () => {
       } else {
         console.warn("locationToRef is null");
       }
-
-      if (touristSpotsRef.current) {
-        console.log("Setting up autocomplete for touristSpots");
-        const touristSpotsAutocomplete =
-          new window.google.maps.places.Autocomplete(touristSpotsRef.current, {
-            types: ["point_of_interest", "tourist_attraction"],
-          });
-        touristSpotsAutocomplete.addListener("place_changed", () => {
-          const place = touristSpotsAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          console.log("touristSpots selected:", locationValue);
-          setValue("touristSpots", locationValue);
-        });
-      } else {
-        console.warn("touristSpotsRef is null");
-      }
     };
 
     if (!isGoogleScriptLoaded && !window.google) {
@@ -223,7 +188,10 @@ const CreatePlan = () => {
     formData.append("meal_plan", data.mealPlan);
     formData.append("status", status);
     formData.append("tourist_spots", data.touristSpots);
-    formData.append("is_confirmed_request", data.confirmation ? "true" : "false");
+    formData.append(
+      "is_confirmed_request",
+      data.confirmation ? "true" : "false"
+    );
 
     if (selectedFile) {
       formData.append("spot_picture", selectedFile);
@@ -237,17 +205,22 @@ const CreatePlan = () => {
       }
 
       if (state?.id) {
-        await update({ id: state.id, updates: formData }).unwrap();
-        toast.success("Plan updated successfully!");
+        const response = await update({
+          id: state.id,
+          updates: formData,
+        }).unwrap();
+        toast.success(response.message || "Plan updated successfully!");
       } else {
-        await createPlan(formData).unwrap();
-        toast.success("Plan created successfully!");
+        const response = await createPlan(formData).unwrap();
+        toast.success(response.message || "Plan created successfully!");
         reset();
         setSelectedFile(null);
       }
       navigate("/user");
     } catch (error) {
-      toast.error(`Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`);
+      toast.error(
+        `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
+      );
     } finally {
       if (status === "draft") {
         setIsSavingDraft(false);
@@ -289,8 +262,6 @@ const CreatePlan = () => {
     <div className="p-6">
       <div className="mx-auto">
         <Toaster />
-        {/* Show loading popup when saving or publishing */}
-        {(isSavingDraft || isPublishing) && <LoadingPopup />}
         {/* Header */}
         <div className="flex items-center mb-8">
           <NavLink to="/user">
@@ -321,7 +292,9 @@ const CreatePlan = () => {
                 {...register("name", { required: "Name is required" })}
               />
               {errors.name && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.name.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.name.message}
+                </p>
               )}
             </div>
             <div>
@@ -341,7 +314,9 @@ const CreatePlan = () => {
                 })}
               />
               {errors.email && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
           </div>
@@ -364,7 +339,9 @@ const CreatePlan = () => {
                 })}
               />
               {errors.phoneNumber && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.phoneNumber.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.phoneNumber.message}
+                </p>
               )}
             </div>
             <div className="flex flex-row gap-4">
@@ -408,7 +385,7 @@ const CreatePlan = () => {
                   </option>
                   <option value="beach">Beach trips</option>
                   <option value="mountain">Mountain adventures</option>
-                  <option value="relaxing">Relaxing tours</option>
+                  <option value="relax">Relaxing tours</option>
                   <option value="group">Group packages</option>
                 </select>
                 {errors.destinationType && (
@@ -445,7 +422,6 @@ const CreatePlan = () => {
             </div>
           </div>
 
-          {/* Row 2: Location From & To */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -462,7 +438,9 @@ const CreatePlan = () => {
                 }}
               />
               {errors.locationFrom && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.locationFrom.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.locationFrom.message}
+                </p>
               )}
             </div>
             <div>
@@ -480,12 +458,13 @@ const CreatePlan = () => {
                 }}
               />
               {errors.locationTo && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.locationTo.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.locationTo.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Row 3: Starting Date & Ending Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -502,7 +481,9 @@ const CreatePlan = () => {
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
               {errors.startingDate && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.startingDate.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.startingDate.message}
+                </p>
               )}
             </div>
             <div>
@@ -520,12 +501,13 @@ const CreatePlan = () => {
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
               {errors.endingDate && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.endingDate.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.endingDate.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Row 4: Adult & Child & Budget */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex w-full gap-4">
               <div className="flex-1">
@@ -544,7 +526,9 @@ const CreatePlan = () => {
                   })}
                 />
                 {errors.adult && (
-                  <p className="text-red-500 text-[14px] mt-1">{errors.adult.message}</p>
+                  <p className="text-red-500 text-[14px] mt-1">
+                    {errors.adult.message}
+                  </p>
                 )}
               </div>
               <div className="flex-1">
@@ -563,7 +547,9 @@ const CreatePlan = () => {
                   })}
                 />
                 {errors.child && (
-                  <p className="text-red-500 text-[14px] mt-1">{errors.child.message}</p>
+                  <p className="text-red-500 text-[14px] mt-1">
+                    {errors.child.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -573,7 +559,9 @@ const CreatePlan = () => {
               </label>
               {showBudgetMessage && isPopupOpened && (
                 <p className="text-sm text-gray-600 mb-2">
-                  Ensure a reasonable price is entered to aid agencies in making appropriate offers. Users entering unrealistically low prices may be restricted or penalized.
+                  Ensure a reasonable price is entered to aid agencies in making
+                  appropriate offers. Users entering unrealistically low prices
+                  may be restricted or penalized.
                 </p>
               )}
               <input
@@ -583,17 +571,26 @@ const CreatePlan = () => {
                 {...register("budget", {
                   required: "Budget is required",
                   min: { value: 0, message: "Budget cannot be negative" },
+                  validate: (value) =>
+                    (value !== null && value !== "") || "Budget is required",
                 })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setValue("budget", value === "" ? null : Number(value), {
+                    shouldValidate: true,
+                  }); // Convert to number and validate
+                }}
                 onClick={handleBudgetClick}
                 ref={budgetRef}
               />
               {errors.budget && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.budget.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.budget.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Row 5: Tourist Spots & Meal Plan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -608,7 +605,9 @@ const CreatePlan = () => {
                 }}
               />
               {errors.touristSpots && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.touristSpots.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.touristSpots.message}
+                </p>
               )}
             </div>
             <div>
@@ -624,16 +623,19 @@ const CreatePlan = () => {
                 </option>
                 <option value="none">No Meals</option>
                 <option value="breakfast">Breakfast</option>
-                <option value="half-board">Half-Board (Breakfast & Dinner)</option>
+                <option value="half-board">
+                  Half-Board (Breakfast & Dinner)
+                </option>
                 <option value="full-board">Full-Board (All Meals)</option>
               </select>
               {errors.mealPlan && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.mealPlan.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.mealPlan.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Row 6: Description */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -643,17 +645,16 @@ const CreatePlan = () => {
                 placeholder="Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
                 rows={4}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                {...register("description", {
-                  required: "Description is required",
-                })}
+                
               />
               {errors.description && (
-                <p className="text-red-500 text-[14px] mt-1">{errors.description.message}</p>
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.description.message}
+                </p>
               )}
             </div>
           </div>
 
-          {/* Confirmation Checkbox */}
           <div className="flex items-start gap-3 mt-8">
             <input
               type="checkbox"
@@ -663,15 +664,20 @@ const CreatePlan = () => {
                 required: "Please confirm the information",
               })}
             />
-            <label htmlFor="confirmation" className="text-[15px] text-gray-600 leading-relaxed">
-              I confirm this is a travel request, and all provided information is valid and does not include any third party.
+            <label
+              htmlFor="confirmation"
+              className="text-[15px] text-gray-600 leading-relaxed"
+            >
+              I confirm this is a travel request, and all provided information
+              is valid and does not include any third party.
             </label>
           </div>
           {errors.confirmation && (
-            <p className="text-red-500 text-[14px] mt-1">{errors.confirmation.message}</p>
+            <p className="text-red-500 text-[14px] mt-1">
+              {errors.confirmation.message}
+            </p>
           )}
 
-          {/* Action Buttons */}
           <div className="flex items-center justify-center gap-4 mt-8 pt-6">
             <button
               type="button"
