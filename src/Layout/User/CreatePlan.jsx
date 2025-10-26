@@ -51,6 +51,9 @@ const CreatePlan = () => {
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
+  const budgetRef = useRef(null); // Ref for budget input
+  const [showBudgetMessage, setShowBudgetMessage] = useState(false); // State for message visibility
+  const [isPopupOpened, setIsPopupOpened] = useState(false); // Track page load state
 
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
     state?.id,
@@ -89,6 +92,8 @@ const CreatePlan = () => {
       setValue("mealPlan", oldData.meal_plan || "");
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
+    // Set isPopupOpened to true when the component mounts
+    setIsPopupOpened(true);
   }, [state?.id, oldData, setValue]);
 
   // Load Google Maps script and initialize autocomplete
@@ -174,6 +179,20 @@ const CreatePlan = () => {
     };
   }, [setValue]);
 
+  // Handle focus change to hide budget message when moving to another field
+  useEffect(() => {
+    const handleFocusChange = (e) => {
+      if (budgetRef.current && e.target !== budgetRef.current) {
+        setShowBudgetMessage(false);
+      }
+    };
+
+    document.addEventListener("focus", handleFocusChange, true);
+    return () => {
+      document.removeEventListener("focus", handleFocusChange, true);
+    };
+  }, []);
+
   const onSubmit = async (data, status) => {
     if (data.endingDate < data.startingDate) {
       toast.error("End date must be after start date");
@@ -243,6 +262,17 @@ const CreatePlan = () => {
     setSelectedFile(file);
   };
 
+  // Define event handlers for budget message
+  const handleBudgetClick = () => {
+    if (isPopupOpened && !showBudgetMessage) {
+      setShowBudgetMessage(true);
+    }
+  };
+
+  const handleOkClick = () => {
+    setShowBudgetMessage(false);
+  };
+
   if (isFetching && state?.id) {
     return <FullScreenInfinityLoader />;
   }
@@ -254,9 +284,6 @@ const CreatePlan = () => {
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location to is required",
   });
-  // const { ref: touristSpotsFormRef, ...touristSpotsRest } = register("touristSpots", {
-  //   required: "Tourist spots are required",
-  // });
 
   return (
     <div className="p-6">
@@ -409,9 +436,9 @@ const CreatePlan = () => {
                   <option value="4">4 Stars</option>
                   <option value="5">5 Stars</option>
                 </select>
-                {errors.minimum_star_hotel && (
+                {errors.minimumHotelStars && (
                   <p className="text-red-500 text-[14px] mt-1">
-                    {errors.minimum_star_hotel.message}
+                    {errors.minimumHotelStars.message}
                   </p>
                 )}
               </div>
@@ -544,6 +571,11 @@ const CreatePlan = () => {
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 Budget
               </label>
+              {showBudgetMessage && isPopupOpened && (
+                <p className="text-sm text-gray-600 mb-2">
+                  Ensure a reasonable price is entered to aid agencies in making appropriate offers. Users entering unrealistically low prices may be restricted or penalized.
+                </p>
+              )}
               <input
                 type="number"
                 placeholder="EUR"
@@ -552,6 +584,8 @@ const CreatePlan = () => {
                   required: "Budget is required",
                   min: { value: 0, message: "Budget cannot be negative" },
                 })}
+                onClick={handleBudgetClick}
+                ref={budgetRef}
               />
               {errors.budget && (
                 <p className="text-red-500 text-[14px] mt-1">{errors.budget.message}</p>
@@ -569,12 +603,9 @@ const CreatePlan = () => {
                 type="text"
                 placeholder="Search for a tourist spot"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                // {...touristSpotsRest}
-                // ref={(e) => {
-                //   touristSpotsFormRef(e);
-                //   touristSpotsRef.current = e;
-                //   console.log("touristSpotsRef set:", !!e);
-                // }}
+                ref={(e) => {
+                  touristSpotsRef.current = e;
+                }}
               />
               {errors.touristSpots && (
                 <p className="text-red-500 text-[14px] mt-1">{errors.touristSpots.message}</p>

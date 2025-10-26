@@ -1,0 +1,232 @@
+import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
+import { MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { FaBed, FaClock, FaListUl, FaUtensils } from "react-icons/fa6";
+import { LuNavigation2 as Navigation } from "react-icons/lu";
+
+function AcceptedOffers() {
+  const { data, error, isLoading } = useAcceptedAllOffersQuery();
+  const [showSentOfferButton, setShowSentOfferButton] = useState(false); // Placeholder for offer button logic
+
+  // Placeholder function for handling sent offer click
+  const handleSentOfferClick = () => {
+    console.log("Sent Offer clicked");
+    // Add your offer-sending logic here
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+  <div className="pt-24 container mx-auto">
+    <h1 className="lg:text-4xl text-[28] font-semibold pb-3 ">All Accepted Offers</h1>
+      <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+        
+      {data && data.map((tour) => (
+        <div
+          key={tour.id}
+          className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6"
+        >
+          <div className="relative">
+            <div className="overflow-hidden">
+              <img
+                src={
+                  tour.spot_picture_url ||
+                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                }
+                alt={`${tour.location_to} destination`}
+                className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300 rounded-t-xl"
+              />
+              <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white rounded-t-xl">
+                <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
+                  {tour.location_to}
+                </h2>
+              </div>
+              {tour.offers && tour.offers.length > 0 && (
+                <div
+                  className="
+                    absolute bottom-4
+                    flex items-center justify-center space-x-8
+                    overflow-x-auto
+                    px-2
+                    scrollbar-none
+                    w-full
+                  "
+                >
+                  {tour.offers.map((offer) => (
+                    <img
+                      key={offer.agency?.id || Math.random()}
+                      src={
+                        offer.agency?.logo_url ||
+                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                      }
+                      alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                      className={`
+                        ${
+                          offer.status === "accepted"
+                            ? "w-[72px] h-[72px] border-gray-400 border-4"
+                            : "w-14 h-14 border-white"
+                        }
+                        object-contain rounded-full border bg-white
+                        flex-shrink-0
+                      `}
+                    />
+                  ))}
+                </div>
+              )}
+              {tour.offer_count >= 3 ? (
+                <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
+                  <svg
+                    className="mr-1"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  Offers completed
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
+                {tour.location_to.length > 8
+                  ? `${tour.location_to.slice(0, 8)}...`
+                  : tour.location_to}
+              </h3>
+              {/* <div className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-green-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-sm text-green-600 font-medium">
+                  Real Request
+                </span>
+              </div> */}
+            </div>
+
+            <div className="space-y-1 text-md text-gray-700">
+              <p>
+                <span className="font-medium">Date:</span>{" "}
+                {tour.start_date}
+              </p>
+              <p>
+                <span className="font-medium">Category:</span>{" "}
+                {tour.travel_type || tour.category || "N/A"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xl font-semibold text-gray-900">
+                Budget: ${tour.budget}
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-10">
+              <span className="text-md text-gray-700">
+                <span className="font-medium">Total:</span>{" "}
+                {tour.total_members}{" "}
+                {tour.total_members > 1 ? "people" : "person"}
+              </span>
+
+              <div className="flex items-center space-x-4">
+                <h1 className="text-md text-gray-700">
+                  <span className="font-medium">Child :</span>{" "}
+                  {tour.child_count}
+                </h1>
+                <h1>
+                  <span className="font-medium">Adult :</span>{" "}
+                  {tour.adult_count} {/* Corrected to use adult_count */}
+                </h1>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <MapPin className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Points of travel:</span>{" "}
+                  {tour.tourist_spots.length > 14
+                    ? `${tour.tourist_spots.slice(0, 14)}...`
+                    : tour.tourist_spots}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <Navigation className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Departure from:</span>{" "}
+                  {tour.location_from || "N/A"}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <FaListUl className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Minimum rating:</span>{" "}
+                  {tour.minimum_star_hotel || "N/A"}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <FaUtensils className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Meal plan:</span>{" "}
+                  {tour.meal_plan || "N/A"}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <FaBed className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Type of accommodation:</span>{" "}
+                  {tour.type_of_accommodation || "N/A"}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <FaClock className="w-6 h-5 text-gray-500" />
+                <span>
+                  <span className="font-medium">Duration:</span>{" "}
+                  {tour.duration || "N/A"}
+                </span>
+              </p>
+
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <FaClock className="w-6 h-5 text-green-500" />
+                <span>
+                  <span className="font-medium">Contact verified via email</span>
+                </span>
+              </p>
+            </div>
+
+            {showSentOfferButton && (
+              <div className="pt-2 w-full">
+                <button
+                  onClick={handleSentOfferClick}
+                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
+                >
+                  Sent Offer
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  );
+}
+
+export default AcceptedOffers;

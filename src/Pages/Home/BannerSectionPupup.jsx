@@ -56,6 +56,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [showBudgetMessage, setShowBudgetMessage] = useState(false); // Local state for session
+  const budgetRef = useRef(null);
+  const [isPopupOpened, setIsPopupOpened] = useState(false); // Track popup open state
+
   const [createPlan] = useCreatePlanOneMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { state } = useLocation();
@@ -74,7 +78,22 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
 
+  // Define the event handlers
+  const handleBudgetClick = () => {
+    if (isPopupOpened && !showBudgetMessage) {
+      setShowBudgetMessage(true);
+    }
+  };
+
+  const handleOkClick = () => {
+    setShowBudgetMessage(false);
+  };
+
   useEffect(() => {
+    // Reset the budget message state when popup is opened
+    setIsPopupOpened(true);
+    setShowBudgetMessage(false); // Reset for new session
+
     if (state?.id) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
@@ -239,10 +258,19 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         fieldsToValidate = ["startingDate", "endingDate", "adults", "children"];
         break;
       case 2:
-        fieldsToValidate = ["locationFrom", "locationTo", "budget", "touristSpots"];
+        fieldsToValidate = [
+          "locationFrom",
+          "locationTo",
+          "budget",
+          "touristSpots",
+        ];
         break;
       case 3:
-        fieldsToValidate = ["typeOfAccommodation", "minimumHotelStars", "mealPlan"];
+        fieldsToValidate = [
+          "typeOfAccommodation",
+          "minimumHotelStars",
+          "mealPlan",
+        ];
         break;
       case 4:
         fieldsToValidate = ["travelType", "destinationType"];
@@ -388,12 +416,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location (To) is required",
   });
-  // const { ref: touristSpotsFormRef, ...touristSpotsRest } = register(
-  //   "touristSpots",
-  //   {
-  //     required: "Tourist Spots are required",
-  //   }
-  // );
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
@@ -576,12 +598,32 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   placeholder="Budget (EUR)"
                   defaultValue={formData.budget}
                   onChange={(e) => updateFormData("budget", e.target.value)}
+                  onClick={handleBudgetClick}
+                  ref={budgetRef}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
                 {errors.budget && (
                   <span className="text-red-500 text-xs mt-1">
                     {errors.budget.message}
                   </span>
+                )}
+                {showBudgetMessage && isPopupOpened && (
+                  <div className="fixed inset-x-0 top-0  flex items-center justify-center z-50 pt-4">
+                    <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 lg:w-96 w-72">
+                      <p className="lg:text-[15px] text-[13px]  text-gray-700">
+                        Ensure a reasonable price is entered to aid agencies in
+                        making appropriate offers. Users entering
+                        unrealistically low prices may be restricted or
+                        penalized.
+                      </p>
+                      <button
+                        onClick={handleOkClick}
+                        className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -905,7 +947,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               />
               {errors.phoneNumber && (
                 <span className="text-red-500 text-xs mt-1">
-                    {errors.phoneNumber.message}
+                  {errors.phoneNumber.message}
                 </span>
               )}
             </div>

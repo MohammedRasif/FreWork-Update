@@ -32,9 +32,10 @@ const Navbar = () => {
     "/membership": "membership",
     "/pricing": "agencies",
     "/tourPlans": "tours",
+    "/acceptedOffers": "acceptedOffers", // Added acceptedOffers route
     "/contact": "contact",
-    "/user/editProfile": "profile", // Add /user/editProfile to map to profile
-    "/user/profile": "profile", // Add /user/profile to map to profile
+    "/user/editProfile": "profile",
+    "/user/profile": "profile",
   };
 
   // Update activeLink based on the current route
@@ -127,8 +128,8 @@ const Navbar = () => {
       {/* Logo/Brand */}
       <NavLink to="/">
         <div className="font-bold lg:h-11 h-8 text-gray-800">
-        <img src={img} className="h-full" alt="Logo" />
-      </div>
+          <img src={img} className="h-full" alt="Logo" />
+        </div>
       </NavLink>
 
       {/* Hamburger Icon for Mobile */}
@@ -203,6 +204,17 @@ const Navbar = () => {
           Tour Plans
         </NavLink>
         <NavLink
+          to="/acceptedOffers"
+          className={`text-base text-[20px] font-medium ${
+            activeLink === "acceptedOffers"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-blue-600"
+          }`}
+          onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
+        >
+          Accepted Offers
+        </NavLink>
+        <NavLink
           to="/contact"
           className={`text-base text-[20px] font-medium ${
             activeLink === "contact"
@@ -251,7 +263,6 @@ const Navbar = () => {
                     >
                       Dashboard
                     </button>
-
                     <button
                       onClick={handleLogout}
                       className="px-4 py-2 text-gray-700 hover:bg-gray-100 text-left cursor-pointer"
@@ -336,7 +347,7 @@ const Navbar = () => {
                 }`}
                 onClick={() => handleLinkClick("agencies", "/pricing")}
               >
-                Membership Plans
+                For agencies
               </NavLink>
               <NavLink
                 to="/tourPlans"
@@ -348,6 +359,17 @@ const Navbar = () => {
                 onClick={() => handleLinkClick("tours", "/tourPlans")}
               >
                 Tour Plans
+              </NavLink>
+              <NavLink
+                to="/acceptedOffers"
+                className={`text-base text-[20px] font-medium ${
+                  activeLink === "acceptedOffers"
+                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+                    : "text-gray-700 hover:text-blue-600"
+                }`}
+                onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
+              >
+                Accepted Offers
               </NavLink>
               <NavLink
                 to="/contact"
@@ -368,7 +390,6 @@ const Navbar = () => {
                   >
                     Dashboard
                   </button>
-
                   <button
                     onClick={handleLogout}
                     className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"

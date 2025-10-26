@@ -34,6 +34,7 @@ import ViewAllPost from "@/Pages/ViewAllPost/ViewAllPost";
 import PrivateRoute from "./PrivetRoute";
 import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
 import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
+import AcceptedOffers from "@/Pages/Home/AcceptedOffers";
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
       { path: "/pricing", element: <Pricing /> },
       { path: "/tourPlan", element: <TourPlan /> },
       { path: "/tourPlans", element: <TourPlanDouble /> },
+      { path: "/acceptedOffers", element: <AcceptedOffers /> },
       { path: "/contact", element: <Contact /> },
       { path: "/viewall", element: <ViewAllPost /> },
     ],

@@ -82,6 +82,11 @@ export const baseApi = createApi({
         `/public/tour-plans/?search=${query.search}&min_budget=${query.min}&max_budget=${query.max}&country=${query.country}&type=${query.type}&category=${query.category}`,
       providesTags: ["TourPlan"], 
     }),
+
+    AcceptedAllOffers: builder.query({
+      query: () => "/public/completed-tour-plans",
+      providesTags: ["Offer"],
+    }),
   }),
 });
 
@@ -98,4 +103,5 @@ export const {
   useSearchAgencyQuery,
   // Tour Plan
   useFilterTourPlanPublicQuery,
+  useAcceptedAllOffersQuery,
 } = baseApi;
