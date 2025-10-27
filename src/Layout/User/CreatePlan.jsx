@@ -204,18 +204,40 @@ const CreatePlan = () => {
         setIsPublishing(true);
       }
 
+      let response;
       if (state?.id) {
-        const response = await update({
+        response = await update({
           id: state.id,
           updates: formData,
         }).unwrap();
-        toast.success(response.message || "Plan updated successfully!");
       } else {
-        const response = await createPlan(formData).unwrap();
-        toast.success(response.message || "Plan created successfully!");
-        reset();
-        setSelectedFile(null);
+        response = await createPlan(formData).unwrap();
       }
+
+      // Show styled success message for 4 seconds
+      toast.success(
+        "Your tour plan has been created! Please wait for the admin approval.",
+        {
+          duration: 4000, // Display for 4 seconds
+          style: {
+            background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
+            color: "#ffffff", // White text
+            borderRadius: "8px", // Rounded corners
+            padding: "16px", // Comfortable padding
+            fontSize: "16px", // Readable font size
+            fontWeight: "500", // Medium font weight
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
+            maxWidth: "400px", // Limit width for better readability
+          },
+          iconTheme: {
+            primary: "#ffffff", // White icon
+            secondary: "#3b82f6", // Blue background for icon
+          },
+        }
+      );
+
+      reset();
+      setSelectedFile(null);
       navigate("/user");
     } catch (error) {
       toast.error(
@@ -645,7 +667,6 @@ const CreatePlan = () => {
                 placeholder="Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
                 rows={4}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                
               />
               {errors.description && (
                 <p className="text-red-500 text-[14px] mt-1">

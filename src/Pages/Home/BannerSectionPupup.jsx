@@ -318,20 +318,42 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       } else {
         setIsPublishing(true);
       }
+      let response;
       if (state?.id) {
-        const response = await updatePlan({
+        response = await updatePlan({
           id: state.id,
           updates: formDataToSend,
         }).unwrap();
         console.log("Update Plan Response:", response);
-        toast.success(response.message || "Plan updated successfully!");
       } else {
-        const response = await createPlan(formDataToSend).unwrap();
+        response = await createPlan(formDataToSend).unwrap();
         console.log("Create Plan Response:", response);
-        toast.success(response.message || "Plan created successfully!");
-        reset();
-        setSelectedFile(null);
       }
+
+      // Show styled success message for 4 seconds
+      toast.success(
+        "Your data successfully submitted! When approved by admin, this tour plan will be published.",
+        {
+          autoClose: 4000, // Display for 4 seconds
+          style: {
+            background: "linear-gradient(135deg, #FF6600, #e55600)", // Orange gradient matching theme
+            color: "#ffffff", // White text
+            borderRadius: "8px", // Rounded corners
+            padding: "16px", // Comfortable padding
+            fontSize: "16px", // Readable font size
+            fontWeight: "500", // Medium font weight
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
+            maxWidth: "400px", // Limit width for better readability
+          },
+          iconTheme: {
+            primary: "#ffffff", // White icon
+            secondary: "#FF6600", // Orange background for icon
+          },
+        }
+      );
+
+      reset();
+      setSelectedFile(null);
       console.log("Navigating to /user and closing form");
       localStorage.removeItem("pendingPlan");
       navigate("/user");
@@ -349,6 +371,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       }
     }
   };
+
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
