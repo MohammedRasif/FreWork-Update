@@ -122,12 +122,12 @@ const handleOfferSubmit = async (e) => {
     return;
   }
 
-  // Budget validation: Check if offered budget is within $500 of tour.budget
+  // Budget validation: Check if offered budget is within ±$500 of tour.budget
   const offeredBudget = Number.parseFloat(offerForm.budget);
   const tourBudget = Number.parseFloat(tour.budget);
-  if (offeredBudget < tourBudget - 500) {
+  if (offeredBudget < tourBudget - 500 || offeredBudget > tourBudget + 500) {
     toast.error(
-      `Offered budget is too low. It must be within $${tourBudget - 500} of the tour budget ($${tourBudget}).`,
+      `Offered budget must be within ±$500 of the tour budget ($${tourBudget}). Your offer ($${offeredBudget}) is outside the range $${tourBudget - 500} to $${tourBudget + 500}.`,
       { duration: 5000 }
     );
     return;
@@ -183,7 +183,26 @@ const handleOfferSubmit = async (e) => {
     });
     setSelectedFile(null);
     setIsPopupOpen(false);
-    toast.success("Offer submitted successfully");
+    toast.success(
+      "Your offer has been successfully submitted! When approved by admin, this tour plan will be published.",
+      {
+        duration: 4000, // Display for 4 seconds
+        style: {
+          background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
+          color: "#ffffff", // White text
+          borderRadius: "8px", // Rounded corners
+          padding: "16px", // Comfortable padding
+          fontSize: "16px", // Readable font size
+          fontWeight: "500", // Medium font weight
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
+          maxWidth: "400px", // Limit width for better readability
+        },
+        iconTheme: {
+          primary: "#ffffff", // White icon
+          secondary: "#3b82f6", // Blue background for icon
+        },
+      }
+    );
     navigate("/admin/chat");
   } catch (error) {
     console.error("Failed to submit offer:", error);
