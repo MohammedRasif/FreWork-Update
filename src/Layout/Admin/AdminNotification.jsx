@@ -29,8 +29,7 @@ const AdminNotification = () => {
 
   // WebSocket for real-time notifications
   useEffect(() => {
-    const baseUrl =
-      "31.97.39.215";
+    const baseUrl = "31.97.39.215";
     const socketUrl = `ws://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
@@ -150,6 +149,15 @@ const AdminNotification = () => {
     setSelectedNotificationId(null);
   };
 
+  // Handle notification click to navigate to tour plan
+  const handleNotificationClick = (planId) => {
+    if (planId) {
+      navigate(`/tour-plans/${planId}`);
+    } else {
+      toast.error("No plan ID available for this notification");
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 w-full max-w-3xl mx-auto">
       {/* Header */}
@@ -171,7 +179,8 @@ const AdminNotification = () => {
           notifications.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-lg shadow-sm px-4 py-2 flex flex-col hover:shadow-md transition-shadow duration-200"
+              className="bg-white rounded-lg shadow-sm px-4 py-2 flex flex-col hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              onClick={() => handleNotificationClick(item.plan_id)}
             >
               <p className="text-sm sm:text-[15px] text-gray-700 font-medium">
                 {item.message}
@@ -188,14 +197,20 @@ const AdminNotification = () => {
                 </span>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleViewClick(item)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the parent div's onClick
+                      handleViewClick(item);
+                    }}
                     className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
                     title="View Notification"
                   >
                     <IoEyeOutline size={20} />
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(item.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the parent div's onClick
+                      handleDeleteClick(item.id);
+                    }}
                     className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors duration-200 cursor-pointer"
                     title="Delete Notification"
                   >

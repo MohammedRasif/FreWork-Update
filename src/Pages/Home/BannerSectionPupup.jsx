@@ -6,6 +6,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+
 let isGoogleScriptLoaded = false;
 
 export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
@@ -36,9 +37,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [showBudgetMessage, setShowBudgetMessage] = useState(false); // Local state for session
+  const [showBudgetMessage, setShowBudgetMessage] = useState(false);
+  const [hasWarningBeenShown, setHasWarningBeenShown] = useState(false);
   const budgetRef = useRef(null);
-  const [isPopupOpened, setIsPopupOpened] = useState(false); // Track popup open state
+  const [isPopupOpened, setIsPopupOpened] = useState(false);
   const [createPlan] = useCreatePlanOneMutation();
   const [updatePlan] = useUpdatePlanMutation();
   const { state } = useLocation();
@@ -54,20 +56,29 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
+
   // Define the event handlers
   const handleBudgetClick = () => {
-    if (isPopupOpened && !showBudgetMessage) {
+    if (isPopupOpened && !showBudgetMessage && !hasWarningBeenShown) {
       setShowBudgetMessage(true);
     }
   };
+
   const handleOkClick = () => {
     setShowBudgetMessage(false);
+    setHasWarningBeenShown(true);
   };
+
   useEffect(() => {
-    // Reset the budget message state when popup is opened
+    // Reset states when popup is opened
     setIsPopupOpened(true);
-    setShowBudgetMessage(false); // Reset for new session
+    setShowBudgetMessage(false);
+    setHasWarningBeenShown(false);
+
+    // Load existing plan or pending plan data
+    const pendingPlan = localStorage.getItem("pendingPlan");
     if (state?.id) {
+      // Load data from state (existing plan)
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
@@ -116,17 +127,16 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           }[key] || key;
         updateFormData(mappedKey, value);
       });
-    } else {
-      const pendingPlan = localStorage.getItem("pendingPlan");
-      if (pendingPlan) {
-        const parsed = JSON.parse(pendingPlan);
-        Object.entries(parsed).forEach(([key, value]) => {
-          setValue(key, value);
-          updateFormData(key, value);
-        });
-      }
+    } else if (pendingPlan) {
+      // Load data from pendingPlan
+      const parsed = JSON.parse(pendingPlan);
+      Object.entries(parsed).forEach(([key, value]) => {
+        setValue(key, value);
+        updateFormData(key, value);
+      });
     }
   }, [state?.id, setValue]);
+
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (!isGoogleScriptLoaded && !window.google) {
@@ -149,6 +159,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     loadGoogleMaps();
     return () => {};
   }, []);
+
   useEffect(() => {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
@@ -187,33 +198,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       } else {
         console.warn("locationToRef is null");
       }
-      if (currentStep === 2 && touristSpotsRef.current) {
-        console.log("Setting up autocomplete for touristSpots");
-        const touristSpotsAutocomplete =
-          new window.google.maps.places.Autocomplete(touristSpotsRef.current, {
-            types: ["point_of_interest", "tourist_attraction"],
-          });
-        touristSpotsAutocomplete.addListener("place_changed", () => {
-          const place = touristSpotsAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          console.log("touristSpots selected:", locationValue);
-          setValue("touristSpots", locationValue);
-          updateFormData("touristSpots", locationValue);
-        });
-      } else if (currentStep === 2) {
-        console.warn("touristSpotsRef is null on Step 2");
-      }
+      
     };
     if (window.google) {
       setTimeout(initAutocomplete, 100);
     }
   }, [setValue, currentStep]);
+
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
+
   const validateStep = async (step) => {
     let fieldsToValidate = [];
     switch (step) {
@@ -250,17 +248,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     return result;
   };
+
   const nextStep = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
+
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
+
   const onSubmit = async (data, status) => {
     console.log("onSubmit called with data:", data, "status:", status);
     const accessToken = localStorage.getItem("access_token");
@@ -268,7 +269,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (!accessToken) {
       localStorage.setItem("pendingPlan", JSON.stringify(data));
       toast.error("Please log in to create a plan");
-      navigate("/register");
+      navigate("/register", { state: { fromLogin: true } }); // Add fromLogin flag
       return;
     }
     if (data.endingDate < data.startingDate) {
@@ -330,24 +331,23 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.log("Create Plan Response:", response);
       }
 
-      // Show styled success message for 4 seconds
       toast.success(
         "Your data successfully submitted! When approved by admin, this tour plan will be published.",
         {
-          autoClose: 4000, // Display for 4 seconds
+          autoClose: 4000,
           style: {
-            background: "linear-gradient(135deg, #FF6600, #e55600)", // Orange gradient matching theme
-            color: "#ffffff", // White text
-            borderRadius: "8px", // Rounded corners
-            padding: "16px", // Comfortable padding
-            fontSize: "16px", // Readable font size
-            fontWeight: "500", // Medium font weight
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
-            maxWidth: "400px", // Limit width for better readability
+            background: "linear-gradient(135deg, #FF6600, #e55600)",
+            color: "#ffffff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "16px",
+            fontWeight: "500",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            maxWidth: "400px",
           },
           iconTheme: {
-            primary: "#ffffff", // White icon
-            secondary: "#FF6600", // Orange background for icon
+            primary: "#ffffff",
+            secondary: "#FF6600",
           },
         }
       );
@@ -377,16 +377,22 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     setSelectedFile(file);
     updateFormData("uploadedFile", file);
   };
+
   const handlepupupClose = () => {
     localStorage.removeItem("pendingPlan");
+    closeForm();
   };
+
   const progressPercentage = (currentStep / totalSteps) * 100;
+
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: "Location (From) is required",
   });
+
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: "Location (To) is required",
   });
+
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
       <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
@@ -569,7 +575,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   onChange={(e) => {
                     const value = e.target.value;
                     updateFormData("budget", value);
-                    setValue("budget", value, { shouldValidate: true }); // Force validation on change
+                    setValue("budget", value, { shouldValidate: true });
                   }}
                   onClick={handleBudgetClick}
                   ref={budgetRef}
@@ -580,7 +586,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     {errors.budget.message}
                   </span>
                 )}
-                {showBudgetMessage && isPopupOpened && (
+                {showBudgetMessage && (
                   <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
                     <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 lg:w-96 w-72">
                       <p className="lg:text-[15px] text-[13px] text-gray-700">
@@ -604,6 +610,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   Tourist Spots
                 </label>
                 <input
+                  {...register("touristSpots", {
+                    required: "Tourist Spots is required",
+                  })}
                   type="text"
                   placeholder="Mare, Monumenti, Ristorante..."
                   defaultValue={formData.touristSpots}
@@ -611,6 +620,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     updateFormData("touristSpots", e.target.value);
                     setValue("touristSpots", e.target.value);
                     console.log("touristSpots input changed:", e.target.value);
+                  }}
+                  ref={(e) => {
+                    touristSpotsRef.current = e;
                   }}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                   style={{ zIndex: 1001 }}
@@ -948,10 +960,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </button>
             )}
             <button
-              onClick={() => {
-                closeForm();
-                localStorage.removeItem("pendingPlan");
-              }}
+              onClick={handlepupupClose}
               className="px-2 py-1 sm:px-2.1 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
             >
               Cancel

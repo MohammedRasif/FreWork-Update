@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import img from "../../assets/img/background.jpg";
 import img1 from "../../assets/img/banner.png";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Add useLocation
 import BannerSectionPopup from "./BannerSectionPupup";
 
 const Banner = () => {
@@ -11,11 +11,17 @@ const Banner = () => {
   const role = localStorage.getItem("role");
   const showCreateRequestButton = !accessToken || role === "tourist";
   const navigate = useNavigate();
+  const location = useLocation(); // Add useLocation to detect navigation source
 
   // Function to determine the initial step based on pendingPlan data
   const getInitialStep = (pendingPlan) => {
-    if (!pendingPlan) return 1;
+    // Check if the user is coming from the login page
+    const fromLogin = location.state?.fromLogin || false;
+    if (fromLogin && accessToken && pendingPlan) {
+      return 5; // Force step 5 if coming from login with a pending plan
+    }
 
+    if (!pendingPlan) return 1;
     const {
       name,
       email,
@@ -47,27 +53,22 @@ const Banner = () => {
     ) {
       return 1;
     }
-
     // Step 2: Check if details are complete
-    if (!budget || !touristSpots || !description) {
+    if (!budget || !touristSpots) { // Removed description as it's optional
       return 2;
     }
-
     // Step 3: Check if accommodation preferences are complete
     if (!typeOfAccommodation || !minimumHotelStars || !mealPlan) {
       return 3;
     }
-
     // Step 4: Check if travel preferences are complete
     if (!travelType || !destinationType) {
       return 4;
     }
-
     // Step 5: Check if personal information and confirmation are complete
     if (!name || !email || !phoneNumber || !confirmation) {
       return 5;
     }
-
     // If all data is present, default to step 5
     return 5;
   };
@@ -97,9 +98,8 @@ const Banner = () => {
           alt="Background"
           className="object-cover w-full h-full "
         />
-        <div className="absolute inset-0 bg-black/10" /> {/* Light overlay */}
+        <div className="absolute inset-0 bg-black/10" />
       </div>
-
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center lg:mt-12 mt-8">
         {/* Logo */}
@@ -115,7 +115,6 @@ const Banner = () => {
         <p className="mt-2 text-[24px] md:text-[40px] lg:text-[42px] font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
           Publish your request and receive personalized offers from agencies
         </p>
-
         {/* CTA Button */}
         {showCreateRequestButton && (
           <button
@@ -126,7 +125,6 @@ const Banner = () => {
           </button>
         )}
       </div>
-
       {/* Popup */}
       {isPopupOpen && (
         <motion.div

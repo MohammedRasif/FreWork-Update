@@ -181,17 +181,7 @@ const Navbar = () => {
         >
           Agencies
         </NavLink>
-        <NavLink
-          to="/pricing"
-          className={`text-base text-[20px] font-medium ${
-            activeLink === "agencies"
-              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-              : "text-gray-700 hover:text-blue-600"
-          }`}
-          onClick={() => handleLinkClick("agencies", "/pricing")}
-        >
-          For agencies
-        </NavLink>
+
         <NavLink
           to="/tourPlans"
           className={`text-base text-[20px] font-medium ${
@@ -213,6 +203,17 @@ const Navbar = () => {
           onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
         >
           Accepted Offers
+        </NavLink>
+        <NavLink
+          to="/pricing"
+          className={`text-base text-[20px] font-medium ${
+            activeLink === "agencies"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-blue-600"
+          }`}
+          onClick={() => handleLinkClick("agencies", "/pricing")}
+        >
+          For agencies
         </NavLink>
         <NavLink
           to="/contact"
@@ -367,7 +368,9 @@ const Navbar = () => {
                     ? "text-[#2464EC] border-b-2 border-[#2464EC]"
                     : "text-gray-700 hover:text-blue-600"
                 }`}
-                onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
+                onClick={() =>
+                  handleLinkClick("acceptedOffers", "/acceptedOffers")
+                }
               >
                 Accepted Offers
               </NavLink>

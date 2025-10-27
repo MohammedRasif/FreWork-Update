@@ -24,6 +24,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import TourPlanPopup from "./TourPlanpopup";
 import { FaListUl } from "react-icons/fa";
+import { FaStar } from "react-icons/fa6";
 
 // Temporary fallback for FullScreenInfinityLoader
 const FullScreenInfinityLoader = () => (
@@ -533,7 +534,7 @@ const TourPlanDouble = () => {
                             </h1>
                             <h1>
                               <span className="font-medium">Adult :</span>{" "}
-                              {tour.child_count}
+                              {tour.adult_count}
                             </h1>
                           </div>
                         </div>
@@ -562,16 +563,6 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaListUl className="w-6 h-5 text-gray-500" />
-                            <span>
-                              <span className="font-medium">
-                                Minimum rating:
-                              </span>{" "}
-                              {tour.includes || "N/A"}
-                            </span>
-                          </p>
-
-                          <p className="text-md text-gray-600 flex items-center gap-2">
                             <Utensils className="w-6 h-5 text-gray-500" />
                             <span>
                               <span className="font-medium">Meal plan:</span>{" "}
@@ -586,6 +577,15 @@ const TourPlanDouble = () => {
                                 Type of accommodation:
                               </span>{" "}
                               {tour.type_of_accommodation || "N/A"}
+                            </span>
+                          </p>
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaStar className="w-5 h-5 text-gray-500" />
+                            <span>
+                              <span className="font-medium">
+                                Minimum rating:
+                              </span>{" "}
+                              {tour.minimum_star_hotel || "N/A"}
                             </span>
                           </p>
 
