@@ -103,118 +103,106 @@ function SinglePost({ prid }) {
     setSelectedFile(file);
   };
 
-const handleOfferSubmit = async (e) => {
-  e.preventDefault();
-  if (!token) {
-    navigate("/login");
-    toast.error("Please log in to submit an offer");
-    return;
-  }
-  if (!offerForm.budget || !offerForm.comment.trim()) {
-    toast.error("Please provide a budget and a comment");
-    return;
-  }
-  if (
-    offerForm.applyDiscount &&
-    (!offerForm.discount || Number(offerForm.discount) <= 0)
-  ) {
-    toast.error("Please provide a valid discount percentage");
-    return;
-  }
-
-  // Budget validation: Check if offered budget is within ±$500 of tour.budget
-  const offeredBudget = Number.parseFloat(offerForm.budget);
-  const tourBudget = Number.parseFloat(tour.budget);
-  if (offeredBudget < tourBudget - 500 || offeredBudget > tourBudget + 500) {
-    toast.error(
-      `Offered budget must be within ±$500 of the tour budget ($${tourBudget}). Your offer ($${offeredBudget}) is outside the range $${tourBudget - 500} to $${tourBudget + 500}.`,
-      { duration: 5000 }
-    );
-    return;
-  }
-
-  setIsOfferSubmitting(true);
-
-  try {
-    const formData = new FormData();
-    formData.append("offered_budget", offeredBudget);
-    formData.append("message", offerForm.comment);
-    formData.append("apply_discount", offerForm.applyDiscount);
-    formData.append(
-      "discount",
-      offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
-    );
-    if (selectedFile) {
-      formData.append("file", selectedFile);
+  const handleOfferSubmit = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      navigate("/login");
+      toast.error("Please log in to submit an offer");
+      return;
+    }
+    if (!offerForm.budget || !offerForm.comment.trim()) {
+      toast.error("Please provide a budget and a comment");
+      return;
+    }
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || Number(offerForm.discount) <= 0)
+    ) {
+      toast.error("Please provide a valid discount percentage");
+      return;
     }
 
-    await offerBudgetToBack({
-      id: finalId,
-      data: formData,
-    }).unwrap();
-
-    const newOffer = {
-      id: `${currentUserId}-${Date.now()}`,
-      offered_budget: offeredBudget,
-      message: offerForm.comment,
-      apply_discount: offerForm.applyDiscount,
-      discount: offerForm.applyDiscount
-        ? Number.parseFloat(offerForm.discount)
-        : 0,
-      file_name: selectedFile ? selectedFile.name : null,
-      agency: {
-        agency_name: localStorage.getItem("name") || "Unknown Agency",
-        logo_url:
-          localStorage.getItem("user_image") ||
-          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-        is_verified: false,
-      },
-    };
-    setPostData((prev) => ({
-      ...prev,
-      offers: [...(prev.offers || []), newOffer],
-      offer_count: (prev.offer_count || 0) + 1,
-    }));
-    setOfferForm({
-      budget: "",
-      comment: "",
-      discount: "",
-      applyDiscount: false,
-    });
-    setSelectedFile(null);
-    setIsPopupOpen(false);
-    toast.success(
-      "Your offer has been successfully submitted! When approved by admin, this tour plan will be published.",
-      {
-        duration: 4000, // Display for 4 seconds
-        style: {
-          background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
-          color: "#ffffff", // White text
-          borderRadius: "8px", // Rounded corners
-          padding: "16px", // Comfortable padding
-          fontSize: "16px", // Readable font size
-          fontWeight: "500", // Medium font weight
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
-          maxWidth: "400px", // Limit width for better readability
-        },
-        iconTheme: {
-          primary: "#ffffff", // White icon
-          secondary: "#3b82f6", // Blue background for icon
-        },
+    setIsOfferSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(offerForm.budget));
+      formData.append("message", offerForm.comment);
+      formData.append("apply_discount", offerForm.applyDiscount);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      if (selectedFile) {
+        formData.append("file", selectedFile);
       }
-    );
-    navigate("/admin/chat");
-  } catch (error) {
-    console.error("Failed to submit offer:", error);
-    toast.error(
-      error.data?.error
-        ? `${error.data.error} Only agency can do this.`
-        : "Something went wrong"
-    );
-  } finally {
-    setIsOfferSubmitting(false);
-  }
-};
+
+      await offerBudgetToBack({
+        id: finalId,
+        data: formData,
+      }).unwrap();
+
+      const newOffer = {
+        id: `${currentUserId}-${Date.now()}`,
+        offered_budget: offeredBudget,
+        message: offerForm.comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
+        file_name: selectedFile ? selectedFile.name : null,
+        agency: {
+          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          is_verified: false,
+        },
+      };
+      setPostData((prev) => ({
+        ...prev,
+        offers: [...(prev.offers || []), newOffer],
+        offer_count: (prev.offer_count || 0) + 1,
+      }));
+      setOfferForm({
+        budget: "",
+        comment: "",
+        discount: "",
+        applyDiscount: false,
+      });
+      setSelectedFile(null);
+      setIsPopupOpen(false);
+      toast.success(
+        "Your offer has been successfully submitted! When approved by admin, this tour plan will be published.",
+        {
+          duration: 4000, // Display for 4 seconds
+          style: {
+            background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
+            color: "#ffffff", // White text
+            borderRadius: "8px", // Rounded corners
+            padding: "16px", // Comfortable padding
+            fontSize: "16px", // Readable font size
+            fontWeight: "500", // Medium font weight
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
+            maxWidth: "400px", // Limit width for better readability
+          },
+          iconTheme: {
+            primary: "#ffffff", // White icon
+            secondary: "#3b82f6", // Blue background for icon
+          },
+        }
+      );
+      navigate("/admin/chat");
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      toast.error(
+        error.data?.error
+          ? `${error.data.error} Only agency can do this.`
+          : "Something went wrong"
+      );
+    } finally {
+      setIsOfferSubmitting(false);
+    }
+  };
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {

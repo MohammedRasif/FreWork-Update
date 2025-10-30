@@ -15,7 +15,7 @@ function AcceptedOffers() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="pt-24 container mx-auto">
+    <div className="pt-24 container mx-auto px-3">
       <h1 className="lg:text-4xl text-[28] font-semibold pb-3 ">
         All Accepted Offers
       </h1>
@@ -42,35 +42,57 @@ function AcceptedOffers() {
                     </h2>
                   </div>
                   {tour.offers && tour.offers.length > 0 && (
-                    <div
-                      className="
-                    absolute bottom-4
-                    flex items-center justify-center space-x-8
-                    overflow-x-auto
-                    px-2
-                    scrollbar-none
-                    w-full
-                  "
-                    >
-                      {tour.offers.map((offer) => (
-                        <img
-                          key={offer.agency?.id || Math.random()}
-                          src={
-                            offer.agency?.logo_url ||
-                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                          }
-                          alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                          className={`
-                        ${
-                          offer.status === "accepted"
-                            ? "w-[72px] h-[72px] border-yellow-600 border-8"
-                            : "w-14 h-14 border-white"
-                        }
-                        object-contain rounded-full border bg-white
-                        flex-shrink-0
-                      `}
-                        />
-                      ))}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2">
+                      {tour.offers
+                        .filter((offer) => offer.status === "accepted")
+                        .slice(0, 1)
+                        .map((offer) => (
+                          <div
+                            key={offer.id}
+                            className=" w-32 h-32 flex items-center justify-center"
+                          >
+                            <div className="relative inset-1 rounded-full  shadow-inner flex flex-col items-center justify-center p-2">
+                              <img
+                                src={
+                                  offer.agency?.logo_url ||
+                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                }
+                                alt={offer.agency?.agency_name || "Agency"}
+                                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md  relative z-30 top-[80px] "
+                              />
+
+                              <div className="relative flex items-center justify-center w-22 h-22 z-10 pt-2  rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-xl border-[6px] border-yellow-500 mt-3">
+                                <svg
+                                  viewBox="0 0 220 220"
+                                  className="relative w-[160px] h-[160px] ml-1"
+                                >
+                                  <defs>
+                                    <path
+                                      id="textCircleTop"
+                                      d="M 100,100 m -85,0 a 85,85 0 1,1 170,0"
+                                      fill="none"
+                                    />
+                                  </defs>
+
+                                  <text
+                                    fill="#000000"
+                                    fontSize="22" 
+                                    fontWeight="600" 
+                                    letterSpacing="2"
+                                  >
+                                    <textPath
+                                      href="#textCircleTop"
+                                      startOffset="50%" 
+                                      textAnchor="middle"
+                                    >
+                                      TRATTATIVA CONCLUSA
+                                    </textPath>
+                                  </text>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   )}
                   {tour.offer_count >= 3 ? (
