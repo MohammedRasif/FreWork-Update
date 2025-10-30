@@ -10,8 +10,8 @@ import {
   BedDouble,
   Utensils,
 } from "lucide-react";
-import { IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
-import { MdVerified } from "react-icons/md";
+import { IoBed, IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
+import { MdOutlineNoMeals, MdVerified } from "react-icons/md";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
 import {
@@ -24,7 +24,13 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import TourPlanPopup from "./TourPlanpopup";
 import { FaListUl } from "react-icons/fa";
-import { FaStar } from "react-icons/fa6";
+import {
+  FaClock,
+  FaList,
+  FaLocationArrow,
+  FaLocationDot,
+  FaStar,
+} from "react-icons/fa6";
 
 // Temporary fallback for FullScreenInfinityLoader
 const FullScreenInfinityLoader = () => (
@@ -548,7 +554,7 @@ const TourPlanDouble = () => {
 
                         <div>
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <MapPin className="w-6 h-5 text-gray-500" />
+                            <FaLocationDot className="w-6 h-5 text-black size-4" />
                             <span>
                               <span className="font-medium">
                                 Points of travel:
@@ -560,7 +566,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <Navigation className="w-6 h-5 text-gray-500" />
+                            <FaLocationArrow className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
                                 Departure from:
@@ -570,7 +576,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <Utensils className="w-6 h-5 text-gray-500" />
+                            <MdOutlineNoMeals className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">Meal plan:</span>{" "}
                               {tour.meal_plan || "N/A"}
@@ -578,7 +584,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <BedDouble className="w-6 h-5 text-gray-500" />
+                            <IoBed className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
                                 Type of accommodation:
@@ -588,7 +594,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaStar className="w-5 h-5 text-gray-500" />
+                            <FaStar  className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
                                 Minimum rating:
@@ -598,7 +604,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <Clock4 className="w-6 h-5 text-gray-500" />
+                            <FaClock className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">Duration:</span>{" "}
                               {tour.duration || "N/A"}

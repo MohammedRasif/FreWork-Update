@@ -601,12 +601,6 @@ const AdminHome = () => {
                 <p className="text-xs sm:text-sm lg:text-sm text-gray-900 font-semibold mb-2">
                   Want to respond fast to get Tourist for "Free"?
                 </p>
-                <a
-                  href="#"
-                  className="text-xs sm:text-sm lg:text-sm text-blue-600 hover:underline"
-                >
-                  Click here
-                </a>
               </div>
             </div>
 

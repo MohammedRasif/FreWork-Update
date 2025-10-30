@@ -12,6 +12,7 @@ import {
   FaList,
   FaLocationArrow,
   FaLocationDot,
+  FaStar,
 } from "react-icons/fa6";
 import { X, Utensils, BedDouble, Clock4, ShieldCheck } from "lucide-react";
 import {
@@ -382,7 +383,7 @@ function SinglePost({ prid }) {
 
           <div className="">
             <p className="text-xl font-bold text-gray-900">
-              Budget: ${tour.budget}
+              Budget: €{tour.budget}
             </p>
           </div>
 
@@ -405,7 +406,7 @@ function SinglePost({ prid }) {
 
           <div>
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+              <FaLocationDot className="w-6 h-5 text-black size-4" />
               <span>
                 <span className="font-medium">Points of travel:</span>{" "}
                 {tour.tourist_spots || "None"}
@@ -413,7 +414,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaLocationArrow className="w-6 h-5 text-gray-500" />
+              <FaLocationArrow className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Departure from:</span>{" "}
                 {tour.location_from || "N/A"}
@@ -421,7 +422,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+              <MdOutlineNoMeals className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Meal plan:</span>{" "}
                 {tour.meal_plan || "N/A"}
@@ -429,14 +430,14 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <IoBed className="w-6 h-5 text-gray-500" />
+              <IoBed className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Type of accommodation:</span>{" "}
                 {tour.type_of_accommodation || "N/A"}
               </span>
             </p>
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaList className="w-6 h-5 text-gray-500" />
+              <FaStar  className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Minimum rating:</span>{" "}
                 {tour.minimum_star_hotel || "N/A"}
@@ -444,7 +445,7 @@ function SinglePost({ prid }) {
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaClock className="w-6 h-5 text-gray-500" />
+              <FaClock className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Duration:</span>{" "}
                 {tour.duration || "N/A"}
@@ -667,7 +668,7 @@ function SinglePost({ prid }) {
                             </div>
                             <div className="flex items-center justify-between sm:justify-end gap-3">
                               <span className="font-semibold text-lg sm:text-xl">
-                                💰 ${offer.offered_budget || "N/A"}
+                                💰 €{offer.offered_budget || "N/A"}
                               </span>
                               <div className="flex gap-2">
                                 <button

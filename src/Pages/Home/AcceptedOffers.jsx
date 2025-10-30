@@ -1,8 +1,19 @@
 import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
-import { MapPin } from "lucide-react";
+import { MapPin, ShieldCheck } from "lucide-react";
 import React, { useState } from "react";
-import { FaBed, FaClock, FaListUl, FaStar, FaUtensils } from "react-icons/fa6";
+import {
+  FaBed,
+  FaClock,
+  FaList,
+  FaListUl,
+  FaLocationArrow,
+  FaLocationDot,
+  FaStar,
+  FaUtensils,
+} from "react-icons/fa6";
+import { IoBed } from "react-icons/io5";
 import { LuNavigation2 as Navigation } from "react-icons/lu";
+import { MdOutlineNoMeals } from "react-icons/md";
 
 function AcceptedOffers() {
   const { data, error, isLoading } = useAcceptedAllOffersQuery();
@@ -76,13 +87,13 @@ function AcceptedOffers() {
 
                                   <text
                                     fill="#000000"
-                                    fontSize="22" 
-                                    fontWeight="600" 
+                                    fontSize="22"
+                                    fontWeight="600"
                                     letterSpacing="2"
                                   >
                                     <textPath
                                       href="#textCircleTop"
-                                      startOffset="50%" 
+                                      startOffset="50%"
                                       textAnchor="middle"
                                     >
                                       TRATTATIVA CONCLUSA
@@ -133,7 +144,7 @@ function AcceptedOffers() {
 
                 <div>
                   <p className="text-xl font-semibold text-gray-900">
-                    Budget: ${tour.budget}
+                    Budget: €{tour.budget}
                   </p>
                 </div>
 
@@ -158,7 +169,7 @@ function AcceptedOffers() {
 
                 <div>
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <MapPin className="w-6 h-5 text-gray-500" />
+                    <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
                       <span className="font-medium">Points of travel:</span>{" "}
                       {tour.tourist_spots.length > 14
@@ -168,7 +179,7 @@ function AcceptedOffers() {
                   </p>
 
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <Navigation className="w-6 h-5 text-gray-500" />
+                    <FaLocationArrow className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">Departure from:</span>{" "}
                       {tour.location_from || "N/A"}
@@ -176,7 +187,7 @@ function AcceptedOffers() {
                   </p>
 
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaUtensils className="w-6 h-5 text-gray-500" />
+                    <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">Meal plan:</span>{" "}
                       {tour.meal_plan || "N/A"}
@@ -184,7 +195,7 @@ function AcceptedOffers() {
                   </p>
 
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaBed className="w-6 h-5 text-gray-500" />
+                    <IoBed className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">
                         Type of accommodation:
@@ -193,7 +204,7 @@ function AcceptedOffers() {
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaStar className="w-5 h-5 text-gray-500" />
+                    <FaStar  className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">Minimum rating:</span>{" "}
                       {tour.minimum_star_hotel || "N/A"}
@@ -201,7 +212,7 @@ function AcceptedOffers() {
                   </p>
 
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaClock className="w-6 h-5 text-gray-500" />
+                    <FaClock className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">Duration:</span>{" "}
                       {tour.duration || "N/A"}
@@ -209,7 +220,7 @@ function AcceptedOffers() {
                   </p>
 
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaClock className="w-6 h-5 text-green-500" />
+                    <ShieldCheck className="w-6 h-5 text-green-500" />
                     <span>
                       <span className="font-medium">
                         Contact verified via email
