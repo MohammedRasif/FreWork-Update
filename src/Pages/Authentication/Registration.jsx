@@ -57,6 +57,7 @@ const Register = () => {
       };
       // Store userType in localStorage
       localStorage.setItem("userType", data.userType);
+      localStorage.setItem("userEmail", data.email);
       console.log("Stored userType in localStorage:", data.userType);
 
       const res = await createUser(payload).unwrap();

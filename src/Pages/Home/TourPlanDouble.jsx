@@ -74,6 +74,13 @@ const TourPlanDouble = () => {
   const { data: userData, isLoading } = useShowUserInpormationQuery();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
 
+  const uniqueCountries = Array.from(
+    new Set(
+      tourPlanPublic?.map((tour) => tour.location_to?.trim()).filter(Boolean) ||
+        []
+    )
+  ).sort((a, b) => a.localeCompare(b));
+
   // Apply client-side filtering
   useEffect(() => {
     let filteredData = tourPlanPublic || [];
@@ -346,7 +353,7 @@ const TourPlanDouble = () => {
                       <option value="">Select a category</option>
                       <option value="beach">Beach trips</option>
                       <option value="mountain">Mountain adventures</option>
-                      <option value="desert">Relaxing tours</option>
+                      <option value="relax">Relaxing tours</option>
                       <option value="island">Group packages</option>
                     </select>
                   </div>
@@ -510,7 +517,7 @@ const TourPlanDouble = () => {
                           </p>
                           <p>
                             <span className="font-medium">Category:</span>{" "}
-                            {tour.travel_type || tour.category || "N/A"}
+                            {tour.destination_type || "N/A"}
                           </p>
                         </div>
 
@@ -579,6 +586,7 @@ const TourPlanDouble = () => {
                               {tour.type_of_accommodation || "N/A"}
                             </span>
                           </p>
+
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaStar className="w-5 h-5 text-gray-500" />
                             <span>
@@ -672,23 +680,31 @@ const TourPlanDouble = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select Country (To)
                   </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
-                    value={filters.country}
-                    onChange={(e) =>
-                      handleFilterChange("country", e.target.value)
-                    }
-                  >
-                    <option value="">Select a country</option>
-                    <option value="thailand">Thailand</option>
-                    <option value="india">India</option>
-                    <option value="malaysia">Malaysia</option>
-                    <option value="singapore">Singapore</option>
-                    <option value="japan">Japan</option>
-                    <option value="indonesia">Indonesia</option>
-                    <option value="vietnam">Vietnam</option>
-                    <option value="sri lanka">Sri Lanka</option>
-                  </select>
+
+                  {isTourPlanPublicLoading ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-500">
+                      Loading countries...
+                    </div>
+                  ) : uniqueCountries.length === 0 ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-500">
+                      No countries found
+                    </div>
+                  ) : (
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
+                      value={filters.country}
+                      onChange={(e) =>
+                        handleFilterChange("country", e.target.value)
+                      }
+                    >
+                      <option value="">All Countries</option>
+                      {uniqueCountries.map((country) => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

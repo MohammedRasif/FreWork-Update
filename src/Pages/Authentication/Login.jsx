@@ -6,7 +6,6 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useLogInMutation } from "@/redux/features/baseApi";
 import img1 from "../../assets/img/removebg.png";
 
-
 const login = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
@@ -37,10 +36,13 @@ const login = () => {
       localStorage.setItem("user_id", res?.profile_data?.user_id);
       localStorage.setItem("user_image", res?.profile_data.image_url);
       localStorage.setItem("role", res?.profile_data.role);
+
       localStorage.setItem(
         "name",
         res?.profile_data.name || res?.profile_data.agency
       );
+
+      localStorage.setItem("userEmail", data.email);
       navigate(redirect, { replace: true });
       // console.log(res, "success responce");
     } catch (error) {
@@ -71,11 +73,11 @@ const login = () => {
         <div className="w-full max-w-xl">
           {/* Logo */}
           <div className="text-center mb-8">
-             <NavLink to="/">
-                         <div className=" flex items-center justify-center mb-6">
-                          <img src={img1} className="h-20" alt="" />
-                        </div>
-                       </NavLink>
+            <NavLink to="/">
+              <div className=" flex items-center justify-center mb-6">
+                <img src={img1} className="h-20" alt="" />
+              </div>
+            </NavLink>
             <h1 className="text-4xl font-semibold text-gray-700">
               Welcome to Frework
             </h1>

@@ -42,9 +42,10 @@ const AdminHome = () => {
   const navigate = useNavigate();
   const { data: userData } = useShowUserInpormationQuery();
   console.log(userData);
-
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
+
+  console.log(tourPlanPublic, "dddddddddddddddddddddd");
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
   const [declineRequest, { isLoading: isDeclineRequestLoading }] =
@@ -69,6 +70,8 @@ const AdminHome = () => {
   }, []);
 
   // Filter plans based on search query and filter option
+  const currentUserEmail = localStorage.getItem("userEmail");
+
   const filteredPlans = tourPlanPublic.filter((plan) => {
     const matchesSearch = plan.location_to
       .toLowerCase()
@@ -76,7 +79,12 @@ const AdminHome = () => {
     const matchesFilter =
       filter === "All" ||
       (filter === "Offered" && plan.offered_status === true);
-    return matchesSearch && matchesFilter;
+
+    const hasUserOffered = plan.offers?.some(
+      (offer) => offer.agency?.contact_email === currentUserEmail
+    );
+
+    return matchesSearch && matchesFilter && !hasUserOffered;
   });
 
   // Handle offer form changes
@@ -94,7 +102,8 @@ const AdminHome = () => {
     setSelectedFile(file);
   };
 
-  // Handle offer submission
+  // add new filter funcation
+
   // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
     if (!token) {
@@ -632,7 +641,7 @@ const AdminHome = () => {
       <Toaster />
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-4/5">
-          <div className="mb-4 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+          <div className="mb-24  lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0 ">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
               Welcome,{" "}
               <span className="font-semibold">
@@ -640,7 +649,7 @@ const AdminHome = () => {
               </span>
             </h1>
             {activeTab === "All Plans" && (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 ">
                 <div className="relative w-full lg:max-w-[30vh]">
                   <input
                     type="text"
@@ -677,63 +686,83 @@ const AdminHome = () => {
           </div>
           {renderContent()}
         </div>
-        <div className="w-full lg:w-1/5 p-3 sm:p-4 lg:p-6 lg:mt-[7.6vh] order-first lg:order-last">
-          <div className="space-y-4 lg:space-y-6">
-            <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center">
-              My Board
-            </h3>
-            <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible">
-              <button
-                onClick={() => setActiveTab("All Plans")}
-                className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeTab === "All Plans"
-                    ? "bg-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                All Plans
-              </button>
-              <button
-                onClick={() => setActiveTab("Decline Plans")}
-                className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeTab === "Decline Plans"
-                    ? "bg-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Decline Plans
-              </button>
-              <button
-                onClick={() => setActiveTab("Offered Plans")}
-                className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeTab === "Offered Plans"
-                    ? "bg-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Offered Plans
-              </button>
-              <button
-                onClick={() => setActiveTab("Accepted Plans")}
-                className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeTab === "Accepted Plans"
-                    ? "bg-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Accepted Plans
-              </button>
+
+        {/* Fixed Sidebar - My Board + Alert */}
+        <div className="fixed right-3 top-20 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40 ">
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center hidden md:block">
+                My Board
+              </h3>
+              <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible">
+                {[
+                  "All Plans",
+                  "Decline Plans",
+                  "Offered Plans",
+                  "Accepted Plans",
+                ].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                      activeTab === tab
+                        ? "bg-white shadow-md border border-blue-200"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <div className="pt-4 lg:pt-6 hidden md:block">
+                <p className="text-xs sm:text-sm lg:text-sm text-gray-900 font-semibold mb-2">
+                  Want to respond fast to get Tourist for "Free"?
+                </p>
+                <a
+                  href="#"
+                  className="text-xs sm:text-sm lg:text-sm text-blue-600 hover:underline"
+                >
+                  Click here
+                </a>
+              </div>
             </div>
-            <div className="pt-4 lg:pt-6">
-              <p className="text-xs sm:text-sm lg:text-sm text-gray-900 font-semibold mb-2">
-                Want to respond fast to get Tourist for "Free"?
-              </p>
-              <a
-                href="#"
-                className="text-xs sm:text-sm lg:text-sm text-blue-600 hover:underline"
-              >
-                Click here
-              </a>
+
+            {/* === New English Alert Section === */}
+            <div className="bg-white border-2 border-red-600 rounded-xl shadow-lg overflow-hidden hidden md:block">
+              {/* Header */}
+              <div className="bg-red-600 text-white px-4 py-3 flex items-center gap-2">
+                <div className="bg-white text-red-600 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold">
+                  !
+                </div>
+                <h3 className="text-sm lg:text-base font-bold">
+                  Important Notice for Agencies
+                </h3>
+              </div>
+
+              {/* Body */}
+              <div className="p-4 space-y-3 text-gray-800 text-xs lg:text-sm">
+                <p className="font-semibold leading-relaxed">
+                  It is <span className="underline">mandatory</span> to click on{" "}
+                  <span className="underline">"Confirm Deal"</span> every time
+                  you close an agreement with a client.
+                </p>
+
+                <p className="leading-relaxed">
+                  The <strong>final confirmation belongs to the client</strong>:
+                  only then will the deal be valid, count toward site
+                  statistics, and award the{" "}
+                  <strong>"Winning Agency" badge</strong> visible to all.
+                </p>
+
+                <p className="font-bold text-red-700 flex items-center gap-1">
+                  <span className="text-xl">X</span>
+                  Agencies that fail to confirm may face{" "}
+                  <span className="underline">
+                    penalties or temporary suspensions
+                  </span>
+                  .
+                </p>
+              </div>
             </div>
           </div>
         </div>

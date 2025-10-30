@@ -205,6 +205,8 @@ export default function AdminDashboardLayout() {
       localStorage.removeItem("name");
       localStorage.removeItem("role");
       localStorage.removeItem("user_id");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userType");
       localStorage.removeItem("user_image");
       navigate(path);
     } else if (itemName === "Change password") {
