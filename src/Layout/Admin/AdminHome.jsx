@@ -70,8 +70,6 @@ const AdminHome = () => {
   }, []);
 
   // Filter plans based on search query and filter option
-  const currentUserEmail = localStorage.getItem("userEmail");
-
   const filteredPlans = tourPlanPublic.filter((plan) => {
     const matchesSearch = plan.location_to
       .toLowerCase()
@@ -79,12 +77,9 @@ const AdminHome = () => {
     const matchesFilter =
       filter === "All" ||
       (filter === "Offered" && plan.offered_status === true);
-
-    const hasUserOffered = plan.offers?.some(
-      (offer) => offer.agency?.contact_email === currentUserEmail
-    );
-
-    return matchesSearch && matchesFilter && !hasUserOffered;
+    const currentUserEmail = localStorage.getItem("userEmail");
+    const isOwnPlan = plan.user === currentUserEmail;
+    return matchesSearch && matchesFilter && !isOwnPlan;
   });
 
   // Handle offer form changes
