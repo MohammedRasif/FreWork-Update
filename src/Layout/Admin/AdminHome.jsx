@@ -70,19 +70,31 @@ const AdminHome = () => {
   }, []);
 
   // Filter plans based on search query and filter option
+  const currentUserEmail = localStorage.getItem("userEmail");
+
   const filteredPlans = tourPlanPublic.filter((plan) => {
     const matchesSearch = plan.location_to
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
+
     const matchesFilter =
       filter === "All" ||
       (filter === "Offered" && plan.offered_status === true);
+
     const currentUserEmail = localStorage.getItem("userEmail");
+
+    const hasUserOffered =
+      Array.isArray(plan.offers) &&
+      plan.offers.some((offer) => {
+        const email = offer.agency?.contact_email;
+
+        return email === currentUserEmail;
+      });
+
     const isOwnPlan = plan.user === currentUserEmail;
-    return matchesSearch && matchesFilter && !isOwnPlan;
+    return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan;
   });
 
-  // Handle offer form changes
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
     setOfferForm((prev) => ({
