@@ -292,12 +292,12 @@ function SinglePost({ prid }) {
       <Toaster />
       <button
         onClick={() => navigate(-1)}
-        className="text-gray-800 rounded-md transition-colors absolute top-4 left-4 cursor-pointer"
+        className= " text-black rounded-md transition-colors absolute top-4 left-4 cursor-pointer z-30"
       >
         <MdOutlineKeyboardBackspace size={36} />
       </button>
 
-      <div className="flex flex-col shadow-lg w-80 lg:w-[50vh] mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
+      <div className="flex flex-col shadow-lg w-full lg:w-[50vh] mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl z-10 lg:mt-0 mt-16">
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img
@@ -314,7 +314,7 @@ function SinglePost({ prid }) {
               </h2>
             </div>
             {tour.offers && tour.offers.length > 0 && (
-              <div className="absolute bottom-4 left-3/7 -translate-x-2/5 flex items-center lg:space-x-20 space-x-10 overflow-x-auto px-2 scrollbar-none">
+              <div className="absolute bottom-4 lg:left-3/7 left-32 -translate-x-2/5 flex items-center lg:space-x-20 space-x-10 overflow-x-auto px-2 scrollbar-none">
                 {tour.offers.map((offer) => (
                   <img
                     key={offer.agency?.id || Math.random()}

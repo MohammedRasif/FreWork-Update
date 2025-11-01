@@ -69,20 +69,16 @@ const AdminHome = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter plans based on search query and filter option
   const currentUserEmail = localStorage.getItem("userEmail");
 
   const filteredPlans = tourPlanPublic.filter((plan) => {
     const matchesSearch = plan.location_to
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-
     const matchesFilter =
       filter === "All" ||
       (filter === "Offered" && plan.offered_status === true);
-
     const currentUserEmail = localStorage.getItem("userEmail");
-
     const hasUserOffered =
       Array.isArray(plan.offers) &&
       plan.offers.some((offer) => {
@@ -90,7 +86,6 @@ const AdminHome = () => {
 
         return email === currentUserEmail;
       });
-
     const isOwnPlan = plan.user === currentUserEmail;
     return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan;
   });
@@ -578,7 +573,7 @@ const AdminHome = () => {
         </div>
 
         {/* Fixed Sidebar - My Board + Alert */}
-        <div className="fixed right-3 top-20 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40 ">
+        <div className="fixed lg:right-3 right-[2px] lg:top-20 top-40 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40 ">
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center hidden md:block">
