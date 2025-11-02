@@ -87,7 +87,7 @@ function AcceptedOffers() {
 
                                   <text
                                     fill="#000000"
-                                    fontSize="22"
+                                    fontSize="19"
                                     fontWeight="600"
                                     letterSpacing="2"
                                   >
