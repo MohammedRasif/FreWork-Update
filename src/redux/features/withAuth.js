@@ -19,7 +19,8 @@ export const sqQuery = createApi({
         endpoint !== "getPlans" &&
         endpoint !== "createPlanOne" &&
         endpoint !== "offerBudget" &&
-        endpoint !== "messageSent"
+        endpoint !== "messageSent" &&
+        endpoint !== "updatePlan"
       ) {
         headers.set("Content-Type", "application/json");
       }
@@ -99,6 +100,7 @@ export const sqQuery = createApi({
         url: `/tour-plans/${data.id}/`,
         method: "PATCH",
         body: data.updates,
+        formData: true,
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "TourPlan", id },
@@ -392,17 +394,10 @@ export const sqQuery = createApi({
       invalidatesTags: ["TourPlan", "declineOffer"],
     }),
 
-
     showMessages: builder.query({
       query: (id) => `chat/conversations/${id}/messages/`,
       providesTags: ["SentMessages"],
     }),
-
-
-
-
-
-
   }),
 });
 
