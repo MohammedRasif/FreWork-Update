@@ -53,19 +53,17 @@ const AdminHome = () => {
 
   const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
-  // State এর পরে (উপরে)
-useEffect(() => {
-  const savedTab = localStorage.getItem("adminActiveTab");
-  if (savedTab) {
-    setActiveTab(savedTab);
-  }
-}, []);
+  useEffect(() => {
+    const savedTab = localStorage.getItem("adminActiveTab");
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, []);
 
-// ট্যাব চেঞ্জ ফাংশন
-const handleTabChange = (tab) => {
-  setActiveTab(tab);
-  localStorage.setItem("adminActiveTab", tab);
-};
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    localStorage.setItem("adminActiveTab", tab);
+  };
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -687,8 +685,10 @@ const handleTabChange = (tab) => {
                 ].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    onClick={() => handleTabChange(tab)}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      handleTabChange(tab);
+                    }}
                     className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap ${
                       activeTab === tab
                         ? "bg-white shadow-md border border-blue-200"

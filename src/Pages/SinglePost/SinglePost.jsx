@@ -6,6 +6,7 @@ import {
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import React, { useEffect, useState, useRef } from "react";
+import img from "../../assets/img/badge.png";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FaClock,
@@ -314,58 +315,46 @@ function SinglePost({ prid }) {
               </h2>
             </div>
             {tour.offers && tour.offers.length > 0 && (
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2">
-                      {tour.offers
-                        .filter((offer) => offer.status === "accepted")
-                        .slice(0, 3)
-                        .map((offer) => (
-                          <div
-                            key={offer.id}
-                            className=" w-32 h-32 flex items-center justify-center"
-                          >
-                            <div className="relative inset-1 rounded-full  shadow-inner flex flex-col items-center justify-center p-2">
-                              <img
-                                src={
-                                  offer.agency?.logo_url ||
-                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                }
-                                alt={offer.agency?.agency_name || "Agency"}
-                                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md  relative z-30 top-[80px] "
-                              />
+              <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center">
+                <div className="flex justify-center items-center space-x-12  w-full px-4">
+                  {tour.offers.slice(0, 3).map((offer) => {
+                    const isAccepted = offer.status === "accepted";
 
-                              <div className="relative flex items-center justify-center w-22 h-22 z-10 pt-2  rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-xl border-[6px] border-yellow-500 mt-3">
-                                <svg
-                                  viewBox="0 0 220 220"
-                                  className="relative w-[160px] h-[160px] ml-1"
-                                >
-                                  <defs>
-                                    <path
-                                      id="textCircleTop"
-                                      d="M 100,100 m -85,0 a 85,85 0 1,1 170,0"
-                                      fill="none"
-                                    />
-                                  </defs>
+                    return (
+                      <div
+                        key={offer.agency?.id || Math.random()}
+                        className={`
+                          relative flex items-center justify-center
+                          ${isAccepted ? "w-20 h-20" : "w-16 h-16"}
+                        `}
+                      >
+                        {isAccepted && (
+                          <img
+                            src={img}
+                            alt="Accepted Badge"
+                            className="absolute inset-0 "
+                          />
+                        )}
 
-                                  <text
-                                    fill="#000000"
-                                    fontSize="19"
-                                    fontWeight="600"
-                                    letterSpacing="2"
-                                  >
-                                    <textPath
-                                      href="#textCircleTop"
-                                      startOffset="50%"
-                                      textAnchor="middle"
-                                    >
-                                      TRATTATIVA CONCLUSA
-                                    </textPath>
-                                  </text>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
+                        {/* Logo on Top (Always) */}
+                        <img
+                          src={
+                            offer.agency?.logo_url ||
+                            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                          }
+                          alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                          className="
+                            relative z-10 w-16 h-16 
+                            object-contain rounded-full bg-white 
+                            border-2  
+                            
+                          "
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
             {tour.offers?.length >= 3 ? (
               <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
