@@ -152,7 +152,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
               </span>
             </p>
             <p className="text-sm text-[#70798F]">
-              Category:{" "}
+              Approval status:{" "}
               <span className="text-[#343E4B] font-medium">
                 {plan.approval_status}
               </span>
