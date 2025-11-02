@@ -72,7 +72,7 @@ export default function BeachCard({ tourPlan }) {
                   className={`
                   ${
                     offer.status === "accepted"
-                      ? "w-14 h-14 border-gray-400 border-4"
+                      ? "w-14 h-14 border-yellow-500 border-10"
                       : "w-12 h-12 border-white"
                   }
                   object-contain rounded-full border bg-white
