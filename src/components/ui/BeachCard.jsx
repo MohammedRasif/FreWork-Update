@@ -92,7 +92,7 @@ export default function TourCard({ tourPlan }) {
                     className={`
                   ${
                     offer.status === "accepted"
-                      ? "w-14 h-14 border-gray-400 border-4"
+                      ? "w-14 h-14 border-amber-500 border-8"
                       : "w-12 h-12 border-white"
                   }
                   object-contain rounded-full border bg-white
@@ -172,7 +172,7 @@ export default function TourCard({ tourPlan }) {
             {localTourPlan.offer_count < 3 ? (
               role !== "tourist" && <div></div>
             ) : (
-              <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
+              <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute -top-54 right-3 bg-green-600 flex items-center">
                 <IoCheckmarkCircleSharp className="mr-1" size={16} />
                 Offers completed
               </div>
