@@ -292,7 +292,7 @@ function SinglePost({ prid }) {
       <Toaster />
       <button
         onClick={() => navigate(-1)}
-        className= " text-black rounded-md transition-colors absolute top-4 left-4 cursor-pointer z-30"
+        className=" text-black rounded-md transition-colors absolute top-4 left-4 cursor-pointer z-30"
       >
         <MdOutlineKeyboardBackspace size={36} />
       </button>
@@ -314,7 +314,7 @@ function SinglePost({ prid }) {
               </h2>
             </div>
             {tour.offers && tour.offers.length > 0 && (
-              <div className="absolute bottom-4 lg:left-3/7 left-32 -translate-x-2/5 flex items-center lg:space-x-20 space-x-10 overflow-x-auto px-2 scrollbar-none">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center lg:space-x-20 space-x-10 overflow-x-auto px-2 scrollbar-none">
                 {tour.offers.map((offer) => (
                   <img
                     key={offer.agency?.id || Math.random()}
@@ -324,14 +324,13 @@ function SinglePost({ prid }) {
                     }
                     alt={`${offer.agency?.agency_name || "Agency"} logo`}
                     className={`
-                                  ${
-                                    offer.status === "accepted"
-                                      ? "w-[72px] h-[72px] border-gray-200 border-2"
-                                      : "w-16 h-16 border-white"
-                                  }
-                                  object-contain rounded-full border bg-white
-                                  flex-shrink-0
-                                `}
+        ${
+          offer.status === "accepted"
+            ? "w-[72px] h-[72px] border-gray-200 border-2"
+            : "w-16 h-16 border-white"
+        }
+        object-contain rounded-full border bg-white flex-shrink-0
+      `}
                   />
                 ))}
               </div>
@@ -437,7 +436,7 @@ function SinglePost({ prid }) {
               </span>
             </p>
             <p className="text-md text-gray-600 flex items-center gap-2">
-              <FaStar  className="w-6 h-5 text-black" />
+              <FaStar className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">Minimum rating:</span>{" "}
                 {tour.minimum_star_hotel || "N/A"}

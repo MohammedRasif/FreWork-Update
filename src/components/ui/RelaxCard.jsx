@@ -127,7 +127,7 @@ export default function BeachCard({ tourPlan }) {
 
         <div>
           <p className="text-lg font-bold text-gray-900">
-            Budget: ${localTourPlan.budget}
+            Budget: €{localTourPlan.budget}
           </p>
         </div>
 

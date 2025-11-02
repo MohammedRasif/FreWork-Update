@@ -129,7 +129,7 @@ export default function MountainCard({ tourPlan }) {
 
         <div>
           <p className="text-lg font-bold text-gray-900">
-            Budget: ${localTourPlan.budget}
+            Budget: €{localTourPlan.budget}
           </p>
         </div>
 
