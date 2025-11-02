@@ -684,9 +684,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   Minimum Hotel Stars
                 </label>
                 <select
-                  {...register("minimumHotelStars", {
-                    required: "Minimum Hotel Stars is required",
-                  })}
+                  {...register("minimumHotelStars", )}
                   defaultValue={formData.minimumHotelStars}
                   onChange={(e) =>
                     updateFormData("minimumHotelStars", e.target.value)

@@ -51,6 +51,8 @@ export const sqQuery = createApi({
     "declineOffer",
     "restore",
     "SentMessages",
+    "createPlanOne",
+    "updatePlan",
   ],
 
   endpoints: (builder) => ({
@@ -93,7 +95,7 @@ export const sqQuery = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["TourPlan"],
+      invalidatesTags: ["createPlanOne"],
     }),
     updatePlan: builder.mutation({
       query: (data) => ({
@@ -103,8 +105,8 @@ export const sqQuery = createApi({
         formData: true,
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: "TourPlan", id },
-        "TourPlan",
+        { type: "updatePlan", id },
+        "updatePlan",
       ],
     }),
     deletePlan: builder.mutation({
