@@ -107,7 +107,92 @@ const AdminHome = () => {
   // add new filter funcation
 
   // Handle offer submission
-  const handleSubmitOffer = async (planId, budget, comment) => {};
+  const handleSubmitOffer = async (planId, budget, comment) => {
+    if (!token) {
+      toast.error("Please log in to submit an offer");
+      return;
+    }
+
+    if (!budget || !comment.trim()) {
+      toast.error("Please provide a budget and a comment");
+      return;
+    }
+
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || offerForm.discount <= 0)
+    ) {
+      toast.error("Please provide a valid discount percentage");
+      return;
+    }
+
+    setIsOfferSubmitting(true);
+
+    try {
+      // Create FormData to include all required fields
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(budget));
+      formData.append("message", comment);
+      formData.append("apply_discount", offerForm.applyDiscount);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
+
+      await offerBudgetToBack({
+        id: planId,
+        data: formData,
+      }).unwrap();
+
+      const newOffer = {
+        id: `${localStorage.getItem("user_id")}-${Date.now()}`,
+        offered_budget: Number.parseFloat(budget),
+        message: comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
+        file_name: selectedFile ? selectedFile.name : null,
+        agency: {
+          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          is_verified: false,
+        },
+      };
+
+      if (selectedPlan && selectedPlan.id === planId) {
+        setSelectedPlan((prev) =>
+          prev
+            ? {
+                ...prev,
+                offers: [...(prev.offers || []), newOffer],
+                offer_count: (prev.offer_count || 0) + 1,
+              }
+            : prev
+        );
+      }
+
+      setOfferBudget(0);
+      setOfferComment("");
+      setOfferForm({ applyDiscount: false, discount: "" });
+      setSelectedFile(null);
+      toast.success("Offer submitted successfully");
+      navigate("/admin/chat");
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      toast.error(
+        error.data?.error ||
+          "Failed to submit offer. Only agencies can do this."
+      );
+    } finally {
+      setIsOfferSubmitting(false);
+    }
+  };
 
   // Handle decline request
   const handleDeclineRequest = async (planId) => {
