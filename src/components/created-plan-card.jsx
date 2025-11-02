@@ -151,9 +151,17 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                 {plan.destination_type}
               </span>
             </p>
-            <p className="text-sm text-[#70798F]">
+            <p className="text-sm text-[#70798F] flex items-center gap-1">
               Approval status:{" "}
-              <span className="text-[#343E4B] font-medium">
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[14px] font-medium ${
+                  plan.approval_status === "rejected"
+                    ? "bg-red-100 text-red-700"
+                    : plan.approval_status === "pending"
+                    ? "bg-gray-100 text-black"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
                 {plan.approval_status}
               </span>
             </p>
