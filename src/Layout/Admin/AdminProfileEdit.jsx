@@ -4,6 +4,8 @@ import { GoArrowLeft } from "react-icons/go";
 import { NavLink } from "react-router-dom";
 import { useAdminProfileMutation, useGetAgencyProfileQuery } from "@/redux/features/withAuth";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
 const AdminProfileEdit = () => {
   const categoryMap = useMemo(
     () => ({
@@ -30,6 +32,8 @@ const AdminProfileEdit = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
+    clearErrors,
   } = useForm({
     defaultValues: {
       agencyName: "",
@@ -44,6 +48,9 @@ const AdminProfileEdit = () => {
 
   const [logoFile, setLogoFile] = useState(null);
   const [coverPhotoFile, setCoverPhotoFile] = useState(null);
+  const [logoSizeError, setLogoSizeError] = useState("");
+  const [coverSizeError, setCoverSizeError] = useState("");
+
   const [adminProfile, { isLoading, error }] = useAdminProfileMutation();
 
   useEffect(() => {
@@ -69,7 +76,54 @@ const AdminProfileEdit = () => {
     }
   }, [profileData, reset]);
 
+  const validateFileSize = (file, setErrorState, errorMessage) => {
+    if (file && file.size > MAX_FILE_SIZE) {
+      setErrorState(errorMessage);
+      return false;
+    }
+    setErrorState("");
+    return true;
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (validateFileSize(file, setLogoSizeError, "Logo must be under 10MB")) {
+        setLogoFile(file);
+        clearErrors("logoFile");
+      } else {
+        setLogoFile(null);
+        e.target.value = null; // Reset input
+        setError("logoFile", { message: "File too large" });
+      }
+    }
+  };
+
+  const handleCoverPhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (validateFileSize(file, setCoverSizeError, "Cover photo must be under 10MB")) {
+        setCoverPhotoFile(file);
+        clearErrors("coverPhotoFile");
+      } else {
+        setCoverPhotoFile(null);
+        e.target.value = null;
+        setError("coverPhotoFile", { message: "File too large" });
+      }
+    }
+  };
+
   const onSubmit = async (data) => {
+    // Final check before submit
+    if (logoFile && logoFile.size > MAX_FILE_SIZE) {
+      setLogoSizeError("Logo must be under 10MB");
+      return;
+    }
+    if (coverPhotoFile && coverPhotoFile.size > MAX_FILE_SIZE) {
+      setCoverSizeError("Cover photo must be under 10MB");
+      return;
+    }
+
     try {
       const mappedCategories = data.categories.map(
         (category) => categoryMap[category]
@@ -77,7 +131,7 @@ const AdminProfileEdit = () => {
 
       const formData = new FormData();
       formData.append("agency_name", data.agencyName);
-      formData.append("vat_id", data.vatNumber); // Corrected to use vatNumber
+      formData.append("vat_id", data.vatNumber);
       formData.append("contact_email", data.email);
       formData.append("contact_phone", data.phoneNumber);
       formData.append("about", data.description);
@@ -92,20 +146,6 @@ const AdminProfileEdit = () => {
     } catch (err) {
       console.error("Failed to update profile:", err);
       alert("Failed to update agency profile. Please try again.");
-    }
-  };
-
-  const handleLogoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-    }
-  };
-
-  const handleCoverPhotoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverPhotoFile(file);
     }
   };
 
@@ -221,11 +261,16 @@ const AdminProfileEdit = () => {
                   accept="image/*"
                 />
               </label>
-              <span className="text-base text-gray-600">
+              <span className="text-base text-gray-600 truncate max-w-[150px]">
                 {logoFile ? logoFile.name : "No file chosen"}
               </span>
             </div>
+            {logoSizeError && (
+              <p className="text-red-500 text-sm mt-1">{logoSizeError}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
           </div>
+
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
               Cover Photo
@@ -240,10 +285,14 @@ const AdminProfileEdit = () => {
                   accept="image/*"
                 />
               </label>
-              <span className="text-base text-gray-600">
+              <span className="text-base text-gray-600 truncate max-w-[150px]">
                 {coverPhotoFile ? coverPhotoFile.name : "No file chosen"}
               </span>
             </div>
+            {coverSizeError && (
+              <p className="text-red-500 text-sm mt-1">{coverSizeError}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
           </div>
         </div>
 
@@ -290,7 +339,7 @@ const AdminProfileEdit = () => {
             )
           )}
           {errors.categories && (
-            <span className="text-red-500 text-sm">{errors.categories.message}</span>
+            <span className="text-red-500 text-sm w-full">{errors.categories.message}</span>
           )}
         </div>
 
@@ -319,9 +368,11 @@ const AdminProfileEdit = () => {
         <div className="flex justify-center pt-6">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !!logoSizeError || !!coverSizeError}
             className={`px-6 py-2 bg-[#3776E2] font-medium text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 ${
-              isLoading ? "opacity-50 cursor-not-allowed" : ""
+              isLoading || logoSizeError || coverSizeError
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
           >
             {isLoading ? "Updating..." : "Complete Registration"}

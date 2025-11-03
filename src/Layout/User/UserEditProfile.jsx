@@ -7,8 +7,10 @@ import {
   useGetTuristProfileQuery,
   useUpdateTuristProfileMutation,
 } from "@/redux/features/withAuth";
-import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
-import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 function UserEditProfile() {
   const { data: profileData, isLoading: profileLoading } =
@@ -35,7 +37,9 @@ function UserEditProfile() {
     phoneHome: "",
   });
 
-  // Populate the formData with fetched profile
+  const [pictureError, setPictureError] = useState("");
+
+  // Populate form with profile data
   useEffect(() => {
     if (profileData) {
       setFormData((prev) => ({
@@ -55,7 +59,7 @@ function UserEditProfile() {
         postalCode: profileData.address_postal_code || "",
         country: profileData.address_country || "",
         phoneHome: profileData.phone_home || "",
-        picture: null, // keep null unless user uploads a new one
+        picture: null,
       }));
     }
   }, [profileData]);
@@ -67,11 +71,31 @@ function UserEditProfile() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData({ ...formData, picture: file });
+    if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setPictureError("Profile picture must be under 10MB");
+        setFormData({ ...formData, picture: null });
+        e.target.value = null; // Reset input
+        toast.warn("File too large! Max 10MB allowed.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+      setPictureError("");
+      setFormData({ ...formData, picture: file });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Final check before submit
+    if (formData.picture && formData.picture.size > MAX_FILE_SIZE) {
+      setPictureError("Profile picture must be under 10MB");
+      return;
+    }
+
     const payload = new FormData();
     payload.append("first_name", formData.firstName);
     payload.append("last_name", formData.lastName);
@@ -92,19 +116,16 @@ function UserEditProfile() {
 
     try {
       await updateUser(payload).unwrap();
-      // Show success toast
       toast.success("Profile updated successfully!", {
         position: "top-right",
-        autoClose: 3000, // Auto-close after 3 seconds
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
       });
     } catch (err) {
       console.error(err);
-      // Show error toast
       toast.error("Error updating profile", {
         position: "top-right",
         autoClose: 3000,
@@ -112,17 +133,16 @@ function UserEditProfile() {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
       });
     }
   };
 
-  if (profileLoading) return <p>Loading profile...</p>;
+  if (profileLoading) return <p className="text-center">Loading profile...</p>;
 
   return (
     <div className="p-3 sm:p-4 lg:p-4 font-semibold">
-      {/* Add ToastContainer to render toasts */}
       <ToastContainer />
+
       <div className="mb-3 sm:mb-4 lg:mb-5">
         <NavLink
           to="/user/profile"
@@ -154,6 +174,7 @@ function UserEditProfile() {
               placeholder="Enter here"
             />
           </div>
+
           {/* Last Name */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
@@ -168,7 +189,8 @@ function UserEditProfile() {
               placeholder="Enter here"
             />
           </div>
-          {/* Personal phone */}
+
+          {/* Personal Phone */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
               Phone number (personal)
@@ -182,6 +204,7 @@ function UserEditProfile() {
               placeholder="Enter here"
             />
           </div>
+
           {/* Bio */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
@@ -196,9 +219,7 @@ function UserEditProfile() {
               placeholder="Enter here"
             />
           </div>
-          {/* Profession */}
-          
-          
+
           {/* Gender and Age */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3">
@@ -230,6 +251,7 @@ function UserEditProfile() {
               </div>
             </div>
           </div>
+
           {/* Language */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
@@ -244,25 +266,30 @@ function UserEditProfile() {
               placeholder="Enter here"
             />
           </div>
-          {/* Picture */}
+
+          {/* Profile Picture */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
               Upload picture
             </label>
             <div className="flex items-center space-x-2 p-1 h-[42px] border border-gray-200 rounded-sm bg-white">
-              <label className="inline-block px-2 sm:px-3 lg:px-4 py-1 bg-gray-100 border rounded cursor-pointer text-xs sm:text-sm lg:text-sm">
+              <label className="inline-block px-2 sm:px-3 lg:px-4 py-1 bg-gray-100 border rounded cursor-pointer text-xs sm:text-sm lg:text-sm hover:bg-gray-200">
                 Choose file
                 <input
                   type="file"
-                  name="picture"
+                  accept="image/*"
                   onChange={handleFileChange}
                   className="hidden"
                 />
               </label>
-              <span className="text-gray-500 text-xs sm:text-sm lg:text-sm truncate">
+              <span className="text-gray-500 text-xs sm:text-sm lg:text-sm truncate max-w-[120px]">
                 {formData.picture ? formData.picture.name : "Choose a file"}
               </span>
             </div>
+            {pictureError && (
+              <p className="text-red-500 text-xs mt-1">{pictureError}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
           </div>
         </div>
 
@@ -356,9 +383,13 @@ function UserEditProfile() {
         {/* Save Button */}
         <div className="mt-6 sm:mt-8 lg:mt-8">
           <button
-            disabled={updateLoading}
+            disabled={updateLoading || !!pictureError}
             type="submit"
-            className="w-full sm:w-auto lg:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 sm:px-8 lg:px-8 rounded-md transition-colors text-sm sm:text-base lg:text-base"
+            className={`w-full sm:w-auto lg:w-auto font-medium py-2 px-6 sm:px-8 lg:px-8 rounded-md transition-colors text-sm sm:text-base lg:text-base ${
+              updateLoading || pictureError
+                ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
             {updateLoading ? "Saving..." : "Save Changes"}
           </button>
