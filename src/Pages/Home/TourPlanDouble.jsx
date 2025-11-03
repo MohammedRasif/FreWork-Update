@@ -31,6 +31,7 @@ import {
   FaLocationDot,
   FaStar,
 } from "react-icons/fa6";
+import img from "../../assets/img/badge.png";
 
 // Temporary fallback for FullScreenInfinityLoader
 const FullScreenInfinityLoader = () => (
@@ -443,35 +444,52 @@ const TourPlanDouble = () => {
                           {tour.offers && tour.offers.length > 0 && (
                             <div
                               className="
-                                absolute bottom-4
-                                flex items-center justify-center space-x-8
-                                overflow-x-auto
-                                px-2
-                                scrollbar-none
-                                w-full
-                              "
+      absolute bottom-6
+      flex items-center justify-center space-x-8
+      px-2
+      w-full
+    "
                             >
-                              {tour.offers.map((offer) => (
-                                <img
-                                  key={offer.agency?.id || Math.random()}
-                                  src={
-                                    offer.agency?.logo_url ||
-                                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                  }
-                                  alt={`${
-                                    offer.agency?.agency_name || "Agency"
-                                  } logo`}
-                                  className={`
-                                  ${
-                                    offer.status === "accepted"
-                                      ? "w-[72px] h-[72px] border-gray-200 border-2"
-                                      : "w-16 h-16 border-white"
-                                  }
-                                  object-contain rounded-full border bg-white
-                                  flex-shrink-0
-                                `}
-                                />
-                              ))}
+                              {tour.offers.map((offer) => {
+                                const isAccepted = offer.status === "accepted";
+
+                                return (
+                                  <div
+                                    key={offer.agency?.id || Math.random()}
+                                    className={`
+            relative flex items-center justify-center flex-shrink-0
+            ${isAccepted ? "w-[72px] h-[72px]" : "w-16 h-16"}
+          `}
+                                  >
+                                    {/* Accepted Badge (Background) */}
+                                    {isAccepted && (
+                                      <img
+                                        src={img}
+                                        alt="Accepted Badge"
+                                        className="absolute inset-0  object-contain pointer-events-none"
+                                      />
+                                    )}
+
+                                    {/* Agency Logo (Always on Top) */}
+                                    <img
+                                      src={
+                                        offer.agency?.logo_url ||
+                                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                      }
+                                      alt={`${
+                                        offer.agency?.agency_name || "Agency"
+                                      } logo`}
+                                      className={`
+              relative z-10
+              ${isAccepted ? "w-[52px] h-[52px]" : "w-16 h-16"}
+              object-contain rounded-full border bg-white
+              ${isAccepted ? "border-gray-200 border-2" : "border-white"}
+              flex-shrink-0
+            `}
+                                    />
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                           {tour.offer_count < 3 ? (
@@ -594,7 +612,7 @@ const TourPlanDouble = () => {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaStar  className="w-6 h-5 text-black" />
+                            <FaStar className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
                                 Minimum rating:

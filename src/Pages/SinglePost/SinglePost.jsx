@@ -344,7 +344,7 @@ function SinglePost({ prid }) {
                           }
                           alt={`${offer.agency?.agency_name || "Agency"} logo`}
                           className="
-                            relative z-10 w-16 h-16 
+                            relative z-10 w-[60px] h-[60px] mt-[1px]
                             object-contain rounded-full bg-white 
                             border-2  
                             

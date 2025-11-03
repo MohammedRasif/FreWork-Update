@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation } from "lucide-react";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
+import img from "../../assets/img/badge.png";
+
 
 export default function GroupCard({ tourPlan }) {
   const [localTourPlan, setLocalTourPlan] = useState(tourPlan);
@@ -51,37 +53,54 @@ export default function GroupCard({ tourPlan }) {
           </div>
           {/* Display agency logos */}
           {localTourPlan.offers && localTourPlan.offers.length > 0 && (
-            <div
-              className="
+                      <div
+                        className="
                 absolute bottom-4
                 flex items-center justify-center space-x-8
-                overflow-x-auto
                 px-2
-                scrollbar-none
                 w-full
               "
-            >
-              {localTourPlan?.offers?.map((offer) => (
-                <img
-                  key={offer.agency?.id || Math.random()}
-                  src={
-                    offer.agency?.logo_url ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                  }
-                  alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                  className={`
-                  ${
-                    offer.status === "accepted"
-                      ? "w-14 h-14 border-gray-400 border-4"
-                      : "w-12 h-12 border-white"
-                  }
-                  object-contain rounded-full border bg-white
-                  flex-shrink-0
-                `}
-                />
-              ))}
-            </div>
-          )}
+                      >
+                        {localTourPlan?.offers?.map((offer) => {
+                          const isAccepted = offer.status === "accepted";
+          
+                          return (
+                            <div
+                              key={offer.agency?.id || Math.random()}
+                              className={`
+                      relative flex items-center justify-center flex-shrink-0
+                      ${isAccepted ? "w-14 h-14" : "w-12 h-12"}
+                    `}
+                            >
+                              {/* Accepted Badge Background */}
+                              {isAccepted && (
+                                <img
+                                  src={img}
+                                  alt="Accepted Badge"
+                                  className="absolute inset-0  object-contain pointer-events-none"
+                                />
+                              )}
+          
+                              {/* Agency Logo (Always on Top) */}
+                              <img
+                                src={
+                                  offer.agency?.logo_url ||
+                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                }
+                                alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                                className={`
+                        relative z-10
+                        ${isAccepted ? "w-10 h-10" : "w-12 h-12"}
+                        object-contain rounded-full border bg-white
+                        ${isAccepted ? "" : "border-white"}
+                        flex-shrink-0
+                      `}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
         </div>
         {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
       </div>

@@ -14,6 +14,7 @@ import {
 import { IoBed } from "react-icons/io5";
 import { LuNavigation2 as Navigation } from "react-icons/lu";
 import { MdOutlineNoMeals } from "react-icons/md";
+import img from "../../assets/img/badge.png";
 
 function AcceptedOffers() {
   const { data, error, isLoading } = useAcceptedAllOffersQuery();
@@ -53,54 +54,31 @@ function AcceptedOffers() {
                     </h2>
                   </div>
                   {tour.offers && tour.offers.length > 0 && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2">
+                    <div className="absolute top-42 left-1/2 -translate-x-1/2 flex justify-center pb-2">
                       {tour.offers
                         .filter((offer) => offer.status === "accepted")
                         .slice(0, 1)
                         .map((offer) => (
                           <div
                             key={offer.id}
-                            className=" w-32 h-32 flex items-center justify-center"
+                            className="w-32 h-32 flex items-center justify-center"
                           >
-                            <div className="relative inset-1 rounded-full  shadow-inner flex flex-col items-center justify-center p-2">
+                            <div className="relative inset-1 rounded-full shadow-inner flex flex-col items-center justify-center p-2">
+                              <img
+                                src={img}
+                                alt="Accepted Badge"
+                                className="absolute inset-0  object-contain rounded-full pointer-events-none z-10"
+                              />
+
+                              {/* Agency Logo (On Top, Centered) */}
                               <img
                                 src={
                                   offer.agency?.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={offer.agency?.agency_name || "Agency"}
-                                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md  relative z-30 top-[80px] "
+                                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
                               />
-
-                              <div className="relative flex items-center justify-center w-22 h-22 z-10 pt-2  rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-xl border-[6px] border-yellow-500 mt-3">
-                                <svg
-                                  viewBox="0 0 220 220"
-                                  className="relative w-[160px] h-[160px] ml-1"
-                                >
-                                  <defs>
-                                    <path
-                                      id="textCircleTop"
-                                      d="M 100,100 m -85,0 a 85,85 0 1,1 170,0"
-                                      fill="none"
-                                    />
-                                  </defs>
-
-                                  <text
-                                    fill="#000000"
-                                    fontSize="19"
-                                    fontWeight="600"
-                                    letterSpacing="2"
-                                  >
-                                    <textPath
-                                      href="#textCircleTop"
-                                      startOffset="50%"
-                                      textAnchor="middle"
-                                    >
-                                      TRATTATIVA CONCLUSA
-                                    </textPath>
-                                  </text>
-                                </svg>
-                              </div>
                             </div>
                           </div>
                         ))}
@@ -204,7 +182,7 @@ function AcceptedOffers() {
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaStar  className="w-6 h-5 text-black" />
+                    <FaStar className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">Minimum rating:</span>{" "}
                       {tour.minimum_star_hotel || "N/A"}
