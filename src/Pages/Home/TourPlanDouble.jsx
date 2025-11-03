@@ -547,7 +547,7 @@ const TourPlanDouble = () => {
 
                         <div>
                           <p className="text-xl font-semibold text-gray-900">
-                            Budget: ${tour.budget}
+                            Budget: €{tour.budget}
                           </p>
                         </div>
 

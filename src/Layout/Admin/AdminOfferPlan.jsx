@@ -175,7 +175,7 @@ function AdminOfferPlan() {
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                         <div>
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                            Budget ${tourPlan.budget}
+                            Budget €{tourPlan.budget}
                           </p>
                           <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                             Total {tourPlan.total_members} person
@@ -251,7 +251,7 @@ function AdminOfferPlan() {
                         </div>
                         <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-3 lg:gap-3">
                           <span className="text-base sm:text-lg lg:text-xl font-semibold">
-                            ${offer.offered_budget}
+                            €{offer.offered_budget}
                           </span>
                           <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                             <NavLink to="/admin/chat">
