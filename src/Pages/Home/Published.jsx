@@ -274,8 +274,8 @@ const Published = () => {
             {relaxTrips.length > 0 && (
               <div className="mb-4">
                 <button
-                  value="desert"
-                  onClick={() => handleCategoryClick("desert")}
+                  value="relax"
+                  onClick={() => handleCategoryClick("relax")}
                   className="text-3xl font-bold text-black mb-4 hover:cursor-pointer flex items-center"
                 >
                   Relaxing Tours <GoChevronRight className="mt-[5px]" />
@@ -323,8 +323,8 @@ const Published = () => {
             {groupTrips.length > 0 && (
               <div className="">
                 <button
-                  value="island"
-                  onClick={() => handleCategoryClick("island")}
+                  value="group"
+                  onClick={() => handleCategoryClick("group")}
                   className="text-3xl font-bold text-black mb-4 flex items-center hover:cursor-pointer"
                 >
                   Group Packages <GoChevronRight className="mt-[5px]" />
