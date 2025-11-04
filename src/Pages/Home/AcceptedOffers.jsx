@@ -60,7 +60,7 @@ function AcceptedOffers() {
                         .map((offer, index) => (
                           <div
                             key={offer.id || index} // Fallback to index if offer.id is not unique
-                            className="w-24 h-24 flex items-center justify-center"
+                            className="w-28 h-28 flex items-center justify-center"
                           >
                             <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
                               {offer.status === "accepted" && (
@@ -79,7 +79,7 @@ function AcceptedOffers() {
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={offer.agency?.agency_name || "Agency"}
-                                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
+                                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
                                 onError={() =>
                                   console.log("Agency logo failed to load")
                                 }
