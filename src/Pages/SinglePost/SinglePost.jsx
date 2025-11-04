@@ -398,7 +398,7 @@ function SinglePost({ prid }) {
           </div>
           <p>
             <span className="font-medium">Categoria:</span>{" "}
-            {tour.travel_type || "N/A"}
+            {tour.destination_type || "N/A"}
           </p>
 
           <div className="">
