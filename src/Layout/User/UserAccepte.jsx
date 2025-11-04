@@ -43,12 +43,11 @@ const UserAccepte = () => {
     setSelectedStar(index + 1);
   };
 
-  const today = new Date();
   const upcomingTours =
     data?.filter((offer) => {
       const startDate = new Date(offer.tour_plan.start_date);
       return (
-        offer.status === "accepted" &&
+        offer.tour_plan.is_completed === false && // Changed to is_completed
         (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
         (!searchQuery ||
           offer.tour_plan.location_to
@@ -61,7 +60,7 @@ const UserAccepte = () => {
     data?.filter((offer) => {
       const endDate = new Date(offer.tour_plan.end_date);
       return (
-        offer.status === "completed" &&
+        offer.tour_plan.is_completed === true && // Changed to is_completed
         (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
         (!searchQuery ||
           offer.tour_plan.location_to
@@ -181,7 +180,6 @@ const UserAccepte = () => {
                     alt={`Tour to ${offer.tour_plan.location_to}`}
                     className="w-full h-48 md:h-full object-cover"
                   />
-                  {/* <h1 className="text-[11px] left-2 absolute bottom-2  font-semibold text-white ">Image generated automatically</h1> */}
                 </div>
 
                 <div className="w-full p-4 sm:p-6">
@@ -192,7 +190,7 @@ const UserAccepte = () => {
                           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                             Tour to {offer.tour_plan.location_to}
                           </h2>
-                          {offer.status === "accepted" && (
+                          {offer.tour_plan.is_completed === false && (
                             <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
                               <FaCheckCircle className="w-4 h-4 rounded-full" />
                               Offer accepted
