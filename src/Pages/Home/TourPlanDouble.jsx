@@ -361,7 +361,7 @@ const TourPlanDouble = () => {
                       <option value="beach">Beach trips</option>
                       <option value="mountain">Mountain adventures</option>
                       <option value="relax">Relaxing tours</option>
-                      <option value="island">Group packages</option>
+                      <option value="group">Group packages</option>
                     </select>
                   </div>
                   <div className="relative w-full sm:w-auto">

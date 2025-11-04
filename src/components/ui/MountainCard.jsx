@@ -140,7 +140,7 @@ export default function MountainCard({ tourPlan }) {
           </p>
           <p>
             <span className="font-medium">Category:</span>{" "}
-            {localTourPlan.travel_type}
+            {localTourPlan.destination_type}
           </p>
         </div>
 
