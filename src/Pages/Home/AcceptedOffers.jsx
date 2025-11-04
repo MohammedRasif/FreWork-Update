@@ -54,13 +54,13 @@ function AcceptedOffers() {
                     </h2>
                   </div>
                   {tour.offers && tour.offers.length > 0 && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row gap-4">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row ">
                       {tour.offers
-                        .slice(0, 3) // Limit to 3 offers
+                        .slice(0, 3)
                         .map((offer, index) => (
                           <div
-                            key={offer.id || index} // Fallback to index if offer.id is not unique
-                            className="w-28 h-28 flex items-center justify-center"
+                            key={offer.id || index} 
+                            className="w-20 h-20 flex items-center justify-center"
                           >
                             <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
                               {offer.status === "accepted" && (
@@ -121,7 +121,7 @@ function AcceptedOffers() {
                   </p>
                   <p>
                     <span className="font-medium">Category:</span>{" "}
-                    {tour.travel_type || tour.category || "N/A"}
+                    {tour.destination_type  || "N/A"}
                   </p>
                 </div>
 
