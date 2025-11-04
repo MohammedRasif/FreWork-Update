@@ -27,7 +27,7 @@ function AcceptedOffers() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="pt-24 container mx-auto px-3">
+    <div className="pt-24 container mx-auto lg:px-3 px-5">
       <h1 className="lg:text-4xl text-[28] font-semibold pb-3 ">
         All Accepted Offers
       </h1>
