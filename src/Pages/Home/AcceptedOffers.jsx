@@ -54,30 +54,35 @@ function AcceptedOffers() {
                     </h2>
                   </div>
                   {tour.offers && tour.offers.length > 0 && (
-                    <div className="absolute top-42 left-1/2 -translate-x-1/2 flex justify-center pb-2">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row gap-4">
                       {tour.offers
-                        .filter((offer) => offer.status === "accepted")
-                        .slice(0, 1)
-                        .map((offer) => (
+                        .slice(0, 3) // Limit to 3 offers
+                        .map((offer, index) => (
                           <div
-                            key={offer.id}
-                            className="w-32 h-32 flex items-center justify-center"
+                            key={offer.id || index} // Fallback to index if offer.id is not unique
+                            className="w-24 h-24 flex items-center justify-center"
                           >
-                            <div className="relative inset-1 rounded-full shadow-inner flex flex-col items-center justify-center p-2">
-                              <img
-                                src={img}
-                                alt="Accepted Badge"
-                                className="absolute inset-0  object-contain rounded-full pointer-events-none z-10"
-                              />
-
-                              {/* Agency Logo (On Top, Centered) */}
+                            <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
+                              {offer.status === "accepted" && (
+                                <img
+                                  src={img}
+                                  alt="Badge"
+                                  className="absolute inset-0 object-contain rounded-full pointer-events-none z-10"
+                                  onError={() =>
+                                    console.log("Badge image failed to load")
+                                  }
+                                />
+                              )}
                               <img
                                 src={
                                   offer.agency?.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={offer.agency?.agency_name || "Agency"}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
+                                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
+                                onError={() =>
+                                  console.log("Agency logo failed to load")
+                                }
                               />
                             </div>
                           </div>
