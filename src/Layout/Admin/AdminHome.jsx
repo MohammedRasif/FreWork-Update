@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { Baby, User, X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -290,7 +290,7 @@ const AdminHome = () => {
                     </p>
                     <p>
                       Category:{" "}
-                      <span className="font-medium">{plan.category}</span>
+                      <span className="font-medium">{plan.destination_type}</span>
                     </p>
                   </div>
                 </div>
@@ -361,51 +361,67 @@ const AdminHome = () => {
                   </h2>
                   <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                     <div>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
                         <span>
-                          <span className="font-medium">Points of travel:</span>{" "}
+                          <span className="font-bold">Points of travel:</span>{" "}
                           {selectedPlan.tourist_spots || "None"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-medium">Departure from:</span>{" "}
+                          <span className="font-bold">Departure from:</span>{" "}
                           {selectedPlan.location_from || "N/A"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaList className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-medium">Minimum rating:</span>{" "}
+                          <span className="font-bold">Minimum rating:</span>{" "}
                           {selectedPlan.minimum_star_hotel || "N/A"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-medium">Meal plan:</span>{" "}
+                          <span className="font-bold">Meal plan:</span>{" "}
                           {selectedPlan.meal_plan || "N/A"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-medium">
+                          <span className="font-bold">
                             Type of accommodation:
                           </span>{" "}
                           {selectedPlan.type_of_accommodation || "N/A"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                        <Baby className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-bold">Child :</span>{" "}
+                          {selectedPlan.child_count || "N/A"}
+                        </span>
+                      </p>
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                        <User className="w-6 h-5 text-gray-500" />
+                        <span>
+                          <span className="font-bold">Adult :</span>{" "}
+                          {selectedPlan.adult_count || "N/A"}
+                        </span>
+                      </p>
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-medium">Duration:</span>{" "}
+                          <span className="font-bold">Duration:</span>{" "}
                           {selectedPlan.duration || "N/A"}
                         </span>
                       </p>
-                      <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+
+                      
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
                           <span className="font-medium">

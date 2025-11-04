@@ -36,7 +36,7 @@ const Membership = () => {
     useSearchAgencyQuery(searchTerm, { skip: !searchTerm });
   const [addToFavo, { isLoading: isAddFevLoading }] = useAddToFavoritMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
-  
+
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
     useInviteToChatMutation();
 
@@ -112,6 +112,7 @@ const Membership = () => {
           user: item.user || null,
           favorite_users: item.favorite_users || [],
           badge_count: item.badge_count || 0,
+          service_categories: item.service_categories || [], // Added service_categories
         }))
       );
       if (currentUserId) {
@@ -139,6 +140,7 @@ const Membership = () => {
           user: item.user || null,
           favorite_users: item.favorite_users || [],
           badge_count: item.badge_count || 0,
+          service_categories: item.service_categories || [], // Added service_categories
         }))
       );
       if (currentUserId) {
@@ -226,7 +228,7 @@ const Membership = () => {
                 key={plan.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col sm:flex-row"
               >
-                <div className="w-full sm:w-72 h-48 sm:h-56 relative">
+                <div className="w-full sm:w-72 h-48 sm:h-60 relative">
                   <img
                     src={
                       plan.image ||
@@ -301,26 +303,21 @@ const Membership = () => {
                       </div>
                     )}
                   </div>
-                  <div className="pb-5">
+                  <div className="pb-2">
                     <h1 className="text-2xl font-semibold text-black">
                       Our Service Category
                     </h1>
                     {plan?.service_categories?.length > 0 ? (
-                      <span className="text-gray-700 text-base">
-                        {(() => {
-                          try {
-                            return JSON.parse(plan.service_categories[0])
-                              .map(
-                                (category) =>
-                                  category.charAt(0).toUpperCase() +
-                                  category.slice(1)
-                              )
-                              .join(", ");
-                          } catch (error) {
-                            return "Error parsing categories";
-                          }
-                        })()}
-                      </span>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {plan.service_categories.map((category, index) => (
+                          <span
+                            key={index}
+                            className="text-gray-700 text-sm bg-gray-100 px-2 py-1 rounded"
+                          >
+                            {category}
+                          </span>
+                        ))}
+                      </div>
                     ) : (
                       <span>No categories available</span>
                     )}
@@ -382,7 +379,7 @@ const Membership = () => {
           </div>
         )}
       </div>
-      <ToastContainer></ToastContainer>
+      <ToastContainer />
     </div>
   );
 };
