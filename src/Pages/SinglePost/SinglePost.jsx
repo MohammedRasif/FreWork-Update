@@ -173,32 +173,28 @@ function SinglePost({ prid }) {
       });
       setSelectedFile(null);
       setIsPopupOpen(false);
-      toast.success(
-        {
-          duration: 4000, 
-          style: {
-            background: "linear-gradient(135deg, #3b82f6, #10b981)", 
-            color: "#ffffff", 
-            borderRadius: "8px", 
-            padding: "16px", 
-            fontSize: "16px", 
-            fontWeight: "500", 
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", 
-            maxWidth: "400px", 
-          },
-          iconTheme: {
-            primary: "#ffffff", 
-            secondary: "#3b82f6", 
-          },
-        }
-      );
+      toast.success({
+        duration: 4000,
+        style: {
+          background: "linear-gradient(135deg, #3b82f6, #10b981)",
+          color: "#ffffff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "16px",
+          fontWeight: "500",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          maxWidth: "400px",
+        },
+        iconTheme: {
+          primary: "#ffffff",
+          secondary: "#3b82f6",
+        },
+      });
       navigate("/admin/chat");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error.data?.error
-          ? `${error.data.error} `
-          : "Something went wrong"
+        error.data?.error ? `${error.data.error} ` : "Something went wrong"
       );
     } finally {
       setIsOfferSubmitting(false);
@@ -278,11 +274,20 @@ function SinglePost({ prid }) {
       toast.error("Please log in to submit an offer");
       return;
     }
-    if (hasMaxOffers) {
-      toast.error("Sorry, this post already has 3 offers submitted.");
-    } else {
-      setIsPopupOpen(true);
+
+    if (tour.status === "accepted") {
+      toast.info("Your offer has been accepted!");
+      return;
     }
+
+    if (hasMaxOffers) {
+      toast.info(
+        "This post already has 3+ offers. No more offers can be submitted."
+      );
+      return;
+    }
+
+    setIsPopupOpen(true);
   };
 
   const showSentOfferButton = !token || role === "agency";
@@ -500,12 +505,33 @@ function SinglePost({ prid }) {
             >
               {showSentOfferButton && (
                 <DialogTrigger className="backdrop-blur-2xl" asChild>
-                  <button
-                    onClick={handleSentOfferClick}
-                    className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
-                  >
-                    Sent Offer
-                  </button>
+                  <div className="relative inline-block w-full">
+                    <button
+                      onClick={handleSentOfferClick}
+                      disabled={tour.status === "accepted" || hasMaxOffers}
+                      className={`
+          block w-full text-center py-2.5 px-4 rounded-lg font-medium transition-all duration-200 text-md
+          ${
+            tour.status === "accepted" || hasMaxOffers
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
+          }
+        `}
+                    >
+                      {tour.status === "accepted"
+                        ? "Offer Accepted"
+                        : "Sent Offer"}
+                    </button>
+
+                    {/* Tooltip on Hover */}
+                    {(tour.status === "accepted" || hasMaxOffers) && (
+                      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 pointer-events-none transition-opacity group-hover:opacity-100">
+                        {tour.status === "accepted"
+                          ? "Your offer has been accepted!"
+                          : "This post already has 3+ offers. No more offers can be submitted."}
+                      </div>
+                    )}
+                  </div>
                 </DialogTrigger>
               )}
               <DialogContent className="lg:w-[60vh]">

@@ -269,7 +269,7 @@ const AdminProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{logoSizeError}</p>
             )}
             <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
-            <p className="text-xs text-gray-500 mt-1">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
+            <p className="text-xs  mt-1 text-red-400">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
           </div>
 
           <div>
@@ -294,7 +294,7 @@ const AdminProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{coverSizeError}</p>
             )}
             <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
-            <p className="text-xs text-gray-500 mt-1">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
+            <p className="text-xs mt-1 text-red-400">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
           </div>
         </div>
 

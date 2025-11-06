@@ -245,9 +245,7 @@ const TourPlanPopup = ({
                       <span className="font-medium text-gray-900">
                         {offer.agency?.agency_name || "Unknown Agency"}
                       </span>
-                      <p className="text-xs sm:text-sm text-gray-600">
-                        {offer.message}
-                      </p>
+                      
                       {offer.file_name && (
                         <p className="text-xs sm:text-sm text-gray-600">
                           File: {offer.file_name}
@@ -262,29 +260,9 @@ const TourPlanPopup = ({
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-3">
-                    <span className="font-semibold text-lg sm:text-xl">
-                      ${offer.offered_budget || "N/A"}
-                    </span>
+                   
                     <div className="flex gap-2">
-                      <button
-                        onClick={() =>
-                          handleMessage({ other_user_id: offer.agency?.user })
-                        }
-                        disabled={
-                          isOfferBudgetLoading ||
-                          isAcceptLoading ||
-                          !offer.agency?.user
-                        }
-                        className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                          isOfferBudgetLoading ||
-                          isAcceptLoading ||
-                          !offer.agency?.user
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-[#3776E2] text-white hover:bg-blue-700"
-                        }`}
-                      >
-                        Message
-                      </button>
+                     
 
                       {tour.user === userData?.user_id && (
                         <button
