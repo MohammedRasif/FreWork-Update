@@ -212,12 +212,10 @@ const TourPlanDouble = () => {
       offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
     );
 
-    // Only append file if it exists
     if (file) {
       formData.append("file", file);
     }
 
-    // Debug: Log FormData entries
     console.log("FormData entries:", [...formData.entries()]);
 
     const response = await offerBudgetToBack({
@@ -225,7 +223,7 @@ const TourPlanDouble = () => {
       data: formData,
     }).unwrap();
 
-    console.log("API Response:", response); // Debug: Log API response
+    console.log("API Response:", response); 
 
     const newOffer = {
       id: response?.id || `${currentUserId}-${Date.now()}`,
