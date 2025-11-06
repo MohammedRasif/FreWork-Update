@@ -105,101 +105,99 @@ function SinglePost({ prid }) {
     setSelectedFile(file);
   };
 
-  const handleOfferSubmit = async (e) => {
-    e.preventDefault();
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
-    if (!offerForm.budget || !offerForm.comment.trim()) {
-      toast.error("Please provide a budget and a comment");
-      return;
-    }
-    if (
-      offerForm.applyDiscount &&
-      (!offerForm.discount || Number(offerForm.discount) <= 0)
-    ) {
-      toast.error("Please provide a valid discount percentage");
-      return;
+ const handleOfferSubmit = async (e) => {
+  e.preventDefault();
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
+  if (!offerForm.budget || !offerForm.comment.trim()) {
+    toast.error("Please provide a budget and a comment");
+    return;
+  }
+  if (
+    offerForm.applyDiscount &&
+    (!offerForm.discount || Number(offerForm.discount) <= 0)
+  ) {
+    toast.error("Please provide a valid discount percentage");
+    return;
+  }
+
+  setIsOfferSubmitting(true);
+  try {
+    const formData = new FormData();
+    formData.append("offered_budget", Number.parseFloat(offerForm.budget));
+    formData.append("message", offerForm.comment);
+    formData.append("apply_discount", offerForm.applyDiscount);
+    formData.append(
+      "discount",
+      offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+    );
+    if (selectedFile) {
+      formData.append("file", selectedFile);
     }
 
-    setIsOfferSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("offered_budget", Number.parseFloat(offerForm.budget));
-      formData.append("message", offerForm.comment);
-      formData.append("apply_discount", offerForm.applyDiscount);
-      formData.append(
-        "discount",
-        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
-      );
-      if (selectedFile) {
-        formData.append("file", selectedFile);
-      }
+    // Make the API call and log the response
+    const response = await offerBudgetToBack({
+      id: finalId,
+      data: formData,
+    }).unwrap();
+    console.log("API Response:", response); // Debug: Check the API response
 
-      await offerBudgetToBack({
-        id: finalId,
-        data: formData,
-      }).unwrap();
+    // Create new offer object
+    const newOffer = {
+      id: `${currentUserId}-${Date.now()}`,
+      offered_budget: Number.parseFloat(offerForm.budget), // Fixed: Use offerForm.budget
+      message: offerForm.comment,
+      apply_discount: offerForm.applyDiscount,
+      discount: offerForm.applyDiscount
+        ? Number.parseFloat(offerForm.discount)
+        : 0,
+      file_name: selectedFile ? selectedFile.name : null,
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
 
-      const newOffer = {
-        id: `${currentUserId}-${Date.now()}`,
-        offered_budget: offeredBudget,
-        message: offerForm.comment,
-        apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
-        file_name: selectedFile ? selectedFile.name : null,
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
-      setPostData((prev) => ({
-        ...prev,
-        offers: [...(prev.offers || []), newOffer],
-        offer_count: (prev.offer_count || 0) + 1,
-      }));
-      setOfferForm({
-        budget: "",
-        comment: "",
-        discount: "",
-        applyDiscount: false,
-      });
-      setSelectedFile(null);
-      setIsPopupOpen(false);
-      toast.success({
-        duration: 4000,
-        style: {
-          background: "linear-gradient(135deg, #3b82f6, #10b981)",
-          color: "#ffffff",
-          borderRadius: "8px",
-          padding: "16px",
-          fontSize: "16px",
-          fontWeight: "500",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          maxWidth: "400px",
-        },
-        iconTheme: {
-          primary: "#ffffff",
-          secondary: "#3b82f6",
-        },
-      });
-      navigate("/admin/chat");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      toast.error(
-        error.data?.error ? `${error.data.error} ` : "Something went wrong"
-      );
-    } finally {
-      setIsOfferSubmitting(false);
-    }
-  };
+    // Update postData with the new offer
+    setPostData((prev) => ({
+      ...prev,
+      offers: [...(prev.offers || []), newOffer],
+      offer_count: (prev.offer_count || 0) + 1,
+    }));
+
+    // Reset form
+    setOfferForm({
+      budget: "",
+      comment: "",
+      discount: "",
+      applyDiscount: false,
+    });
+    setSelectedFile(null);
+    setIsPopupOpen(false);
+
+    // Clear previous toasts and show success message
+    toast.dismiss();
+    toast.success("Offer submitted successfully");
+  } catch (error) {
+    // Log detailed error information
+    console.error("Failed to submit offer:", {
+      error,
+      status: error.status,
+      data: error.data,
+      originalStatus: error.originalStatus,
+    });
+    // Show a specific error message
+    toast.error(error.data?.error || error.message || "Failed to submit offer");
+  } finally {
+    setIsOfferSubmitting(false);
+  }
+};
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {

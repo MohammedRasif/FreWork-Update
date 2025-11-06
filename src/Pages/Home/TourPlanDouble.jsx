@@ -167,110 +167,125 @@ const TourPlanDouble = () => {
   };
 
   const handleSubmitOffer = async (
-    tourId,
-    budget,
-    comment,
-    offerForm,
-    file
-  ) => {
-    const token = localStorage.getItem("access_token");
-    const role = localStorage.getItem("role");
-    if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
-      return;
-    }
-    if (role !== "agency") {
-      toast.error("Only agencies can submit offers");
-      return;
-    }
-    if (!budget || isNaN(budget) || budget <= 0) {
-      toast.error("Please provide a valid budget amount");
-      return;
-    }
-    if (!comment.trim()) {
-      toast.error("Please provide a comment");
-      return;
-    }
-    if (
-      offerForm.applyDiscount &&
-      (!offerForm.discount ||
-        isNaN(offerForm.discount) ||
-        offerForm.discount <= 0)
-    ) {
-      toast.error("Please provide a valid discount percentage");
-      return;
-    }
-    try {
-      const formData = new FormData();
-      formData.append("offered_budget", Number.parseFloat(budget));
-      formData.append("message", comment.trim());
-      formData.append("apply_discount", offerForm.applyDiscount || false);
-      formData.append(
-        "discount",
-        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
-      );
+  tourId,
+  budget,
+  comment,
+  offerForm,
+  file
+) => {
+  const token = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
+  if (!token) {
+    navigate("/login");
+    toast.error("Please log in to submit an offer");
+    return;
+  }
+  if (role !== "agency") {
+    toast.error("Only agencies can submit offers");
+    return;
+  }
+  if (!budget || isNaN(budget) || budget <= 0) {
+    toast.error("Please provide a valid budget amount");
+    return;
+  }
+  if (!comment.trim()) {
+    toast.error("Please provide a comment");
+    return;
+  }
+  if (
+    offerForm.applyDiscount &&
+    (!offerForm.discount ||
+      isNaN(offerForm.discount) ||
+      offerForm.discount <= 0)
+  ) {
+    toast.error("Please provide a valid discount percentage");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("offered_budget", Number.parseFloat(budget));
+    formData.append("message", comment.trim());
+    formData.append("apply_discount", offerForm.applyDiscount || false);
+    formData.append(
+      "discount",
+      offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+    );
+
+    // Only append file if it exists
+    if (file) {
       formData.append("file", file);
-
-      const response = await offerBudgetToBack({
-        id: tourId,
-        data: formData,
-      }).unwrap();
-
-      const newOffer = {
-        id: response?.id || `${currentUserId}-${Date.now()}`,
-        offered_budget: Number.parseFloat(budget),
-        message: comment.trim(),
-        apply_discount: offerForm.applyDiscount || false,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
-        file_name: file?.name || null,
-        status: "pending", // default
-        agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
-          logo_url:
-            localStorage.getItem("user_image") ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-          is_verified: false,
-        },
-      };
-
-      setTours((prevTours) =>
-        prevTours.map((tour) =>
-          tour.id === tourId
-            ? {
-                ...tour,
-                offers: [...(tour.offers || []), newOffer],
-                offer_count: (tour.offer_count || 0) + 1,
-              }
-            : tour
-        )
-      );
-
-      if (selectedTour && selectedTour.id === tourId) {
-        setSelectedTour((prev) =>
-          prev
-            ? {
-                ...prev,
-                offers: [...(prev.offers || []), newOffer],
-                offer_count: (prev.offer_count || 0) + 1,
-              }
-            : prev
-        );
-      }
-
-      toast.success("Offer submitted successfully!");
-      navigate("/admin/chat");
-    } catch (error) {
-      console.error("Failed to submit offer:", error);
-      const errorMessage =
-        error?.data?.error ||
-        error?.data?.detail ||
-        "Failed to submit offer. Please try again.";
-      toast.error(errorMessage);
     }
-  };
+
+    // Debug: Log FormData entries
+    console.log("FormData entries:", [...formData.entries()]);
+
+    const response = await offerBudgetToBack({
+      id: tourId,
+      data: formData,
+    }).unwrap();
+
+    console.log("API Response:", response); // Debug: Log API response
+
+    const newOffer = {
+      id: response?.id || `${currentUserId}-${Date.now()}`,
+      offered_budget: Number.parseFloat(budget),
+      message: comment.trim(),
+      apply_discount: offerForm.applyDiscount || false,
+      discount: offerForm.applyDiscount
+        ? Number.parseFloat(offerForm.discount)
+        : 0,
+      file_name: file?.name || null,
+      status: "pending", // default
+      agency: {
+        agency_name: localStorage.getItem("name") || "Unknown Agency",
+        logo_url:
+          localStorage.getItem("user_image") ||
+          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+        is_verified: false,
+      },
+    };
+
+    setTours((prevTours) =>
+      prevTours.map((tour) =>
+        tour.id === tourId
+          ? {
+              ...tour,
+              offers: [...(tour.offers || []), newOffer],
+              offer_count: (tour.offer_count || 0) + 1,
+            }
+          : tour
+      )
+    );
+
+    if (selectedTour && selectedTour.id === tourId) {
+      setSelectedTour((prev) =>
+        prev
+          ? {
+              ...prev,
+              offers: [...(prev.offers || []), newOffer],
+              offer_count: (prev.offer_count || 0) + 1,
+            }
+          : prev
+      );
+    }
+
+    toast.dismiss(); 
+    toast.success("Offer submitted successfully!");
+  } catch (error) {
+    console.error("Failed to submit offer:", {
+      error,
+      status: error.status,
+      data: error.data,
+      originalStatus: error.originalStatus,
+    });
+    const errorMessage =
+      error?.data?.error ||
+      error?.data?.detail ||
+      "Failed to submit offer. Please try again.";
+    toast.error(errorMessage);
+  }
+};
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
