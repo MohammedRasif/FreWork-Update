@@ -19,21 +19,84 @@ import img from "../../assets/img/badge.png";
 function AcceptedOffers() {
   const { data, error, isLoading } = useAcceptedAllOffersQuery();
   const [showSentOfferButton, setShowSentOfferButton] = useState(false);
+
   const handleSentOfferClick = () => {
     console.log("Sent Offer clicked");
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  // Loading Skeleton Component
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <div
+          key={i}
+          className="rounded-xl bg-white shadow-sm border border-gray-200 animate-pulse"
+        >
+          <div className="h-72 bg-gray-300 rounded-t-xl"></div>
+          <div className="p-4 space-y-3">
+            <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+            <div className="h-5 bg-gray-300 rounded w-full"></div>
+            <div className="h-5 bg-gray-300 rounded w-5/6"></div>
+            <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-300 rounded w-full"></div>
+              <div className="h-4 bg-gray-300 rounded w-11/12"></div>
+              <div className="h-4 bg-gray-300 rounded w-10/12"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const NoDataMessage = () => (
+    <div className="flex flex-col items-center justify-center py-20 text-center min-h-screen -my-56">
+      <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+        No Accepted Offers Yet
+      </h3>
+      
+    </div>
+  );
+
+  // Error Message
+  const ErrorMessage = () => (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="bg-red-100 p-4 rounded-full mb-4">
+        <svg
+          className="w-12 h-12 text-red-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-gray-800 mb-1">
+        Something went wrong!
+      </h3>
+      <p className="text-gray-600">Failed to load offers. Please try again later.</p>
+    </div>
+  );
 
   return (
     <div className="pt-24 container mx-auto lg:px-3 px-5">
-      <h1 className="lg:text-4xl text-[28] font-semibold pb-3 ">
+      <h1 className="lg:text-4xl text-[28px] font-semibold pb-3">
         All Accepted Offers
       </h1>
-      <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
-        {data &&
-          data.map((tour) => (
+
+      {/* Conditional Rendering */}
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : error ? (
+        <ErrorMessage />
+      ) : data && data.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {data.map((tour) => (
             <div
               key={tour.id}
               className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6"
@@ -53,43 +116,39 @@ function AcceptedOffers() {
                       {tour.location_to}
                     </h2>
                   </div>
+
+                  {/* Agency Logos */}
                   {tour.offers && tour.offers.length > 0 && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row ">
-                      {tour.offers
-                        .slice(0, 3)
-                        .map((offer, index) => (
-                          <div
-                            key={offer.id || index} 
-                            className="w-20 h-20 flex items-center justify-center"
-                          >
-                            <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
-                              {offer.status === "accepted" && (
-                                <img
-                                  src={img}
-                                  alt="Badge"
-                                  className="absolute inset-0 object-contain rounded-full pointer-events-none z-10"
-                                  onError={() =>
-                                    console.log("Badge image failed to load")
-                                  }
-                                />
-                              )}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row">
+                      {tour.offers.slice(0, 3).map((offer, index) => (
+                        <div
+                          key={offer.id || index}
+                          className="w-20 h-20 flex items-center justify-center"
+                        >
+                          <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
+                            {offer.status === "accepted" && (
                               <img
-                                src={
-                                  offer.agency?.logo_url ||
-                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                }
-                                alt={offer.agency?.agency_name || "Agency"}
-                                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
-                                onError={() =>
-                                  console.log("Agency logo failed to load")
-                                }
+                                src={img}
+                                alt="Badge"
+                                className="absolute inset-0 object-contain rounded-full pointer-events-none z-10"
                               />
-                            </div>
+                            )}
+                            <img
+                              src={
+                                offer.agency?.logo_url ||
+                                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                              }
+                              alt={offer.agency?.agency_name || "Agency"}
+                              className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
+                            />
                           </div>
-                        ))}
+                        </div>
+                      ))}
                     </div>
                   )}
-                  {tour.offer_count >= 3 ? (
+
+                  {/* Offers Completed Badge */}
+                  {tour.offer_count >= 3 && (
                     <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
                       <svg
                         className="mr-1"
@@ -102,10 +161,11 @@ function AcceptedOffers() {
                       </svg>
                       Offers completed
                     </div>
-                  ) : null}
+                  )}
                 </div>
               </div>
 
+              {/* Card Content */}
               <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
                 <div className="flex items-center justify-between">
                   <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
@@ -121,7 +181,7 @@ function AcceptedOffers() {
                   </p>
                   <p>
                     <span className="font-medium">Category:</span>{" "}
-                    {tour.destination_type  || "N/A"}
+                    {tour.destination_type || "N/A"}
                   </p>
                 </div>
 
@@ -137,7 +197,6 @@ function AcceptedOffers() {
                     {tour.total_members}{" "}
                     {tour.total_members > 1 ? "people" : "person"}
                   </span>
-
                   <div className="flex items-center space-x-4">
                     <h1 className="text-md text-gray-700">
                       <span className="font-medium">Child :</span>{" "}
@@ -145,7 +204,7 @@ function AcceptedOffers() {
                     </h1>
                     <h1>
                       <span className="font-medium">Adult :</span>{" "}
-                      {tour.adult_count} {/* Corrected to use adult_count */}
+                      {tour.adult_count}
                     </h1>
                   </div>
                 </div>
@@ -160,7 +219,6 @@ function AcceptedOffers() {
                         : tour.tourist_spots}
                     </span>
                   </p>
-
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationArrow className="w-6 h-5 text-black" />
                     <span>
@@ -168,7 +226,6 @@ function AcceptedOffers() {
                       {tour.location_from || "N/A"}
                     </span>
                   </p>
-
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
@@ -176,13 +233,10 @@ function AcceptedOffers() {
                       {tour.meal_plan || "N/A"}
                     </span>
                   </p>
-
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <IoBed className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">
-                        Type of accommodation:
-                      </span>{" "}
+                      <span className="font-medium">Type of accommodation:</span>{" "}
                       {tour.type_of_accommodation || "N/A"}
                     </span>
                   </p>
@@ -193,7 +247,6 @@ function AcceptedOffers() {
                       {tour.minimum_star_hotel || "N/A"}
                     </span>
                   </p>
-
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaClock className="w-6 h-5 text-black" />
                     <span>
@@ -201,13 +254,10 @@ function AcceptedOffers() {
                       {tour.duration || "N/A"}
                     </span>
                   </p>
-
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <ShieldCheck className="w-6 h-5 text-green-500" />
                     <span>
-                      <span className="font-medium">
-                        Contact verified via email
-                      </span>
+                      <span className="font-medium">Contact verified via email</span>
                     </span>
                   </p>
                 </div>
@@ -225,7 +275,10 @@ function AcceptedOffers() {
               </div>
             </div>
           ))}
-      </div>
+        </div>
+      ) : (
+        <NoDataMessage />
+      )}
     </div>
   );
 }

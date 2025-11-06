@@ -174,22 +174,21 @@ function SinglePost({ prid }) {
       setSelectedFile(null);
       setIsPopupOpen(false);
       toast.success(
-        "Your offer has been successfully submitted! When approved by admin, this tour plan will be published.",
         {
-          duration: 4000, // Display for 4 seconds
+          duration: 4000, 
           style: {
-            background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
-            color: "#ffffff", // White text
-            borderRadius: "8px", // Rounded corners
-            padding: "16px", // Comfortable padding
-            fontSize: "16px", // Readable font size
-            fontWeight: "500", // Medium font weight
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
-            maxWidth: "400px", // Limit width for better readability
+            background: "linear-gradient(135deg, #3b82f6, #10b981)", 
+            color: "#ffffff", 
+            borderRadius: "8px", 
+            padding: "16px", 
+            fontSize: "16px", 
+            fontWeight: "500", 
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", 
+            maxWidth: "400px", 
           },
           iconTheme: {
-            primary: "#ffffff", // White icon
-            secondary: "#3b82f6", // Blue background for icon
+            primary: "#ffffff", 
+            secondary: "#3b82f6", 
           },
         }
       );
@@ -198,7 +197,7 @@ function SinglePost({ prid }) {
       console.error("Failed to submit offer:", error);
       toast.error(
         error.data?.error
-          ? `${error.data.error} Only agency can do this.`
+          ? `${error.data.error} `
           : "Something went wrong"
       );
     } finally {

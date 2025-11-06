@@ -198,7 +198,8 @@ const AdminHome = () => {
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
-        error.data?.error ||
+        error?.data?.error ||
+          error?.error ||
           "Failed to submit offer. Only agencies can do this."
       );
     } finally {
@@ -290,7 +291,9 @@ const AdminHome = () => {
                     </p>
                     <p>
                       Category:{" "}
-                      <span className="font-medium">{plan.destination_type}</span>
+                      <span className="font-medium">
+                        {plan.destination_type}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -420,7 +423,6 @@ const AdminHome = () => {
                         </span>
                       </p>
 
-                      
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>

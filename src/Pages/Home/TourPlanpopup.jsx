@@ -32,7 +32,39 @@ const TourPlanPopup = ({
     applyDiscount: false,
   });
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
+  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false); // local state
+
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Critical: Prevent page reload
+
+    if (isOfferSubmitting || isOfferBudgetLoading) return;
+
+    setIsOfferSubmitting(true);
+
+    try {
+      await handleSubmitOffer(
+        tour.id,
+        offerForm.budget,
+        offerForm.comment,
+        offerForm,
+        selectedFile
+      );
+
+      // Reset form after success
+      setOfferForm({
+        budget: "",
+        comment: "",
+        discount: "",
+        applyDiscount: false,
+      });
+      setSelectedFile(null);
+      onClose();
+    } catch (err) {
+    } finally {
+      setIsOfferSubmitting(false);
+    }
+  };
 
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,60 +79,6 @@ const TourPlanPopup = ({
     setSelectedFile(file);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Budget validation: Check if offered budget is within ±$500 of tour.budget
-    const offeredBudget = Number.parseFloat(offerForm.budget);
-    const tourBudget = Number.parseFloat(tour.budget);
-    if (offeredBudget < tourBudget - 500 || offeredBudget > tourBudget + 500) {
-      toast.error(
-        `Offered budget must be within ±$500 of the tour budget ($${tourBudget}). Your offer ($${offeredBudget}) is outside the range $${
-          tourBudget - 500
-        } to $${tourBudget + 500}.`,
-        { duration: 5000 }
-      );
-      return;
-    }
-
-    setIsOfferSubmitting(true);
-    await handleSubmitOffer(
-      tour.id,
-      offerForm.budget,
-      offerForm.comment,
-      offerForm,
-      selectedFile
-    );
-    setIsOfferSubmitting(false);
-    setOfferForm({
-      budget: "",
-      comment: "",
-      discount: "",
-      applyDiscount: false,
-    });
-    setSelectedFile(null);
-    toast.success(
-      "Your tour plan has been created! Please wait for the admin approval.",
-      {
-        duration: 4000, // Display for 4 seconds
-        style: {
-          background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
-          color: "#ffffff", // White text
-          borderRadius: "8px", // Rounded corners
-          padding: "16px", // Comfortable padding
-          fontSize: "16px", // Readable font size
-          fontWeight: "500", // Medium font weight
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
-          maxWidth: "400px", // Limit width for better readability
-        },
-        iconTheme: {
-          primary: "#ffffff", // White icon
-          secondary: "#3b82f6", // Blue background for icon
-        },
-      }
-    );
-  };
-
   return (
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -113,7 +91,9 @@ const TourPlanPopup = ({
             <X size={24} />
           </button>
         </div>
+
         <div className="p-4">
+          {/* Offer Form */}
           <div className="flex-1 w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               Place Your Offer
@@ -193,8 +173,7 @@ const TourPlanPopup = ({
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1">
-                  Website suggests extra discount, increases conversions by 30%.
-                  Check to offer more.
+                  Offer extra discount to increase conversion.
                 </p>
               </div>
 
@@ -203,7 +182,7 @@ const TourPlanPopup = ({
                   htmlFor="discount"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Discount
+                  Discount (%)
                 </label>
                 <input
                   type="number"
@@ -211,7 +190,7 @@ const TourPlanPopup = ({
                   id="discount"
                   value={offerForm.discount}
                   onChange={handleOfferChange}
-                  placeholder="Enter discount percentage"
+                  placeholder="e.g., 10"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   disabled={!offerForm.applyDiscount}
                 />
@@ -231,7 +210,7 @@ const TourPlanPopup = ({
                   !offerForm.budget ||
                   !offerForm.comment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 <IoIosSend size={20} />
@@ -242,6 +221,7 @@ const TourPlanPopup = ({
             </form>
           </div>
 
+          {/* Existing Offers */}
           {tour.offers && tour.offers.length > 0 && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">
@@ -258,9 +238,7 @@ const TourPlanPopup = ({
                         offer.agency?.logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                       }
-                      alt={`${
-                        offer.agency?.agency_name || "Unknown Agency"
-                      } avatar`}
+                      alt={`${offer.agency?.agency_name || "Agency"} avatar`}
                       className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                     />
                     <div>
@@ -282,9 +260,10 @@ const TourPlanPopup = ({
                       )}
                     </div>
                   </div>
+
                   <div className="flex items-center justify-between sm:justify-end gap-3">
                     <span className="font-semibold text-lg sm:text-xl">
-                      💰 ${offer.offered_budget || "N/A"}
+                      ${offer.offered_budget || "N/A"}
                     </span>
                     <div className="flex gap-2">
                       <button
@@ -301,11 +280,12 @@ const TourPlanPopup = ({
                           isAcceptLoading ||
                           !offer.agency?.user
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
+                            : "bg-[#3776E2] text-white hover:bg-blue-700"
                         }`}
                       >
                         Message
                       </button>
+
                       {tour.user === userData?.user_id && (
                         <button
                           onClick={() => handleAcceptOffer(offer.id, tour.id)}

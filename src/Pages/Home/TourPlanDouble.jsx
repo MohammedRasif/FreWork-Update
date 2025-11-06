@@ -206,11 +206,6 @@ const TourPlanDouble = () => {
       return;
     }
 
-    if (!file) {
-      toast.error("Please upload a file");
-      return;
-    }
-
     if (
       offerForm.applyDiscount &&
       (!offerForm.discount ||
