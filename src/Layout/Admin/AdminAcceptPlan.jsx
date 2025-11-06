@@ -80,9 +80,9 @@ export default function AdminAcceptPlan() {
                   alt={`${tour.tour_plan.location_to} destination`}
                   className="w-full h-44 rounded-md object-cover"
                 />
-                <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">
+                {/* <h1 className="text-[14px] left-3 absolute top-2  font-semibold text-white ">
                   Image generated automatically
-                </h1>
+                </h1> */}
               </div>
 
               {/* Card Content */}

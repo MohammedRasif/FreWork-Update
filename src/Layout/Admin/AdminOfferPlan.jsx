@@ -254,7 +254,7 @@ function AdminOfferPlan() {
                             €{offer.offered_budget}
                           </span>
                           <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-                            <NavLink to="/admin/chat">
+                            <NavLink to={`/admin/chat/${offer?.room_id}`}>
                               <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-blue-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-blue-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
                                 Start conversation
                               </button>
