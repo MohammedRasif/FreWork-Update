@@ -14,13 +14,12 @@ const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // Get user data from the query with refetchOnMountOrArgChange
   const {
     data: userData,
     isLoading,
     refetch,
   } = useShowUserInpormationQuery(undefined, {
-    refetchOnMountOrArgChange: true, // Force refetch on mount or token change
+    refetchOnMountOrArgChange: true, 
   });
 
   // Check if access_token exists in localStorage
@@ -32,7 +31,7 @@ const Navbar = () => {
     "/membership": "membership",
     "/pricing": "agencies",
     "/tourPlans": "tours",
-    "/acceptedOffers": "acceptedOffers", // Added acceptedOffers route
+    "/acceptedOffers": "acceptedOffers", 
     "/contact": "contact",
     "/user/editProfile": "profile",
     "/user/profile": "profile",
