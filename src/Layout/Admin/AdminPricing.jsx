@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
@@ -9,19 +10,20 @@ import {
 } from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 const AdminPricing = () => {
+  const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState("monthly");
   const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery();
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
     useSubscriptionMutation();
   const navigate = useNavigate();
 
-  // Handle subscription error toast with useEffect to prevent duplicates
   useEffect(() => {
     if (subscriptionError) {
       const errorMessage =
-        subscriptionError?.data?.detail || "Failed to process subscription";
+        subscriptionError?.data?.detail || t("failed_to_process_subscription");
       toast.error(errorMessage, {
         toastId: "subscription-error",
         position: "top-right",
@@ -30,33 +32,27 @@ const AdminPricing = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
       });
     }
-  }, [subscriptionError]);
+  }, [subscriptionError, t]);
 
-  // Customized Free User plan
   const freePlan = {
-    name: "Free User",
+    name: t("free_user"),
     limit: "5",
-    limitUnit: "Query/Day",
-    price: "0/month",
+    limitUnit: t("query_per_day"),
+    price: t("free_price"),
     features: [
-      "Includes general source databases",
-      "Limited free queries per bot day",
-      "No access to specific, company, or private databases",
+      t("includes_general_databases"),
+      t("limited_free_queries"),
+      t("no_access_to_specific_db"),
     ],
   };
 
-  // Function to handle plan selection
   const handleSelectPlan = async (planName) => {
-    console.log(`Selected plan: ${planName}`);
     if (planName === "premium") {
-      // Check for access_token in localStorage
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        console.log("No access token found, redirecting to /login");
-        toast.info("Please log in to subscribe to the Premium plan.", {
+        toast.info(t("login_required_for_premium"), {
           toastId: "login-required",
           position: "top-right",
           autoClose: 3000,
@@ -64,22 +60,17 @@ const AdminPricing = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
         });
         navigate("/login", { state: { from: "/admin/pricing" } });
         return;
       }
 
       try {
-        console.log("Attempting to trigger subscription mutation...");
         const response = await subscription({ plan_id: "premium" }).unwrap();
-        console.log("Subscription response:", response);
-        // Check for checkout_url in response and redirect
         if (response?.checkout_url) {
-          console.log("Redirecting to checkout URL:", response.checkout_url);
           window.location.href = response.checkout_url;
         } else {
-          toast.success("Subscription successful!", {
+          toast.success(t("subscription_successful"), {
             toastId: "subscription-success",
             position: "top-right",
             autoClose: 5000,
@@ -87,16 +78,13 @@ const AdminPricing = () => {
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
-            progress: undefined,
           });
         }
       } catch (error) {
-        console.error("Subscription error:", error);
-        // Error toast is handled by useEffect
+        // Error handled by useEffect
       }
     } else {
-      console.log("Free plan selected, no mutation needed.");
-      toast.info("Free plan selected!", {
+      toast.info(t("free_plan_selected"), {
         toastId: "free-plan-selected",
         position: "top-right",
         autoClose: 5000,
@@ -104,7 +92,6 @@ const AdminPricing = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
       });
     }
   };
@@ -113,35 +100,35 @@ const AdminPricing = () => {
     <section className="pt-5 roboto bg-gray-50">
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-5 tracking-wider">
-          Pricing and Packages
+          {t("pricing_and_packages")}
         </h1>
         <h1 className="text-[16px] text-center font-medium text-gray-600 mb-5">
-          Find your best package here
+          {t("find_best_package")}
         </h1>
 
         {/* Membership Info */}
         <div className="flex items-center justify-between border border-gray-400 m-5 p-3 rounded-md">
           <div>
             <h1 className="text-[16px] text-gray-700 font-medium">
-              Date of Starting
+              {t("date_of_starting")}
             </h1>
             <h1 className="text-[13px] text-gray-700">12 July, 2025</h1>
           </div>
           <div>
             <h1 className="text-[16px] text-gray-700 font-medium">
-              Membership (Current)
+              {t("membership_current")}
             </h1>
-            <h1 className="text-[13px] text-gray-700">Freebie</h1>
+            <h1 className="text-[13px] text-gray-700">{t("freebie")}</h1>
           </div>
           <div>
-            <h1 className="text-[16px] text-gray-700 font-medium">Date of end</h1>
+            <h1 className="text-[16px] text-gray-700 font-medium">{t("date_of_end")}</h1>
             <h1 className="text-[13px] text-gray-700">12 July, 2025</h1>
           </div>
         </div>
 
         {/* Loading state */}
         {isLoading && (
-          <p className="text-center text-gray-600">Loading plans...</p>
+          <p className="text-center text-gray-600">{t("loading_plans")}</p>
         )}
 
         {/* Pricing cards */}
@@ -160,7 +147,7 @@ const AdminPricing = () => {
                 <div className="w-3/4 rounded-r-lg my-10 relative">
                   <img
                     src={img}
-                    alt="Plan background"
+                    alt={t("plan_background")}
                     className="w-full h-auto"
                   />
                   <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
@@ -176,7 +163,7 @@ const AdminPricing = () => {
                     </span>
                   </div>
                   <p className="text-slate-500 text-base mt-1">
-                    Measurable results
+                    {t("measurable_results")}
                   </p>
                 </div>
                 <button
@@ -184,15 +171,15 @@ const AdminPricing = () => {
                   onClick={() => handleSelectPlan("free")}
                   disabled={isSubscribing}
                 >
-                  Select
+                  {t("select")}
                 </button>
                 <p className="text-slate-500 text-base mb-6">
-                  Contact us for more Details
+                  {t("contact_for_more_details")}
                 </p>
                 <div className="mb-4 flex-grow">
                   <div className="flex items-center mb-3">
                     <span className="text-slate-700 font-semibold text-lg">
-                      Features
+                      {t("features")}
                     </span>
                     <div className="ml-2 text-[#3776E2]">
                       <IoCheckmarkCircleSharp size={20} />
@@ -227,7 +214,7 @@ const AdminPricing = () => {
                   <div className="w-3/4 rounded-r-lg my-10 relative">
                     <img
                       src={img}
-                      alt="Plan background"
+                      alt={t("plan_background")}
                       className="w-full h-auto"
                     />
                     <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
@@ -243,7 +230,7 @@ const AdminPricing = () => {
                       </span>
                     </div>
                     <p className="text-slate-500 text-base mt-1">
-                      Measurable results
+                      {t("measurable_results")}
                     </p>
                   </div>
                   <button
@@ -251,15 +238,15 @@ const AdminPricing = () => {
                     onClick={() => handleSelectPlan("premium")}
                     disabled={isSubscribing || isLoading}
                   >
-                    {isSubscribing ? "Subscribing..." : "Select"}
+                    {isSubscribing ? t("subscribing") : t("select")}
                   </button>
                   <p className="text-slate-500 text-base mb-6">
-                    Contact us for more Details
+                    {t("contact_for_more_details")}
                   </p>
                   <div className="mb-4 flex-grow">
                     <div className="flex items-center mb-3">
                       <span className="text-slate-700 font-semibold text-lg">
-                        Features
+                        {t("features")}
                       </span>
                       <div className="ml-2 text-[#3776E2]">
                         <IoCheckmarkCircleSharp size={20} />
@@ -283,7 +270,7 @@ const AdminPricing = () => {
                             className="text-[#3776E2] mt-1 mr-2 flex-shrink-0"
                             size={20}
                           />
-                          <span>No features available</span>
+                          <span>{t("no_features_available")}</span>
                         </li>
                       )}
                     </ul>

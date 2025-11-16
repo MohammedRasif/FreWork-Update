@@ -9,10 +9,12 @@ import {
 } from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 function UserEditProfile() {
+  const { t } = useTranslation();
   const { data: profileData, isLoading: profileLoading } =
     useGetTuristProfileQuery();
   const [updateUser, { isLoading: updateLoading }] =
@@ -73,10 +75,10 @@ function UserEditProfile() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > MAX_FILE_SIZE) {
-        setPictureError("Profile picture must be under 10MB");
+        setPictureError(t("file_too_large"));
         setFormData({ ...formData, picture: null });
-        e.target.value = null; // Reset input
-        toast.warn("File too large! Max 10MB allowed.", {
+        e.target.value = null;
+        toast.warn(t("file_too_large"), {
           position: "top-right",
           autoClose: 3000,
         });
@@ -90,9 +92,8 @@ function UserEditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Final check before submit
     if (formData.picture && formData.picture.size > MAX_FILE_SIZE) {
-      setPictureError("Profile picture must be under 10MB");
+      setPictureError(t("file_too_large"));
       return;
     }
 
@@ -116,7 +117,7 @@ function UserEditProfile() {
 
     try {
       await updateUser(payload).unwrap();
-      toast.success("Profile updated successfully!", {
+      toast.success(t("profile_updated"), {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -126,7 +127,7 @@ function UserEditProfile() {
       });
     } catch (err) {
       console.error(err);
-      toast.error("Error updating profile", {
+      toast.error(t("error_updating_profile"), {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -137,7 +138,7 @@ function UserEditProfile() {
     }
   };
 
-  if (profileLoading) return <p className="text-center">Loading profile...</p>;
+  if (profileLoading) return <p className="text-center">{t("loading_profile")}</p>;
 
   return (
     <div className="p-3 sm:p-4 lg:p-4 font-semibold">
@@ -149,12 +150,12 @@ function UserEditProfile() {
           className="inline-flex items-center px-2 sm:px-3 lg:px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 text-sm sm:text-base lg:text-base"
         >
           <IoArrowBack className="h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 mr-1 sm:mr-2 lg:mr-2 text-gray-700" />
-          Back
+          {t("back")}
         </NavLink>
       </div>
 
       <h1 className="text-xl sm:text-2xl lg:text-3xl pb-3 sm:pb-4 lg:pb-5">
-        Welcome, <span className="font-normal">Edit Profile Details</span>
+        {t("welcome")}, <span className="font-normal">{t("edit_profile_details")}</span>
       </h1>
 
       <form onSubmit={handleSubmit}>
@@ -163,7 +164,7 @@ function UserEditProfile() {
           {/* First Name */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              First Name
+              {t("first_name")}
             </label>
             <input
               type="text"
@@ -171,14 +172,14 @@ function UserEditProfile() {
               value={formData.firstName}
               onChange={handleChange}
               className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
             />
           </div>
 
           {/* Last Name */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Last Name
+              {t("last_name")}
             </label>
             <input
               type="text"
@@ -186,14 +187,14 @@ function UserEditProfile() {
               value={formData.lastName}
               onChange={handleChange}
               className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
             />
           </div>
 
           {/* Personal Phone */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Phone number (personal)
+              {t("phone_personal")}
             </label>
             <input
               type="tel"
@@ -201,14 +202,14 @@ function UserEditProfile() {
               value={formData.phonePersonal}
               onChange={handleChange}
               className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
             />
           </div>
 
           {/* Bio */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Describe yourself in short
+              {t("describe_yourself")}
             </label>
             <input
               type="text"
@@ -216,7 +217,7 @@ function UserEditProfile() {
               value={formData.describeYourself}
               onChange={handleChange}
               className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
             />
           </div>
 
@@ -225,7 +226,7 @@ function UserEditProfile() {
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3">
               <div>
                 <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                  Gender
+                  {t("gender")}
                 </label>
                 <input
                   type="text"
@@ -233,12 +234,12 @@ function UserEditProfile() {
                   value={formData.gender}
                   onChange={handleChange}
                   className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                 />
               </div>
               <div>
                 <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                  Age
+                  {t("age")}
                 </label>
                 <input
                   type="number"
@@ -246,7 +247,7 @@ function UserEditProfile() {
                   value={formData.age}
                   onChange={handleChange}
                   className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                 />
               </div>
             </div>
@@ -255,7 +256,7 @@ function UserEditProfile() {
           {/* Language */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Language
+              {t("language")}
             </label>
             <input
               type="text"
@@ -263,18 +264,18 @@ function UserEditProfile() {
               value={formData.language}
               onChange={handleChange}
               className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
             />
           </div>
 
           {/* Profile Picture */}
           <div>
             <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-              Upload picture
+              {t("upload_picture")}
             </label>
             <div className="flex items-center space-x-2 p-1 h-[42px] border border-gray-200 rounded-sm bg-white">
               <label className="inline-block px-2 sm:px-3 lg:px-4 py-1 bg-gray-100 border rounded cursor-pointer text-xs sm:text-sm lg:text-sm hover:bg-gray-200">
-                Choose file
+                {t("choose_file")}
                 <input
                   type="file"
                   accept="image/*"
@@ -283,25 +284,25 @@ function UserEditProfile() {
                 />
               </label>
               <span className="text-gray-500 text-xs sm:text-sm lg:text-sm truncate max-w-[120px]">
-                {formData.picture ? formData.picture.name : "Choose a file"}
+                {formData.picture ? formData.picture.name : t("choose_a_file")}
               </span>
             </div>
             {pictureError && (
               <p className="text-red-500 text-xs mt-1">{pictureError}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
+            <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
           </div>
         </div>
 
         {/* Address Section */}
         <div className="mt-6 sm:mt-7 lg:mt-8 mb-3 sm:mb-4 lg:mb-5">
           <h3 className="text-lg sm:text-xl lg:text-[24px] font-semibold text-gray-700 mb-3 sm:mb-4 lg:mb-4">
-            Address
+            {t("address")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-4">
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                House No.
+                {t("house_no")}
               </label>
               <input
                 type="text"
@@ -309,12 +310,12 @@ function UserEditProfile() {
                 value={formData.houseNo}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                Road No
+                {t("road_no")}
               </label>
               <input
                 type="text"
@@ -322,12 +323,12 @@ function UserEditProfile() {
                 value={formData.roadNo}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                Town/city
+                {t("town_city")}
               </label>
               <input
                 type="text"
@@ -335,12 +336,12 @@ function UserEditProfile() {
                 value={formData.townCity}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                Postal code
+                {t("postal_code")}
               </label>
               <input
                 type="text"
@@ -348,12 +349,12 @@ function UserEditProfile() {
                 value={formData.postalCode}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                Country
+                {t("country")}
               </label>
               <input
                 type="text"
@@ -361,12 +362,12 @@ function UserEditProfile() {
                 value={formData.country}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-sm sm:text-base lg:text-base mb-1">
-                Phone number (Home)
+                {t("phone_home")}
               </label>
               <input
                 type="tel"
@@ -374,7 +375,7 @@ function UserEditProfile() {
                 value={formData.phoneHome}
                 onChange={handleChange}
                 className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
               />
             </div>
           </div>
@@ -391,7 +392,7 @@ function UserEditProfile() {
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
           >
-            {updateLoading ? "Saving..." : "Save Changes"}
+            {updateLoading ? t("saving") : t("save_changes")}
           </button>
         </div>
       </form>

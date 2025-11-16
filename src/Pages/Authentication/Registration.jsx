@@ -5,8 +5,10 @@ import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "@/redux/features/baseApi";
 import img1 from "../../assets/img/removebg.png";
+import { useTranslation } from "react-i18next";
 
 const Register = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [createUser, { isLoading, isError, error, isSuccess }] =
@@ -32,10 +34,7 @@ const Register = () => {
       try {
         const parsedPlan = JSON.parse(pendingPlan);
         if (parsedPlan.email) {
-          console.log(
-            "Setting default email from pendingPlan:",
-            parsedPlan.email
-          );
+          console.log("Setting default email from pendingPlan:", parsedPlan.email);
           setValue("email", parsedPlan.email);
         }
       } catch (err) {
@@ -53,9 +52,9 @@ const Register = () => {
         role: data.userType,
         password: data.password,
         invitation_code: data.invitationCode || undefined,
-        vat_id: data.vatId || undefined, // Add vat_id to payload
+        vat_id: data.vatId || undefined,
       };
-      // Store userType in localStorage
+
       localStorage.setItem("userType", data.userType);
       localStorage.setItem("userEmail", data.email);
       console.log("Stored userType in localStorage:", data.userType);
@@ -67,13 +66,8 @@ const Register = () => {
       });
     } catch (err) {
       console.error("Error creating user:", err);
-      console.log(err.data.error);
-      setErrorMessage(err.data.error);
-      alert(
-        errorMessage ||
-          err.data.error ||
-          "Error occurred during registration. Please try again."
-      );
+      setErrorMessage(err.data?.error || t("registration_error"));
+      alert(err.data?.error || t("registration_error"));
     }
   };
 
@@ -89,7 +83,7 @@ const Register = () => {
       <div className="hidden lg:flex lg:w-1/2 relative">
         <img
           src={img}
-          alt="Background image"
+          alt={t("background_image")}
           className="w-full h-full object-cover absolute inset-0"
         />
       </div>
@@ -99,22 +93,29 @@ const Register = () => {
         <div className="w-full max-w-xl">
           {/* Logo */}
           <div className="text-center mb-8">
-           <NavLink to="/">
-             <div className=" flex items-center justify-center mb-6">
-              <img src={img1} className="h-20" alt="" />
-            </div>
-           </NavLink>
+            <NavLink to="/">
+              <div className="flex items-center justify-center mb-6">
+                <img src={img1} className="h-20" alt={t("logo")} />
+              </div>
+            </NavLink>
             <h1 className="text-4xl font-semibold text-gray-700">
-              Welcome to Frework
+              {t("welcome_to_frework")}
             </h1>
           </div>
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="flex items-center justify-center p-4 mb-4">
+              <span className="text-red-500 text-center">{errorMessage}</span>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t("email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -122,14 +123,14 @@ const Register = () => {
                 </div>
                 <input
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("email_required"),
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: t("invalid_email"),
                     },
                   })}
                   type="email"
-                  placeholder="user@gmail.com"
+                  placeholder={t("email_placeholder")}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -143,7 +144,7 @@ const Register = () => {
             {/* User Type Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                What describes you best
+                {t("user_type_label")}
               </label>
               <div className="relative">
                 <button
@@ -156,7 +157,7 @@ const Register = () => {
                       selectedUserType ? "text-gray-900" : "text-gray-400"
                     }
                   >
-                    {selectedUserType || "Select one"}
+                    {selectedUserType ? t(`user_type_${selectedUserType}`) : t("select_one")}
                   </span>
                   <ChevronDown
                     className={`h-4 sm:h-4 w-3 sm:w-4 text-gray-400 transition-transform ${
@@ -173,7 +174,7 @@ const Register = () => {
                         onClick={() => handleUserTypeSelect(type)}
                         className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 first:rounded-t-sm last:rounded-b-sm text-sm sm:text-base"
                       >
-                        {type}
+                        {t(`user_type_${type}`)}
                       </button>
                     ))}
                   </div>
@@ -181,7 +182,7 @@ const Register = () => {
               </div>
               <input
                 {...register("userType", {
-                  required: "Please select user type",
+                  required: t("user_type_required"),
                 })}
                 type="hidden"
                 value={selectedUserType}
@@ -197,18 +198,18 @@ const Register = () => {
             {userType === "agency" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  VAT ID
+                  {t("vat_id")}
                 </label>
                 <input
                   {...register("vatId", {
-                    required: "VAT ID is required for agency",
+                    required: t("vat_id_required"),
                     pattern: {
                       value: /^\d{11}$/,
-                      message: "VAT ID must be exactly 11 digits",
+                      message: t("vat_id_digits"),
                     },
                   })}
                   type="text"
-                  placeholder="Enter 11-digit VAT ID"
+                  placeholder={t("vat_id_placeholder")}
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {errors.vatId && (
@@ -222,7 +223,7 @@ const Register = () => {
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                {t("password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -230,14 +231,14 @@ const Register = () => {
                 </div>
                 <input
                   {...register("password", {
-                    required: "Password is required",
+                    required: t("password_required"),
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters",
+                      message: t("password_min_length"),
                     },
                   })}
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("password_placeholder")}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -251,7 +252,7 @@ const Register = () => {
             {/* Confirm Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                {t("confirm_password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -259,12 +260,12 @@ const Register = () => {
                 </div>
                 <input
                   {...register("confirmPassword", {
-                    required: "Please confirm your password",
+                    required: t("confirm_password_required"),
                     validate: (value) =>
-                      value === password || "Passwords do not match",
+                      value === password || t("passwords_do_not_match"),
                   })}
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("password_placeholder")}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -278,12 +279,12 @@ const Register = () => {
             {/* Invitation Code Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Invitation code (optional)
+                {t("invitation_code")}
               </label>
               <input
                 {...register("invitationCode")}
                 type="text"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -291,18 +292,19 @@ const Register = () => {
             {/* Register Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mt-6"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Register
+              {isLoading ? t("registering") : t("register")}
             </button>
           </form>
 
           {/* Login Link */}
           <div className="text-center mt-6">
             <NavLink to="/login" className="text-sm text-gray-600">
-              Already have an account?{" "}
+              {t("already_have_account")}{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
-                Login
+                {t("login")}
               </button>
             </NavLink>
           </div>

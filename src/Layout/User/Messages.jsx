@@ -19,19 +19,18 @@ import {
 import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
 
 function Messages() {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
-  console.log("Conversation ID:", id);
   const userId = localStorage.getItem("user_id");
-  console.log("User ID:", userId);
   const location = useLocation();
   const navigate = useNavigate();
   const agency = location.state?.agency;
-  console.log("Agency:", agency);
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -51,7 +50,6 @@ function Messages() {
     isLoading: isMessagesLoading,
     error: messagesError,
   } = useShowMessagesQuery(id);
-  console.log("Messages Data:", messagesData);
 
   const {
     data: chatList,
@@ -62,7 +60,6 @@ function Messages() {
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
 
-  // State for menu dropdown visibility
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
@@ -79,13 +76,13 @@ function Messages() {
 
         const agencyData = {
           id: currentChat.id?.toString() || "",
-          name: currentChat.other_participant_name || "Unknown User",
+          name: currentChat.other_participant_name || t("unknown_user"),
           image:
             currentChat.other_participant_image ||
             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
           other_user_id: currentChat.other_user_id || null,
           tour_plan_id: currentChat.tour_plan_id || null,
-          tour_plan_title: currentChat.tour_plan_title || "No Tour Plan",
+          tour_plan_title: currentChat.tour_plan_title || t("no_tour_plan"),
           is_archived: currentChat.is_archived || false,
         };
 
@@ -95,9 +92,8 @@ function Messages() {
         });
       }
     }
-  }, [agency, id, chatList, isChatListLoading, navigate, location.pathname]);
+  }, [agency, id, chatList, isChatListLoading, navigate,  navigate, location.pathname, t]);
 
-  // Set initial tour plan from agency.tour_plan_id
   useEffect(() => {
     if (agency?.tour_plan_id && plansData) {
       const selectedPlan = plansData.find(
@@ -109,7 +105,6 @@ function Messages() {
     }
   }, [agency, plansData]);
 
-  // Update isConversationArchived based on chatList
   useEffect(() => {
     if (chatList && Array.isArray(chatList)) {
       const currentChat = chatList.find((chat) => chat.id?.toString() === id);
@@ -124,14 +119,12 @@ function Messages() {
       label: plan.location_to,
     }));
 
-  // Reset messages when conversation ID changes
   useEffect(() => {
     setMessages([]);
     pendingMessagesRef.current.clear();
     setSelectedFile(null);
   }, [id]);
 
-  // Initialize WebSocket for real-time messages
   useEffect(() => {
     const chat_url = chat_sockit(id);
     wsRef.current = new WebSocket(chat_url);
@@ -139,20 +132,12 @@ function Messages() {
     wsRef.current.onmessage = (event) => {
       try {
         const received = JSON.parse(event.data);
-        console.log("Received WebSocket message:", received);
-
-        if (received.type !== "chat_message") {
-          return;
-        }
+        if (received.type !== "chat_message") return;
 
         const inner = received.message || received;
-
         let messageType = "text";
-        if (inner.file) {
-          messageType = "file";
-        } else if (inner.message_type) {
-          messageType = inner.message_type;
-        }
+        if (inner.file) messageType = "file";
+        else if (inner.message_type) messageType = inner.message_type;
 
         const serverMessage = {
           id: inner.id,
@@ -170,39 +155,25 @@ function Messages() {
 
         setMessages((prev) => {
           if (serverMessage.isUser) {
-            const matchingPending = Array.from(
-              pendingMessagesRef.current.values()
-            ).find(
+            const matchingPending = Array.from(pendingMessagesRef.current.values()).find(
               (pm) =>
                 pm.message_type === serverMessage.message_type &&
-                (pm.text === serverMessage.text ||
-                  (pm.text === null && serverMessage.text === null)) &&
-                Math.abs(
-                  pm.timestamp.getTime() - serverMessage.timestamp.getTime()
-                ) < 10000
+                (pm.text === serverMessage.text || (pm.text === null && serverMessage.text === null)) &&
+                Math.abs(pm.timestamp.getTime() - serverMessage.timestamp.getTime()) < 10000
             );
 
             if (matchingPending) {
               return prev.map((msg) =>
                 msg.tempId === matchingPending.tempId
-                  ? {
-                      ...msg,
-                      id: serverMessage.id,
-                      status: "sent",
-                      tempId: undefined,
-                    }
+                  ? { ...msg, id: serverMessage.id, status: "sent", tempId: undefined }
                   : msg
               );
             }
           }
 
           const exists = prev.some((msg) => msg.id === serverMessage.id);
-          if (exists) {
-            return prev;
-          }
-          return [...prev, serverMessage].sort(
-            (a, b) => a.timestamp - b.timestamp
-          );
+          if (exists) return prev;
+          return [...prev, serverMessage].sort((a, b) => a.timestamp - b.timestamp);
         });
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
@@ -210,24 +181,15 @@ function Messages() {
     };
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
+      if (wsRef.current) wsRef.current.close();
     };
   }, [id, userId]);
 
-  // Process messages from useShowMessagesQuery
   useEffect(() => {
-    if (
-      messagesData?.messages &&
-      Array.isArray(messagesData.messages) &&
-      userId
-    ) {
-      console.log("Processing messages:", messagesData.messages);
+    if (messagesData?.messages && Array.isArray(messagesData.messages) && userId) {
       const formattedMessages = messagesData.messages.map((msg) => ({
         id: msg.id,
-        message_type:
-          msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
+        message_type: msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
         text: msg.text || null,
         data: msg.data || null,
         tour_plan_id: msg.tour_plan_id || null,
@@ -243,23 +205,14 @@ function Messages() {
         is_read: msg.is_read,
         status: "sent",
       }));
-      console.log("Formatted messages:", formattedMessages);
       setMessages((prev) => {
         const allMsgs = [...prev, ...formattedMessages];
         const uniqueMsgs = allMsgs.reduce((acc, msg) => {
-          if (!acc[msg.id]) {
-            acc[msg.id] = msg;
-          }
+          if (!acc[msg.id]) acc[msg.id] = msg;
           return acc;
         }, {});
-        const sortedMessages = Object.values(uniqueMsgs).sort(
-          (a, b) => a.timestamp - b.timestamp
-        );
-        console.log("Updated messages state:", sortedMessages);
-        return sortedMessages;
+        return Object.values(uniqueMsgs).sort((a, b) => a.timestamp - b.timestamp);
       });
-    } else {
-      console.log("No messages to process:", { messagesData, userId });
     }
   }, [messagesData, userId, id]);
 
@@ -271,23 +224,18 @@ function Messages() {
     scrollToBottom();
   }, [messages]);
 
-  // Handle file selection and auto-send
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       if (!selectedDropdown && !agency?.tour_plan_id) {
-        alert("Please select a tour plan first");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
+        alert(t("select_tour_plan_first"));
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
 
       const tempId = uuidv4();
       const messageId = uuidv4();
-      const tourPlan = dropdownOptions.find(
-        (opt) => opt.value === selectedDropdown
-      );
+      const tourPlan = dropdownOptions.find((opt) => opt.value === selectedDropdown);
 
       const filePreviewUrl = URL.createObjectURL(file);
       const localFileName = file.name;
@@ -320,9 +268,7 @@ function Messages() {
           data: formData,
         }).unwrap();
 
-        if (filePreviewUrl) {
-          URL.revokeObjectURL(filePreviewUrl);
-        }
+        if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
 
         setMessages((prev) =>
           prev.map((msg) =>
@@ -346,10 +292,8 @@ function Messages() {
         pendingMessagesRef.current.delete(tempId);
       } catch (error) {
         console.error("Failed to send file message:", error);
-        toast.error("Failed to send file message");
-        if (filePreviewUrl) {
-          URL.revokeObjectURL(filePreviewUrl);
-        }
+        toast.error(t("failed_send_file"));
+        if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.tempId === tempId
@@ -360,26 +304,21 @@ function Messages() {
         pendingMessagesRef.current.delete(tempId);
       }
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       inputRef.current?.focus();
     }
   };
 
-  // Handle sending text message
   const handleSendMessage = async () => {
     if (newMessage.trim() === "") return;
     if (!selectedDropdown && !agency?.tour_plan_id) {
-      alert("Please select a tour plan first");
+      alert(t("select_tour_plan_first"));
       return;
     }
 
     const tempId = uuidv4();
     const messageId = uuidv4();
-    const tourPlan = dropdownOptions.find(
-      (opt) => opt.value === selectedDropdown
-    );
+    const tourPlan = dropdownOptions.find((opt) => opt.value === selectedDropdown);
 
     const localMessage = {
       id: messageId,
@@ -410,19 +349,14 @@ function Messages() {
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId
-            ? {
-                ...msg,
-                id: response.id || msg.id,
-                status: "sent",
-                tempId: undefined,
-              }
+            ? { ...msg, id: response.id || msg.id, status: "sent", tempId: undefined }
             : msg
         )
       );
       pendingMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Failed to send text message:", error);
-      toast.error("Failed to send text message");
+      toast.error(t("failed_send_text"));
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg
@@ -435,7 +369,6 @@ function Messages() {
     inputRef.current?.focus();
   };
 
-  // Handle accept final offer
   const handleAcceptFinalOffer = async () => {
     setIsAccepting(true);
     try {
@@ -443,16 +376,15 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: true },
       }).unwrap();
-      toast.success("Final offer accepted successfully");
+      toast.success(t("final_offer_accepted"));
     } catch (error) {
       console.error("Failed to accept final offer:", error);
-      toast.error("Failed to accept final offer");
+      toast.error(t("failed_accept_offer"));
     } finally {
       setIsAccepting(false);
     }
   };
 
-  // Handle decline final offer
   const handleDeclineFinalOffer = async () => {
     setIsDeclining(true);
     try {
@@ -460,10 +392,10 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: false },
       }).unwrap();
-      toast.success("Final offer declined successfully");
+      toast.success(t("final_offer_declined"));
     } catch (error) {
       console.error("Failed to decline final offer:", error);
-      toast.error("Failed to decline final offer");
+      toast.error(t("failed_decline_offer"));
     } finally {
       setIsDeclining(false);
     }
@@ -514,7 +446,7 @@ function Messages() {
       pendingMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Failed to retry message:", error);
-      toast.error("Failed to retry message");
+      toast.error(t("failed_retry_message"));
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg
@@ -527,7 +459,7 @@ function Messages() {
   const handleDropdownChange = async (e) => {
     const selectedId = e.target.value;
     if (!agency?.other_user_id) {
-      alert("Please select an agency and tour plan first");
+      alert(t("select_agency_and_plan"));
       return;
     }
     setSelectedDropdown(selectedId);
@@ -536,9 +468,7 @@ function Messages() {
         const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
         const messageId = uuidv4();
         const tempId = uuidv4();
-        const messageText = `Conversation started regarding tour plan: ${
-          tourPlan?.label || "Unknown"
-        }`;
+        const messageText = t("conversation_started", { plan: tourPlan?.label || t("unknown") });
 
         const localMessage = {
           id: messageId,
@@ -565,12 +495,7 @@ function Messages() {
         setMessages((prev) =>
           prev.map((msg) =>
             msg.tempId === tempId
-              ? {
-                  ...msg,
-                  id: res.id || msg.id,
-                  status: "sent",
-                  tempId: undefined,
-                }
+              ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined }
               : msg
           )
         );
@@ -603,7 +528,7 @@ function Messages() {
 
   const handleViewDetails = () => {
     if (!agency?.tour_plan_id) {
-      alert("Tourist has not provided a tour plan.");
+      alert(t("no_tour_plan_provided"));
       return;
     }
     navigate(`/tour-plans/${agency.tour_plan_id}`);
@@ -616,23 +541,13 @@ function Messages() {
       setMenuOpen(false);
       toast.success(
         isConversationArchived
-          ? "Conversation unarchived successfully"
-          : "Conversation archived successfully"
+          ? t("conversation_unarchived")
+          : t("conversation_archived")
       );
       await refetchChatList();
-      // Do not navigate away; let the chat remain visible in the inbox tab
     } catch (err) {
-      console.error(
-        `Failed to ${
-          isConversationArchived ? "unarchive" : "archive"
-        } conversation:`,
-        err
-      );
-      toast.error(
-        `Failed to ${
-          isConversationArchived ? "unarchive" : "archive"
-        } conversation`
-      );
+      console.error(`Failed to ${isConversationArchived ? "unarchive" : "archive"} conversation:`, err);
+      toast.error(t("failed_archive_conversation", { action: isConversationArchived ? t("unarchive") : t("archive") }));
     }
   };
 
@@ -660,7 +575,7 @@ function Messages() {
               {isImageFile ? (
                 <img
                   src={message.file}
-                  alt={message.localFileName || "Attachment"}
+                  alt={message.localFileName || t("attachment")}
                   className="max-w-full h-auto rounded"
                   style={{ maxWidth: "200px" }}
                 />
@@ -687,14 +602,14 @@ function Messages() {
         </>
       );
     }
-    return <p>Unknown content.</p>;
+    return <p>{t("unknown_content")}</p>;
   };
 
   if (isMessagesLoading) {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          Loading messages...
+          {t("loading_messages")}
         </h1>
       </div>
     );
@@ -704,7 +619,7 @@ function Messages() {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          Loading chat...
+          {t("loading_chat")}
         </h1>
       </div>
     );
@@ -714,7 +629,7 @@ function Messages() {
     return (
       <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
         <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          {messagesError ? "Error loading chat history" : "Chat not found"}
+          {messagesError ? t("error_loading_chat") : t("chat_not_found")}
         </h1>
       </div>
     );
@@ -724,7 +639,6 @@ function Messages() {
 
   return (
     <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
-      {/* Header Section */}
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
         <div></div>
         <div className="flex items-center space-x-2">
@@ -734,7 +648,7 @@ function Messages() {
               onClick={() => setMenuOpen((prev) => !prev)}
               type="button"
             >
-              ⋮
+              ...
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#252c3b] border border-gray-200 dark:border-gray-700 rounded shadow-lg z-10">
@@ -742,26 +656,26 @@ function Messages() {
                   className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
                   onClick={handleViewDetails}
                 >
-                  View Tour Details
+                  {t("view_tour_details")}
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
                   onClick={handleArchiveConversation}
                 >
                   {isConversationArchived
-                    ? "Unarchive Conversation"
-                    : "Archive Conversation"}
+                    ? t("unarchive_conversation")
+                    : t("archive_conversation")}
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
-      {/* Messages Section */}
+
       <div className="flex-1 p-4 space-y-4 overflow-y-auto">
         {messages.length === 0 && (
           <div className="text-center text-gray-500 dark:text-gray-400">
-            No messages to display.
+            {t("no_messages")}
           </div>
         )}
         {messages.map((message) => {
@@ -776,10 +690,7 @@ function Messages() {
 
           if (message.message_type === "start_conversation") {
             return (
-              <div
-                key={message.id || message.tempId}
-                className="flex justify-center w-full"
-              >
+              <div key={message.id || message.tempId} className="flex justify-center w-full">
                 <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full italic max-w-sm text-center">
                   {message.text}
                 </div>
@@ -809,7 +720,7 @@ function Messages() {
                         </button>
                       )}
                       <span className="text-[8px] text-gray-300">
-                        {message.timestamp.toLocaleTimeString([], {
+                        {message.timestamp.toLocaleTimeString(i18n.language === 'it' ? 'it-IT' : 'en-US', {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -817,7 +728,7 @@ function Messages() {
                     </div>
                   </div>
                   <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
-                    <span className="text-xs text-gray-600">You</span>
+                    <span className="text-xs text-gray-600">{t("you")}</span>
                   </div>
                 </div>
               ) : (
@@ -851,7 +762,7 @@ function Messages() {
                     : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
                 }`}
               >
-                {isAccepting ? "Accepting..." : "Accept final offer"}
+                {isAccepting ? t("accepting") : t("accept_final_offer")}
               </button>
               <button
                 onClick={handleDeclineFinalOffer}
@@ -862,12 +773,12 @@ function Messages() {
                     : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
                 }`}
               >
-                {isDeclining ? "Declining..." : "Decline final offer"}
+                {isDeclining ? t("declining") : t("decline_final_offer")}
               </button>
             </div>
           )}
       </div>
-      {/* Message input area */}
+
       <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
         <div className="flex items-center bg-gray-100 dark:bg-[#1E232E] rounded-full px-4 py-2">
           <button
@@ -886,7 +797,7 @@ function Messages() {
           />
           <input
             type="text"
-            placeholder="Type a message or select a file"
+            placeholder={t("type_message_or_select_file")}
             className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm text-gray-800 dark:text-gray-200"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
@@ -901,9 +812,7 @@ function Messages() {
                 : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             }`}
             onClick={handleSendMessage}
-            disabled={
-              newMessage.trim() === "" || !!currentChat?.final_offer_response
-            }
+            disabled={newMessage.trim() === "" || !!currentChat?.final_offer_response}
           >
             <SendIcon className="h-5 w-5 cursor-pointer" />
           </button>

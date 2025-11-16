@@ -15,8 +15,10 @@ import { IoBed } from "react-icons/io5";
 import { LuNavigation2 as Navigation } from "react-icons/lu";
 import { MdOutlineNoMeals } from "react-icons/md";
 import img from "../../assets/img/badge.png";
+import { useTranslation } from "react-i18next";
 
 function AcceptedOffers() {
+  const { t } = useTranslation();
   const { data, error, isLoading } = useAcceptedAllOffersQuery();
   const [showSentOfferButton, setShowSentOfferButton] = useState(false);
 
@@ -24,7 +26,6 @@ function AcceptedOffers() {
     console.log("Sent Offer clicked");
   };
 
-  // Loading Skeleton Component
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {[...Array(4)].map((_, i) => (
@@ -52,13 +53,11 @@ function AcceptedOffers() {
   const NoDataMessage = () => (
     <div className="flex flex-col items-center justify-center py-20 text-center min-h-screen -my-56">
       <h3 className="text-2xl font-semibold text-gray-700 mb-2">
-        No Accepted Offers Yet
+        {t("no_accepted_offers_yet")}
       </h3>
-      
     </div>
   );
 
-  // Error Message
   const ErrorMessage = () => (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="bg-red-100 p-4 rounded-full mb-4">
@@ -77,19 +76,18 @@ function AcceptedOffers() {
         </svg>
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-1">
-        Something went wrong!
+        {t("something_went_wrong")}
       </h3>
-      <p className="text-gray-600">Failed to load offers. Please try again later.</p>
+      <p className="text-gray-600">{t("failed_to_load_offers")}</p>
     </div>
   );
 
   return (
     <div className="pt-24 container mx-auto lg:px-3 px-5">
       <h1 className="lg:text-4xl text-[28px] font-semibold pb-3">
-        All Accepted Offers
+        {t("all_accepted_offers")}
       </h1>
 
-      {/* Conditional Rendering */}
       {isLoading ? (
         <LoadingSkeleton />
       ) : error ? (
@@ -117,7 +115,6 @@ function AcceptedOffers() {
                     </h2>
                   </div>
 
-                  {/* Agency Logos */}
                   {tour.offers && tour.offers.length > 0 && (
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row">
                       {tour.offers.slice(0, 3).map((offer, index) => (
@@ -129,7 +126,7 @@ function AcceptedOffers() {
                             {offer.status === "accepted" && (
                               <img
                                 src={img}
-                                alt="Badge"
+                                alt={t("badge")}
                                 className="absolute inset-0 object-contain rounded-full pointer-events-none z-10"
                               />
                             )}
@@ -138,7 +135,7 @@ function AcceptedOffers() {
                                 offer.agency?.logo_url ||
                                 "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                               }
-                              alt={offer.agency?.agency_name || "Agency"}
+                              alt={offer.agency?.agency_name || t("agency")}
                               className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
                             />
                           </div>
@@ -147,7 +144,6 @@ function AcceptedOffers() {
                     </div>
                   )}
 
-                  {/* Offers Completed Badge */}
                   {tour.offer_count >= 3 && (
                     <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
                       <svg
@@ -159,13 +155,12 @@ function AcceptedOffers() {
                       >
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                       </svg>
-                      Offers completed
+                      {t("offers_completed")}
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Card Content */}
               <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
                 <div className="flex items-center justify-between">
                   <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
@@ -177,33 +172,33 @@ function AcceptedOffers() {
 
                 <div className="space-y-1 text-md text-gray-700">
                   <p>
-                    <span className="font-medium">Date:</span> {tour.start_date}
+                    <span className="font-medium">{t("date")}:</span> {tour.start_date}
                   </p>
                   <p>
-                    <span className="font-medium">Category:</span>{" "}
+                    <span className="font-medium">{t("category")}:</span>{" "}
                     {tour.destination_type || "N/A"}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-xl font-semibold text-gray-900">
-                    Budget: €{tour.budget}
+                    {t("budget")}: €{tour.budget}
                   </p>
                 </div>
 
                 <div className="flex items-center space-x-10">
                   <span className="text-md text-gray-700">
-                    <span className="font-medium">Total:</span>{" "}
+                    <span className="font-medium">{t("total")}:</span>{" "}
                     {tour.total_members}{" "}
-                    {tour.total_members > 1 ? "people" : "person"}
+                    {tour.total_members > 1 ? t("people") : t("person")}
                   </span>
                   <div className="flex items-center space-x-4">
                     <h1 className="text-md text-gray-700">
-                      <span className="font-medium">Child :</span>{" "}
+                      <span className="font-medium">{t("child")} :</span>{" "}
                       {tour.child_count}
                     </h1>
                     <h1>
-                      <span className="font-medium">Adult :</span>{" "}
+                      <span className="font-medium">{t("adult")} :</span>{" "}
                       {tour.adult_count}
                     </h1>
                   </div>
@@ -213,7 +208,7 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
-                      <span className="font-medium">Points of travel:</span>{" "}
+                      <span className="font-medium">{t("points_of_travel")}:</span>{" "}
                       {tour.tourist_spots.length > 14
                         ? `${tour.tourist_spots.slice(0, 14)}...`
                         : tour.tourist_spots}
@@ -222,42 +217,42 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationArrow className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">Departure from:</span>{" "}
+                      <span className="font-medium">{t("departure_from")}:</span>{" "}
                       {tour.location_from || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">Meal plan:</span>{" "}
+                      <span className="font-medium">{t("meal_plan")}:</span>{" "}
                       {tour.meal_plan || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <IoBed className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">Type of accommodation:</span>{" "}
+                      <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
                       {tour.type_of_accommodation || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaStar className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">Minimum rating:</span>{" "}
+                      <span className="font-medium">{t("minimum_rating")}:</span>{" "}
                       {tour.minimum_star_hotel || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaClock className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">Duration:</span>{" "}
+                      <span className="font-medium">{t("duration")}:</span>{" "}
                       {tour.duration || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <ShieldCheck className="w-6 h-5 text-green-500" />
                     <span>
-                      <span className="font-medium">Contact verified via email</span>
+                      <span className="font-medium">{t("contact_verified")}</span>
                     </span>
                   </p>
                 </div>
@@ -268,7 +263,7 @@ function AcceptedOffers() {
                       onClick={handleSentOfferClick}
                       className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
                     >
-                      Sent Offer
+                      {t("sent_offer")}
                     </button>
                   </div>
                 )}

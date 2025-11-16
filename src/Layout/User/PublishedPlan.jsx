@@ -27,13 +27,14 @@ import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
 
 function PublishedPlan() {
+  const { t, i18n } = useTranslation();
   const { data: posts, isLoading, isError } = useGetPlansQuery();
-  console.log(posts, "posts");
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudget, setOfferBudget] = useState("");
   const [offerComment, setOfferComment] = useState("");
@@ -59,7 +60,6 @@ function PublishedPlan() {
     useGetPublicisResponseQuery(selectedUserId, {
       skip: !selectedUserId,
     });
-  console.log(showResponseData, "showResponseData");
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
     useInviteToChatMutation();
 
@@ -108,7 +108,7 @@ function PublishedPlan() {
   const handleLike = async (tourId) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to like a post");
+      toast.error(t("login_to_like"));
       return;
     }
 
@@ -123,33 +123,32 @@ function PublishedPlan() {
       }));
     } catch (error) {
       console.error("Failed to update like:", error);
-      toast.error("Failed to update like");
+      toast.error(t("failed_update_like"));
     }
   };
 
   const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
-    console.log(data); // Debug log for the data being sent
     if (!role) {
       navigate("/login");
-      toast.error("Please log in to send a message");
+      toast.error(t("login_to_message"));
       return;
     }
 
     try {
-      await invite({ ...data, other_user_id: data.other_user_id }).unwrap(); // Ensure data structure matches API expectation
-      toast.success("Chat invitation sent successfully!");
+      await invite({ ...data, other_user_id: data.other_user_id }).unwrap();
+      toast.success(t("chat_invitation_sent"));
       navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
     } catch (error) {
       console.error("Invite to chat error:", error);
-      toast.error(error?.data?.detail || "Failed to send chat invitation");
+      toast.error(error?.data?.detail || t("failed_send_invitation"));
     }
   };
 
   const handleShare = async (tourId) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to share a post");
+      toast.error(t("login_to_share"));
       return;
     }
 
@@ -157,7 +156,7 @@ function PublishedPlan() {
       await navigator.clipboard.writeText(
         `http://localhost:5173/post?postid=${tourId}`
       );
-      toast.success("Post link is copied");
+      toast.success(t("post_link_copied"));
 
       await interact({
         id: tourId,
@@ -170,7 +169,7 @@ function PublishedPlan() {
       }));
     } catch (error) {
       console.error("Failed to update share:", error);
-      toast.error("Failed to copy link or update share");
+      toast.error(t("failed_copy_link"));
     }
   };
 
@@ -189,12 +188,12 @@ function PublishedPlan() {
   const handleSubmitOffer = async (tourId, budget, comment) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to submit an offer");
+      toast.error(t("login_to_submit_offer"));
       return;
     }
 
     if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
+      toast.error(t("provide_budget_and_comment"));
       return;
     }
 
@@ -204,12 +203,12 @@ function PublishedPlan() {
         data: { offered_budget: parseFloat(budget), message: comment },
       }).unwrap();
 
-      toast.success("Offer submitted successfully");
+      toast.success(t("offer_submitted"));
       setOfferBudget("");
       setOfferComment("");
     } catch (error) {
       console.error("Failed to submit offer:", error);
-      toast.error(error.data?.detail || "Failed to submit offer");
+      toast.error(error.data?.detail || t("failed_submit_offer"));
     }
   };
 
@@ -242,7 +241,6 @@ function PublishedPlan() {
     setSelectedUserId(userId);
     setShowAgencyModal(true);
     setShowReviews(false);
-    console.log(offer, userId, "offer and userId");
   };
 
   const handleReviewsClick = () => {
@@ -275,7 +273,7 @@ function PublishedPlan() {
   if (isError)
     return (
       <div className="text-center text-red-600 text-base sm:text-lg">
-        Error loading plans
+        {t("error_loading_plans")}
       </div>
     );
 
@@ -287,7 +285,7 @@ function PublishedPlan() {
     return (
       <div className="w-full rounded-xl p-4 flex justify-center items-center">
         <p className="text-[#70798F] text-base sm:text-lg">
-          No published plans available
+          {t("no_published_plans")}
         </p>
       </div>
     );
@@ -295,12 +293,12 @@ function PublishedPlan() {
   const handleDelete = async (id) => {
     try {
       await deletePublishPlan(id).unwrap();
-      toast.success("Plan deleted successfully!", {
+      toast.success(t("plan_deleted"), {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      toast.error("Failed to delete plan!", {
+      toast.error(t("failed_delete_plan"), {
         position: "top-right",
         autoClose: 3000,
       });
@@ -321,23 +319,29 @@ function PublishedPlan() {
                     <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
                       <div>
                         <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
-                          Tour from {plan.location_from} to {plan.location_to}
+                          {t("tour_from_to", {
+                            from: plan.location_from,
+                            to: plan.location_to,
+                          })}
                         </h2>
                         <div className="space-y-1 text-xs sm:text-sm text-gray-600">
                           <p>
-                            Willing to go on{" "}
+                            {t("willing_to_go")}{" "}
                             <span className="font-medium">
-                              {plan.start_date}
+                              {new Date(plan.start_date).toLocaleDateString(
+                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                { day: "numeric", month: "long", year: "numeric" }
+                              )}
                             </span>
                           </p>
                           <p>
-                            Duration:{" "}
+                            {t("duration")}:{" "}
                             <span className="font-medium">
-                              {plan.duration} Days
+                              {plan.duration} {t("days")}
                             </span>
                           </p>
                           <p>
-                            Category:{" "}
+                            {t("category")}:{" "}
                             <span className="font-medium">{plan.category}</span>
                           </p>
                         </div>
@@ -345,11 +349,13 @@ function PublishedPlan() {
                       <div className="flex items-center relative mt-4 sm:mt-0">
                         <div>
                           <p className="text-base sm:text-lg font-bold text-gray-700">
-                            Budget ${plan.budget}
+                            {t("budget")} ${plan.budget}
                           </p>
                           <p className="text-xs sm:text-md text-gray-800">
-                            Total {plan.total_members} person
-                            {plan.total_members > 1 ? "s" : ""}
+                            {t("total_members", {
+                              count: plan.total_members,
+                              suffix: plan.total_members > 1 ? "s" : "",
+                            })}
                           </p>
                         </div>
                         <button
@@ -375,8 +381,8 @@ function PublishedPlan() {
                               disabled={isDeletePublishPlan}
                             >
                               {isDeletePublishPlan
-                                ? "Deleting..."
-                                : "Delete Plan"}
+                                ? t("deleting")
+                                : t("delete_plan")}
                             </button>
                           </div>
                         )}
@@ -389,7 +395,7 @@ function PublishedPlan() {
                     </div>
                     <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                       <p className="text-xs sm:text-sm font-medium text-gray-700">
-                        Interested Travel Points:
+                        {t("interested_travel_points")}:
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {plan.tourist_spots ? (
@@ -406,7 +412,7 @@ function PublishedPlan() {
                           ))
                         ) : (
                           <span className="text-xs sm:text-sm text-gray-500">
-                            None specified
+                            {t("none_specified")}
                           </span>
                         )}
                       </div>
@@ -419,73 +425,10 @@ function PublishedPlan() {
                           plan.spot_picture_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                         }
-                        alt="Tour destination"
+                        alt={t("tour_destination")}
                         className="w-full h-64 sm:h-96 object-cover"
                       />
-                      {/* <h1 className="text-[20px] left-2/6 absolute bottom-2  font-semibold text-white ">
-                        Image generated automatically
-                      </h1> */}
                     </div>
-                    {/* <div className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center">
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
-                            <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
-                          </div>
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
-                            <Heart className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
-                          </div>
-                        </div>
-                        <span className="text-xs sm:text-sm text-gray-600 ml-2">
-                          {likeCount} Likes
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                        <span>{plan.offers?.length || 0} Offers</span>
-                        <span>{shareCount} Shares</span>
-                      </div>
-                    </div> */}
-                    {/* <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <div className="flex items-center gap-3 sm:gap-4 w-full justify-around sm:w-auto sm:justify-start">
-                        <button
-                          onClick={() => handleLike(plan.id)}
-                          disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                            isLiked[plan.id] ? "text-blue-600" : "text-gray-600"
-                          } hover:text-blue-600 transition-colors hover:cursor-pointer`}
-                        >
-                          <ThumbsUp
-                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                              isLiked[plan.id] ? "fill-current" : ""
-                            }`}
-                          />
-                          <span>{isLiked[plan.id] ? "Unlike" : "Like"}</span>
-                        </button>
-                        <button
-                          onClick={() => openPopup(plan)}
-                          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                        >
-                          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span>Comments</span>
-                        </button>
-                        <button
-                          onClick={() => handleShare(plan.id)}
-                          disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                            isShared[plan.id]
-                              ? "text-gray-600"
-                              : "text-gray-600"
-                          } hover:text-blue-600 transition-colors`}
-                        >
-                          <Share2
-                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                              isShared[plan.id] ? "" : ""
-                            }`}
-                          />
-                          <span>{isShared[plan.id] ? "Share" : "Share"}</span>
-                        </button>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
                 <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
@@ -494,12 +437,12 @@ function PublishedPlan() {
                       <div>
                         <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 pt-3 flex items-center space-x-2">
                           <GoArrowLeft />
-                          <p>All Offers</p>
+                          <p>{t("all_offers")}</p>
                         </h3>
                       </div>
                       <div className="flex items-center space-x-8 sm:space-x-16 pt-2">
                         <div className="text-xs sm:text-sm text-gray-600">
-                          Offered Budget
+                          {t("offered_budget")}
                         </div>
                       </div>
                     </div>
@@ -522,7 +465,7 @@ function PublishedPlan() {
                                   offer.agency.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
-                                alt={`${offer.company} avatar`}
+                                alt={t("agency_avatar", { name: offer.company })}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
                               <div>
@@ -539,7 +482,7 @@ function PublishedPlan() {
                                           }
                                           className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                         >
-                                          See More
+                                          {t("see_more")}
                                         </button>
                                       )}
                                     {isTruncated &&
@@ -550,7 +493,7 @@ function PublishedPlan() {
                                           }
                                           className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                         >
-                                          Show Less
+                                          {t("show_less")}
                                         </button>
                                       )}
                                   </span>
@@ -570,7 +513,7 @@ function PublishedPlan() {
                             <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold text-base sm:text-xl">
-                                  💰 {offer.offered_budget}
+                                  {offer.offered_budget}
                                 </span>
                               </div>
                               <button
@@ -579,7 +522,7 @@ function PublishedPlan() {
                                 }
                                 className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                               >
-                                Response
+                                {t("response")}
                               </button>
                             </div>
                           </div>
@@ -587,7 +530,7 @@ function PublishedPlan() {
                       })
                     ) : (
                       <div className="text-gray-600 text-xs sm:text-sm">
-                        No offers available
+                        {t("no_offers_available")}
                       </div>
                     )}
                     <div className="border-t border-gray-200 my-4"></div>
@@ -605,7 +548,7 @@ function PublishedPlan() {
           <div className="bg-white rounded-lg w-full max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-200">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Tour Details
+                {t("tour_details")}
               </h2>
               <button
                 onClick={closePopup}
@@ -621,24 +564,29 @@ function PublishedPlan() {
                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
                       <div className="flex-1">
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
-                          Tour from {selectedTour.location_from} to{" "}
-                          {selectedTour.location_to}
+                          {t("tour_from_to", {
+                            from: selectedTour.location_from,
+                            to: selectedTour.location_to,
+                          })}
                         </h2>
                         <div className="space-y-1 text-xs sm:text-sm text-gray-600">
                           <p>
-                            Willing to go on{" "}
+                            {t("willing_to_go")}{" "}
                             <span className="font-medium">
-                              {selectedTour.start_date}
+                              {new Date(selectedTour.start_date).toLocaleDateString(
+                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                { day: "numeric", month: "long", year: "numeric" }
+                              )}
                             </span>
                           </p>
                           <p>
-                            Duration:{" "}
+                            {t("duration")}:{" "}
                             <span className="font-medium">
-                              {selectedTour.duration} Days
+                              {selectedTour.duration} {t("days")}
                             </span>
                           </p>
                           <p>
-                            Category:{" "}
+                            {t("category")}:{" "}
                             <span className="font-medium">
                               {selectedTour.category}
                             </span>
@@ -648,11 +596,13 @@ function PublishedPlan() {
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                         <div>
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                            Budget ${selectedTour.budget}
+                            {t("budget")} ${selectedTour.budget}
                           </p>
                           <p className="text-xs sm:text-sm text-gray-800">
-                            Total {selectedTour.total_members} person
-                            {selectedTour.total_members > 1 ? "s" : ""}
+                            {t("total_members", {
+                              count: selectedTour.total_members,
+                              suffix: selectedTour.total_members > 1 ? "s" : "",
+                            })}
                           </p>
                         </div>
                       </div>
@@ -664,7 +614,7 @@ function PublishedPlan() {
                     </div>
                     <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                       <p className="text-xs sm:text-sm font-medium text-gray-600">
-                        Interested Travel Points:
+                        {t("interested_travel_points")}:
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {selectedTour.tourist_spots ? (
@@ -683,7 +633,7 @@ function PublishedPlan() {
                             ))
                         ) : (
                           <span className="text-xs sm:text-sm text-gray-600">
-                            None
+                            {t("none")}
                           </span>
                         )}
                       </div>
@@ -694,7 +644,7 @@ function PublishedPlan() {
                           selectedTour.spot_picture_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
-                        alt="Tour destination"
+                        alt={t("tour_destination")}
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                       />
                     </div>
@@ -709,13 +659,13 @@ function PublishedPlan() {
                           </div>
                         </div>
                         <span className="text-xs sm:text-sm text-gray-600 ml-2">
-                          {getInteractionCounts(selectedTour).likeCount} Likes
+                          {getInteractionCounts(selectedTour).likeCount} {t("likes")}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                        <span>{selectedTour.offers?.length || 0} Offers</span>
+                        <span>{selectedTour.offers?.length || 0} {t("offers")}</span>
                         <span>
-                          {getInteractionCounts(selectedTour).shareCount} Shares
+                          {getInteractionCounts(selectedTour).shareCount} {t("shares")}
                         </span>
                       </div>
                     </div>
@@ -736,7 +686,7 @@ function PublishedPlan() {
                             }`}
                           />
                           <span>
-                            {isLiked[selectedTour.id] ? "Unlike" : "Like"}
+                            {isLiked[selectedTour.id] ? t("unlike") : t("like")}
                           </span>
                         </button>
                         <button
@@ -744,7 +694,7 @@ function PublishedPlan() {
                           className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                         >
                           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span>Comments</span>
+                          <span>{t("comments")}</span>
                         </button>
                         <button
                           onClick={() => handleShare(selectedTour.id)}
@@ -761,7 +711,7 @@ function PublishedPlan() {
                             }`}
                           />
                           <span>
-                            {isShared[selectedTour.id] ? "Unshare" : "Share"}
+                            {isShared[selectedTour.id] ? t("unshare") : t("share")}
                           </span>
                         </button>
                       </div>
@@ -773,24 +723,24 @@ function PublishedPlan() {
                             localStorage.getItem("user_image") ||
                             "https://res.cloudinary.com/dpi0t9wfn/image/upload/v1741443124/samples/smile.jpg"
                           }
-                          alt="User avatar"
+                          alt={t("user_avatar")}
                           className="rounded-full w-10 h-10 sm:w-11 sm:h-11"
                         />
                       </div>
                       <div className="flex-1 w-full">
                         <p className="text-base sm:text-lg font-medium text-gray-700 mb-2">
-                          Place your offer
+                          {t("place_your_offer")}
                         </p>
                         <div className="flex flex-col gap-3">
                           <input
                             type="number"
-                            placeholder="Enter your budget"
+                            placeholder={t("enter_your_budget")}
                             value={offerBudget}
                             onChange={(e) => setOfferBudget(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                           />
                           <textarea
-                            placeholder="Enter your comment"
+                            placeholder={t("enter_your_comment")}
                             value={offerComment}
                             onChange={(e) => setOfferComment(e.target.value)}
                             className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
@@ -812,7 +762,7 @@ function PublishedPlan() {
                             disabled={!offerBudget || !offerComment.trim()}
                           >
                             <IoIosSend size={20} />
-                            <span>Submit Offer</span>
+                            <span>{t("submit_offer")}</span>
                           </button>
                         </div>
                       </div>
@@ -835,7 +785,7 @@ function PublishedPlan() {
                                     offer.image ||
                                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                   }
-                                  alt={`${offer.company} avatar`}
+                                  alt={t("agency_avatar", { name: offer.company })}
                                   className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                                 />
                                 <div>
@@ -852,7 +802,7 @@ function PublishedPlan() {
                                             }
                                             className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                           >
-                                            See More
+                                            {t("see_more")}
                                           </button>
                                         )}
                                       {isTruncated &&
@@ -863,7 +813,7 @@ function PublishedPlan() {
                                             }
                                             className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
                                           >
-                                            Show Less
+                                            {t("show_less")}
                                           </button>
                                         )}
                                     </span>
@@ -883,7 +833,7 @@ function PublishedPlan() {
                               <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                                 <div className="flex items-center gap-2">
                                   <span className="font-semibold text-base sm:text-xl">
-                                    💰 {offer.offered_budget}
+                                    {offer.offered_budget}
                                   </span>
                                 </div>
                                 <button
@@ -895,7 +845,7 @@ function PublishedPlan() {
                                   }
                                   className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                                 >
-                                  Response
+                                  {t("response")}
                                 </button>
                               </div>
                             </div>
@@ -903,7 +853,7 @@ function PublishedPlan() {
                         })
                       ) : (
                         <div className="text-gray-600 text-xs sm:text-sm">
-                          No offers available
+                          {t("no_offers_available")}
                         </div>
                       )}
                     </div>
@@ -920,7 +870,6 @@ function PublishedPlan() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 sm:p-6">
           <div className="bg-white rounded-lg w-full max-w-[95vw] sm:max-w-[90vh] max-h-[80vh] overflow-hidden">
             <div className="flex flex-col sm:flex-row h-auto sm:h-[450px]">
-              {/* Left Image & Close Button */}
               <div className="w-full sm:w-1/2 relative">
                 <button
                   onClick={() => {
@@ -930,19 +879,18 @@ function PublishedPlan() {
                   className="absolute top-4 left-4 bg-gray-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-r-full flex items-center gap-2 z-10 cursor-pointer transition-colors"
                 >
                   <GoArrowLeft className="w-4 h-4" />
-                  Back
+                  {t("back")}
                 </button>
                 <img
                   src={
                     showResponseData?.cover_photo_url ||
                     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529170/samples/landscapes/nature-mountains.jpg"
                   }
-                  alt="Agency"
+                  alt={t("agency_cover")}
                   className="w-full h-48 sm:h-full object-cover"
                 />
               </div>
 
-              {/* Right Content */}
               <div className="w-full sm:w-1/2 p-4 sm:p-6 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3 sm:gap-4">
@@ -953,7 +901,7 @@ function PublishedPlan() {
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529167/samples/ecommerce/analog-classic.jpg"
                         }
                         className="rounded-full w-12 h-12 sm:w-16 sm:h-16 object-cover"
-                        alt="Agency Logo"
+                        alt={t("agency_logo")}
                       />
                     </div>
                     <div>
@@ -971,7 +919,7 @@ function PublishedPlan() {
                             onClick={handleReviewsClick}
                             className="text-xs sm:text-sm text-blue-600 hover:underline cursor-pointer"
                           >
-                            Reviews
+                            {t("reviews")}
                           </button>
                           <span className="text-xs sm:text-sm text-gray-600">
                             )
@@ -982,37 +930,32 @@ function PublishedPlan() {
                   </div>
                 </div>
 
-                {/* Description */}
                 <div className="mb-4 sm:mb-6 flex-1">
                   <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                     {showResponseData?.about ||
-                      "Aspen is as close as one can get to a storybook alpine town in America..."}
+                      t("default_agency_description")}
                   </p>
                 </div>
 
                 <div className="mb-2">
                   <h1 className="flex items-center">
-                    {" "}
                     <Mail className="w-4 h-4 text-blue-600 mr-1" />{" "}
                     {showResponseData?.contact_email}
                   </h1>
                   <h1 className="flex items-center">
-                    {" "}
                     <Phone className="w-4 h-4 text-green-600 mr-1" />{" "}
                     {showResponseData?.contact_phone}
                   </h1>
                   <h1 className="flex items-center">
-                    {" "}
                     <MapPin className="w-4 h-4 text-red-600 mr-1" />{" "}
                     {showResponseData?.address}
                   </h1>
                 </div>
 
-                {/* Facilities */}
-                <div className=" flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
-                      Facilities
+                      {t("facilities")}
                     </h3>
                     <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">
@@ -1030,35 +973,10 @@ function PublishedPlan() {
                       </div>
                     </div>
                   </div>
-                  {/* <div>
-                    <button
-                      onClick={() => {
-                        if (!token) {
-                          navigate("/login");
-                        } else {
-                          handleMessage({ other_user_id: selectedUserId });
-                        }
-                      }}
-                      disabled={isInviteLoading}
-                      className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
-                    >
-                      {isInviteLoading ? (
-                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      ) : (
-                        <>
-                          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                          <span className="text-sm sm:text-base font-medium">
-                            Message
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  </div> */}
                 </div>
               </div>
             </div>
 
-            {/* AnimatePresence block for Reviews */}
             <AnimatePresence>
               {showReviews && (
                 <motion.div
@@ -1082,7 +1000,7 @@ function PublishedPlan() {
                       transition={{ duration: 0.3, delay: 0.3 }}
                     >
                       <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4 -mt-5">
-                        Recent Reviews
+                        {t("recent_reviews")}
                       </h3>
                       <div className="space-y-4 max-h-56 overflow-y-auto">
                         <div className="text-gray-600 text-xs sm:text-sm">
@@ -1132,7 +1050,7 @@ function PublishedPlan() {
                                           <span className="text-xs sm:text-sm text-gray-500 italic">
                                             {new Date(
                                               review.created_at
-                                            ).toLocaleDateString("en-GB", {
+                                            ).toLocaleDateString(i18n.language === 'it' ? 'it-IT' : 'en-GB', {
                                               day: "numeric",
                                               month: "long",
                                               year: "numeric",
@@ -1147,7 +1065,7 @@ function PublishedPlan() {
                                   </div>
                                 )
                               )
-                            : "No reviews available"}
+                            : t("no_reviews_available")}
                         </div>
                       </div>
                     </motion.div>

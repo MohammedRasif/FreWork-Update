@@ -34,8 +34,10 @@ import {
 } from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import AdminNotification from "../Admin/AdminNotification";
+import { useTranslation } from "react-i18next";
 
 export default function UserDashboardLayout() {
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -82,7 +84,7 @@ export default function UserDashboardLayout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.new_password !== formData.confirm_password) {
-      toast.error("New password and confirm password do not match!");
+      toast.error(t("passwords_do_not_match"));
       return;
     }
     try {
@@ -90,7 +92,7 @@ export default function UserDashboardLayout() {
         current_password: formData.current_password,
         new_password: formData.new_password,
       }).unwrap();
-      toast.success("Password changed successfully!");
+      toast.success(t("password_changed_success"));
       setFormData({
         current_password: "",
         new_password: "",
@@ -98,7 +100,7 @@ export default function UserDashboardLayout() {
       });
       handleClosePopup();
     } catch (error) {
-      toast.error(error?.data?.error || "Failed to change password");
+      toast.error(error?.data?.error || t("failed_to_change_password"));
     }
   };
 
@@ -111,7 +113,7 @@ export default function UserDashboardLayout() {
   };
 
   const handleItemClick = (itemName, path) => {
-    if (itemName === "Logout") {
+    if (itemName === t("logout")) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("name");
@@ -121,7 +123,7 @@ export default function UserDashboardLayout() {
       localStorage.removeItem("userType");
       localStorage.removeItem("user_image");
       navigate(path);
-    } else if (itemName === "Change password") {
+    } else if (itemName === t("change_password")) {
       setIsChangePasswordOpen(true);
     } else {
       setSelectedItem(itemName);
@@ -170,8 +172,6 @@ export default function UserDashboardLayout() {
 
     ws.current.onerror = (error) => {
       console.error("WebSocket error:", error);
-      if (error.message) console.error("Error message:", error.message);
-      if (error.code) console.error("Error code:", error.code);
     };
 
     ws.current.onclose = () => {
@@ -198,23 +198,11 @@ export default function UserDashboardLayout() {
     const profileRoutes = ["/user/profile", "/user/editProfile"];
 
     if (myPlansRoutes.includes(normalizedLocation)) {
-      setSelectedItem("My Plans");
-      console.log(
-        "normalizedLocation:",
-        normalizedLocation,
-        "selectedItem:",
-        "My Plans"
-      );
+      setSelectedItem(t("my_plans"));
       return;
     }
     if (profileRoutes.includes(normalizedLocation)) {
-      setSelectedItem("Profile");
-      console.log(
-        "normalizedLocation:",
-        normalizedLocation,
-        "selectedItem:",
-        "Profile"
-      );
+      setSelectedItem(t("profile"));
       return;
     }
     let currentItem = menuItems[0].items.find((item) => {
@@ -228,22 +216,10 @@ export default function UserDashboardLayout() {
     });
     if (currentItem) {
       setSelectedItem(currentItem.name);
-      console.log(
-        "normalizedLocation:",
-        normalizedLocation,
-        "selectedItem:",
-        currentItem.name
-      );
     } else {
       setSelectedItem(null);
-      console.log(
-        "normalizedLocation:",
-        normalizedLocation,
-        "selectedItem:",
-        null
-      );
     }
-  }, [location.pathname]);
+  }, [location.pathname, t]);
 
   // Close mobile menu and notification dropdown when route changes
   useEffect(() => {
@@ -285,28 +261,26 @@ export default function UserDashboardLayout() {
     {
       items: [
         {
-          name: "My Plans",
+          name: t("my_plans"),
           icon: <ClipboardList size={20} />,
           path: "/user",
           exact: true,
         },
         {
-          name: "Profile",
+          name: t("profile"),
           icon: <UserRound size={20} />,
           path: "/user/profile",
         },
         {
-          name: "Conversations",
+          name: t("conversations"),
           icon: <MessageCircle size={20} />,
           path: "/user/chat",
         },
-
-        { name: "Logout", icon: <LogOut size={20} />, path: "/" },
+        { name: t("logout"), icon: <LogOut size={20} />, path: "/" },
       ],
     },
   ];
 
-  // Dropdown animation variants
   const dropdownVariants = {
     closed: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
     open: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
@@ -327,7 +301,7 @@ export default function UserDashboardLayout() {
       >
         <NavLink to="/" className="w-full">
           <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
-            <img src={img} className="h-full" alt="Logo" />
+            <img src={img} className="h-full" alt={t("logo")} />
           </div>
         </NavLink>
         {!isProfileLoading && profileData && (
@@ -346,7 +320,7 @@ export default function UserDashboardLayout() {
                       profileData.profile_picture_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt="User"
+                    alt={t("user_avatar")}
                     className="w-16 h-16 rounded-full"
                   />
                 </div>
@@ -361,7 +335,7 @@ export default function UserDashboardLayout() {
                   {profileData.first_name + " " + profileData.last_name}
                 </h3>
                 <span className="text-center text-lg font-bold text-[#343E4B]">
-                  {profileData.profession || "User"}
+                  {profileData.profession || t("user")}
                 </span>
               </div>
             </div>
@@ -397,18 +371,6 @@ export default function UserDashboardLayout() {
                       >
                         {item.name}
                       </span>
-                      {item.badge && !isCollapsed && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
-                          {item.badge}
-                        </span>
-                      )}
-                      {item.name === "Notifications" &&
-                        unreadCount > 0 &&
-                        !isCollapsed && (
-                          <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
-                            {unreadCount}
-                          </span>
-                        )}
                     </NavLink>
                   </li>
                 ))}
@@ -421,16 +383,16 @@ export default function UserDashboardLayout() {
             </div>
             <div className="w-full flex flex-col gap-1">
               <h3 className="font-open-sans text-base font-semibold text-white">
-                Need Help
+                {t("need_help")}
               </h3>
               <h5 className="font-open-sans text-sm font-normal text-white">
-                Please check our docs
+                {t("check_our_docs")}
               </h5>
               <Button
                 variant="secondary"
                 className="bg-white text-gray-800 hover:bg-gray-100"
               >
-                DOCUMENTATION
+                {t("documentation")}
               </Button>
             </div>
           </div>
@@ -444,10 +406,11 @@ export default function UserDashboardLayout() {
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-[#343E4B]">Menu</h2>
+          <h2 className="text-lg font-semibold text-[#343E4B]">{t("menu")}</h2>
           <button
             onClick={toggleMobileMenu}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            title={t("close")}
           >
             <X size={20} />
           </button>
@@ -456,7 +419,7 @@ export default function UserDashboardLayout() {
           <div className="flex flex-col w-full justify-center items-center">
             <NavLink to="/" className="w-full">
               <div className="font-bold lg:h-11 h-8 text-gray-800 mt-5 mb-5 flex items-center justify-center">
-                <img src={img} className="h-full" alt="Logo" />
+                <img src={img} className="h-full" alt={t("logo")} />
               </div>
             </NavLink>
             <div className="relative">
@@ -466,7 +429,7 @@ export default function UserDashboardLayout() {
                     (!isProfileLoading && profileData?.profile_picture_url) ||
                     UserAvatar
                   }
-                  alt="User"
+                  alt={t("user_avatar")}
                   className="w-full h-full rounded-full"
                 />
               </div>
@@ -479,14 +442,14 @@ export default function UserDashboardLayout() {
             <div className="w-full flex flex-col gap-1 pl-3 mt-4">
               <h3 className="text-xl text-center font-normal text-[#343E4B]">
                 {isProfileLoading
-                  ? "Loading..."
+                  ? t("loading")
                   : profileData?.first_name + " " + profileData?.last_name ||
-                    "User"}
+                    t("user")}
               </h3>
               <span className="text-center text-sm text-[#8C8C8C]">
                 {isProfileLoading
-                  ? "Loading..."
-                  : profileData?.profession || "User"}
+                  ? t("loading")
+                  : profileData?.profession || t("user")}
               </span>
             </div>
           </div>
@@ -515,16 +478,6 @@ export default function UserDashboardLayout() {
                       <span className="text-md font-semibold whitespace-nowrap">
                         {item.name}
                       </span>
-                      {item.badge && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
-                          {item.badge}
-                        </span>
-                      )}
-                      {item.name === "Notifications" && unreadCount > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">
-                          {unreadCount}
-                        </span>
-                      )}
                     </NavLink>
                   </li>
                 ))}
@@ -537,16 +490,16 @@ export default function UserDashboardLayout() {
             </div>
             <div className="w-full flex flex-col gap-1">
               <h3 className="font-open-sans text-base font-semibold text-white">
-                Need Help
+                {t("need_help")}
               </h3>
               <h5 className="font-open-sans text-sm font-normal text-white">
-                Please check our docs
+                {t("check_our_docs")}
               </h5>
               <Button
                 variant="secondary"
                 className="bg-white text-gray-800 hover:bg-gray-100"
               >
-                DOCUMENTATION
+                {t("documentation")}
               </Button>
             </div>
           </div>
@@ -560,6 +513,7 @@ export default function UserDashboardLayout() {
               <button
                 onClick={toggleMobileMenu}
                 className="mobile-menu-button lg:hidden p-2 hover:bg-gray-200 rounded-full transition-colors duration-300"
+                title={t("open_menu")}
               >
                 <Menu size={20} />
               </button>
@@ -569,6 +523,7 @@ export default function UserDashboardLayout() {
                 <button
                   onClick={toggleNotificationDropdown}
                   className="p-2 rounded-full relative z-10 hover:bg-gray-200 transition-colors duration-200"
+                  title={t("notifications")}
                 >
                   <Bell size={20} className="sm:w-6 sm:h-6" />
                   {unreadCount > 0 && (
@@ -592,27 +547,27 @@ export default function UserDashboardLayout() {
                 </AnimatePresence>
               </div>
               <div className="hidden sm:flex items-center justify-center gap-5">
-                <h4 className="text-xl font-medium">Settings</h4>
+                <h4 className="text-xl font-medium">{t("settings")}</h4>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="cursor-pointer">
+                    <button className="cursor-pointer" title={t("more_options")}>
                       <ChevronDown size={20} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
                     <DropdownMenuItem
                       onClick={() =>
-                        handleItemClick("Contact support", "/user/support")
+                        handleItemClick(t("contact_support"), "/user/support")
                       }
                     >
                       <Mail size={20} />
-                      Contact support
+                      {t("contact_support")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleItemClick("Change password", "")}
+                      onClick={() => handleItemClick(t("change_password"), "")}
                     >
                       <Lock size={20} />
-                      Change password
+                      {t("change_password")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -620,32 +575,32 @@ export default function UserDashboardLayout() {
               <div className="sm:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="cursor-pointer p-2">
+                    <button className="cursor-pointer p-2" title={t("more_options")}>
                       <ChevronDown size={16} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
                     <DropdownMenuItem
                       onClick={() =>
-                        handleItemClick("Upgrade package", "/user/upgrade")
+                        handleItemClick(t("upgrade_package"), "/user/upgrade")
                       }
                     >
                       <CircleArrowUp size={20} />
-                      Upgrade package
+                      {t("upgrade_package")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() =>
-                        handleItemClick("Contact support", "/user/support")
+                        handleItemClick(t("contact_support"), "/user/support")
                       }
                     >
                       <Mail size={20} />
-                      Contact support
+                      {t("contact_support")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleItemClick("Change password", "")}
+                      onClick={() => handleItemClick(t("change_password"), "")}
                     >
                       <Lock size={20} />
-                      Change password
+                      {t("change_password")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -662,11 +617,12 @@ export default function UserDashboardLayout() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Change Password</h2>
+                <h2 className="text-lg font-semibold">{t("change_password")}</h2>
                 <button
                   onClick={handleClosePopup}
                   className="text-gray-500 hover:text-gray-700"
                   disabled={isChangePasswordLoading}
+                  title={t("close")}
                 >
                   <X size={20} />
                 </button>
@@ -674,14 +630,14 @@ export default function UserDashboardLayout() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
                   <label className="block text-sm font-medium text-gray-700">
-                    Old password
+                    {t("old_password")}
                   </label>
                   <input
                     type={showPasswords.current_password ? "text" : "password"}
                     name="current_password"
                     value={formData.current_password}
                     onChange={handleInputChange}
-                    placeholder="Enter Password"
+                    placeholder={t("enter_password")}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
                     required
                   />
@@ -689,6 +645,7 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("current_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                    title={showPasswords.current_password ? t("hide_password") : t("show_password")}
                   >
                     {showPasswords.current_password ? (
                       <EyeOff size={20} className="text-gray-500" />
@@ -699,14 +656,14 @@ export default function UserDashboardLayout() {
                 </div>
                 <div className="relative">
                   <label className="block text-sm font-medium text-gray-700">
-                    New password
+                    {t("new_password")}
                   </label>
                   <input
                     type={showPasswords.new_password ? "text" : "password"}
                     name="new_password"
                     value={formData.new_password}
                     onChange={handleInputChange}
-                    placeholder="Enter Password"
+                    placeholder={t("enter_password")}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
                     required
                   />
@@ -714,6 +671,7 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("new_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                    title={showPasswords.new_password ? t("hide_password") : t("show_password")}
                   >
                     {showPasswords.new_password ? (
                       <EyeOff size={20} className="text-gray-500" />
@@ -724,14 +682,14 @@ export default function UserDashboardLayout() {
                 </div>
                 <div className="relative">
                   <label className="block text-sm font-medium text-gray-700">
-                    Confirm new password
+                    {t("confirm_new_password")}
                   </label>
                   <input
                     type={showPasswords.confirm_password ? "text" : "password"}
                     name="confirm_password"
                     value={formData.confirm_password}
                     onChange={handleInputChange}
-                    placeholder="Enter Password"
+                    placeholder={t("enter_password")}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
                     required
                   />
@@ -739,6 +697,7 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("confirm_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
+                    title={showPasswords.confirm_password ? t("hide_password") : t("show_password")}
                   >
                     {showPasswords.confirm_password ? (
                       <EyeOff size={20} className="text-gray-500" />
@@ -752,7 +711,7 @@ export default function UserDashboardLayout() {
                   className="w-full bg-blue-600 text-white py-2 rounded-md disabled:bg-blue-400"
                   disabled={isChangePasswordLoading}
                 >
-                  {isChangePasswordLoading ? "Processing..." : "Confirm"}
+                  {isChangePasswordLoading ? t("processing") : t("confirm")}
                 </button>
               </form>
             </div>

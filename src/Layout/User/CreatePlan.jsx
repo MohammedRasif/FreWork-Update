@@ -9,11 +9,13 @@ import {
 } from "@/redux/features/withAuth";
 import { Toaster, toast } from "react-hot-toast";
 import FullScreenInfinityLoader from "@/lib/Loading";
+import { useTranslation } from "react-i18next";
 
 // Global flag to ensure Google Maps script loads only once
 let isGoogleScriptLoaded = false;
 
 const CreatePlan = () => {
+  const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -32,16 +34,15 @@ const CreatePlan = () => {
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
-  const budgetRef = useRef(null); // Ref for budget input
-  const [showBudgetMessage, setShowBudgetMessage] = useState(false); // State for message visibility
-  const [isPopupOpened, setIsPopupOpened] = useState(false); // Track page load state
+  const budgetRef = useRef(null);
+  const [showBudgetMessage, setShowBudgetMessage] = useState(false);
+  const [isPopupOpened, setIsPopupOpened] = useState(false);
 
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
     state?.id,
     { skip: !state?.id }
   );
 
-  // Populate form with data when oldData is available
   useEffect(() => {
     if (state?.id && oldData) {
       setValue("name", oldData.name || "");
@@ -73,85 +74,64 @@ const CreatePlan = () => {
       setValue("mealPlan", oldData.meal_plan || "");
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
-    // Set isPopupOpened to true when the component mounts
     setIsPopupOpened(true);
   }, [state?.id, oldData, setValue]);
 
-  // Load Google Maps script and initialize autocomplete
   useEffect(() => {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
         console.error("Google Maps Places API is not available");
-        toast.error("Google Maps Places API is not available");
+        toast.error(t("google_maps_error"));
         return;
       }
-      console.log("Initializing autocomplete...");
 
       if (locationFromRef.current) {
-        console.log("Setting up autocomplete for locationFrom");
         const fromAutocomplete = new window.google.maps.places.Autocomplete(
           locationFromRef.current
         );
         fromAutocomplete.addListener("place_changed", () => {
           const place = fromAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
-          console.log("locationFrom selected:", locationValue);
           setValue("locationFrom", locationValue);
         });
-      } else {
-        console.warn("locationFromRef is null");
       }
 
       if (locationToRef.current) {
-        console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
           locationToRef.current
         );
         toAutocomplete.addListener("place_changed", () => {
           const place = toAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
-          console.log("locationTo selected:", locationValue);
           setValue("locationTo", locationValue);
         });
-      } else {
-        console.warn("locationToRef is null");
       }
     };
 
     if (!isGoogleScriptLoaded && !window.google) {
       isGoogleScriptLoaded = true;
-      console.log("Loading Google Maps script...");
       const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        console.log("Google Maps script loaded successfully");
         setTimeout(initAutocomplete, 100);
       };
       script.onerror = () => {
-        console.error("Failed to load Google Maps API");
-        toast.error("Failed to load Google Maps API");
+        toast.error(t("google_maps_load_error"));
       };
       document.head.appendChild(script);
     } else if (window.google) {
-      console.log("Google Maps already loaded, initializing autocomplete...");
       setTimeout(initAutocomplete, 100);
     }
+  }, [setValue, t]);
 
-    return () => {
-      // Cleanup
-    };
-  }, [setValue]);
-
-  // Handle focus change to hide budget message when moving to another field
   useEffect(() => {
     const handleFocusChange = (e) => {
       if (budgetRef.current && e.target !== budgetRef.current) {
         setShowBudgetMessage(false);
       }
     };
-
     document.addEventListener("focus", handleFocusChange, true);
     return () => {
       document.removeEventListener("focus", handleFocusChange, true);
@@ -160,12 +140,12 @@ const CreatePlan = () => {
 
   const onSubmit = async (data, status) => {
     if (data.endingDate < data.startingDate) {
-      toast.error("End date must be after start date");
+      toast.error(t("end_date_after_start"));
       return;
     }
 
     if (!data.adult && !data.child) {
-      toast.error("At least one adult or child is required");
+      toast.error(t("at_least_one_person"));
       return;
     }
 
@@ -214,35 +194,29 @@ const CreatePlan = () => {
         response = await createPlan(formData).unwrap();
       }
 
-      // Show styled success message for 4 seconds
-      toast.success(
-        "Your tour plan has been created! Please wait for the admin approval.",
-        {
-          duration: 4000, // Display for 4 seconds
-          style: {
-            background: "linear-gradient(135deg, #3b82f6, #10b981)", // Blue to green gradient
-            color: "#ffffff", // White text
-            borderRadius: "8px", // Rounded corners
-            padding: "16px", // Comfortable padding
-            fontSize: "16px", // Readable font size
-            fontWeight: "500", // Medium font weight
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // Subtle shadow
-            maxWidth: "400px", // Limit width for better readability
-          },
-          iconTheme: {
-            primary: "#ffffff", // White icon
-            secondary: "#3b82f6", // Blue background for icon
-          },
-        }
-      );
+      toast.success(t("plan_created_success"), {
+        duration: 4000,
+        style: {
+          background: "linear-gradient(135deg, #3b82f6, #10b981)",
+          color: "#ffffff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "16px",
+          fontWeight: "500",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          maxWidth: "400px",
+        },
+        iconTheme: {
+          primary: "#ffffff",
+          secondary: "#3b82f6",
+        },
+      });
 
       reset();
       setSelectedFile(null);
       navigate("/user");
     } catch (error) {
-      toast.error(
-        `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
-      );
+      toast.error(t("error_creating_plan", { action: state?.id ? t("updating") : t("creating") }));
     } finally {
       if (status === "draft") {
         setIsSavingDraft(false);
@@ -257,7 +231,6 @@ const CreatePlan = () => {
     setSelectedFile(file);
   };
 
-  // Define event handlers for budget message
   const handleBudgetClick = () => {
     if (isPopupOpened && !showBudgetMessage) {
       setShowBudgetMessage(true);
@@ -272,46 +245,41 @@ const CreatePlan = () => {
     return <FullScreenInfinityLoader />;
   }
 
-  // Register touristSpots with react-hook-form
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
-    required: "Location from is required",
+    required: t("location_from_required"),
   });
   const { ref: toFormRef, ...toRest } = register("locationTo", {
-    required: "Location to is required",
+    required: t("location_to_required"),
   });
 
   return (
     <div className="p-6">
       <div className="mx-auto">
         <Toaster />
-        {/* Header */}
         <div className="flex items-center mb-8">
           <NavLink to="/user">
             <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
               <FiArrowLeft className="w-5 h-5" />
-              <span className="text-md">Back</span>
+              <span className="text-md">{t("back")}</span>
             </button>
           </NavLink>
         </div>
 
-        {/* Title */}
         <h1 className="text-3xl font-semibold text-gray-800 text-center mb-8">
-          {state?.id ? "Edit Tour Plan" : "Create a Tour Plan"}
+          {state?.id ? t("edit_tour_plan") : t("create_tour_plan")}
         </h1>
 
-        {/* Form */}
         <form className="space-y-6">
-          {/* Row 1: Name, Email, Phone Number */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Name
+                {t("name")}
               </label>
               <input
                 type="text"
-                placeholder="Enter your full name"
+                placeholder={t("enter_full_name")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("name", { required: "Name is required" })}
+                {...register("name", { required: t("name_required") })}
               />
               {errors.name && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -321,17 +289,17 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Email
+                {t("email")}
               </label>
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("enter_email")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...register("email", {
-                  required: "Email is required",
+                  required: t("email_required"),
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "Invalid email address",
+                    message: t("invalid_email"),
                   },
                 })}
               />
@@ -346,17 +314,17 @@ const CreatePlan = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Phone Number
+                {t("phone_number")}
               </label>
               <input
                 type="tel"
-                placeholder="Enter your phone number"
+                placeholder={t("enter_phone_number")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...register("phoneNumber", {
-                  required: "Phone number is required",
+                  required: t("phone_required"),
                   pattern: {
                     value: /^[0-9]{10,15}$/,
-                    message: "Invalid phone number",
+                    message: t("invalid_phone"),
                   },
                 })}
               />
@@ -369,22 +337,22 @@ const CreatePlan = () => {
             <div className="flex flex-row gap-4">
               <div>
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Type of Accommodation
+                  {t("accommodation_type")}
                 </label>
                 <select
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register("typeOfAccommodation", {
-                    required: "Type of accommodation is required",
+                    required: t("accommodation_required"),
                   })}
                 >
                   <option value="" disabled selected>
-                    Select Accommodation Type
+                    {t("select_accommodation")}
                   </option>
-                  <option value="hotel">Hotel</option>
-                  <option value="resort">Resort</option>
-                  <option value="homestay">Homestay</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="hostel">Hostel</option>
+                  <option value="hotel">{t("hotel")}</option>
+                  <option value="resort">{t("resort")}</option>
+                  <option value="homestay">{t("homestay")}</option>
+                  <option value="apartment">{t("apartment")}</option>
+                  <option value="hostel">{t("hostel")}</option>
                 </select>
                 {errors.typeOfAccommodation && (
                   <p className="text-red-500 text-[14px] mt-1">
@@ -394,21 +362,21 @@ const CreatePlan = () => {
               </div>
               <div>
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Destination Type
+                  {t("destination_type")}
                 </label>
                 <select
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register("destinationType", {
-                    required: "Destination Type is required",
+                    required: t("destination_required"),
                   })}
                 >
                   <option value="" disabled selected>
-                    Select Destination Type
+                    {t("select_destination")}
                   </option>
-                  <option value="beach">Beach trips</option>
-                  <option value="mountain">Mountain adventures</option>
-                  <option value="relax">Relaxing tours</option>
-                  <option value="group">Group packages</option>
+                  <option value="beach">{t("beach_trips")}</option>
+                  <option value="mountain">{t("mountain_adventures")}</option>
+                  <option value="relax">{t("relaxing_tours")}</option>
+                  <option value="group">{t("group_packages")}</option>
                 </select>
                 {errors.destinationType && (
                   <p className="text-red-500 text-[14px] mt-1">
@@ -418,26 +386,21 @@ const CreatePlan = () => {
               </div>
               <div>
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Minimum Hotel Stars
+                  {t("minimum_hotel_stars")}
                 </label>
                 <select
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  {...register("minimumHotelStars", )}
+                  {...register("minimumHotelStars")}
                 >
                   <option value="" disabled selected>
-                    Select Star Rating
+                    {t("select_star_rating")}
                   </option>
-                  <option value="1">1 Star</option>
-                  <option value="2">2 Stars</option>
-                  <option value="3">3 Stars</option>
-                  <option value="4">4 Stars</option>
-                  <option value="5">5 Stars</option>
+                  <option value="1">{t("1_star")}</option>
+                  <option value="2">{t("2_stars")}</option>
+                  <option value="3">{t("3_stars")}</option>
+                  <option value="4">{t("4_stars")}</option>
+                  <option value="5">{t("5_stars")}</option>
                 </select>
-                {errors.minimumHotelStars && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.minimumHotelStars.message}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -445,11 +408,11 @@ const CreatePlan = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Location (From)
+                {t("location_from")}
               </label>
               <input
                 type="text"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...fromRest}
                 ref={(e) => {
@@ -465,11 +428,11 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Location (To)
+                {t("location_to")}
               </label>
               <input
                 type="text"
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...toRest}
                 ref={(e) => {
@@ -488,14 +451,14 @@ const CreatePlan = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Starting Date
+                {t("starting_date")}
               </label>
               <div className="relative">
                 <input
                   type="date"
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 max-w-full"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                   {...register("startingDate", {
-                    required: "Starting date is required",
+                    required: t("starting_date_required"),
                   })}
                 />
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
@@ -508,14 +471,14 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Ending Date
+                {t("ending_date")}
               </label>
               <div className="relative">
                 <input
                   type="date"
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                   {...register("endingDate", {
-                    required: "Ending date is required",
+                    required: t("ending_date_required"),
                   })}
                 />
                 <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
@@ -532,16 +495,16 @@ const CreatePlan = () => {
             <div className="flex w-full gap-4">
               <div className="flex-1">
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Adult
+                  {t("adult")}
                 </label>
                 <input
                   type="number"
-                  placeholder="Enter number of adults"
+                  placeholder={t("enter_adults")}
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register("adult", {
                     min: {
                       value: 0,
-                      message: "Number of adults cannot be negative",
+                      message: t("adults_cannot_be_negative"),
                     },
                   })}
                 />
@@ -553,16 +516,16 @@ const CreatePlan = () => {
               </div>
               <div className="flex-1">
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  Child
+                  {t("child")}
                 </label>
                 <input
                   type="number"
-                  placeholder="Enter number of children"
+                  placeholder={t("enter_children")}
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...register("child", {
                     min: {
                       value: 0,
-                      message: "Number of children cannot be negative",
+                      message: t("children_cannot_be_negative"),
                     },
                   })}
                 />
@@ -575,13 +538,11 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Budget
+                {t("budget")}
               </label>
               {showBudgetMessage && isPopupOpened && (
                 <p className="text-sm text-gray-600 mb-2">
-                  Ensure a reasonable price is entered to aid agencies in making
-                  appropriate offers. Users entering unrealistically low prices
-                  may be restricted or penalized.
+                  {t("budget_message")}
                 </p>
               )}
               <input
@@ -589,16 +550,16 @@ const CreatePlan = () => {
                 placeholder="EUR"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 {...register("budget", {
-                  required: "Budget is required",
-                  min: { value: 0, message: "Budget cannot be negative" },
+                  required: t("budget_required"),
+                  min: { value: 0, message: t("budget_cannot_be_negative") },
                   validate: (value) =>
-                    (value !== null && value !== "") || "Budget is required",
+                    (value !== null && value !== "") || t("budget_required"),
                 })}
                 onChange={(e) => {
                   const value = e.target.value;
                   setValue("budget", value === "" ? null : Number(value), {
                     shouldValidate: true,
-                  }); // Convert to number and validate
+                  });
                 }}
                 onClick={handleBudgetClick}
                 ref={budgetRef}
@@ -614,39 +575,32 @@ const CreatePlan = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Tourist Spots
+                {t("tourist_spots")}
               </label>
               <input
                 type="text"
-                placeholder="Search for a tourist spot"
+                placeholder={t("search_tourist_spot")}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 ref={(e) => {
                   touristSpotsRef.current = e;
                 }}
               />
-              {errors.touristSpots && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.touristSpots.message}
-                </p>
-              )}
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Meal Plan
+                {t("meal_plan")}
               </label>
               <select
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                {...register("mealPlan", { required: "Meal plan is required" })}
+                {...register("mealPlan", { required: t("meal_plan_required") })}
               >
                 <option value="" disabled selected>
-                  Select Meal Plan
+                  {t("select_meal_plan")}
                 </option>
-                <option value="none">No Meals</option>
-                <option value="breakfast">Breakfast</option>
-                <option value="half-board">
-                  Half-Board (Breakfast & Dinner)
-                </option>
-                <option value="full-board">Full-Board (All Meals)</option>
+                <option value="none">{t("no_meals")}</option>
+                <option value="breakfast">{t("breakfast")}</option>
+                <option value="half-board">{t("half_board")}</option>
+                <option value="full-board">{t("full_board")}</option>
               </select>
               {errors.mealPlan && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -659,18 +613,14 @@ const CreatePlan = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                Description
+                {t("description")}
               </label>
               <textarea
-                placeholder="Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
+                placeholder={t("description_placeholder")}
                 rows={4}
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                {...register("description")}
               />
-              {errors.description && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.description.message}
-                </p>
-              )}
             </div>
           </div>
 
@@ -680,15 +630,14 @@ const CreatePlan = () => {
               id="confirmation"
               className="mt-1 w-4 h-4 text-blue-600 border border-blue-600 rounded focus:ring-blue-500 hover:cursor-pointer checkbox checkbox-xs checked:text-blue-600"
               {...register("confirmation", {
-                required: "Please confirm the information",
+                required: t("confirm_information"),
               })}
             />
             <label
               htmlFor="confirmation"
               className="text-[15px] text-gray-600 leading-relaxed"
             >
-              I confirm this is a travel request, and all provided information
-              is valid and does not include any third party.
+              {t("confirmation_text")}
             </label>
           </div>
           {errors.confirmation && (
@@ -704,7 +653,7 @@ const CreatePlan = () => {
               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
               disabled={isSavingDraft || isPublishing}
             >
-              {isSavingDraft ? "Saving..." : "Save for Future"}
+              {isSavingDraft ? t("saving") : t("save_for_future")}
             </button>
             <button
               type="button"
@@ -712,7 +661,7 @@ const CreatePlan = () => {
               className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
               disabled={isSavingDraft || isPublishing}
             >
-              {isPublishing ? "Publishing..." : "Publish Now"}
+              {isPublishing ? t("publishing") : t("publish_now")}
             </button>
           </div>
         </form>

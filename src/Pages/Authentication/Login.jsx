@@ -5,8 +5,10 @@ import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useLogInMutation } from "@/redux/features/baseApi";
 import img1 from "../../assets/img/removebg.png";
+import { useTranslation } from "react-i18next";
 
-const login = () => {
+const Login = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,10 +46,9 @@ const login = () => {
 
       localStorage.setItem("userEmail", data.email);
       navigate(redirect, { replace: true });
-      // console.log(res, "success responce");
     } catch (error) {
       console.log(error);
-      setErrorMessage(error.data.message || "An error occurred during login");
+      setErrorMessage(error.data?.message || t("login_error"));
     }
   };
 
@@ -63,7 +64,7 @@ const login = () => {
       <div className="hidden lg:flex lg:w-1/2 relative">
         <img
           src={img}
-          alt="Background image"
+          alt={t("background_image")}
           className="w-full h-full object-cover absolute inset-0"
         />
       </div>
@@ -74,14 +75,16 @@ const login = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <NavLink to="/">
-              <div className=" flex items-center justify-center mb-6">
-                <img src={img1} className="h-20" alt="" />
+              <div className="flex items-center justify-center mb-6">
+                <img src={img1} className="h-20" alt={t("logo")} />
               </div>
             </NavLink>
             <h1 className="text-4xl font-semibold text-gray-700">
-              Welcome to Frework
+              {t("welcome_to_frework")}
             </h1>
           </div>
+
+          {/* Error Message */}
           {errorMessage && (
             <div className="flex items-center justify-center p-4 mb-4">
               <span className="text-red-500 text-center">{errorMessage}</span>
@@ -97,7 +100,7 @@ const login = () => {
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t("email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -105,14 +108,14 @@ const login = () => {
                 </div>
                 <input
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("email_required"),
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: t("invalid_email"),
                     },
                   })}
                   type="email"
-                  placeholder="user@gmail.com"
+                  placeholder={t("email_placeholder")}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -126,7 +129,7 @@ const login = () => {
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                {t("password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -134,14 +137,14 @@ const login = () => {
                 </div>
                 <input
                   {...register("password", {
-                    required: "Password is required",
+                    required: t("password_required"),
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters",
+                      message: t("password_min_length"),
                     },
                   })}
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("password_placeholder")}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -152,30 +155,31 @@ const login = () => {
               )}
             </div>
 
+            {/* Forget Password */}
             <div>
               <h1
                 onClick={() => navigate("/verify")}
                 className="text-blue-500 text-end cursor-pointer hover:underline"
               >
-                forget password
+                {t("forget_password")}
               </h1>
             </div>
 
-            {/* login Button */}
+            {/* Login Button */}
             <button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mt-6"
             >
-              Login
+              {t("login")}
             </button>
           </form>
 
-          {/* Login Link */}
+          {/* Register Link */}
           <div className="text-center mt-6">
-            <NavLink to="/register" className="text-sm text-gray-600 ">
-              Don't have a account?{" "}
+            <NavLink to="/register" className="text-sm text-gray-600">
+              {t("no_account")}{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
-                Register
+                {t("register")}
               </button>
             </NavLink>
           </div>
@@ -185,4 +189,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;

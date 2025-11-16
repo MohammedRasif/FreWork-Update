@@ -2,8 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import img from "../../assets/img/contact.jpg";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -13,7 +15,7 @@ const Contact = () => {
 
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    alert("Form submitted successfully!");
+    alert(t("form_submitted_success"));
     reset();
   };
 
@@ -36,10 +38,10 @@ const Contact = () => {
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-              Contact Us
+              {t("contact_us")}
             </h1>
             <p className="text-gray-300 text-base sm:text-lg">
-              Have a question? Reach out to us!
+              {t("have_question_reach_out")}
             </p>
           </div>
 
@@ -49,12 +51,12 @@ const Contact = () => {
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  First name
+                  {t("first_name")}
                 </label>
                 <input
-                  {...register("firstName", { required: "First name is required" })}
+                  {...register("firstName", { required: t("first_name_required") })}
                   type="text"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.firstName && (
@@ -66,12 +68,12 @@ const Contact = () => {
 
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  Last name
+                  {t("last_name")}
                 </label>
                 <input
-                  {...register("lastName", { required: "Last name is required" })}
+                  {...register("lastName", { required: t("last_name_required") })}
                   type="text"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.lastName && (
@@ -86,18 +88,18 @@ const Contact = () => {
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  Email
+                  {t("email")}
                 </label>
                 <input
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("email_required"),
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: t("invalid_email"),
                     },
                   })}
                   type="email"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.email && (
@@ -109,12 +111,12 @@ const Contact = () => {
 
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  Phone number
+                  {t("phone_number")}
                 </label>
                 <input
-                  {...register("phoneNumber", { required: "Phone number is required" })}
+                  {...register("phoneNumber", { required: t("phone_required") })}
                   type="tel"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.phoneNumber && (
@@ -129,12 +131,12 @@ const Contact = () => {
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  Town
+                  {t("town")}
                 </label>
                 <input
-                  {...register("town", { required: "Town is required" })}
+                  {...register("town", { required: t("town_required") })}
                   type="text"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.town && (
@@ -146,12 +148,12 @@ const Contact = () => {
 
               <div>
                 <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                  Location
+                  {t("location")}
                 </label>
                 <input
-                  {...register("location", { required: "Location is required" })}
+                  {...register("location", { required: t("location_required") })}
                   type="text"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
                 {errors.location && (
@@ -165,11 +167,11 @@ const Contact = () => {
             {/* Message Field */}
             <div>
               <label className="block text-white text-sm font-medium mb-1 sm:mb-2">
-                How can we help you?
+                {t("how_can_we_help")}
               </label>
               <textarea
-                {...register("message", { required: "Message is required" })}
-                placeholder="Enter here"
+                {...register("message", { required: t("message_required") })}
+                placeholder={t("enter_here")}
                 rows={4}
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
               />
@@ -186,7 +188,7 @@ const Contact = () => {
                 type="submit"
                 className="px-8 sm:px-12 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent text-sm sm:text-base"
               >
-                Submit
+                {t("submit")}
               </button>
             </div>
           </form>

@@ -6,8 +6,10 @@ import {
   useOtpVerifyMutation,
   useReSendOtpMutation,
 } from "@/redux/features/baseApi";
+import { useTranslation } from "react-i18next";
 
 const OTP_Verification = () => {
+  const { t } = useTranslation();
   const [otp, setOtp] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
@@ -23,11 +25,11 @@ const OTP_Verification = () => {
     e.preventDefault();
 
     if (!otp || otp.length < 4) {
-      return alert("Please enter a 4-digit OTP.");
+      return alert(t("enter_4_digit_otp"));
     }
 
     if (!location.state?.email) {
-      return alert("No email found. Please try again.");
+      return alert(t("no_email_found"));
     }
 
     try {
@@ -40,16 +42,13 @@ const OTP_Verification = () => {
         localStorage.setItem("access_token", res.access);
         localStorage.setItem("refresh_token", res.refresh);
 
-        // Get userType from localStorage
         const userType = localStorage.getItem("userType");
         console.log("Retrieved userType from localStorage:", userType);
 
-        // Show popup only if userType is 'agency'
         if (userType === "agency") {
           setShowPopup(true);
         }
 
-        // After 2 sec navigate based on userType
         setTimeout(() => {
           setShowPopup(false);
           if (userType === "agency") {
@@ -63,11 +62,11 @@ const OTP_Verification = () => {
           }
         }, 7000);
       } else {
-        alert("OTP verification failed. Check the code or try again.");
+        alert(t("otp_verification_failed"));
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert(error.data?.message || "OTP verification failed.");
+      alert(error.data?.message || t("otp_verification_failed"));
     }
   };
 
@@ -78,7 +77,7 @@ const OTP_Verification = () => {
         <img
           src={img}
           className="absolute inset-0 w-full h-full mx-auto object-cover opacity-70"
-          alt="Background"
+          alt={t("background")}
         />
       </div>
 
@@ -87,17 +86,17 @@ const OTP_Verification = () => {
         <div className="w-full max-w-xl space-y-8">
           <form className="backdrop-blur-sm bg-white/60 p-10 mb-10 rounded-lg border border-blue-200 shadow-xl">
             <h2 className="text-3xl font-bold text-blue-600 mb-10 text-center">
-              Verify your OTP
+              {t("verify_your_otp")}
             </h2>
             <div className="form-control w-full mb-6">
               <div className="relative">
                 <input
                   type="number"
-                  placeholder="Enter your OTP"
+                  placeholder={t("enter_your_otp")}
                   value={otp}
                   onChange={handleOtpChange}
                   maxLength={4}
-                  className="input input-bordered border-blue-200 w-full pl-10 bg-white/70 text-blue-900 placeholder-blue-300 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 "
+                  className="input input-bordered border-blue-200 w-full pl-10 bg-white/70 text-blue-900 placeholder-blue-300 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
                 <Lock
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400"
@@ -108,10 +107,11 @@ const OTP_Verification = () => {
 
             <div className="pb-2">
               <button
-                onClick={(e) => handleOtpSubmit(e)}
-                className="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full w-full text-base"
+                onClick={handleOtpSubmit}
+                disabled={isLoading}
+                className="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full w-full text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                {isLoading ? t("verifying") : t("next")}
               </button>
 
               <div className="flex mx-auto justify-center">
@@ -122,15 +122,15 @@ const OTP_Verification = () => {
                       const res = await reSend({
                         email: location.state.email,
                       }).unwrap();
-                      alert(res.message || "OTP resent successfully!");
+                      alert(res.message || t("otp_resent_success"));
                     } catch (error) {
-                      alert(error.data?.message || "Error sending OTP again.");
+                      alert(error.data?.message || t("error_sending_otp"));
                     }
                   }}
                   disabled={ResendLoading}
                   className="font-semibold mt-4 text-sm text-blue-500 hover:text-blue-600 hover:underline hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {ResendLoading ? "Sending..." : "Resend Code"}
+                  {ResendLoading ? t("sending") : t("resend_code")}
                 </button>
               </div>
             </div>
@@ -140,16 +140,16 @@ const OTP_Verification = () => {
 
       {/* Popup */}
       {showPopup && (
-        <div className=" backdrop-blur-[5px] absolute inset-0 flex items-center justify-center bg-black/40 z-50">
+        <div className="backdrop-blur-[5px] absolute inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white rounded-xl shadow-lg p-16 text-center max-w-xl">
             <p className="text-blue-600 font-semibold text-2xl">
-              Please complete your profile right now
+              {t("complete_profile_now")}
             </p>
             <p className="text-gray-600 mt-2 text-xl pb-1">
-              Then you can access full dashboard features.
+              {t("access_full_dashboard")}
             </p>
             <p className="text-gray-600 mt-2 text-xl">
-              Please wait.............
+              {t("please_wait")}
             </p>
           </div>
         </div>

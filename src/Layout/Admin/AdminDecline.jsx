@@ -1,3 +1,4 @@
+"use client";
 import {
   useDeclineOfferQuery,
   useRestoreMutation,
@@ -13,23 +14,21 @@ import {
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 function AdminDecline() {
+  const { t } = useTranslation();
   const { data: declineData = [], isLoading: isDeclineLoading } =
     useDeclineOfferQuery();
   const [restore, { isLoading: isRestoreLoading }] = useRestoreMutation();
-  console.log(declineData);
 
   const handleRestore = async (id) => {
     try {
       await restore(id).unwrap();
-      toast.success("Plan restored successfully");
+      toast.success(t("plan_restored_success"));
     } catch (error) {
-      console.error("Failed to restore plan:", error);
-
-      console.error("Error details:", error?.data || error.message);
       toast.error(
-        error?.data?.error || error?.data?.message || "Failed to restore plan"
+        error?.data?.error || error?.data?.message || t("failed_to_restore")
       );
     }
   };
@@ -37,7 +36,7 @@ function AdminDecline() {
   if (isDeclineLoading) {
     return (
       <div className="text-center text-gray-600 py-8">
-        Loading declined plans...
+        {t("loading_declined_plans")}
       </div>
     );
   }
@@ -45,7 +44,7 @@ function AdminDecline() {
   if (!declineData.length) {
     return (
       <div className="text-center text-gray-600 py-8">
-        No declined plans yet.
+        {t("no_declined_plans")}
       </div>
     );
   }
@@ -69,52 +68,50 @@ function AdminDecline() {
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
                       <span>
-                        <span className="font-medium">Points of travel:</span>{" "}
-                        {plan.tour_plan.tourist_spots || "None"}
+                        <span className="font-medium">{t("points_of_travel")}:</span>{" "}
+                        {plan.tour_plan.tourist_spots || t("none")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaLocationArrow className="w-6 h-5 text-gray-500" />
                       <span>
-                        <span className="font-medium">Departure from:</span>{" "}
-                        {plan.tour_plan.location_from || "N/A"}
+                        <span className="font-medium">{t("departure_from")}:</span>{" "}
+                        {plan.tour_plan.location_from || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaList className="w-6 h-5 text-gray-500" />
                       <span>
-                        <span className="font-medium">Minimum rating:</span>{" "}
-                        {plan.tour_plan.minimum_star_hotel || "N/A"}
+                        <span className="font-medium">{t("minimum_rating")}:</span>{" "}
+                        {plan.tour_plan.minimum_star_hotel || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
                       <span>
-                        <span className="font-medium">Meal plan:</span>{" "}
-                        {plan.tour_plan.meal_plan || "N/A"}
+                        <span className="font-medium">{t("meal_plan")}:</span>{" "}
+                        {plan.tour_plan.meal_plan || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <IoBed className="w-6 h-5 text-gray-500" />
                       <span>
-                        <span className="font-medium">
-                          Type of accommodation:
-                        </span>{" "}
-                        {plan.tour_plan.type_of_accommodation || "N/A"}
+                        <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
+                        {plan.tour_plan.type_of_accommodation || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaClock className="w-6 h-5 text-gray-500" />
                       <span>
-                        <span className="font-medium">Duration:</span>{" "}
-                        {plan.tour_plan.duration || "N/A"}
+                        <span className="font-medium">{t("duration")}:</span>{" "}
+                        {plan.tour_plan.duration || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <MdVerifiedUser className="w-7 h-6 text-green-500" />
                       <span>
                         <span className="font-medium">
-                          Contact verified via email
+                          {t("contact_verified_via_email")}
                         </span>
                       </span>
                     </p>
@@ -124,10 +121,10 @@ function AdminDecline() {
               <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                 <div>
                   <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
-                    Budget <FaEuroSign /> {plan.tour_plan.budget}
+                    {t("budget")} <FaEuroSign /> {plan.tour_plan.budget}
                   </p>
                   <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                    Total {plan.tour_plan.total_members} person
+                    {t("total_persons", { count: plan.tour_plan.total_members })}
                   </p>
                 </div>
               </div>
@@ -139,7 +136,7 @@ function AdminDecline() {
             </div>
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
               <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                Interested Travel Points:
+                {t("interested_travel_points")}:
               </p>
               <div className="flex flex-wrap gap-1">
                 {plan.tour_plan.tourist_spots ? (
@@ -158,7 +155,7 @@ function AdminDecline() {
                     ))
                 ) : (
                   <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                    None
+                    {t("none")}
                   </span>
                 )}
               </div>
@@ -169,11 +166,11 @@ function AdminDecline() {
                   plan.tour_plan.spot_picture_url ||
                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                 }
-                alt="Tour destination"
+                alt={t("tour_destination")}
                 className="w-full h-48 sm:h-36 lg:h-72 object-cover rounded-lg"
               />
               <h1 className="text-[20px] lg:left-64 left-5 absolute top-2 font-semibold text-white">
-                Image generated automatically
+                {t("image_generated_automatically")}
               </h1>
             </div>
             <div className="flex justify-end mt-4">
@@ -186,7 +183,7 @@ function AdminDecline() {
                     : "bg-green-600 hover:bg-green-700"
                 }`}
               >
-                {isRestoreLoading ? "Restoring..." : "Restore"}
+                {isRestoreLoading ? t("restoring") : t("restore")}
               </button>
             </div>
           </div>

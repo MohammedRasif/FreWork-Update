@@ -1,3 +1,4 @@
+"use client";
 import {
   useDeleteNotificationMutation,
   useGetNotificationsQuery,
@@ -8,8 +9,10 @@ import { IoClose, IoEyeOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const AdminNotification = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
@@ -20,14 +23,12 @@ const AdminNotification = () => {
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
 
-  // Request notification permission on component mount
   useEffect(() => {
     if ("Notification" in window && Notification.permission !== "granted") {
       Notification.requestPermission();
     }
   }, []);
 
-  // WebSocket for real-time notifications
   useEffect(() => {
     const baseUrl = "31.97.39.215";
     const socketUrl = `ws://${baseUrl}/ws/notifications/?token=${token}`;
@@ -42,30 +43,24 @@ const AdminNotification = () => {
         const newNotification = JSON.parse(event.data);
         console.log("New notification received:", newNotification);
 
-        // Update notifications state with the new notification
         setNotifications((prev) => [newNotification, ...prev]);
 
-        // Trigger desktop notification if permitted
         if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("New Notification", {
-            body: newNotification.message || "You have a new notification!",
+          new Notification(t("new_notification"), {
+            body: newNotification.message || t("new_notification_body"),
             icon: "/path/to/icon.png",
           });
-        } else if (
-          "Notification" in window &&
-          Notification.permission !== "denied"
-        ) {
+        } else if ("Notification" in window && Notification.permission !== "denied") {
           Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
-              new Notification("New Notification", {
-                body: newNotification.message || "You have a new notification!",
+              new Notification(t("new_notification"), {
+                body: newNotification.message || t("new_notification_body"),
                 icon: "/path/to/icon.png",
               });
             }
           });
         }
 
-        // Mark as seen if applicable
         if (newNotification.id && !newNotification.seen) {
           seenNotification(newNotification.id);
         }
@@ -82,12 +77,9 @@ const AdminNotification = () => {
       console.log("WebSocket connection closed");
     };
 
-    return () => {
-      socket.close();
-    };
-  }, [token, seenNotification]);
+    return () => socket.close();
+  }, [token, seenNotification, t]);
 
-  // Sync notifications from API
   useEffect(() => {
     if (notificationsData) {
       setNotifications(notificationsData);
@@ -99,17 +91,14 @@ const AdminNotification = () => {
     }
   }, [notificationsData, seenNotification]);
 
-  // Handle view notification
   const handleViewClick = (notification) => {
-    console.log("Viewing notification:", notification);
     if (notification.target_url) {
       navigate(notification.target_url);
     } else {
-      toast.error("No target URL available for this notification");
+      toast.error(t("no_target_url"));
     }
   };
 
-  // Handle delete notification
   const handleDeleteClick = (id) => {
     setSelectedNotificationId(id);
     setShowPopup(true);
@@ -118,10 +107,10 @@ const AdminNotification = () => {
   const handleConfirmDelete = async () => {
     try {
       await deleteNotification(selectedNotificationId).unwrap();
-      setNotifications(
-        notifications.filter((item) => item.id !== selectedNotificationId)
+      setNotifications((prev) =>
+        prev.filter((item) => item.id !== selectedNotificationId)
       );
-      toast.success("Notification deleted successfully!", {
+      toast.success(t("notification_deleted_success"), {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -133,7 +122,7 @@ const AdminNotification = () => {
       setSelectedNotificationId(null);
     } catch (error) {
       console.error("Failed to delete notification:", error);
-      toast.error("Failed to delete notification!", {
+      toast.error(t("failed_to_delete_notification"), {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -149,12 +138,11 @@ const AdminNotification = () => {
     setSelectedNotificationId(null);
   };
 
-  // Handle notification click to navigate to tour plan
   const handleNotificationClick = (planId) => {
     if (planId) {
       navigate(`/tour-plans/${planId}`);
     } else {
-      toast.error("No plan ID available for this notification");
+      toast.error(t("no_plan_id"));
     }
   };
 
@@ -163,17 +151,17 @@ const AdminNotification = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">
-          Notifications
+          {t("notifications")}
         </h1>
       </div>
 
       {/* Notifications List */}
       <div className="space-y-3">
         {isNotificationsLoading ? (
-          <p className="text-gray-600 text-center">Loading notifications...</p>
+          <p className="text-gray-600 text-center">{t("loading_notifications")}</p>
         ) : notifications.length === 0 ? (
           <p className="text-gray-600 text-center">
-            No notifications available.
+            {t("no_notifications_available")}
           </p>
         ) : (
           notifications.map((item) => (
@@ -198,21 +186,21 @@ const AdminNotification = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the parent div's onClick
+                      e.stopPropagation();
                       handleViewClick(item);
                     }}
                     className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
-                    title="View Notification"
+                    title={t("view_notification")}
                   >
                     <IoEyeOutline size={20} />
                   </button>
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the parent div's onClick
+                      e.stopPropagation();
                       handleDeleteClick(item.id);
                     }}
                     className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors duration-200 cursor-pointer"
-                    title="Delete Notification"
+                    title={t("delete_notification")}
                   >
                     <RiDeleteBin6Line size={20} />
                   </button>
@@ -229,7 +217,7 @@ const AdminNotification = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
-                Delete Notification
+                {t("delete_notification")}
               </h2>
               <button
                 onClick={handleCancelDelete}
@@ -239,20 +227,20 @@ const AdminNotification = () => {
               </button>
             </div>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this notification?
+              {t("confirm_delete_notification")}
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={handleCancelDelete}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 onClick={handleConfirmDelete}
                 className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>

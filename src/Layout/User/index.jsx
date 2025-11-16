@@ -1,20 +1,19 @@
-
-
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const HomeLayout = ({ children }) => {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
 
   return (
     <div className="w-full h-auto">
       <div className="w-full flex flex-col gap-2 px-4">
         <h2 className="text-[#343E4B] font-semibold text-xl">
-         <span className="text-[28px]"> Welcome, </span>
+          <span className="text-[28px]">{t("welcome")}, </span>
           <span className="font-normal text-[18px] font">
-             Share your vacation plan and receive 3 personalized offers from agencies.
+            {t("share_plan_subtitle")}
           </span>
         </h2>
       </div>
@@ -28,7 +27,7 @@ const HomeLayout = ({ children }) => {
                 variant="transparent"
                 className="font-nunito-sans font-semibold"
               >
-                Create Plan
+                {t("create_plan")}
                 <Plus size={18} />
               </Button>
             </NavLink>
@@ -54,7 +53,7 @@ const HomeLayout = ({ children }) => {
         {/* My All Plans Section */}
         <div className="lg:col-start-7 lg:col-span-2 max-lg:order-first lg:pt-16 lg:mx-10">
           <h3 className="text-2xl font-semibold text-gray-700 mb-6 text-center">
-            My All Plans
+            {t("my_all_plans")}
           </h3>
           <div className="flex flex-col gap-4 py-2 px-4">
             <Link to="/user">
@@ -65,7 +64,7 @@ const HomeLayout = ({ children }) => {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                Created Plan
+                {t("created_plan")}
               </button>
             </Link>
             <Link to="/user/published">
@@ -76,7 +75,7 @@ const HomeLayout = ({ children }) => {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                Published Plans
+                {t("published_plans")}
               </button>
             </Link>
             <Link to="/user/accepted">
@@ -87,7 +86,7 @@ const HomeLayout = ({ children }) => {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                Accepted Offers
+                {t("accepted_offers")}
               </button>
             </Link>
             <Link to="/user/favourite">
@@ -98,20 +97,20 @@ const HomeLayout = ({ children }) => {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                Favourite Agencies
+                {t("favourite_agencies")}
               </button>
             </Link>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 mt-6">
               <p className="text-sm text-gray-900 font-semibold mb-2">
-                Need free fasted response?
+                {t("need_fast_response")}
               </p>
               <Button
                 variant="link"
                 size="sm"
                 className="p-0 underline text-left w-min text-xs"
               >
-                Click here
+                {t("click_here")}
               </Button>
             </div>
           </div>

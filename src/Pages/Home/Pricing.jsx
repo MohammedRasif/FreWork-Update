@@ -7,18 +7,18 @@ import Faq from "./Faq";
 import { useShowSubscriptionDataQuery, useSubscriptionMutation } from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 const Pricing = () => {
+  const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState("monthly");
   const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery();
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] = useSubscriptionMutation();
   const navigate = useNavigate();
-  console.log("Subscription Data:", subscriptionData);
 
-  // Handle subscription error toast with useEffect to prevent duplicates
   useEffect(() => {
     if (subscriptionError) {
-      const errorMessage = subscriptionError?.data?.detail || "Failed to process subscription";
+      const errorMessage = subscriptionError?.data?.detail || t("failed_to_process_subscription");
       toast.error(errorMessage, {
         toastId: "subscription-error",
         position: "top-right",
@@ -30,29 +30,24 @@ const Pricing = () => {
         progress: undefined,
       });
     }
-  }, [subscriptionError]);
+  }, [subscriptionError, t]);
 
-  // Customized Free User plan
   const freePlan = {
-    name: "Free User",
+    name: t("free_user"),
     limit: "3",
-    limitUnit: "Query/Day",
+    limitUnit: t("query_per_day"),
     features: [
-      "Access to general source databases",
-      "Limited to 3 free queries per day",
-      "No access to company or private databases",
+      t("free_feature_1"),
+      t("free_feature_2"),
+      t("free_feature_3"),
     ],
   };
 
-  // Function to handle plan selection
   const handleSelectPlan = async (planName) => {
-    console.log(`Selected plan: ${planName}`);
     if (planName === "premium") {
-      // Check for access_token in localStorage
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        console.log("No access token found, redirecting to /login");
-        toast.info("Please log in to subscribe to the Premium plan.", {
+        toast.info(t("login_required_for_premium"), {
           toastId: "login-required",
           position: "top-right",
           autoClose: 3000,
@@ -67,15 +62,11 @@ const Pricing = () => {
       }
 
       try {
-        console.log("Attempting to trigger subscription mutation...");
         const response = await subscription({ plan_id: "premium" }).unwrap();
-        console.log("Subscription response:", response);
-        // Check for checkout_url in response and redirect
         if (response?.checkout_url) {
-          console.log("Redirecting to checkout URL:", response.checkout_url);
           window.location.href = response.checkout_url;
         } else {
-          toast.success("Subscription successful!", {
+          toast.success(t("subscription_success"), {
             toastId: "subscription-success",
             position: "top-right",
             autoClose: 5000,
@@ -87,12 +78,10 @@ const Pricing = () => {
           });
         }
       } catch (error) {
-        console.error("Subscription error:", error);
-        // Error toast is handled by useEffect
+        // Error toast handled by useEffect
       }
     } else {
-      console.log("Free plan selected, no mutation needed.");
-      toast.info("Free plan selected!", {
+      toast.info(t("free_plan_selected"), {
         toastId: "free-plan-selected",
         position: "top-right",
         autoClose: 5000,
@@ -109,13 +98,13 @@ const Pricing = () => {
     <section className="pt-24 roboto bg-gray-50 ">
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-5 tracking-wider">
-          PRICING
+          {t("pricing")}
         </h1>
-        {/* Loading state */}
+
         {isLoading && (
-          <p className="text-center text-gray-600">Loading plans...</p>
+          <p className="text-center text-gray-600">{t("loading_plans")}</p>
         )}
-        {/* Pricing cards */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           <AnimatePresence mode="wait">
             {/* Free Plan Card */}
@@ -131,21 +120,23 @@ const Pricing = () => {
                 <div className="w-3/4 rounded-r-lg my-10 relative">
                   <img
                     src={img}
-                    alt="Plan background"
+                    alt={t("plan_background")}
                     className="w-full h-auto"
                   />
                   <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
-                    Free User
+                    {freePlan.name}
                   </h3>
                 </div>
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <div className="mb-6">
                   <div className="flex items-end">
-                    <span className="text-4xl font-bold text-slate-700">0/month</span>
+                    <span className="text-4xl font-bold text-slate-700">
+                      0{t("per_month")}
+                    </span>
                   </div>
                   <p className="text-slate-500 text-base mt-1">
-                    Measurable results
+                    {t("measurable_results")}
                   </p>
                 </div>
                 <button
@@ -153,15 +144,15 @@ const Pricing = () => {
                   onClick={() => handleSelectPlan("free")}
                   disabled={isSubscribing}
                 >
-                  Select
+                  {t("select")}
                 </button>
                 <p className="text-slate-500 text-base mb-6">
-                  Contact us for more Details
+                  {t("contact_for_details")}
                 </p>
                 <div className="mb-4 flex-grow">
                   <div className="flex items-center mb-3">
                     <span className="text-slate-700 font-semibold text-lg">
-                      Features
+                      {t("features")}
                     </span>
                     <div className="ml-2 text-[#3776E2]">
                       <IoCheckmarkCircleSharp size={20} />
@@ -196,7 +187,7 @@ const Pricing = () => {
                   <div className="w-3/4 rounded-r-lg my-10 relative">
                     <img
                       src={img}
-                      alt="Plan background"
+                      alt={t("plan_background")}
                       className="w-full h-auto"
                     />
                     <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
@@ -212,7 +203,7 @@ const Pricing = () => {
                       </span>
                     </div>
                     <p className="text-slate-500 text-base mt-1">
-                      Measurable results
+                      {t("measurable_results")}
                     </p>
                   </div>
                   <button
@@ -220,15 +211,15 @@ const Pricing = () => {
                     onClick={() => handleSelectPlan("premium")}
                     disabled={isSubscribing || isLoading}
                   >
-                    {isSubscribing ? "Subscribing..." : "Select"}
+                    {isSubscribing ? t("subscribing") : t("select")}
                   </button>
                   <p className="text-slate-500 text-base mb-6">
-                    Contact us for more Details
+                    {t("contact_for_details")}
                   </p>
                   <div className="mb-4 flex-grow">
                     <div className="flex items-center mb-3">
                       <span className="text-slate-700 font-semibold text-lg">
-                        Features
+                        {t("features")}
                       </span>
                       <div className="ml-2 text-[#3776E2]">
                         <IoCheckmarkCircleSharp size={20} />
@@ -252,7 +243,7 @@ const Pricing = () => {
                             className="text-[#3776E2] mt-1 mr-2 flex-shrink-0"
                             size={20}
                           />
-                          <span>No features available</span>
+                          <span>{t("no_features_available")}</span>
                         </li>
                       )}
                     </ul>

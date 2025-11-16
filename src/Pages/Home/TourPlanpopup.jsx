@@ -13,6 +13,7 @@ import {
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { IoIosSend } from "react-icons/io";
+import { useTranslation } from "react-i18next";
 
 const TourPlanPopup = ({
   tour,
@@ -25,6 +26,7 @@ const TourPlanPopup = ({
   handleSubmitOffer,
   isOfferBudgetLoading,
 }) => {
+  const { t } = useTranslation();
   const [offerForm, setOfferForm] = useState({
     budget: "",
     comment: "",
@@ -32,11 +34,10 @@ const TourPlanPopup = ({
     applyDiscount: false,
   });
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false); // local state
+  const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
-  // Handle form submit
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Critical: Prevent page reload
+    e.preventDefault();
 
     if (isOfferSubmitting || isOfferBudgetLoading) return;
 
@@ -51,7 +52,6 @@ const TourPlanPopup = ({
         selectedFile
       );
 
-      // Reset form after success
       setOfferForm({
         budget: "",
         comment: "",
@@ -83,20 +83,22 @@ const TourPlanPopup = ({
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Send Offer</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            {t("send_offer")}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
+            aria-label={t("close")}
           >
             <X size={24} />
           </button>
         </div>
 
         <div className="p-4">
-          {/* Offer Form */}
           <div className="flex-1 w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Place Your Offer
+              {t("place_your_offer")}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -104,7 +106,7 @@ const TourPlanPopup = ({
                   htmlFor="budget"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Offer
+                  {t("offer")}
                 </label>
                 <input
                   type="number"
@@ -112,7 +114,7 @@ const TourPlanPopup = ({
                   id="budget"
                   value={offerForm.budget}
                   onChange={handleOfferChange}
-                  placeholder="Enter your budget (e.g., 6000)"
+                  placeholder={t("enter_budget_placeholder")}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 />
@@ -123,7 +125,7 @@ const TourPlanPopup = ({
                   htmlFor="comment"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Message
+                  {t("message")}
                 </label>
                 <textarea
                   name="comment"
@@ -131,7 +133,7 @@ const TourPlanPopup = ({
                   value={offerForm.comment}
                   onChange={handleOfferChange}
                   rows="4"
-                  placeholder="Enter your message"
+                  placeholder={t("enter_message_placeholder")}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
                 />
@@ -142,7 +144,7 @@ const TourPlanPopup = ({
                   htmlFor="file"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Upload File (Optional)
+                  {t("upload_file_optional")}
                 </label>
                 <input
                   type="file"
@@ -153,7 +155,7 @@ const TourPlanPopup = ({
                 />
                 {selectedFile && (
                   <p className="text-xs text-gray-600 mt-1">
-                    Selected: {selectedFile.name}
+                    {t("selected")}: {selectedFile.name}
                   </p>
                 )}
               </div>
@@ -169,11 +171,11 @@ const TourPlanPopup = ({
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-md text-gray-700">
-                    Apply an additional discount
+                    {t("apply_additional_discount")}
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1">
-                  Offer extra discount to increase conversion.
+                  {t("discount_tip")}
                 </p>
               </div>
 
@@ -182,7 +184,7 @@ const TourPlanPopup = ({
                   htmlFor="discount"
                   className="block text-md font-medium text-gray-700 mb-1"
                 >
-                  Discount (%)
+                  {t("discount_percent")}
                 </label>
                 <input
                   type="number"
@@ -190,7 +192,7 @@ const TourPlanPopup = ({
                   id="discount"
                   value={offerForm.discount}
                   onChange={handleOfferChange}
-                  placeholder="e.g., 10"
+                  placeholder={t("discount_placeholder")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   disabled={!offerForm.applyDiscount}
                 />
@@ -215,17 +217,16 @@ const TourPlanPopup = ({
               >
                 <IoIosSend size={20} />
                 {isOfferSubmitting || isOfferBudgetLoading
-                  ? "Submitting..."
-                  : "Submit Offer"}
+                  ? t("submitting")
+                  : t("submit_offer")}
               </button>
             </form>
           </div>
 
-          {/* Existing Offers */}
           {tour.offers && tour.offers.length > 0 && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                Offers
+                {t("offers")}
               </h3>
               {tour.offers.map((offer) => (
                 <div
@@ -243,27 +244,24 @@ const TourPlanPopup = ({
                     />
                     <div>
                       <span className="font-medium text-gray-900">
-                        {offer.agency?.agency_name || "Unknown Agency"}
+                        {offer.agency?.agency_name || t("unknown_agency")}
                       </span>
                       
                       {offer.file_name && (
                         <p className="text-xs sm:text-sm text-gray-600">
-                          File: {offer.file_name}
+                          {t("file")}: {offer.file_name}
                         </p>
                       )}
                       {offer.apply_discount && offer.discount > 0 && (
                         <p className="text-xs sm:text-sm text-green-600">
-                          Discount: {offer.discount}% off
+                          {t("discount")}: {offer.discount}% off
                         </p>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-3">
-                   
                     <div className="flex gap-2">
-                     
-
                       {tour.user === userData?.user_id && (
                         <button
                           onClick={() => handleAcceptOffer(offer.id, tour.id)}
@@ -274,7 +272,7 @@ const TourPlanPopup = ({
                               : "bg-[#3776E2] text-white hover:bg-blue-700"
                           }`}
                         >
-                          Accept
+                          {t("accept")}
                         </button>
                       )}
                     </div>

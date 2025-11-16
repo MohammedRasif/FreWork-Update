@@ -32,8 +32,8 @@ import {
   FaStar,
 } from "react-icons/fa6";
 import img from "../../assets/img/badge.png";
+import { useTranslation } from "react-i18next";
 
-// Temporary fallback for FullScreenInfinityLoader
 const FullScreenInfinityLoader = () => (
   <div className="flex justify-center items-center min-h-screen">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -41,6 +41,7 @@ const FullScreenInfinityLoader = () => (
 );
 
 const TourPlanDouble = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -87,7 +88,6 @@ const TourPlanDouble = () => {
     )
   ).sort((a, b) => a.localeCompare(b));
 
-  // Apply client-side filtering
   useEffect(() => {
     let filteredData = tourPlanPublic || [];
     if (filters.search) {
@@ -177,19 +177,19 @@ const TourPlanDouble = () => {
     const role = localStorage.getItem("role");
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to submit an offer");
+      toast.error(t("login_to_submit_offer"));
       return;
     }
     if (role !== "agency") {
-      toast.error("Only agencies can submit offers");
+      toast.error(t("only_agencies_can_submit"));
       return;
     }
     if (!budget || isNaN(budget) || budget <= 0) {
-      toast.error("Please provide a valid budget amount");
+      toast.error(t("valid_budget_required"));
       return;
     }
     if (!comment.trim()) {
-      toast.error("Please provide a comment");
+      toast.error(t("comment_required"));
       return;
     }
     if (
@@ -198,7 +198,7 @@ const TourPlanDouble = () => {
         isNaN(offerForm.discount) ||
         offerForm.discount <= 0)
     ) {
-      toast.error("Please provide a valid discount percentage");
+      toast.error(t("valid_discount_required"));
       return;
     }
 
@@ -216,14 +216,10 @@ const TourPlanDouble = () => {
         formData.append("file", file);
       }
 
-      console.log("FormData entries:", [...formData.entries()]);
-
       const response = await offerBudgetToBack({
         id: tourId,
         data: formData,
       }).unwrap();
-
-      console.log("API Response:", response);
 
       const newOffer = {
         id: response?.id || `${currentUserId}-${Date.now()}`,
@@ -234,9 +230,9 @@ const TourPlanDouble = () => {
           ? Number.parseFloat(offerForm.discount)
           : 0,
         file_name: file?.name || null,
-        status: "pending", // default
+        status: "pending",
         agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          agency_name: localStorage.getItem("name") || t("unknown_agency"),
           logo_url:
             localStorage.getItem("user_image") ||
             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
@@ -269,18 +265,12 @@ const TourPlanDouble = () => {
       }
 
       toast.dismiss();
-      toast.success("Offer submitted successfully!");
+      toast.success(t("offer_submitted_success"));
     } catch (error) {
-      console.error("Failed to submit offer:", {
-        error,
-        status: error.status,
-        data: error.data,
-        originalStatus: error.originalStatus,
-      });
       const errorMessage =
         error?.data?.error ||
         error?.data?.detail ||
-        "Failed to submit offer. Please try again.";
+        t("failed_to_submit_offer");
       toast.error(errorMessage);
     }
   };
@@ -288,7 +278,7 @@ const TourPlanDouble = () => {
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to accept an offer");
+      toast.error(t("login_to_accept_offer"));
       return;
     }
     try {
@@ -316,27 +306,25 @@ const TourPlanDouble = () => {
         }));
       }
 
-      toast.success("Offer accepted successfully");
+      toast.success(t("offer_accepted_success"));
     } catch (error) {
-      console.error("Failed to accept offer:", error);
-      toast.error(error.data?.detail || "Failed to accept offer");
+      toast.error(error.data?.detail || t("failed_to_accept_offer"));
     }
   };
 
   const handleMessage = async (data) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to send a message");
+      toast.error(t("login_to_send_message"));
       return;
     }
     const role = localStorage.getItem("role");
     try {
       await invite(data).unwrap();
-      toast.success("Chat initiated successfully");
+      toast.success(t("chat_initiated_success"));
       navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
     } catch (error) {
-      console.error("Failed to initiate chat:", error);
-      toast.error(error.data?.detail || "Failed to initiate chat");
+      toast.error(error.data?.detail || t("failed_to_initiate_chat"));
     }
   };
 
@@ -351,14 +339,14 @@ const TourPlanDouble = () => {
           onClick={toggleMobileFilter}
         >
           <Menu size={18} />
-          <span>Filters</span>
+          <span>{t("filters")}</span>
         </button>
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 pt-20">
           <div className="w-full md:w-3/4 lg:w-4/5 order-2 md:order-1">
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-600">
-                  Published Tour Plans
+                  {t("published_tour_plans")}
                 </h1>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                   <div className="w-full sm:w-auto">
@@ -367,17 +355,17 @@ const TourPlanDouble = () => {
                       value={filters.destination_type || ""}
                       onChange={(e) => handleCategoryChange(e.target.value)}
                     >
-                      <option value="">Select a category</option>
-                      <option value="beach">Beach trips</option>
-                      <option value="mountain">Mountain adventures</option>
-                      <option value="relax">Relaxing tours</option>
-                      <option value="group">Group packages</option>
+                      <option value="">{t("select_category")}</option>
+                      <option value="beach">{t("beach_trips")}</option>
+                      <option value="mountain">{t("mountain_adventures")}</option>
+                      <option value="relax">{t("relaxing_tours")}</option>
+                      <option value="group">{t("group_packages")}</option>
                     </select>
                   </div>
                   <div className="relative w-full sm:w-auto">
                     <input
                       type="text"
-                      placeholder="Search by destination"
+                      placeholder={t("search_by_destination")}
                       className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full sm:w-64"
                       value={filters.search}
                       onChange={(e) =>
@@ -401,7 +389,7 @@ const TourPlanDouble = () => {
                 </div>
               </div>
               <p className="text-gray-500 text-md font-medium">
-                All posted tour plans are here
+                {t("all_posted_tour_plans_here")}
               </p>
             </div>
 
@@ -421,12 +409,11 @@ const TourPlanDouble = () => {
 
                   let tooltipMessage = "";
                   if (hasAcceptedOffer && isOfferLimitReached) {
-                    tooltipMessage =
-                      "Your offer accepted and 3+ offers received";
+                    tooltipMessage = t("offer_accepted_and_limit");
                   } else if (hasAcceptedOffer) {
-                    tooltipMessage = "Your offer has been accepted";
+                    tooltipMessage = t("offer_accepted");
                   } else if (isOfferLimitReached) {
-                    tooltipMessage = "3+ offers already received";
+                    tooltipMessage = t("offer_limit_reached");
                   }
 
                   const token = localStorage.getItem("access_token");
@@ -435,7 +422,7 @@ const TourPlanDouble = () => {
 
                   const handleSentOfferClick = () => {
                     if (!token) {
-                      toast.error("Please log in to submit an offer");
+                      toast.error(t("login_to_submit_offer"));
                       navigate("/login");
                       return;
                     }
@@ -449,7 +436,6 @@ const TourPlanDouble = () => {
                       key={tour.id}
                       className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6 relative"
                     >
-                      {/* Tooltip for disabled button */}
                       {isDisabled && showSentOfferButton && (
                         <div className="absolute inset-0 pointer-events-none z-10">
                           <div className="relative h-full w-full">
@@ -480,7 +466,6 @@ const TourPlanDouble = () => {
                             </h2>
                           </div>
 
-                          {/* Accepted & Offer Logos */}
                           {tour.offers && tour.offers.length > 0 && (
                             <div className="absolute bottom-6 flex items-center justify-center space-x-8 px-2 w-full">
                               {tour.offers.map((offer) => {
@@ -497,18 +482,16 @@ const TourPlanDouble = () => {
                                     {isAccepted && (
                                       <img
                                         src={img}
-                                        alt="Accepted Badge"
+                                        alt={t("accepted_badge")}
                                         className="absolute inset-0 object-contain pointer-events-none"
                                       />
                                     )}
-                                    <img
+                                    < img
                                       src={
                                         offer.agency?.logo_url ||
                                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                       }
-                                      alt={`${
-                                        offer.agency?.agency_name || "Agency"
-                                      } logo`}
+                                      alt={`${offer.agency?.agency_name || "Agency"} logo`}
                                       className={`relative z-10 ${
                                         isAccepted
                                           ? "w-[52px] h-[52px]"
@@ -531,7 +514,7 @@ const TourPlanDouble = () => {
                                 className="mr-1"
                                 size={16}
                               />
-                              Offers completed
+                              {t("offers_completed")}
                             </div>
                           )}
                         </div>
@@ -557,39 +540,39 @@ const TourPlanDouble = () => {
                               />
                             </svg>
                             <span className="text-sm text-green-600 font-medium">
-                              Real Request
+                              {t("real_request")}
                             </span>
                           </div>
                         </div>
 
                         <div className="space-y-1 text-md text-gray-700">
                           <p>
-                            <span className="font-medium">Date:</span>{" "}
+                            <span className="font-medium">{t("date")}:</span>{" "}
                             {tour.start_date}
                           </p>
                           <p>
-                            <span className="font-medium">Category:</span>{" "}
+                            <span className="font-medium">{t("category")}:</span>{" "}
                             {tour.destination_type || "N/A"}
                           </p>
                         </div>
                         <div>
                           <p className="text-xl font-semibold text-gray-900">
-                            Budget: €{tour.budget}
+                            {t("budget")}: €{tour.budget}
                           </p>
                         </div>
                         <div className="flex items-center space-x-10">
                           <span className="text-md text-gray-700">
-                            <span className="font-medium">Total:</span>{" "}
+                            <span className="font-medium">{t("total")}:</span>{" "}
                             {tour.total_members}{" "}
-                            {tour.total_members > 1 ? "people" : "person"}
+                            {tour.total_members > 1 ? t("people") : t("person")}
                           </span>
                           <div className="flex items-center space-x-4">
                             <h1 className="text-md text-gray-700">
-                              <span className="font-medium">Child :</span>{" "}
+                              <span className="font-medium">{t("child")} :</span>{" "}
                               {tour.child_count}
                             </h1>
                             <h1>
-                              <span className="font-medium">Adult :</span>{" "}
+                              <span className="font-medium">{t("adult")} :</span>{" "}
                               {tour.adult_count}
                             </h1>
                           </div>
@@ -600,7 +583,7 @@ const TourPlanDouble = () => {
                             <FaLocationDot className="w-6 h-5 text-black size-4" />
                             <span>
                               <span className="font-medium">
-                                Points of travel:
+                                {t("points_of_travel")}:
                               </span>{" "}
                               {tour.tourist_spots.length > 14
                                 ? `${tour.tourist_spots.slice(0, 14)}...`
@@ -611,7 +594,7 @@ const TourPlanDouble = () => {
                             <FaLocationArrow className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
-                                Departure from:
+                                {t("departure_from")}:
                               </span>{" "}
                               {tour.location_from || "N/A"}
                             </span>
@@ -619,7 +602,7 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-black" />
                             <span>
-                              <span className="font-medium">Meal plan:</span>{" "}
+                              <span className="font-medium">{t("meal_plan")}:</span>{" "}
                               {tour.meal_plan || "N/A"}
                             </span>
                           </p>
@@ -627,7 +610,7 @@ const TourPlanDouble = () => {
                             <IoBed className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
-                                Type of accommodation:
+                                {t("type_of_accommodation")}:
                               </span>{" "}
                               {tour.type_of_accommodation || "N/A"}
                             </span>
@@ -636,7 +619,7 @@ const TourPlanDouble = () => {
                             <FaStar className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
-                                Minimum rating:
+                                {t("minimum_rating")}:
                               </span>{" "}
                               {tour.minimum_star_hotel || "N/A"}
                             </span>
@@ -644,7 +627,7 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
-                              <span className="font-medium">Duration:</span>{" "}
+                              <span className="font-medium">{t("duration")}:</span>{" "}
                               {tour.duration || "N/A"}
                             </span>
                           </p>
@@ -652,7 +635,7 @@ const TourPlanDouble = () => {
                             <ShieldCheck className="w-6 h-5 text-green-500" />
                             <span>
                               <span className="font-medium">
-                                Contact verified via email
+                                {t("contact_verified")}
                               </span>
                             </span>
                           </p>
@@ -668,7 +651,7 @@ const TourPlanDouble = () => {
                                   : "bg-blue-600 hover:bg-blue-700 text-white"
                               }`}
                             >
-                              Sent Offer
+                              {t("sent_offer")}
                               {token && isDisabled && (
                                 <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
                                   {tooltipMessage}
@@ -683,12 +666,11 @@ const TourPlanDouble = () => {
                   );
                 })
               ) : (
-                <div className="col-span-full">No tours found</div>
+                <div className="col-span-full">{t("no_tours_found")}</div>
               )}
             </div>
           </div>
 
-          {/* Filters Sidebar */}
           <div
             className={`w-full md:w-1/4 lg:w-1/5 order-1 md:order-2 lg:mt-24 ${
               isMobileFilterOpen ? "block" : "hidden md:block"
@@ -696,7 +678,7 @@ const TourPlanDouble = () => {
           >
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 top-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t("filters")}</h3>
                 <button
                   className="md:hidden text-gray-500"
                   onClick={toggleMobileFilter}
@@ -707,12 +689,12 @@ const TourPlanDouble = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price Range (USD)
+                    {t("price_range_usd")}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="text"
-                      placeholder="Min"
+                      placeholder={t("min")}
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={filters.min}
                       onChange={(e) =>
@@ -721,7 +703,7 @@ const TourPlanDouble = () => {
                     />
                     <input
                       type="text"
-                      placeholder="Max"
+                      placeholder={t("max")}
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={filters.max}
                       onChange={(e) =>
@@ -732,15 +714,15 @@ const TourPlanDouble = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Country (To)
+                    {t("select_country_to")}
                   </label>
                   {isTourPlanPublicLoading ? (
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-500">
-                      Loading countries...
+                      {t("loading_countries")}
                     </div>
                   ) : uniqueCountries.length === 0 ? (
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-500">
-                      No countries found
+                      {t("no_countries_found")}
                     </div>
                   ) : (
                     <select
@@ -750,7 +732,7 @@ const TourPlanDouble = () => {
                         handleFilterChange("country", e.target.value)
                       }
                     >
-                      <option value="">All Countries</option>
+                      <option value="">{t("all_countries")}</option>
                       {uniqueCountries.map((country) => (
                         <option key={country} value={country}>
                           {country}
@@ -761,11 +743,11 @@ const TourPlanDouble = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Travel Type
+                    {t("travel_type")}
                   </label>
                   <input
                     type="text"
-                    placeholder="Search by travel type"
+                    placeholder={t("search_by_travel_type")}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.travel_type}
                     onChange={(e) =>

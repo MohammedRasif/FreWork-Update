@@ -1,20 +1,24 @@
+"use client";
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useMemo } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { NavLink } from "react-router-dom";
 import { useAdminProfileMutation, useGetAgencyProfileQuery } from "@/redux/features/withAuth";
+import { useTranslation } from "react-i18next";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 const AdminProfileEdit = () => {
+  const { t } = useTranslation();
+
   const categoryMap = useMemo(
     () => ({
-      "Beach trips": "beach",
-      "Mountain adventures": "mountain",
-      "Relaxing tours": "desert",
-      "Group Packages": "island",
+      [t("beach_trips")]: "beach",
+      [t("mountain_adventures")]: "mountain",
+      [t("relaxing_tours")]: "desert",
+      [t("group_packages")]: "island",
     }),
-    []
+    [t]
   );
 
   const reverseCategoryMap = useMemo(
@@ -74,7 +78,7 @@ const AdminProfileEdit = () => {
         console.error("Error parsing service_categories:", err);
       }
     }
-  }, [profileData, reset]);
+  }, [profileData, reset, reverseCategoryMap]);
 
   const validateFileSize = (file, setErrorState, errorMessage) => {
     if (file && file.size > MAX_FILE_SIZE) {
@@ -88,13 +92,13 @@ const AdminProfileEdit = () => {
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (validateFileSize(file, setLogoSizeError, "Logo must be under 10MB")) {
+      if (validateFileSize(file, setLogoSizeError, t("logo_size_error"))) {
         setLogoFile(file);
         clearErrors("logoFile");
       } else {
         setLogoFile(null);
-        e.target.value = null; // Reset input
-        setError("logoFile", { message: "File too large" });
+        e.target.value = null;
+        setError("logoFile", { message: t("file_too_large") });
       }
     }
   };
@@ -102,25 +106,24 @@ const AdminProfileEdit = () => {
   const handleCoverPhotoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (validateFileSize(file, setCoverSizeError, "Cover photo must be under 10MB")) {
+      if (validateFileSize(file, setCoverSizeError, t("cover_size_error"))) {
         setCoverPhotoFile(file);
         clearErrors("coverPhotoFile");
       } else {
         setCoverPhotoFile(null);
         e.target.value = null;
-        setError("coverPhotoFile", { message: "File too large" });
+        setError("coverPhotoFile", { message: t("file_too_large") });
       }
     }
   };
 
   const onSubmit = async (data) => {
-    // Final check before submit
     if (logoFile && logoFile.size > MAX_FILE_SIZE) {
-      setLogoSizeError("Logo must be under 10MB");
+      setLogoSizeError(t("logo_size_error"));
       return;
     }
     if (coverPhotoFile && coverPhotoFile.size > MAX_FILE_SIZE) {
-      setCoverSizeError("Cover photo must be under 10MB");
+      setCoverSizeError(t("cover_size_error"));
       return;
     }
 
@@ -141,16 +144,16 @@ const AdminProfileEdit = () => {
 
       const response = await adminProfile(formData).unwrap();
       console.log("Profile Updated:", response);
-      alert("Agency profile updated successfully!");
+      alert(t("profile_updated_success"));
       window.location.reload();
     } catch (err) {
       console.error("Failed to update profile:", err);
-      alert("Failed to update agency profile. Please try again.");
+      alert(t("failed_to_update_profile"));
     }
   };
 
   if (isProfileLoading) {
-    return <div>Loading profile data...</div>;
+    return <div>{t("loading_profile")}</div>;
   }
 
   return (
@@ -158,25 +161,25 @@ const AdminProfileEdit = () => {
       <div className="flex items-center justify-between">
         <NavLink to="/admin/profile" className="flex items-center space-x-1 cursor-pointer">
           <GoArrowLeft size={22} />
-          <h1 className="text-[19px] -mt-1">Back</h1>
+          <h1 className="text-[19px] -mt-1">{t("back")}</h1>
         </NavLink>
         <h1 className="text-3xl text-black font-semibold text-center pb-10 pt-5">
-          Agency Registration
+          {t("agency_registration")}
         </h1>
         <div></div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Agency Data</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">{t("agency_data")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              Agency Name
+              {t("agency_name")}
             </label>
             <input
-              {...register("agencyName", { required: "Agency name is required" })}
+              {...register("agencyName", { required: t("agency_name_required") })}
               type="text"
-              placeholder="Enter here"
+              placeholder={t("enter_here")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             />
             {errors.agencyName && (
@@ -187,18 +190,18 @@ const AdminProfileEdit = () => {
           </div>
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              VAT Number
+              {t("vat_number")}
             </label>
             <input
               {...register("vatNumber", {
-                required: "VAT Number is required",
+                required: t("vat_number_required"),
                 pattern: {
                   value: /^\d{11}$/,
-                  message: "VAT Number must be exactly 11 digits",
+                  message: t("vat_11_digits"),
                 },
               })}
               type="text"
-              placeholder="Enter 11-digit VAT Number"
+              placeholder={t("enter_11_digit_vat")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             />
             {errors.vatNumber && (
@@ -207,14 +210,14 @@ const AdminProfileEdit = () => {
           </div>
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              Contact Email
+              {t("contact_email")}
             </label>
             <input
               {...register("email", {
-                required: "Email is required",
+                required: t("email_required"),
                 pattern: {
                   value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: "Invalid email address",
+                  message: t("invalid_email"),
                 },
               })}
               type="email"
@@ -227,18 +230,18 @@ const AdminProfileEdit = () => {
           </div>
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              Phone
+              {t("phone")}
             </label>
             <input
               {...register("phoneNumber", {
-                required: "Phone Number is required",
+                required: t("phone_required"),
                 pattern: {
                   value: /^[0-9]{9,15}$/,
-                  message: "Invalid phone number",
+                  message: t("invalid_phone"),
                 },
               })}
               type="tel"
-              placeholder="Ex. 123456789"
+              placeholder={t("phone_example")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
             />
             {errors.phoneNumber && (
@@ -247,13 +250,13 @@ const AdminProfileEdit = () => {
           </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Images</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">{t("images")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-2">Logo</label>
+            <label className="block text-base font-medium text-gray-700 mb-2">{t("logo")}</label>
             <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-md">
               <label className="px-4 py-2 text-gray-700 cursor-pointer bg-gray-300 hover:bg-gray-200">
-                Choose file
+                {t("choose_file")}
                 <input
                   type="file"
                   className="hidden"
@@ -262,23 +265,23 @@ const AdminProfileEdit = () => {
                 />
               </label>
               <span className="text-base text-gray-600 truncate max-w-[150px]">
-                {logoFile ? logoFile.name : "No file chosen"}
+                {logoFile ? logoFile.name : t("no_file_chosen")}
               </span>
             </div>
             {logoSizeError && (
               <p className="text-red-500 text-sm mt-1">{logoSizeError}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
-            <p className="text-xs  mt-1 text-red-400">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
+            <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
+            <p className="text-xs mt-1 text-red-400">{t("upload_images_mandatory")}</p>
           </div>
 
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              Cover Photo
+              {t("cover_photo")}
             </label>
             <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-md">
               <label className="px-4 py-2 text-gray-700 cursor-pointer bg-gray-300 hover:bg-gray-200">
-                Choose file
+                {t("choose_file")}
                 <input
                   type="file"
                   className="hidden"
@@ -287,30 +290,30 @@ const AdminProfileEdit = () => {
                 />
               </label>
               <span className="text-base text-gray-600 truncate max-w-[150px]">
-                {coverPhotoFile ? coverPhotoFile.name : "No file chosen"}
+                {coverPhotoFile ? coverPhotoFile.name : t("no_file_chosen")}
               </span>
             </div>
             {coverSizeError && (
               <p className="text-red-500 text-sm mt-1">{coverSizeError}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
-            <p className="text-xs mt-1 text-red-400">Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.</p>
+            <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
+            <p className="text-xs mt-1 text-red-400">{t("upload_images_mandatory")}</p>
           </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Profile</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">{t("profile")}</h3>
         <div>
           <label className="block text-base font-medium text-gray-700 mb-2">
-            Short Description
+            {t("short_description")}
           </label>
           <textarea
             {...register("description", {
               maxLength: {
                 value: 500,
-                message: "Description cannot exceed 500 characters",
+                message: t("description_max_500"),
               },
             })}
-            placeholder="Enter a short description"
+            placeholder={t("enter_short_description")}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -319,27 +322,25 @@ const AdminProfileEdit = () => {
           )}
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Main Categories</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">{t("main_categories")}</h3>
         <div className="flex flex-wrap gap-3">
-          {["Beach trips", "Mountain adventures", "Relaxing tours", "Group Packages"].map(
-            (category) => (
-              <label
-                key={category}
-                className="flex items-center gap-2 text-base text-gray-700 bg-white px-4 py-1 rounded-full border border-gray-200 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  value={category}
-                  {...register("categories", {
-                    validate: (value) =>
-                      value.length > 0 || "At least one category must be selected",
-                  })}
-                  className="h-4 w-4 text-blue-600"
-                />
-                {category}
-              </label>
-            )
-          )}
+          {Object.keys(categoryMap).map((category) => (
+            <label
+              key={category}
+              className="flex items-center gap-2 text-base text-gray-700 bg-white px-4 py-1 rounded-full border border-gray-200 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                value={category}
+                {...register("categories", {
+                  validate: (value) =>
+                    value.length > 0 || t("select_at_least_one_category"),
+                })}
+                className="h-4 w-4 text-blue-600"
+              />
+              {category}
+            </label>
+          ))}
           {errors.categories && (
             <span className="text-red-500 text-sm w-full">{errors.categories.message}</span>
           )}
@@ -349,12 +350,12 @@ const AdminProfileEdit = () => {
           <input
             type="checkbox"
             {...register("terms", {
-              required: "You must accept Terms & Privacy",
+              required: t("accept_terms_required"),
             })}
             className="h-4 w-4 text-blue-600"
           />
           <span className="ml-2 text-base text-gray-700">
-            I accept Terms and Privacy
+            {t("accept_terms_privacy")}
           </span>
         </div>
         {errors.terms && (
@@ -363,7 +364,7 @@ const AdminProfileEdit = () => {
 
         {error && (
           <div className="text-red-500 text-sm text-center">
-            {error.data?.message || "An error occurred while updating the profile"}
+            {error.data?.message || t("update_profile_error")}
           </div>
         )}
 
@@ -377,7 +378,7 @@ const AdminProfileEdit = () => {
                 : ""
             }`}
           >
-            {isLoading ? "Updating..." : "Complete Registration"}
+            {isLoading ? t("updating") : t("complete_registration")}
           </button>
         </div>
       </form>

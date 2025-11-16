@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef } from "react";
 import { Baby, User, X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
@@ -21,10 +22,10 @@ import {
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 import AdminDecline from "./AdminDecline";
-
-const token = localStorage.getItem("access_token");
+import { useTranslation } from "react-i18next";
 
 const AdminHome = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("All Plans");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("All");
@@ -41,23 +42,17 @@ const AdminHome = () => {
   const popupRef = useRef(null);
   const navigate = useNavigate();
   const { data: userData } = useShowUserInpormationQuery();
-  console.log(userData);
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
-
-  console.log(tourPlanPublic, "dddddddddddddddddddddd");
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
   const [declineRequest, { isLoading: isDeclineRequestLoading }] =
     useDeclineRequestMutation();
-
   const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
   useEffect(() => {
     const savedTab = localStorage.getItem("adminActiveTab");
-    if (savedTab) {
-      setActiveTab(savedTab);
-    }
+    if (savedTab) setActiveTab(savedTab);
   }, []);
 
   const handleTabChange = (tab) => {
@@ -65,7 +60,6 @@ const AdminHome = () => {
     localStorage.setItem("adminActiveTab", tab);
   };
 
-  // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
@@ -88,16 +82,10 @@ const AdminHome = () => {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesFilter =
-      filter === "All" ||
-      (filter === "Offered" && plan.offered_status === true);
-    const currentUserEmail = localStorage.getItem("userEmail");
+      filter === "All" || (filter === "Offered" && plan.offered_status === true);
     const hasUserOffered =
       Array.isArray(plan.offers) &&
-      plan.offers.some((offer) => {
-        const email = offer.agency?.contact_email;
-
-        return email === currentUserEmail;
-      });
+      plan.offers.some((offer) => offer.agency?.contact_email === currentUserEmail);
     const isOwnPlan = plan.user === currentUserEmail;
     return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan;
   });
@@ -110,38 +98,27 @@ const AdminHome = () => {
     }));
   };
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
   };
 
-  // add new filter funcation
-
-  // Handle offer submission
   const handleSubmitOffer = async (planId, budget, comment) => {
-    if (!token) {
-      toast.error("Please log in to submit an offer");
+    if (!localStorage.getItem("access_token")) {
+      toast.error(t("login_to_submit_offer"));
       return;
     }
-
     if (!budget || !comment.trim()) {
-      toast.error("Please provide a budget and a comment");
+      toast.error(t("provide_budget_and_comment"));
       return;
     }
-
-    if (
-      offerForm.applyDiscount &&
-      (!offerForm.discount || offerForm.discount <= 0)
-    ) {
-      toast.error("Please provide a valid discount percentage");
+    if (offerForm.applyDiscount && (!offerForm.discount || offerForm.discount <= 0)) {
+      toast.error(t("provide_valid_discount"));
       return;
     }
 
     setIsOfferSubmitting(true);
-
     try {
-      // Create FormData to include all required fields
       const formData = new FormData();
       formData.append("offered_budget", Number.parseFloat(budget));
       formData.append("message", comment);
@@ -150,26 +127,19 @@ const AdminHome = () => {
         "discount",
         offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
       );
-      if (selectedFile) {
-        formData.append("file", selectedFile);
-      }
+      if (selectedFile) formData.append("file", selectedFile);
 
-      await offerBudgetToBack({
-        id: planId,
-        data: formData,
-      }).unwrap();
+      await offerBudgetToBack({ id: planId, data: formData }).unwrap();
 
       const newOffer = {
         id: `${localStorage.getItem("user_id")}-${Date.now()}`,
         offered_budget: Number.parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount
-          ? Number.parseFloat(offerForm.discount)
-          : 0,
+        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
         file_name: selectedFile ? selectedFile.name : null,
         agency: {
-          agency_name: localStorage.getItem("name") || "Unknown Agency",
+          agency_name: localStorage.getItem("name") || t("unknown_agency"),
           logo_url:
             localStorage.getItem("user_image") ||
             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
@@ -178,56 +148,43 @@ const AdminHome = () => {
       };
 
       if (selectedPlan && selectedPlan.id === planId) {
-        setSelectedPlan((prev) =>
-          prev
-            ? {
-                ...prev,
-                offers: [...(prev.offers || []), newOffer],
-                offer_count: (prev.offer_count || 0) + 1,
-              }
-            : prev
-        );
+        setSelectedPlan((prev) => prev ? {
+          ...prev,
+          offers: [...(prev.offers || []), newOffer],
+          offer_count: (prev.offer_count || 0) + 1,
+        } : prev);
       }
 
       setOfferBudget(0);
       setOfferComment("");
       setOfferForm({ applyDiscount: false, discount: "" });
       setSelectedFile(null);
-      toast.success("Offer submitted successfully");
+      toast.success(t("offer_submitted_success"));
       navigate("/admin/chat");
     } catch (error) {
-      console.error("Failed to submit offer:", error);
       toast.error(
-        error?.data?.error ||
-          error?.error ||
-          "Failed to submit offer. Only agencies can do this."
+        error?.data?.error || error?.error || t("failed_to_submit_offer")
       );
     } finally {
       setIsOfferSubmitting(false);
     }
   };
 
-  // Handle decline request
   const handleDeclineRequest = async (planId) => {
-    if (!token) {
-      toast.error("Please log in to decline a request");
+    if (!localStorage.getItem("access_token")) {
+      toast.error(t("login_to_decline"));
       return;
     }
-
     try {
       await declineRequest({ id: planId }).unwrap();
-      toast.success("Request declined successfully");
+      toast.success(t("request_declined_success"));
     } catch (error) {
-      toast.error(error?.data?.error || "Failed to decline request");
+      toast.error(error?.data?.error || t("failed_to_decline"));
     }
   };
 
-  // Open/close popup
   const openPopup = (plan, type = "view") => {
-    setSelectedPlan({
-      ...plan,
-      offers: plan.offers || [],
-    });
+    setSelectedPlan({ ...plan, offers: plan.offers || [] });
     setModalType(type);
     setIsPopupOpen(true);
   };
@@ -242,34 +199,22 @@ const AdminHome = () => {
     setSelectedFile(null);
   };
 
-  // Render content for different tabs
   const renderContent = () => {
     switch (activeTab) {
-      case "All Plans":
+      case t("all_plans_tab"):
         if (isTourPlanPublicLoading) {
-          return (
-            <div className="text-center text-gray-600">Loading plans...</div>
-          );
+          return <div className="text-center text-gray-600">{t("loading_plans")}</div>;
         }
         if (!filteredPlans.length) {
-          return (
-            <div className="text-center text-gray-600">No plans found.</div>
-          );
+          return <div className="text-center text-gray-600">{t("no_plans_found")}</div>;
         }
         return filteredPlans.map((plan) => (
-          <div
-            key={plan.id}
-            className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
-          >
+          <div key={plan.id} className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto">
             <div className="flex flex-col lg:flex-row">
               <div className="lg:flex relative">
                 <img
-                  src={
-                    plan.spot_picture_url
-                      ? plan.spot_picture_url
-                      : "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                  }
-                  alt={`${plan.location_to || "Tourist spot"}`}
+                  src={plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"}
+                  alt={t("tourist_spot")}
                   className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
                 />
               </div>
@@ -280,20 +225,18 @@ const AdminHome = () => {
                   </h2>
                   <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                     <p>
-                      Dates:{" "}
+                      {t("dates")}:{" "}
                       <span className="font-medium">
                         {plan.start_date} — {plan.end_date || plan.start_date}
                       </span>
                     </p>
                     <p>
-                      Total members:{" "}
+                      {t("total_members")}:{" "}
                       <span className="font-medium">{plan.total_members}</span>
                     </p>
                     <p>
-                      Category:{" "}
-                      <span className="font-medium">
-                        {plan.destination_type}
-                      </span>
+                      {t("category")}:{" "}
+                      <span className="font-medium">{plan.destination_type}</span>
                     </p>
                   </div>
                 </div>
@@ -301,10 +244,10 @@ const AdminHome = () => {
                   <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
                     <div className="text-center lg:text-right">
                       <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
-                        Budget <FaEuroSign /> {plan.budget}
+                        {t("budget")} <FaEuroSign /> {plan.budget}
                       </p>
                       <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                        {plan.total_members} person
+                        {t("total_persons", { count: plan.total_members })}
                       </p>
                     </div>
                     <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
@@ -312,26 +255,22 @@ const AdminHome = () => {
                         onClick={() => openPopup(plan, "view")}
                         className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                       >
-                        View
+                        {t("view")}
                       </button>
                       <button
                         onClick={() => openPopup(plan, "offer")}
                         className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
                       >
-                        Send offer
+                        {t("send_offer")}
                       </button>
                       <button
                         onClick={() => handleDeclineRequest(plan.id)}
                         disabled={isDeclineRequestLoading}
                         className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                          isDeclineRequestLoading
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
+                          isDeclineRequestLoading ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                       >
-                        {isDeclineRequestLoading
-                          ? "Declining..."
-                          : "Decline request"}
+                        {isDeclineRequestLoading ? t("declining") : t("decline_request")}
                       </button>
                     </div>
                   </div>
@@ -340,11 +279,11 @@ const AdminHome = () => {
             </div>
           </div>
         ));
-      case "Decline Plans":
+      case t("decline_plans_tab"):
         return <AdminDecline />;
-      case "Offered Plans":
+      case t("offered_plans_tab"):
         return <AdminOfferPlan />;
-      case "Accepted Plans":
+      case t("accepted_plans_tab"):
         return <AdminAcceptPlan />;
       default:
         return null;
@@ -367,68 +306,63 @@ const AdminHome = () => {
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
                         <span>
-                          <span className="font-bold">Points of travel:</span>{" "}
-                          {selectedPlan.tourist_spots || "None"}
+                          <span className="font-bold">{t("points_of_travel")}:</span>{" "}
+                          {selectedPlan.tourist_spots || t("none")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Departure from:</span>{" "}
-                          {selectedPlan.location_from || "N/A"}
+                          <span className="font-bold">{t("departure_from")}:</span>{" "}
+                          {selectedPlan.location_from || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaList className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Minimum rating:</span>{" "}
-                          {selectedPlan.minimum_star_hotel || "N/A"}
+                          <span className="font-bold">{t("minimum_rating")}:</span>{" "}
+                          {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Meal plan:</span>{" "}
-                          {selectedPlan.meal_plan || "N/A"}
+                          <span className="font-bold">{t("meal_plan")}:</span>{" "}
+                          {selectedPlan.meal_plan || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">
-                            Type of accommodation:
-                          </span>{" "}
-                          {selectedPlan.type_of_accommodation || "N/A"}
+                          <span className="font-bold">{t("type_of_accommodation")}:</span>{" "}
+                          {selectedPlan.type_of_accommodation || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <Baby className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Child :</span>{" "}
-                          {selectedPlan.child_count || "N/A"}
+                          <span className="font-bold">{t("child")}:</span>{" "}
+                          {selectedPlan.child_count || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <User className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Adult :</span>{" "}
-                          {selectedPlan.adult_count || "N/A"}
+                          <span className="font-bold">{t("adult")}:</span>{" "}
+                          {selectedPlan.adult_count || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-500" />
                         <span>
-                          <span className="font-bold">Duration:</span>{" "}
-                          {selectedPlan.duration || "N/A"}
+                          <span className="font-bold">{t("duration")}:</span>{" "}
+                          {selectedPlan.duration || t("na")}
                         </span>
                       </p>
-
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
-                          <span className="font-medium">
-                            Contact verified via email
-                          </span>
+                          <span className="font-medium">{t("contact_verified_via_email")}</span>
                         </span>
                       </p>
                     </div>
@@ -437,10 +371,10 @@ const AdminHome = () => {
                 <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0">
                   <div>
                     <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center">
-                      Budget <FaEuroSign /> {selectedPlan.budget}
+                      {t("budget")} <FaEuroSign /> {selectedPlan.budget}
                     </p>
                     <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                      Total {selectedPlan.total_members} person
+                      {t("total_persons", { count: selectedPlan.total_members })}
                     </p>
                   </div>
                 </div>
@@ -452,42 +386,32 @@ const AdminHome = () => {
               </div>
               <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                 <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                  Interested Travel Points:
+                  {t("interested_travel_points")}:
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {selectedPlan.tourist_spots ? (
-                    selectedPlan.tourist_spots
-                      .split(",")
-                      .map((location, index) => (
-                        <span
-                          key={index}
-                          className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-                        >
-                          {location.trim()}
-                          {index <
-                            selectedPlan.tourist_spots.split(",").length - 1 &&
-                            ", "}
-                        </span>
-                      ))
+                    selectedPlan.tourist_spots.split(",").map((location, index) => (
+                      <span
+                        key={index}
+                        className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {location.trim()}
+                        {index < selectedPlan.tourist_spots.split(",").length - 1 && ", "}
+                      </span>
+                    ))
                   ) : (
                     <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                      None
+                      {t("none")}
                     </span>
                   )}
                 </div>
               </div>
               <div className="mb-4 relative">
                 <img
-                  src={
-                    selectedPlan.spot_picture_url ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                  }
-                  alt="Tour destination"
+                  src={selectedPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"}
+                  alt={t("tour_destination")}
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                 />
-                {/* <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
-                  Image generated automatically
-                </h1> */}
               </div>
             </div>
           </div>
@@ -498,18 +422,18 @@ const AdminHome = () => {
         <div className="p-4">
           <div className="flex-1 w-full">
             <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
-              Place your offer
+              {t("place_your_offer")}
             </p>
             <div className="flex flex-col gap-3">
               <input
                 type="number"
-                placeholder="Enter your budget"
+                placeholder={t("enter_your_budget")}
                 value={offerBudget}
                 onChange={(e) => setOfferBudget(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               />
               <textarea
-                placeholder="Enter your comment"
+                placeholder={t("enter_your_comment")}
                 value={offerComment}
                 onChange={(e) => setOfferComment(e.target.value)}
                 className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
@@ -517,7 +441,7 @@ const AdminHome = () => {
               />
               <div className="mt-4">
                 <label className="block lg:text-md font-medium text-gray-700 mb-1">
-                  Upload File (Optional)
+                  {t("upload_file_optional")}
                 </label>
                 <input
                   type="file"
@@ -526,7 +450,7 @@ const AdminHome = () => {
                 />
                 {selectedFile && (
                   <p className="text-xs text-gray-600 mt-1">
-                    Selected: {selectedFile.name}
+                    {t("selected")}: {selectedFile.name}
                   </p>
                 )}
               </div>
@@ -535,68 +459,53 @@ const AdminHome = () => {
                   <input
                     type="checkbox"
                     name="applyDiscount"
-                    id="applyDiscount"
                     checked={offerForm.applyDiscount}
                     onChange={handleOfferChange}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 lg:text-md text-gray-700">
-                    Apply an additional discount
+                    {t("apply_additional_discount")}
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1">
-                  Website suggests extra discount, increases conversions by 30%.
-                  Check to offer more.
+                  {t("discount_suggestion")}
                 </p>
               </div>
               <div className="mt-4 mb-2">
-                <label
-                  htmlFor="discount"
-                  className="block lg:text-md font-medium text-gray-700 mb-1"
-                >
-                  Discount
+                <label htmlFor="discount" className="block lg:text-md font-medium text-gray-700 mb-1">
+                  {t("discount")}
                 </label>
                 <input
                   type="number"
                   name="discount"
-                  id="discount"
                   value={offerForm.discount}
                   onChange={handleOfferChange}
-                  placeholder="Enter discount percentage"
+                  placeholder={t("enter_discount_percentage")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   disabled={!offerForm.applyDiscount}
                 />
               </div>
               <button
-                onClick={() =>
-                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
-                }
+                onClick={() => handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)}
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
-                disabled={
-                  isOfferSubmitting || !offerBudget || !offerComment.trim()
-                }
+                disabled={isOfferSubmitting || !offerBudget || !offerComment.trim()}
               >
                 <IoIosSend size={24} />
-                <span>
-                  {isOfferSubmitting ? "Submitting..." : "Submit Offer"}
-                </span>
+                <span>{isOfferSubmitting ? t("submitting") : t("submit_offer")}</span>
               </button>
             </div>
           </div>
           {selectedPlan.offers && selectedPlan.offers.length > 0 && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                Offers
+                {t("offers")}
               </h3>
               {selectedPlan.offers.map((offer) => (
-                <div
-                  key={offer.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
-                >
+                <div key={offer.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3">
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                     <img
                       src={offer.agency.logo_url || "/placeholder.svg"}
@@ -607,23 +516,12 @@ const AdminHome = () => {
                       <span className="font-medium text-gray-900">
                         {offer.agency.agency_name}
                       </span>
-                      {/* <p className="text-xs sm:text-sm text-gray-600">
-                        {offer.message}
-                      </p> */}
-                      {/* {offer.file_name && (
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          File: {offer.file_name}
-                        </p>
-                      )} */}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* <span className="font-semibold text-lg sm:text-xl">
-                      ${offer.offered_budget}
-                    </span> */}
                     {offer.apply_discount && offer.discount > 0 && (
                       <span className="text-sm text-green-600">
-                        ({offer.discount}% off)
+                        ({offer.discount}% {t("off")})
                       </span>
                     )}
                   </div>
@@ -641,19 +539,16 @@ const AdminHome = () => {
       <Toaster />
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-4/5">
-          <div className="mb-24  lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0 ">
+          <div className="mb-24 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              Welcome,{" "}
-              <span className="font-semibold">
-                Choose perfect offer for you
-              </span>
+              {t("welcome")}, <span className="font-semibold">{t("choose_perfect_offer")}</span>
             </h1>
-            {activeTab === "All Plans" && (
-              <div className="flex items-center space-x-4 ">
+            {activeTab === t("all_plans_tab") && (
+              <div className="flex items-center space-x-4">
                 <div className="relative w-full lg:max-w-[30vh]">
                   <input
                     type="text"
-                    placeholder="Search by Tour Location"
+                    placeholder={t("search_by_tour_location")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
@@ -665,12 +560,7 @@ const AdminHome = () => {
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <select
@@ -678,8 +568,8 @@ const AdminHome = () => {
                   onChange={(e) => setFilter(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700"
                 >
-                  <option value="All">All</option>
-                  <option value="Offered">Offered</option>
+                  <option value="All">{t("all")}</option>
+                  <option value="Offered">{t("offered")}</option>
                 </select>
               </div>
             )}
@@ -687,26 +577,22 @@ const AdminHome = () => {
           {renderContent()}
         </div>
 
-        {/* Fixed Sidebar - My Board + Alert */}
-        <div className="fixed lg:right-3 right-[2px] lg:top-20 top-40 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40 ">
+        <div className="fixed lg:right-3 right-[2px] lg:top-20 top-40 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40">
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center hidden md:block">
-                My Board
+                {t("my_board")}
               </h3>
               <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible">
                 {[
-                  "All Plans",
-                  "Decline Plans",
-                  "Offered Plans",
-                  "Accepted Plans",
+                  t("all_plans_tab"),
+                  t("decline_plans_tab"),
+                  t("offered_plans_tab"),
+                  t("accepted_plans_tab"),
                 ].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => {
-                      setActiveTab(tab);
-                      handleTabChange(tab);
-                    }}
+                    onClick={() => handleTabChange(tab)}
                     className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap ${
                       activeTab === tab
                         ? "bg-white shadow-md border border-blue-200"
@@ -719,65 +605,45 @@ const AdminHome = () => {
               </div>
               <div className="pt-4 lg:pt-6 hidden md:block">
                 <p className="text-xs sm:text-sm lg:text-sm text-gray-900 font-semibold mb-2">
-                  Want to respond fast to get Tourist for "Free"?
+                  {t("respond_fast_for_free")}
                 </p>
               </div>
             </div>
 
-            {/* === New English Alert Section === */}
             <div className="bg-white border-2 border-red-600 rounded-xl shadow-lg overflow-hidden hidden md:block">
-              {/* Header */}
               <div className="bg-red-600 text-white px-4 py-3 flex items-center gap-2">
                 <div className="bg-white text-red-600 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold">
                   !
                 </div>
                 <h3 className="text-sm lg:text-base font-bold">
-                  Important Notice for Agencies
+                  {t("important_notice_for_agencies")}
                 </h3>
               </div>
-
-              {/* Body */}
               <div className="p-4 space-y-3 text-gray-800 text-xs lg:text-sm">
                 <p className="font-semibold leading-relaxed">
-                  It is <span className="underline">mandatory</span> to click on{" "}
-                  <span className="underline">"Confirm Deal"</span> every time
-                  you close an agreement with a client.
+                  {t("confirm_deal_mandatory")}
                 </p>
-
                 <p className="leading-relaxed">
-                  The <strong>final confirmation belongs to the client</strong>:
-                  only then will the deal be valid, count toward site
-                  statistics, and award the{" "}
-                  <strong>"Winning Agency" badge</strong> visible to all.
+                  {t("final_confirmation_client")}
                 </p>
-
                 <p className="font-bold text-red-700 flex items-center gap-1">
                   <span className="text-xl">X</span>
-                  Agencies that fail to confirm may face{" "}
-                  <span className="underline">
-                    penalties or temporary suspensions
-                  </span>
-                  .
+                  {t("penalties_for_noncompliance")}
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {isPopupOpen && selectedPlan && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div
-            ref={popupRef}
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-          >
+          <div ref={popupRef} className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">
-                {modalType === "view" ? "Tour Details" : "Send Offer"}
+                {modalType === "view" ? t("tour_details") : t("send_offer")}
               </h2>
-              <button
-                onClick={closePopup}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
+              <button onClick={closePopup} className="text-gray-500 hover:text-gray-700 transition-colors">
                 <X size={24} />
               </button>
             </div>

@@ -1,100 +1,28 @@
+"use client";
 import { useState, useEffect } from "react";
 import { VscRobot } from "react-icons/vsc";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const AdminMessages = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current route
+  const location = useLocation();
   const [selectedUserId, setSelectedUserId] = useState(null);
 
-  const users = [
-    {
-      id: "U001",
-      name: "Alice",
-      number: "3",
-      message: "hello",
-      bot: "hello",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529179/cld-sample.jpg",
-    },
-    {
-      id: "U002",
-      name: "Bob",
-      number: "2",
-      message: "how are you",
-      bot: "how are you",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529178/samples/man-portrait.jpg",
-    },
-    {
-      id: "U003",
-      name: "Charlie",
-      number: "3",
-      message: "are you ok",
-      bot: "are you ok",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529177/samples/smile.jpg",
-    },
-    {
-      id: "U008",
-      name: "Ramis",
-      number: "",
-      message: "are you know me",
-      bot: "are you know me",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529179/cld-sample.jpg",
-    },
-    {
-      id: "U004",
-      name: "Bijoy",
-      number: "5",
-      message: "are you know me",
-      bot: "are you know me",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529173/samples/two-ladies.jpg",
-    },
-    {
-      id: "U005",
-      name: "Pappu",
-      number: "",
-      message: "show this",
-      bot: "show this",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/people/boy-snow-hoodie.jpg",
-    },
-    {
-      id: "U006",
-      name: "Rasif",
-      number: "",
-      message: "are you crazy",
-      bot: "are you crazy",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/people/smiling-man.jpg",
-    },
-    {
-      id: "U007",
-      name: "Sojib",
-      number: "",
-      message: "do you know me",
-      bot: "do you know me",
-      image:
-        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529168/samples/people/kitchen-bar.jpg",
-    },
-  ];
+  const users = [];
 
-  // Update selectedUserId based on the current route
   useEffect(() => {
     const pathParts = location.pathname.split("/");
     const userIdFromPath = pathParts[pathParts.length - 1];
 
-    // Check if the route is for a user (not chatbot)
     if (
       pathParts.includes("Message") &&
       users.some((user) => user.id === userIdFromPath)
     ) {
       setSelectedUserId(userIdFromPath);
     } else {
-      setSelectedUserId(null); // Reset when on chatbot or other routes
+      setSelectedUserId(null);
     }
   }, [location.pathname]);
 
@@ -104,17 +32,16 @@ const AdminMessages = () => {
   };
 
   const handleChatbotClick = () => {
-    setSelectedUserId(null); // Ensure no user is selected
+    setSelectedUserId(null);
     navigate("/Admin_Dashboard/Message/chatbot");
   };
 
-  // Check if the current route is the base route (/Admin_Dashboard/Message)
   const isBaseRoute = location.pathname === "/Admin_Dashboard/Message";
 
   return (
     <div className="p-10 roboto">
       <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        Messages
+        {t("messages")}
       </h1>
       <div className="flex" style={{ height: "80vh" }}>
         {/* User List Sidebar */}
@@ -122,10 +49,8 @@ const AdminMessages = () => {
           <div className="m-3">
             <input
               type="text"
-              name=""
-              placeholder="Search"
+              placeholder={t("search_placeholder")}
               className="border border-gray-300 rounded-md w-full pl-2 py-[10px]"
-              id=""
             />
           </div>
 
@@ -141,7 +66,7 @@ const AdminMessages = () => {
               <VscRobot size={25} />
             </div>
             <div className="text-md">
-              <h1 className="pt-1 font-semibold">Smart Ai Assistant</h1>
+              <h1 className="pt-1 font-semibold">{t("smart_ai_assistant")}</h1>
             </div>
           </div>
 
@@ -181,11 +106,10 @@ const AdminMessages = () => {
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                  Select a Chat to Start Messaging
+                  {t("select_chat_to_start")}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Choose a user or the Smart AI Assistant to begin your
-                  conversation.
+                  {t("choose_user_or_ai")}
                 </p>
               </div>
             </div>

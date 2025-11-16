@@ -1,3 +1,4 @@
+"use client";
 import { GoArrowLeft } from "react-icons/go";
 import { MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
@@ -12,8 +13,10 @@ import {
 } from "@/redux/features/withAuth";
 import { NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 function AdminOfferPlan() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudgets, setOfferBudgets] = useState({});
   const [isLiked, setIsLiked] = useState({});
@@ -44,65 +47,59 @@ function AdminOfferPlan() {
     };
   }, []);
 
-  // Handle deletion of offer
   const handleDelete = async (offerId) => {
     setIsDeleting((prev) => ({ ...prev, [offerId]: true }));
     try {
       await deleteOfferPlan(offerId).unwrap();
-      toast.success("Offer deleted successfully");
+      toast.success(t("offer_deleted_success"));
     } catch (error) {
       console.error("Failed to delete offer:", error);
-      toast.error("Failed to delete offer");
+      toast.error(t("failed_to_delete_offer"));
     } finally {
       setIsDeleting((prev) => ({ ...prev, [offerId]: false }));
     }
   };
 
-  // Handle confirm deal (open popup)
   const handleConfirmDeal = (offerId) => {
     setSelectedOfferId(offerId);
     setIsPopupOpen(true);
   };
 
-  // Handle confirm action in popup
   const handleConfirmFinalOffer = async () => {
     if (!selectedOfferId) return;
     setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: true }));
     try {
       await finalOfferSent(selectedOfferId).unwrap();
-      toast.success("Final offer sent successfully");
+      toast.success(t("final_offer_sent_success"));
       setIsPopupOpen(false);
       setSelectedOfferId(null);
     } catch (error) {
       console.error("Failed to send final offer:", error);
-      toast.error("Failed to send final offer");
+      toast.error(t("failed_to_send_final_offer"));
     } finally {
       setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: false }));
     }
   };
 
-  // Handle cancel action in popup
   const handleCancel = () => {
     setIsPopupOpen(false);
     setSelectedOfferId(null);
   };
 
-  // Handle loading and error states
   if (isLoading)
     return (
       <div className="min-h-screen flex items-center justify-center">
-        Loading...
+        {t("loading")}
       </div>
     );
   if (isError || !offeredPlans || offeredPlans.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        Fetching plans or no plans available.
+        {t("no_plans_available")}
       </div>
     );
   }
 
-  // Group offers by tour_plan.id
   const tourPlansMap = offeredPlans.reduce((acc, offer) => {
     const tourPlanId = offer.tour_plan.id;
     if (!acc[tourPlanId]) {
@@ -115,40 +112,36 @@ function AdminOfferPlan() {
     return acc;
   }, {});
 
-  // Convert to array for rendering
   const tourPlans = Object.values(tourPlansMap);
 
   return (
     <div className="min-h-screen">
       <div className="flex">
-        {/* Main Content */}
         <div className="flex-1">
           {tourPlans.map(({ tourPlan, offers }) => {
-            // Calculate duration
             const startDate = new Date(tourPlan.start_date);
             const endDate = new Date(tourPlan.end_date);
             const duration =
               Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) +
-              " Days";
+              ` ${t("days")}`;
 
-            // Format destination and date
-            const destination = `Tour from ${tourPlan.location_from} to ${tourPlan.location_to}`;
+            const destination = t("tour_from_to", {
+              from: tourPlan.location_from,
+              to: tourPlan.location_to,
+            });
             const formattedDate = startDate.toLocaleDateString("en-US", {
               day: "numeric",
               month: "long",
               year: "numeric",
             });
 
-            // Fallback for tourist spots
             const interestedLocations = tourPlan.tourist_spots
               ? tourPlan.tourist_spots.split(",")
-              : ["No specific locations provided"];
+              : [t("no_specific_locations")];
 
             return (
               <div key={tourPlan.id} className="mb-6">
-                {/* Tour Card */}
                 <div className="bg-white rounded-t-lg border-x border-t border-gray-200">
-                  {/* Card Header */}
                   <div className="p-3 sm:p-4 lg:p-6 pb-2 sm:pb-3 lg:pb-4">
                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
                       <div className="flex-1">
@@ -157,68 +150,57 @@ function AdminOfferPlan() {
                         </h2>
                         <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                           <p>
-                            Willing to go on{" "}
+                            {t("willing_to_go_on")}{" "}
                             <span className="font-medium">{formattedDate}</span>
                           </p>
                           <p>
-                            Include:{" "}
+                            {t("include")}:{" "}
                             <span className="font-medium">{duration}</span>
                           </p>
                           <p>
-                            Category:{" "}
-                            <span className="font-medium">
-                              {tourPlan.category}
-                            </span>
+                            {t("category")}:{" "}
+                            <span className="font-medium">{tourPlan.category}</span>
                           </p>
                         </div>
                       </div>
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                         <div>
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                            Budget €{tourPlan.budget}
+                            {t("budget")} €{tourPlan.budget}
                           </p>
                           <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                            Total {tourPlan.total_members} person
-                            {tourPlan.total_members > 1 ? "s" : ""}
+                            {t("total_persons", { count: tourPlan.total_members })}
                           </p>
                           <p className="text-xs sm:text-sm lg:text-md text-gray-500 mt-1">
-                            Status: {tourPlan.status || "Pending"}
+                            {t("status")}: {tourPlan.status || t("pending")}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Description */}
                     <div className="mb-4">
                       <p className="text-xs sm:text-sm lg:text-sm text-gray-600 leading-relaxed">
-                        {tourPlan.description || "No description provided."}
+                        {tourPlan.description || t("no_description")}
                       </p>
                     </div>
                   </div>
 
-                  {/* Tour Image with Buttons */}
                   <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6 space-y-4 relative">
-                    <div className="rounded-lg  overflow-hidden">
+                    <div className="rounded-lg overflow-hidden">
                       <img
                         src={
                           tourPlan.spot_picture_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                         }
-                        alt="Tour destination"
+                        alt={t("tour_destination")}
                         className="w-full h-48 sm:h-64 lg:h-72 object-cover"
                       />
-                      {/* <h1 className="text-[20px] left-64 absolute top-2  font-semibold text-white ">
-                        Image generated automatically
-                      </h1> */}
                     </div>
                   </div>
                 </div>
 
-                {/* Offers Section */}
                 <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
-                  {/* Content */}
                   <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6 space-y-4 py-3 sm:py-4 lg:py-6 border-t">
-                    {/* Existing Offers */}
                     {offers.map((offer) => (
                       <div
                         key={offer.id}
@@ -240,10 +222,7 @@ function AdminOfferPlan() {
                               </span>
                               {offer.agency.is_verified && (
                                 <span className="text-blue-500">
-                                  <MdVerified
-                                    size={16}
-                                    className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                                  />
+                                  <MdVerified size={16} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                                 </span>
                               )}
                             </div>
@@ -256,7 +235,7 @@ function AdminOfferPlan() {
                           <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                             <NavLink to={`/admin/chat/${offer?.room_id}`}>
                               <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-blue-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-blue-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
-                                Start conversation
+                                {t("start_conversation")}
                               </button>
                             </NavLink>
                             {!offer.is_final && (
@@ -264,7 +243,7 @@ function AdminOfferPlan() {
                                 onClick={() => handleConfirmDeal(offer.id)}
                                 className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-green-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-green-600 hover:cursor-pointer transition-colors w-full sm:w-auto"
                               >
-                                Confirm the deal
+                                {t("confirm_the_deal")}
                               </button>
                             )}
                             <button
@@ -276,9 +255,7 @@ function AdminOfferPlan() {
                                   : "bg-yellow-500 hover:bg-yellow-600"
                               }`}
                             >
-                              {isDeleting[offer.id]
-                                ? "Deleting..."
-                                : "No agreement"}
+                              {isDeleting[offer.id] ? t("deleting") : t("no_agreement")}
                             </button>
                           </div>
                         </div>
@@ -292,23 +269,21 @@ function AdminOfferPlan() {
         </div>
       </div>
 
-      {/* Popup for Confirm Deal */}
       {isPopupOpen && (
         <div className="fixed inset-0 backdrop-blur-[5px] bg-black/10 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white  dark:bg-[#252c3b] rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-[#252c3b] rounded-lg p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Confirm Deal
+              {t("confirm_deal")}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to confirm this deal? This will send the
-              final offer.
+              {t("confirm_deal_message")}
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 onClick={handleConfirmFinalOffer}
@@ -319,7 +294,7 @@ function AdminOfferPlan() {
                     : "bg-green-500 hover:bg-green-600"
                 }`}
               >
-                {isConfirming[selectedOfferId] ? "Confirming..." : "Confirm"}
+                {isConfirming[selectedOfferId] ? t("confirming") : t("confirm")}
               </button>
             </div>
           </div>

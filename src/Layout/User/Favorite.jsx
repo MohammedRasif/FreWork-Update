@@ -1,10 +1,12 @@
 import { useAllFavoritAgencyQuery } from "@/redux/features/withAuth";
-import { FiSearch, FiClock } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import FullScreenInfinityLoader from "@/lib/Loading";
+import { useTranslation } from "react-i18next";
 
 const Favorite = () => {
+  const { t } = useTranslation();
   const { data: favoriteAgency, isLoading } = useAllFavoritAgencyQuery();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -20,7 +22,7 @@ const Favorite = () => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">
-              Favorite agency
+              {t("favorite_agency")}
             </h1>
           </div>
 
@@ -28,7 +30,7 @@ const Favorite = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search by agency name"
+              placeholder={t("search_by_agency_name")}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 text-sm bg-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -40,7 +42,7 @@ const Favorite = () => {
         {/* Tour Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center col-span-full">
               <FullScreenInfinityLoader />
             </div>
           ) : filteredAgencies?.length > 0 ? (
@@ -53,15 +55,14 @@ const Favorite = () => {
                   <div className="relative">
                     <img
                       src={agency.cover_photo_url}
-                      alt={`${agency.agency_name} cover`}
+                      alt={t("agency_cover_alt", { name: agency.agency_name })}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
-                    {/* <h1 className="text-[12px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
-                    <div className="w-20 h-20 rounded-full mr-4 absolute -bottom-6 left-5 overflow-hidden">
+                    <div className="w-20 h-20 rounded-full mr-4 absolute -bottom-6 left-5 overflow-hidden border-4 border-white">
                       <img
                         src={agency.logo_url}
-                        alt={`${agency.agency_name} logo`}
-                        className=""
+                        alt={t("agency_logo_alt", { name: agency.agency_name })}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
@@ -72,12 +73,12 @@ const Favorite = () => {
                           {agency.agency_name}
                         </h2>
                         {agency.is_verified && (
-                          <VscVerifiedFilled className="text-2xl w-12" />
+                          <VscVerifiedFilled className="text-blue-600 text-2xl" />
                         )}
                       </div>
                     </div>
                     <p className="text-gray-600 mb-4 line-clamp-[7]">
-                      {agency.about}
+                      {agency.about || t("no_description")}
                     </p>
                   </div>
                 </div>
@@ -85,22 +86,22 @@ const Favorite = () => {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <span className="text-yellow-400 text-2xl">
-                        {"★".repeat(agency.average_rating)}
+                        {"★".repeat(Math.round(agency.average_rating))}
                       </span>
                       <span className="text-gray-500 ml-2">
-                        ({agency.review_count} reviews)
+                        ({agency.review_count} {t("reviews")})
                       </span>
                     </div>
                     <span className="text-gray-500">
-                      {agency.favorite_users.length} favorites
+                      {agency.favorite_users.length} {t("favorites")}
                     </span>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center py-8 col-span-full">
-              No agencies found matching your search.
+            <div className="text-center py-8 col-span-full text-gray-600">
+              {t("no_agencies_found")}
             </div>
           )}
         </div>

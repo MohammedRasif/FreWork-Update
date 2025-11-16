@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
 import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function ChatInterface() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { id: urlChatId } = useParams();
@@ -55,7 +57,7 @@ export default function ChatInterface() {
 
       const mappedChats = sortedChats.map((chat) => ({
         id: chat.id?.toString() || "",
-        name: chat.other_participant_name || "Unknown User",
+        name: chat.other_participant_name || t("unknown_user"),
         image:
           chat.other_participant_image ||
           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
@@ -64,14 +66,14 @@ export default function ChatInterface() {
         active: chat.active || false,
         tourist_is_verified: chat.tourist_is_verified || false,
         other_user_id: chat.other_user_id || null,
-        tour_plan_title: chat.tour_plan_title || "No Tour Plan",
+        tour_plan_title: chat.tour_plan_title || t("no_tour_plan"),
         tour_plan_id: chat.tour_plan_id || null,
         is_archived: chat.is_archived || false,
       }));
 
       setChatsList(mappedChats);
     }
-  }, [chatList, isChatListLoading]);
+  }, [chatList, isChatListLoading, t]);
 
   // Check for mobile layout
   useEffect(() => {
@@ -133,11 +135,11 @@ export default function ChatInterface() {
     return (
       <div className="h-screen flex flex-col">
         <div className="p-4 border-b border-gray-300">
-          <h1 className="text-xl font-semibold mb-3">Messages</h1>
+          <h1 className="text-xl font-semibold mb-3">{t("messages")}</h1>
           <div className="relative">
             <input
               type="text"
-              placeholder="Search chats or tour plans"
+              placeholder={t("search_chats_or_tour_plans")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-gray-200 rounded-lg pl-10 pr-4 py-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -153,7 +155,7 @@ export default function ChatInterface() {
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
-              Inbox
+              {t("inbox")}
             </button>
             <button
               onClick={() => setActiveTab("archived")}
@@ -163,15 +165,15 @@ export default function ChatInterface() {
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
-              Archived
+              {t("archived")}
             </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {isChatListLoading ? (
-            <div className="p-4 text-center">Loading...</div>
+            <div className="p-4 text-center">{t("loading")}</div>
           ) : filteredAgencies.length === 0 ? (
-            <div className="p-4 text-center">No chats found</div>
+            <div className="p-4 text-center">{t("no_chats_found")}</div>
           ) : (
             filteredAgencies.map((agency) => (
               <div
@@ -213,7 +215,7 @@ export default function ChatInterface() {
                     {agency.tour_plan_title}
                   </p>
                   <p className="text-sm text-gray-500 truncate">
-                    {agency.lastMessage || "No messages yet"}
+                    {agency.lastMessage || t("no_messages_yet")}
                   </p>
                 </div>
               </div>
@@ -233,14 +235,14 @@ export default function ChatInterface() {
   return (
     <div className="roboto p-4">
       <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        Messages
+        {t("messages")}
       </h1>
       <div className="flex" style={{ height: "80vh" }}>
         <div className="w-1/4 rounded-l-lg bg-gray-50 dark:bg-[#1E232E] border-r border-gray-200 dark:border-gray-300 flex flex-col">
           <div className="m-3 relative">
             <input
               type="text"
-              placeholder="Search chats or tour plans"
+              placeholder={t("search_chats_or_tour_plans")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="border border-gray-300 rounded-md w-full pl-10 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
@@ -256,7 +258,7 @@ export default function ChatInterface() {
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
-              Inbox
+              {t("inbox")}
             </button>
             <button
               onClick={() => setActiveTab("archived")}
@@ -266,14 +268,14 @@ export default function ChatInterface() {
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
-              Archived
+              {t("archived")}
             </button>
           </div>
           <div className="overflow-y-auto flex-1">
             {isChatListLoading ? (
-              <div className="p-4 text-center">Loading...</div>
+              <div className="p-4 text-center">{t("loading")}</div>
             ) : filteredAgencies.length === 0 ? (
-              <div className="p-4 text-center">No chats found</div>
+              <div className="p-4 text-center">{t("no_chats_found")}</div>
             ) : (
               filteredAgencies.map((agency) => (
                 <div
@@ -319,7 +321,7 @@ export default function ChatInterface() {
                       )}
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                      {agency.lastMessage || "No messages yet"}
+                      {agency.lastMessage || t("no_messages_yet")}
                     </p>
                   </div>
                 </div>
@@ -332,10 +334,10 @@ export default function ChatInterface() {
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                  Select a Chat to Start Messaging
+                  {t("select_a_chat")}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Choose an agency to begin your conversation.
+                  {t("choose_an_agency")}
                 </p>
               </div>
             </div>

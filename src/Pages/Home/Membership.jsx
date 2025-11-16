@@ -18,8 +18,10 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import { FaAward } from "react-icons/fa6";
 import { RiAwardLine } from "react-icons/ri";
+import { useTranslation } from "react-i18next";
 
 const Membership = () => {
+  const { t } = useTranslation();
   const [agency, setAgency] = useState([]);
   const [topAgencie, setTopAgency] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -88,7 +90,7 @@ const Membership = () => {
       const errorMessage =
         error?.data?.detail ||
         error?.detail ||
-        "Failed to update favorite status";
+        t("failed_to_update_favorite");
       toast.error(errorMessage);
     }
   };
@@ -102,17 +104,17 @@ const Membership = () => {
             item.cover_photo_url ||
             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
           verified: item.is_verified,
-          agency: item.agency_name || "Unknown Agency",
+          agency: item.agency_name || t("unknown_agency"),
           rating: item.average_rating.toFixed(1),
           reviews: item.review_count,
-          about: item.about || "No description available.",
+          about: item.about || t("no_description"),
           location: "Unknown Location",
-          price: "Contact for pricing",
+          price: t("contact_for_pricing"),
           logo_url: item.logo_url || "",
           user: item.user || null,
           favorite_users: item.favorite_users || [],
           badge_count: item.badge_count || 0,
-          service_categories: item.service_categories || [], // Added service_categories
+          service_categories: item.service_categories || [],
         }))
       );
       if (currentUserId) {
@@ -130,17 +132,17 @@ const Membership = () => {
             item.cover_photo_url ||
             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
           verified: item.is_verified,
-          agency: item.agency_name || "Unknown Agency",
+          agency: item.agency_name || t("unknown_agency"),
           rating: item.average_rating.toFixed(1),
           reviews: item.review_count,
-          about: item.about || "No description available.",
+          about: item.about || t("no_description"),
           location: "Unknown Location",
-          price: "Contact for pricing",
+          price: t("contact_for_pricing"),
           logo_url: item.logo_url || "",
           user: item.user || null,
           favorite_users: item.favorite_users || [],
           badge_count: item.badge_count || 0,
-          service_categories: item.service_categories || [], // Added service_categories
+          service_categories: item.service_categories || [],
         }))
       );
       if (currentUserId) {
@@ -151,13 +153,13 @@ const Membership = () => {
         );
       }
     }
-  }, [AgencyAll, SearchAgencies, searchTerm, currentUserId]);
+  }, [AgencyAll, SearchAgencies, searchTerm, currentUserId, t]);
 
   useEffect(() => {
     if (TopAgencies) {
       setTopAgency(
         TopAgencies.map((item, index) => ({
-          name: item.agency_name || "Unknown Agency",
+          name: item.agency_name || t("unknown_agency"),
           rating: item.average_rating.toFixed(1),
           reviews: item.review_count,
           color: `bg-gradient-to-br from-${
@@ -169,7 +171,7 @@ const Membership = () => {
         }))
       );
     }
-  }, [TopAgencies]);
+  }, [TopAgencies, t]);
 
   const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
@@ -188,10 +190,10 @@ const Membership = () => {
       <div className="w-full sm:w-4/5 p-4 sm:p-6">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold sm:font-medium text-gray-600 mb-3 sm:mb-5">
-            Search for Tour Planner (Agencies)
+            {t("search_for_tour_planner")}
           </h1>
           <p className="text-gray-500 text-sm sm:text-base font-medium">
-            All posted tour plans are here
+            {t("all_posted_tour_plans")}
           </p>
         </div>
 
@@ -199,14 +201,14 @@ const Membership = () => {
           <div className="flex">
             <input
               type="text"
-              placeholder="Search here..."
+              placeholder={t("search_placeholder")}
               onChange={handleSearch}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              aria-label="Search tour plans"
+              aria-label={t("search_tour_plans")}
             />
             <button
               className="px-4 sm:px-5 py-2 sm:py-3 bg-[#3776E2] text-white rounded-r-lg transition-colors hover:bg-blue-600"
-              aria-label="Search"
+              aria-label={t("search")}
             >
               <Search className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
@@ -219,7 +221,7 @@ const Membership = () => {
           </div>
         ) : agency.length === 0 ? (
           <div className="text-center text-gray-600 h-full">
-            <div className="min-h-[400px]">No tour plans available</div>
+            <div className="min-h-[400px]">{t("no_tour_plans_available")}</div>
           </div>
         ) : (
           <div className="space-y-6">
@@ -232,14 +234,14 @@ const Membership = () => {
                   <img
                     src={
                       plan.image ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpgs"
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                     }
-                    alt={`${plan.location} tour`}
+                    alt={`${plan.agency} tour`}
                     className="w-full h-full object-cover"
                   />
                   {plan.verified && (
                     <div className="absolute top-3 right-2 bg-black/50 text-white px-2 py-1 text-sm sm:text-base font-medium flex items-center space-x-2 rounded-full">
-                      <span>Verified</span>
+                      <span>{t("verified")}</span>
                       <VscVerifiedFilled size={20} className="text-green-500" />
                     </div>
                   )}
@@ -248,8 +250,8 @@ const Membership = () => {
                     className="bg-gray-300 rounded-full absolute bottom-3 right-2 p-1 hover:bg-gray-400 transition-colors hover:cursor-pointer"
                     aria-label={
                       favorites.includes(plan.user)
-                        ? "Remove from favorites"
-                        : "Add to favorites"
+                        ? t("remove_from_favorites")
+                        : t("add_to_favorites")
                     }
                     disabled={isAddFevLoading}
                   >
@@ -289,7 +291,7 @@ const Membership = () => {
                             {plan.rating}
                           </span>
                           <span className="text-sm text-gray-500 font-medium">
-                            ({plan.reviews} Reviews)
+                            ({plan.reviews} {t("reviews")})
                           </span>
                         </div>
                       </div>
@@ -305,7 +307,7 @@ const Membership = () => {
                   </div>
                   <div className="pb-2">
                     <h1 className="text-2xl font-semibold text-black">
-                      Our Service Category
+                      {t("our_service_category")}
                     </h1>
                     {plan?.service_categories?.length > 0 ? (
                       <div className="flex flex-wrap gap-2 pt-1">
@@ -319,12 +321,12 @@ const Membership = () => {
                         ))}
                       </div>
                     ) : (
-                      <span>No categories available</span>
+                      <span>{t("no_categories_available")}</span>
                     )}
                   </div>
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-800 mb-2 text-base">
-                      About
+                      {t("about")}
                     </h4>
                     <p className="text-gray-600 font-medium text-sm leading-relaxed line-clamp-3">
                       {plan.about}
@@ -339,7 +341,7 @@ const Membership = () => {
 
       <div className="w-full sm:w-1/5 bg-white border border-gray-200 p-4 sm:p-6 sm:ml-5 sm:mt-20 rounded-xl lg:mt-52">
         <h2 className="font-semibold text-gray-800 mb-6 text-center text-lg sm:text-xl">
-          TOP AGENCIES
+          {t("top_agencies")}
         </h2>
         {isTopAgencyLoading ? (
           <div className="text-center text-gray-600">
@@ -347,7 +349,7 @@ const Membership = () => {
           </div>
         ) : topAgencie.length === 0 ? (
           <div className="text-center text-gray-600">
-            No top agencies available
+            {t("no_top_agencies_available")}
           </div>
         ) : (
           <div className="space-y-5">
@@ -370,7 +372,7 @@ const Membership = () => {
                       {agency.rating}
                     </span>
                     <span className="text-xs text-blue-500 underline font-medium">
-                      ({agency.reviews} Reviews)
+                      ({agency.reviews} {t("reviews")})
                     </span>
                   </div>
                 </div>

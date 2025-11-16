@@ -9,8 +9,10 @@ import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { FiSearch, FiStar, FiMapPin, FiUsers } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const UserAccepte = () => {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -18,17 +20,16 @@ const UserAccepte = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isLoading } = useGetAllacceptedOfferQuery();
-  console.log(data, "helllllll");
   const [reviewMessage, setReviewMessage] = useState("");
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [giveReview, { isLoading: isReviewLoading }] = useGiveReviewMutation();
 
   const ratingLabels = [
-    "Not good enough",
-    "Average",
-    "Good",
-    "Liked it",
-    "Excellent",
+    t("rating.not_good"),
+    t("rating.average"),
+    t("rating.good"),
+    t("rating.liked"),
+    t("rating.excellent"),
   ];
 
   const handleStarHover = (index) => {
@@ -47,7 +48,7 @@ const UserAccepte = () => {
     data?.filter((offer) => {
       const startDate = new Date(offer.tour_plan.start_date);
       return (
-        offer.tour_plan.is_completed === false && // Changed to is_completed
+        offer.tour_plan.is_completed === false &&
         (!dateFilter || offer.tour_plan.start_date.includes(dateFilter)) &&
         (!searchQuery ||
           offer.tour_plan.location_to
@@ -60,7 +61,7 @@ const UserAccepte = () => {
     data?.filter((offer) => {
       const endDate = new Date(offer.tour_plan.end_date);
       return (
-        offer.tour_plan.is_completed === true && // Changed to is_completed
+        offer.tour_plan.is_completed === true &&
         (!dateFilter || offer.tour_plan.end_date.includes(dateFilter)) &&
         (!searchQuery ||
           offer.tour_plan.location_to
@@ -75,7 +76,7 @@ const UserAccepte = () => {
 
   const handleReviewSubmit = async () => {
     if (!selectedOffer || !selectedStar) {
-      alert("Please select a rating before submitting.");
+      toast.error(t("select_rating"));
       return;
     }
 
@@ -87,16 +88,14 @@ const UserAccepte = () => {
 
     try {
       await giveReview(reviewData).unwrap();
-      toast.success("Review submitted successfully!");
+      toast.success(t("review_submitted"));
       setIsReviewModalOpen(false);
       setSelectedStar(0);
       setReviewMessage("");
       setSelectedOffer(null);
     } catch (error) {
-      console.error("Failed to submit review:", error.data.error);
-      toast.error(
-        error.data.error || "Failed to submit review. Please try again."
-      );
+      console.error("Failed to submit review:", error.data?.error);
+      toast.error(error.data?.error || t("failed_submit_review"));
     }
   };
 
@@ -108,7 +107,7 @@ const UserAccepte = () => {
   };
 
   return (
-    <div className=" ">
+    <div className="">
       <Toaster />
       <div className="flex flex-col sm:flex-row justify-between mt-6 mb-6 border-b border-gray-300">
         <div className="flex space-x-4 sm:space-x-8 mb-4 sm:mb-0">
@@ -120,7 +119,7 @@ const UserAccepte = () => {
                 : "text-gray-500 border-transparent hover:text-gray-700"
             }`}
           >
-            Upcoming
+            {t("upcoming")}
           </button>
           <button
             onClick={() => setActiveTab("completed")}
@@ -130,7 +129,7 @@ const UserAccepte = () => {
                 : "text-gray-500 border-transparent hover:text-gray-700"
             }`}
           >
-            Completed
+            {t("completed")}
           </button>
         </div>
 
@@ -138,7 +137,7 @@ const UserAccepte = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search by tour title"
+              placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={handleSearchChange}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64 text-sm text-gray-700 bg-white"
@@ -156,14 +155,16 @@ const UserAccepte = () => {
         </div>
       </div>
 
-      {/* Content based on active tab */}
+      {/* Upcoming Tours */}
       {activeTab === "upcoming" && (
         <div>
           {isLoading ? (
             <FullScreenInfinityLoader />
           ) : upcomingTours.length === 0 ? (
             <div className="w-full rounded-xl p-4 flex justify-center items-center">
-              <p className="text-[#70798F] text-base sm:text-lg">No upcoming tours found.</p>
+              <p className="text-[#70798F] text-base sm:text-lg">
+                {t("no_upcoming_tours")}
+              </p>
             </div>
           ) : (
             upcomingTours.map((offer) => (
@@ -177,7 +178,7 @@ const UserAccepte = () => {
                       offer.tour_plan.spot_picture_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                     }
-                    alt={`Tour to ${offer.tour_plan.location_to}`}
+                    alt={t("tour_to", { location: offer.tour_plan.location_to })}
                     className="w-full h-48 md:h-full object-cover"
                   />
                 </div>
@@ -188,24 +189,23 @@ const UserAccepte = () => {
                       <div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-2">
                           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                            Tour to {offer.tour_plan.location_to}
+                            {t("tour_to", { location: offer.tour_plan.location_to })}
                           </h2>
                           {offer.tour_plan.is_completed === false && (
                             <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
                               <FaCheckCircle className="w-4 h-4 rounded-full" />
-                              Offer accepted
+                              {t("offer_accepted")}
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2 mb-2">
                           <FiUsers className="text-gray-600" />
                           <span className="text-base sm:text-lg font-semibold">
-                            ${offer.offered_budget} / total{" "}
-                            {offer.tour_plan.total_members} Person
+                            ${offer.offered_budget} / {t("total")} {offer.tour_plan.total_members} {t("person", { count: offer.tour_plan.total_members })}
                           </span>
                         </div>
                         <p className="text-gray-600 mb-2 sm:mb-4">
-                          Category:{" "}
+                          {t("category")}:{" "}
                           <span className="font-medium">
                             {offer.tour_plan.category}
                           </span>
@@ -213,7 +213,7 @@ const UserAccepte = () => {
                         <div className="flex items-center gap-2 mb-2 sm:mb-4">
                           <FiMapPin className="text-gray-600" />
                           <span className="font-medium">
-                            Tour location: {offer.tour_plan.location_to}
+                            {t("tour_location")}: {offer.tour_plan.location_to}
                           </span>
                         </div>
                         <p className="text-gray-700 text-sm leading-relaxed mb-4 sm:mb-6">
@@ -225,19 +225,25 @@ const UserAccepte = () => {
                           <div className="flex items-center gap-2">
                             <FaCheckCircle className="w-4 h-4 text-blue-600 rounded-full" />
                             <span className="text-xs sm:text-sm font-medium">
-                              Starting Date:
+                              {t("starting_date")}:
                             </span>
                             <span className="text-xs sm:text-sm">
-                              {offer.tour_plan.start_date}
+                              {new Date(offer.tour_plan.start_date).toLocaleDateString(
+                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                { day: "numeric", month: "long", year: "numeric" }
+                              )}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <FaCheckCircle className="w-4 h-4 text-blue-600 rounded-full" />
                             <span className="text-xs sm:text-sm font-medium">
-                              Ending Date:
+                              {t("ending_date")}:
                             </span>
                             <span className="text-xs sm:text-sm">
-                              {offer.tour_plan.end_date}
+                              {new Date(offer.tour_plan.end_date).toLocaleDateString(
+                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                { day: "numeric", month: "long", year: "numeric" }
+                              )}
                             </span>
                           </div>
                         </div>
@@ -248,7 +254,7 @@ const UserAccepte = () => {
                         <img
                           src={offer.agency.logo_url}
                           className="rounded-full w-12 h-12 sm:w-16 sm:h-16 object-cover"
-                          alt="Agency logo"
+                          alt={t("agency_logo")}
                           onError={(e) => {
                             e.target.src =
                               "https://via.placeholder.com/64?text=Agency+Logo";
@@ -278,6 +284,7 @@ const UserAccepte = () => {
         </div>
       )}
 
+      {/* Completed Tours */}
       {activeTab === "completed" && (
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -288,7 +295,7 @@ const UserAccepte = () => {
             ) : completedTours.length === 0 ? (
               <div className="w-full rounded-xl p-4 flex justify-center items-center">
                 <p className="text-[#70798F] text-base sm:text-lg">
-                  No completed tours found.
+                  {t("no_completed_tours")}
                 </p>
               </div>
             ) : (
@@ -298,22 +305,30 @@ const UserAccepte = () => {
                   className="bg-white rounded-lg shadow-md overflow-hidden"
                 >
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-800 p-4">
-                    Previous Tour Plans
+                    {t("previous_tour_plans")}
                   </h3>
                   <img
                     src={
                       offer.tour_plan.spot_picture_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={`Tour to ${offer.tour_plan.location_to}`}
+                    alt={t("tour_to", { location: offer.tour_plan.location_to })}
                     className="w-full h-40 sm:h-48 p-2 rounded-md object-cover"
                   />
                   <div className="p-4">
                     <div className="text-xs sm:text-sm text-gray-500 mb-2">
-                      {offer.tour_plan.start_date} - {offer.tour_plan.end_date}
+                      {new Date(offer.tour_plan.start_date).toLocaleDateString(
+                        i18n.language === "it" ? "it-IT" : "en-GB",
+                        { day: "numeric", month: "short", year: "numeric" }
+                      )}{" "}
+                      -{" "}
+                      {new Date(offer.tour_plan.end_date).toLocaleDateString(
+                        i18n.language === "it" ? "it-IT" : "en-GB",
+                        { day: "numeric", month: "short", year: "numeric" }
+                      )}
                     </div>
                     <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
-                      Tour to {offer.tour_plan.location_to}
+                      {t("tour_to", { location: offer.tour_plan.location_to })}
                     </h4>
                     <p className="text-xs sm:text-sm text-gray-600 mb-4 line-clamp-3">
                       {offer.tour_plan.description}
@@ -325,7 +340,7 @@ const UserAccepte = () => {
                       }}
                       className="px-4 border border-blue-600 text-blue-600 py-2 rounded-md font-medium hover:bg-blue-50 transition-colors w-full sm:w-auto"
                     >
-                      Give a review
+                      {t("give_review")}
                     </button>
                   </div>
                 </div>
@@ -347,14 +362,16 @@ const UserAccepte = () => {
                 <span>
                   <FaArrowLeft />
                 </span>{" "}
-                Back
+                {t("back")}
               </button>
-              <h2 className="text-xl sm:text-2xl font-semibold py-1">Give a review</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold py-1">
+                {t("give_review")}
+              </h2>
             </div>
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                How Was Your Experience With This Organization?
+                {t("how_was_experience")}
               </label>
               <div className="flex items-center gap-2 mb-2">
                 {[...Array(5)].map((_, index) => (
@@ -380,11 +397,11 @@ const UserAccepte = () => {
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Describe your experience{" "}
-                <span className="text-gray-500">(Optional)</span>
+                {t("describe_experience")}{" "}
+                <span className="text-gray-500">({t("optional")})</span>
               </label>
               <textarea
-                placeholder="Enter here"
+                placeholder={t("enter_here")}
                 value={reviewMessage}
                 onChange={(e) => setReviewMessage(e.target.value)}
                 className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
@@ -398,7 +415,7 @@ const UserAccepte = () => {
                 isReviewLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isReviewLoading ? "Submitting..." : "SUBMIT"}
+              {isReviewLoading ? t("submitting") : t("submit")}
             </button>
           </div>
         </div>
