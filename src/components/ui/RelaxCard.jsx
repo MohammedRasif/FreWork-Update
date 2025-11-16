@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation } from "lucide-react";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import img from "../../assets/img/badge.png";
+import { useTranslation } from "react-i18next";
 
 export default function BeachCard({ tourPlan }) {
+  const { t } = useTranslation();
   const [localTourPlan, setLocalTourPlan] = useState(tourPlan);
   const [isLocalStorageLoaded, setIsLocalStorageLoaded] = useState(false);
   const [role, setRole] = useState(null);
@@ -30,7 +32,7 @@ export default function BeachCard({ tourPlan }) {
   };
 
   if (!isLocalStorageLoaded) {
-    return <div>Loading user data...</div>;
+    return <div>{t("loading_user_data")}</div>;
   }
 
   return (
@@ -50,50 +52,30 @@ export default function BeachCard({ tourPlan }) {
               {localTourPlan.location_to}
             </h2>
           </div>
-          {/* Display agency logos */}
           {localTourPlan.offers && localTourPlan.offers.length > 0 && (
-            <div
-              className="
-      absolute bottom-4
-      flex items-center justify-center space-x-8
-      px-2
-      w-full
-    "
-            >
+            <div className="absolute bottom-4 flex items-center justify-center space-x-8 px-2 w-full">
               {localTourPlan?.offers?.map((offer) => {
                 const isAccepted = offer.status === "accepted";
 
                 return (
                   <div
                     key={offer.agency?.id || Math.random()}
-                    className={`
-            relative flex items-center justify-center flex-shrink-0
-            ${isAccepted ? "w-14 h-14" : "w-12 h-12"}
-          `}
+                    className={`relative flex items-center justify-center flex-shrink-0 ${isAccepted ? "w-14 h-14" : "w-12 h-12"}`}
                   >
-                    {/* Accepted Badge Background */}
                     {isAccepted && (
                       <img
                         src={img}
                         alt="Accepted Badge"
-                        className="absolute inset-0  object-contain pointer-events-none"
+                        className="absolute inset-0 object-contain pointer-events-none"
                       />
                     )}
-
-                    {/* Agency Logo (Always on Top) */}
                     <img
                       src={
                         offer.agency?.logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                       }
                       alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                      className={`
-              relative z-10
-              ${isAccepted ? "w-10 h-10" : "w-12 h-12"}
-              object-contain rounded-full border bg-white
-              ${isAccepted ? "" : "border-white"}
-              flex-shrink-0
-            `}
+                      className={`relative z-10 ${isAccepted ? "w-10 h-10" : "w-12 h-12"} object-contain rounded-full border bg-white ${isAccepted ? "" : "border-white"} flex-shrink-0`}
                     />
                   </div>
                 );
@@ -101,7 +83,6 @@ export default function BeachCard({ tourPlan }) {
             </div>
           )}
         </div>
-        {/* <h1 className="text-[14px] left-10 absolute top-2  font-semibold text-white ">Image generated automatically</h1> */}
       </div>
 
       <div className="flex flex-col flex-grow p-4 space-y-1">
@@ -124,57 +105,51 @@ export default function BeachCard({ tourPlan }) {
               />
             </svg>
             <span className="text-sm text-green-600 font-medium">
-              Real Request
+              {t("real_request")}
             </span>
           </div>
         </div>
 
         <div className="space-y-1 text-[15px] text-gray-700">
           <p>
-            <span className="font-medium">Date:</span>{" "}
-            {localTourPlan.start_date} to{" "}
+            <span className="font-medium">{t("date")}:</span>{" "}
+            {localTourPlan.start_date} {t("to")}{" "}
             {localTourPlan.offers.length > 0
               ? localTourPlan.offers[0].tour_plan.end_date
-              : localTourPlan.end_date || "N/A"}{" "}
+              : localTourPlan.end_date || "N/A"}
           </p>
           <p>
-            <span className="font-medium">Category:</span>{" "}
+            <span className="font-medium">{t("category")}:</span>{" "}
             {localTourPlan.destination_type}
           </p>
         </div>
 
         <div>
           <p className="text-lg font-bold text-gray-900">
-            Budget: €{localTourPlan.budget}
+            {t("budget")}: €{localTourPlan.budget}
           </p>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-700">
-            <span className="font-medium">Total:</span>{" "}
+            <span className="font-medium">{t("total")}:</span>{" "}
             {localTourPlan.total_members}{" "}
-            {localTourPlan.total_members > 1 ? "people" : "person"}
+            {localTourPlan.total_members > 1 ? t("people") : t("person")}
           </span>
         </div>
 
-        <div
-          className={
-            localTourPlan.offer_count < 3
-              ? "pt-2 w-full relative"
-              : "pt-2 w-full"
-          }
-        >
+        <div className={localTourPlan.offer_count < 3 ? "pt-2 w-full relative" : "pt-2 w-full"}>
           <button
             onClick={handleViewDetails}
             className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
           >
-            View Details
+            {t("view_details")}
           </button>
 
           {localTourPlan.offer_count >= 3 && (
             <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
               <IoCheckmarkCircleSharp className="mr-1" size={16} />
-              Offers completed
+              {t("offers_completed")}
             </div>
           )}
         </div>

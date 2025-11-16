@@ -7,10 +7,13 @@ import img5 from "../../assets/img/Plane vector.svg";
 import { CiHeart } from "react-icons/ci";
 import { IoMdSend } from "react-icons/io";
 import { MapPin, Send, Leaf, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const EasyandFast = () => {
+  const { t } = useTranslation();
+
   return (
-    <div className="mb-10 sm:mb-16 lg:mb-20 ">
+    <div className="mb-10 sm:mb-16 lg:mb-20">
       <img
         src={img4}
         alt=""
@@ -25,14 +28,14 @@ const EasyandFast = () => {
         {/* Benefits and Trip Card Section */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 sm:mb-12 lg:mb-20 gap-6 sm:gap-8 lg:gap-[100px]">
           {/* Benefits List */}
-        
           <div className="w-full lg:w-1/2 px-4 sm:px-6">
             <div className="mb-8 sm:mb-10 lg:mb-10">
               <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium">
-                Easy and Fast
+                {t("easy_and_fast")}
               </span>
               <h1 className="text-[20px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight lg:px-2 sm:px-4">
-                WHY USE <br /> VacanzaMyCost.it?
+                {t("why_use_vacanza")} <br />
+                VacanzaMyCost.it?
               </h1>
             </div>
 
@@ -46,11 +49,10 @@ const EasyandFast = () => {
                 </div>
                 <div className="px-2 sm:px-4">
                   <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    NO COMMISSION
+                    {t("no_commission")}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Utma. tortor tempus.
+                    {t("no_commission_desc")}
                   </p>
                 </div>
               </div>
@@ -64,17 +66,16 @@ const EasyandFast = () => {
                 </div>
                 <div className="px-2 sm:px-4">
                   <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    FAST REPLIES
+                    {t("fast_replies")}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Utma. tortor tempus.
+                    {t("fast_replies_desc")}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0 ">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
                   <img
                     src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1748100792/Group_11_n4edkj.svg"
                     alt=""
@@ -82,40 +83,36 @@ const EasyandFast = () => {
                 </div>
                 <div className="px-2 sm:px-4">
                   <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    ONLY VERIFIED AGENCIES
+                    {t("verified_agencies")}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Utma. tortor tempus.
+                    {t("verified_agencies_desc")}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div
-              className="relative w-full lg:w-auto min-w-[280px] sm:min-w-[320px] lg:min-w-[430px] px-4 sm:px-6"
-            // className="relative w-full max-w-full sm:min-w-[320px] lg:min-w-[360px] px-4 sm:px-6"
-          >
+          <div className="relative w-full lg:w-auto min-w-[280px] sm:min-w-[320px] lg:min-w-[430px] px-4 sm:px-6">
             <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xl border border-gray-100">
               <div className="relative h-40 sm:h-48 lg:h-64 bg-white overflow-hidden rounded-xl mb-3 sm:mb-4">
                 <img
                   src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/sheep.jpg"
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 "
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   alt="Trip to Greece"
                 />
                 <button className="absolute right-3 sm:right-4 w-7 h-7 sm:w-8 sm:h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors hover:bg-white">
-                  <CiHeart size={18} sm:size={20} className="text-gray-700" />
+                  <CiHeart size={18} className="text-gray-700" />
                 </button>
               </div>
 
               <div className="p-3 sm:p-4">
                 <div className="mb-3 sm:mb-4">
                   <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
-                    Trip To Greece
+                    {t("trip_to_greece")}
                   </h3>
                   <p className="text-gray-500 text-xs sm:text-sm">
-                    14-29 June | by Robbin Joseph
+                    {t("greece_date_by")}
                   </p>
                 </div>
 
@@ -134,7 +131,7 @@ const EasyandFast = () => {
                 <div className="flex items-center">
                   <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 mr-2" />
                   <span className="text-gray-600 text-xs sm:text-sm font-medium">
-                    24 People Going
+                    {t("people_going")}
                   </span>
                 </div>
               </div>
@@ -145,17 +142,17 @@ const EasyandFast = () => {
                 <img
                   src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/landscapes/architecture-signs.jpg"
                   alt="Profile"
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3 object-cover border-2 border-white  "
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3 object-cover border-2 border-white"
                 />
                 <div>
                   <div className="flex items-center">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 mr-1 sm:mr-1.5"></div>
                     <p className="text-xs font-medium text-green-600">
-                      Ongoing
+                      {t("ongoing")}
                     </p>
                   </div>
                   <p className="text-sm sm:text-md font-semibold text-gray-800">
-                    Trip to Rome
+                    {t("trip_to_rome")}
                   </p>
                   <div className="w-20 sm:w-24 h-1.5 bg-gray-200 rounded-full mt-1 sm:mt-1.5 mb-1">
                     <div
@@ -163,7 +160,7 @@ const EasyandFast = () => {
                       style={{ width: "40%" }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-500">40% Completed</p>
+                  <p className="text-xs text-gray-500">{t("progress_40")}</p>
                 </div>
               </div>
             </div>
@@ -172,12 +169,11 @@ const EasyandFast = () => {
 
         {/* Add Your Agency Section */}
         <div className="flex flex-col lg:flex-row items-center pt-0 sm:pt-24 lg:pt-52 gap-8 sm:gap-10 lg:gap-12">
-          {/* Images Section */}
           <div className="relative mr-0 lg:mr-8 w-full lg:w-1/2 h-[40vh] sm:h-[50vh] lg:h-[50vh]">
             <img
               src={img1}
               alt="Destination 1"
-              className="w-[70vw] sm:w-72 lg:w-96 h-[50vh] sm:h-[40vh] lg:h-[60vh]  rounded-3xl"
+              className="w-[70vw] sm:w-72 lg:w-96 h-[50vh] sm:h-[40vh] lg:h-[60vh] rounded-3xl"
             />
             <img
               src={img3}
@@ -196,51 +192,35 @@ const EasyandFast = () => {
             />
           </div>
 
-          {/* Text Section */}
           <div className="w-full lg:w-1/2 px-4 sm:px-6 lg:pt-0 pt-10">
             <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium lg:pl-0 pl-2">
-              Start Earning
+              {t("start_earning")}
             </span>
             <h1 className="text-[22px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight pb-4 sm:pb-5 px-2 sm:px-4">
-              Add Your Agency to <br className="hidden md:block" />
+              {t("add_your_agency")} <br className="hidden md:block" />
               <span className="">VacanzaMyCost.it</span>
             </h1>
             <div className="space-y-3 sm:space-y-4 text-gray-600 px-2 sm:px-4">
               <p className="text-sm sm:text-md leading-relaxed">
-                Amet cursus vulputate sit amet dictum. At erat pellentesque
-                adipiscing commodo. Sit amet volut pat consectetur mauris nunc
-                congue nisi vitae suscipit in arcu cursus euis mod quis viverra
-                nibh cras pulvinar. Vulputate eu scelerisques felis imperdiet
-                proin fermentum.
+                {t("agency_desc_1")}
               </p>
               <p className="text-sm sm:text-md leading-relaxed">
-                Rutrum quisque non tellus orci ac. Varius vel pharetra vel
-                turpis nunc eget lorem dolor sed. Interdum posuere lorem ipsum
-                dolor sit. Egestas maecenas pharetra convallis posuere morbi.
+                {t("agency_desc_2")}
               </p>
             </div>
 
             <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6 px-2 sm:px-4">
-              <a
-                href="#"
-                className="group flex items-center text-sm sm:text-md font-medium"
-              >
+              <a href="#" className="group flex items-center text-sm sm:text-md font-medium">
                 <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
-                Done adipiscing tristique risus nec feugiat in
+                {t("benefit_1")}
               </a>
-              <a
-                href="#"
-                className="group flex items-center text-sm sm:text-md font-medium transition-colors"
-              >
+              <a href="#" className="group flex items-center text-sm sm:text-md font-medium transition-colors">
                 <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
-                Done adipiscing tristique risus nec feugiat in
+                {t("benefit_2")}
               </a>
-              <a
-                href="#"
-                className="group flex items-center text-sm sm:text-md font-medium transition-colors"
-              >
+              <a href="#" className="group flex items-center text-sm sm:text-md font-medium transition-colors">
                 <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
-                Done adipiscing tristique risus nec feugiat in
+                {t("benefit_3")}
               </a>
             </div>
           </div>

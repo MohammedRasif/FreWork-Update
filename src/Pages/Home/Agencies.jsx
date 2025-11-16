@@ -11,12 +11,13 @@ import { useGetTopAgencyQuery } from "@/redux/features/baseApi";
 import AgencyCard from "@/components/ui/AgencyCard";
 import { useRef } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Agencies = () => {
+  const { t } = useTranslation();
   const mountainPrevRef = useRef(null);
   const mountainNextRef = useRef(null);
   const { data: topAgency = [], isLoading, isError } = useGetTopAgencyQuery();
-  console.log(topAgency)
 
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8">
@@ -56,10 +57,10 @@ const Agencies = () => {
 
       <div className="text-center py-10 lg:py-12">
         <p className="text-gray-700 text-[16px] md:text-lg lg:mb-4 font-medium">
-          Top Agencies are here
+          {t("top_agencies_here")}
         </p>
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
-          Currently Top Agencies
+          {t("currently_top_agencies")}
         </h1>
       </div>
 
@@ -70,15 +71,15 @@ const Agencies = () => {
           </div>
         ) : isError ? (
           <div className="text-center text-red-500 py-8">
-            Error loading agencies. Please try again later.
+            {t("error_loading_agencies")}
           </div>
         ) : topAgency.length === 0 ? (
           <div className="text-center text-gray-600 py-6">
-            No agencies available at the moment.
+            {t("no_agencies_available")}
           </div>
         ) : (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-black mb-4">Top Agencies</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">{t("top_agencies")}</h2>
             <div className="relative">
               <button
                 ref={mountainPrevRef}
@@ -128,7 +129,7 @@ const Agencies = () => {
       {topAgency.length === 0 ? null : (
         <NavLink to="/membership" className="flex justify-center">
           <h1 className="w-full md:w-auto h-[48px] bg-gray-300 md:bg-transparent rounded-2xl py-2 mt-6 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
-            see more...
+            {t("see_more")}
           </h1>
         </NavLink>
       )}
