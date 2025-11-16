@@ -9,7 +9,7 @@ import {
 import { router } from './routes/routes.jsx';
 import { store } from './redux/sotre.js';
 import { Provider } from 'react-redux';
-
+import '../i18n.js';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store = {store}>

@@ -1,27 +1,23 @@
 "use client";
 
 import { NavLink, useNavigate } from "react-router-dom";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 
-import Card from "@/components/ui/Card";
 import BeachCard from "@/components/ui/BeachCard";
 import MountainCard from "@/components/ui/MountainCard";
 import RelaxCard from "@/components/ui/RelaxCard";
 import GroupCard from "@/components/ui/GroupCard";
 import { useRef } from "react";
-import { ArrowBigRight, ArrowLeft, ArrowRight } from "lucide-react";
 import { GoChevronRight } from "react-icons/go";
 import { useGetTourPlanPublicQuery } from "@/redux/features/withAuth";
+import { useTranslation } from "react-i18next";
 
 const Published = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const beachPrevRef = useRef(null);
   const beachNextRef = useRef(null);
@@ -54,55 +50,6 @@ const Published = () => {
     localStorage.setItem("selectedCategory", category);
     navigate("/tourPlans");
   };
-
-  const getSliderSettings = (length) => ({
-    dots: true,
-    infinite: length > 3,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    arrows: true,
-    swipe: true,
-    touchMove: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          infinite: length > 2,
-          dots: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 640,
-        settings: {
-          slidesToShow: 1.5,
-          slidesToScroll: 1,
-          infinite: length > 1,
-          dots: true,
-          arrows: false,
-          variableWidth: false,
-          swipe: true,
-          touchMove: true,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          infinite: length > 1,
-          dots: true,
-          arrows: false,
-          variableWidth: false,
-          swipe: true,
-          touchMove: true,
-        },
-      },
-    ],
-  });
 
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#4691F2]/10">
@@ -149,10 +96,10 @@ const Published = () => {
 
       <div className="text-center py-1 mb-6 sm:py-12 lg:py-16">
         <p className="text-gray-700 text-[13px] md:text-lg lg:mb-4 font-medium">
-          Top Requests are here
+          {t("top_requests_here")}
         </p>
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
-          Last Request Published
+          {t("last_request_published")}
         </h1>
       </div>
 
@@ -163,11 +110,11 @@ const Published = () => {
           </div>
         ) : isError ? (
           <div className="text-center text-red-500 py-8">
-            Error loading tour plans. Please try again later.
+            {t("error_loading")}
           </div>
         ) : publishedData.length === 0 ? (
           <div className="text-center text-gray-600 py-8">
-            No tour plans available at the moment.
+            {t("no_tour_plans")}
           </div>
         ) : (
           <>
@@ -178,7 +125,7 @@ const Published = () => {
                   onClick={() => handleCategoryClick("beach")}
                   className="text-3xl font-bold text-black mb-4 flex items-center hover:cursor-pointer"
                 >
-                  Beach Trips
+                  {t("beach_trips")}
                   <GoChevronRight className="mt-[5px]" />
                 </button>
                 <div className="relative">
@@ -228,7 +175,7 @@ const Published = () => {
                   onClick={() => handleCategoryClick("mountain")}
                   className="text-3xl font-bold text-black flex items-center mb-4 hover:cursor-pointer"
                 >
-                  Mountain Adventures
+                  {t("mountain_adventures")}
                   <GoChevronRight className="mt-[5px]" />
                 </button>
                 <div className="relative">
@@ -278,7 +225,7 @@ const Published = () => {
                   onClick={() => handleCategoryClick("relax")}
                   className="text-3xl font-bold text-black mb-4 hover:cursor-pointer flex items-center"
                 >
-                  Relaxing Tours <GoChevronRight className="mt-[5px]" />
+                  {t("relaxing_tours")} <GoChevronRight className="mt-[5px]" />
                 </button>
                 <div className="relative">
                   <Swiper
@@ -327,7 +274,7 @@ const Published = () => {
                   onClick={() => handleCategoryClick("group")}
                   className="text-3xl font-bold text-black mb-4 flex items-center hover:cursor-pointer"
                 >
-                  Group Packages <GoChevronRight className="mt-[5px]" />
+                  {t("group_packages")} <GoChevronRight className="mt-[5px]" />
                 </button>
                 <div className="relative">
                   <Swiper
@@ -344,12 +291,12 @@ const Published = () => {
                       },
                     }}
                     navigation={{
-                      prevEl: relaxPrevRef.current,
-                      nextEl: relaxNextRef.current,
+                      prevEl: groupPrevRef.current,
+                      nextEl: groupNextRef.current,
                     }}
                     onBeforeInit={(swiper) => {
-                      swiper.params.navigation.prevEl = relaxPrevRef.current;
-                      swiper.params.navigation.nextEl = relaxNextRef.current;
+                      swiper.params.navigation.prevEl = groupPrevRef.current;
+                      swiper.params.navigation.nextEl = groupNextRef.current;
                     }}
                     breakpoints={{
                       1024: { slidesPerView: 4, spaceBetween: 12 },
@@ -374,7 +321,7 @@ const Published = () => {
 
       <NavLink to="/tourPlans" className="flex justify-center mt-2">
         <h1 className="w-5/6 md:w-auto h-[48px] rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
-          see more
+          {t("see_more")}
         </h1>
       </NavLink>
     </div>
