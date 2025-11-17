@@ -35,6 +35,7 @@ import PrivateRoute from "./PrivetRoute";
 import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
 import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
 import AcceptedOffers from "@/Pages/Home/AcceptedOffers";
+import Blog from "@/Pages/Home/blog";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
     element: <Main />,
     children: [
       { path: "/", element: <Home /> },
+      { path: "/blog", element: <Blog /> },
       { path: "/membership", element: <Membership /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/tourPlan", element: <TourPlan /> },

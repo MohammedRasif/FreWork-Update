@@ -29,7 +29,7 @@ const Navbar = () => {
 
   const routeMap = {
     "/": "home",
-    "/membership": "membership",
+    "/blog": "blog",
     "/pricing": "agencies",
     "/tourPlans": "tours",
     "/acceptedOffers": "acceptedOffers",
@@ -158,15 +158,15 @@ const Navbar = () => {
           {t("home")}
         </NavLink>
         <NavLink
-          to="/membership"
+          to="/blog"
           className={`text-base text-[18px] font-medium ${
-            activeLink === "membership"
+            activeLink === "blog"
               ? "text-[#2464EC] border-b-2 border-[#2464EC]"
               : "text-gray-700 hover:text-blue-600"
           }`}
-          onClick={() => handleLinkClick("membership", "/membership")}
+          onClick={() => handleLinkClick("blog", "/blog")}
         >
-          {t("agencies")}
+          {t("blog")}
         </NavLink>
         <NavLink
           to="/tourPlans"
@@ -314,13 +314,13 @@ const Navbar = () => {
                 {t("home")}
               </NavLink>
               <NavLink
-                to="/membership"
+                to="/blog"
                 className={`text-base text-[20px] font-medium ${
-                  activeLink === "membership"
+                  activeLink === "blog"
                     ? "text-[#2464EC] border-b-2 border-[#2464EC]"
                     : "text-gray-700 hover:text-blue-600"
                 }`}
-                onClick={() => handleLinkClick("membership", "/membership")}
+                onClick={() => handleLinkClick("blog", "/blog")}
               >
                 {t("agencies")}
               </NavLink>

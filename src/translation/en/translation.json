@@ -655,6 +655,7 @@
   "registration_error": "Error occurred during registration. Please try again.",
   "reset_your_password": "Reset your Password",
   "password_reset_success": "Password successfully reset!",
-  "error_resetting_password": "Error resetting password. Please try again."
+  "error_resetting_password": "Error resetting password. Please try again.",
+  "blog": "Blog"
 
 }

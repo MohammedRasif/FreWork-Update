@@ -648,5 +648,6 @@
   "registration_error": "Si è verificato un errore durante la registrazione. Riprova.",
   "reset_your_password": "Reimposta la tua Password",
   "password_reset_success": "Password reimpostata con successo!",
-  "error_resetting_password": "Errore nel reimpostare la password. Riprova."
+  "error_resetting_password": "Errore nel reimpostare la password. Riprova.",
+  "blog": "Blog"
  }

@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -33,8 +34,8 @@ const Footer = () => {
           <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">
             {t("about_us")}
           </h3>
-          <p className="text-sm text-gray-400 pt-5">{t("why_us")}</p>
-          <p className="text-sm text-gray-400">{t("contact_us")}</p>
+         <p className="pt-5"> <NavLink to="/contact" className="text-sm text-gray-400 ">{t("contact_us")}</NavLink></p>
+          <NavLink to="/membership" className="text-sm text-gray-400">{t("agencies")}</NavLink>
         </div>
 
         {/* Follow us on Column */}

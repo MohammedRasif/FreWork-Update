@@ -13,13 +13,11 @@ const LanguageToggleButton = () => {
   const { t } = useTranslation();
   const [currentLang, setCurrentLang] = useState(i18n.language);
 
-  // Listen to language change
   useEffect(() => {
     const changeHandler = (lng) => {
       setCurrentLang(lng);
     };
 
-    // এখানে i18n instance এর উপর event listener
     i18n.on("languageChanged", changeHandler);
 
     // Cleanup
