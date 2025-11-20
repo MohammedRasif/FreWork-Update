@@ -11,7 +11,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  // Define tag types for cache management
   tagTypes: ["User", "Agency", "TourPlan"],
   endpoints: (builder) => ({
     // User-related mutations
@@ -21,7 +20,7 @@ export const baseApi = createApi({
         method: "POST",
         body: userData,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on signup
+      invalidatesTags: ["User"], 
     }),
     logIn: builder.mutation({
       query: (loginData) => ({
@@ -29,7 +28,7 @@ export const baseApi = createApi({
         method: "POST",
         body: loginData,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on login
+      invalidatesTags: ["User"], 
     }),
     otpVerify: builder.mutation({
       query: (otpData) => ({
@@ -37,7 +36,7 @@ export const baseApi = createApi({
         method: "POST",
         body: otpData,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on OTP verification
+      invalidatesTags: ["User"], 
     }),
     reSendOtp: builder.mutation({
       query: (email) => ({
@@ -45,7 +44,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on OTP resend
+      invalidatesTags: ["User"], 
     }),
     verifyEmail: builder.mutation({
       query: (email) => ({
@@ -53,7 +52,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on email verification
+      invalidatesTags: ["User"], 
     }),
     updatePassword: builder.mutation({
       query: (data) => ({
@@ -61,20 +60,20 @@ export const baseApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["User"], // Invalidate User-related queries on password update
+      invalidatesTags: ["User"], 
     }),
     // Agency-related queries
     getAllAgency: builder.query({
       query: () => "/public/agencies/",
-      providesTags: ["Agency"], // Cache this query with Agency tag
+      providesTags: ["Agency"], 
     }),
     getTopAgency: builder.query({
       query: () => "/public/top-agencies/",
-      providesTags: ["Agency"], // Cache this query with Agency tag
+      providesTags: ["Agency"], 
     }),
     searchAgency: builder.query({
       query: (search) => `/public/agencies/?search=${search}`,
-      providesTags: ["Agency"], // Cache this query with Agency tag
+      providesTags: ["Agency"], 
     }),
    
     filterTourPlanPublic: builder.query({

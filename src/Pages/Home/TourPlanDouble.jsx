@@ -548,7 +548,7 @@ const TourPlanDouble = () => {
                         <div className="space-y-1 text-md text-gray-700">
                           <p>
                             <span className="font-medium">{t("date")}:</span>{" "}
-                            {tour.start_date}
+                            {tour.start_date} to {tour.end_date }
                           </p>
                           <p>
                             <span className="font-medium">{t("category")}:</span>{" "}
