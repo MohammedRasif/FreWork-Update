@@ -142,7 +142,7 @@ export default function Blog() {
 
   if (isError || !blogPosts.length) {
     return (
-      <div className="text-center py-20 text-gray-500">
+      <div className="text-center py-20 text-gray-500 pt-40 h-screen">
         <p>No blog posts found or something went wrong.</p>
       </div>
     );

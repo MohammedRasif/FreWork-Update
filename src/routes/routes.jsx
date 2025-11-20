@@ -35,7 +35,7 @@ import PrivateRoute from "./PrivetRoute";
 import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
 import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
 import AcceptedOffers from "@/Pages/Home/AcceptedOffers";
-import Blog from "@/Pages/Home/blog";
+import Blog from "@/Pages/Home/Blog";
 import BlogDetails from "@/Pages/Home/BlogDetails";
 
 export const router = createBrowserRouter([
