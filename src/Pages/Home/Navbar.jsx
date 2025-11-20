@@ -40,6 +40,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const pathname = location.pathname.replace(/\/$/, "");
+    if (pathname.startsWith("/blog_details/")) {
+      setActiveLink("blog");
+      return;
+    }
     const newActiveLink = routeMap[pathname] || "home";
     setActiveLink(newActiveLink);
   }, [location.pathname]);
@@ -353,7 +357,9 @@ const Navbar = () => {
                     ? "text-[#2464EC] border-b-2 border-[#2464EC]"
                     : "text-gray-700 hover:text-blue-600"
                 }`}
-                onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
+                onClick={() =>
+                  handleLinkClick("acceptedOffers", "/acceptedOffers")
+                }
               >
                 {t("accepted_offers")}
               </NavLink>

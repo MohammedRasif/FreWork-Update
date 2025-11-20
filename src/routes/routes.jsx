@@ -36,6 +36,7 @@ import SubscriptionSuccess from "@/Pages/Home/SubscriptionSuccess";
 import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
 import AcceptedOffers from "@/Pages/Home/AcceptedOffers";
 import Blog from "@/Pages/Home/blog";
+import BlogDetails from "@/Pages/Home/BlogDetails";
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },
+      { path: "/blog_details/:id", element: <BlogDetails /> },
       { path: "/membership", element: <Membership /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/tourPlan", element: <TourPlan /> },
@@ -65,7 +67,7 @@ export const router = createBrowserRouter([
       { path: "membership", element: <AdminPricing /> },
       { path: "admin_notification", element: <AdminNotification /> },
       {
-        path: "chat", // Changed from "user" to "chat" to avoid repetition
+        path: "chat", 
         element: <ChatInterface />,
         children: [
           {

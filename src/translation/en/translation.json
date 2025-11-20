@@ -656,6 +656,8 @@
   "reset_your_password": "Reset your Password",
   "password_reset_success": "Password successfully reset!",
   "error_resetting_password": "Error resetting password. Please try again.",
-  "blog": "Blog"
+  "blog": "Blog",
+  "blog_title":"Our Travel Blog",
+  "blog_description":"Stories, tips, and inspiration from the road. Join thousands of travelers who read our blog every week."
 
 }

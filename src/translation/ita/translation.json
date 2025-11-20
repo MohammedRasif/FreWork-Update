@@ -649,5 +649,7 @@
   "reset_your_password": "Reimposta la tua Password",
   "password_reset_success": "Password reimpostata con successo!",
   "error_resetting_password": "Errore nel reimpostare la password. Riprova.",
-  "blog": "Blog"
+  "blog": "Blog",
+  "blog_title":"Il nostro blog di viaggi",
+  "blog_description":"Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana."
  }
