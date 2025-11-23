@@ -275,9 +275,9 @@
   "my_board": "My Board",
   "respond_fast_for_free": "Want to respond fast to get Tourist for \"Free\"?",
   "important_notice_for_agencies": "Important Notice for Agencies",
-  "confirm_deal_mandatory": "It is <1>mandatory</1> to click on <1>\"Confirm Deal\"</1> every time you close an agreement with a client.",
-  "final_confirmation_client": "The <1>final confirmation belongs to the client</1>: only then will the deal be valid, count toward site statistics, and award the <1>\"Winning Agency\" badge</1> visible to all.",
-  "penalties_for_noncompliance": "Agencies that fail to confirm may face <1>penalties or temporary suspensions</1>.",
+  "confirm_deal_mandatory": "It is mandatory to click on Confirm Deal every time you close an agreement with a client.",
+  "final_confirmation_client": "The final confirmation belongs to the client only then will the deal be valid, count toward site statistics, and award the Winning Agency badge visible to all.",
+  "penalties_for_noncompliance": "Agencies that fail to confirm may face penalties or temporary suspensions.",
   "tour_details": "Tour Details",
   "enter_your_budget": "Enter your budget",
   "enter_your_comment": "Enter your comment",
@@ -663,6 +663,7 @@
   
   "please_accept_terms": "Please accept the Terms & Conditions to continue",
   "terms_and_conditions": "Terms and Conditions",
-  "privacy_policy": "Privacy Policy"
+  "privacy_policy": "Privacy Policy",
+  "who_work": "How it works"
 
 }

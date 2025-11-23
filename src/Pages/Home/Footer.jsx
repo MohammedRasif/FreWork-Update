@@ -35,7 +35,8 @@ const Footer = () => {
             {t("about_us")}
           </h3>
          <p className="pt-5"> <NavLink to="/contact" className="text-sm text-gray-400 ">{t("contact_us")}</NavLink></p>
-          <NavLink to="/membership" className="text-sm text-gray-400">{t("agencies")}</NavLink>
+          <p><NavLink to="/membership" className="text-sm text-gray-400">{t("agencies")}</NavLink></p>
+          <NavLink to="/blog" className="text-sm text-gray-400"> {t("blog")}</NavLink>
         </div>
 
         {/* Follow us on Column */}

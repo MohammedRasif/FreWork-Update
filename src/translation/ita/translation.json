@@ -275,9 +275,9 @@
   "my_board": "La Mia Bacheca",
   "respond_fast_for_free": "Vuoi rispondere velocemente per ottenere turisti \"Gratis\"?",
   "important_notice_for_agencies": "Avviso Importante per le Agenzie",
-  "confirm_deal_mandatory": "È <1>obbligatorio</1> cliccare su <1>\"Conferma Affare\"</1> ogni volta che chiudi un accordo con un cliente.",
-  "final_confirmation_client": "La <1>conferma finale spetta al cliente</1>: solo allora l'affare sarà valido, conterà nelle statistiche del sito e assegnerà il badge <1>\"Agenzia Vincente\"</1> visibile a tutti.",
-  "penalties_for_noncompliance": "Le agenzie che non confermano potrebbero subire <1>penalità o sospensioni temporanee</1>.",
+  "confirm_deal_mandatory": "Èobbligatoriocliccare su Conferma Affare ogni volta che chiudi un accordo con un cliente.",
+  "final_confirmation_client": "La conferma finale spetta al cliente solo allora l'affare sarà valido, conterà nelle statistiche del sito e assegnerà il badge Agenzia Vincente visibile a tutti.",
+  "penalties_for_noncompliance": "Le agenzie che non confermano potrebbero subire penalità o sospensioni temporanee.",
   "tour_details": "Dettagli del Tour",
   "enter_your_budget": "Inserisci il tuo budget",
   "enter_your_comment": "Inserisci il tuo commento",
@@ -656,5 +656,6 @@
  
   "please_accept_terms": "Accetta i Termini e Condizioni per continuare",
   "terms_and_conditions": "Termini e Condizioni",
-  "privacy_policy": "Informativa sulla Privacy"
+  "privacy_policy": "Informativa sulla Privacy",
+  "who_work":"Come Funziona"
  }

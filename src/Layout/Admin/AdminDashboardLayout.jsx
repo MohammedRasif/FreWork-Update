@@ -297,7 +297,7 @@ export default function AdminDashboardLayout() {
               </div>
             ))}
 
-            <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
+            {/* <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
               <div className="w-8 h-8 flex items-center justify-center bg-white shadow-[0_2px_4px_-1px_#00000030] p-2 rounded-md">
                 <SlDiamond size={16} />
               </div>
@@ -312,7 +312,7 @@ export default function AdminDashboardLayout() {
                   {t("documentation")}
                 </Button>
               </div>
-            </div>
+            </div> */}
           </nav>
         </aside>
 
@@ -381,7 +381,7 @@ export default function AdminDashboardLayout() {
               </div>
             ))}
 
-            <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
+            {/* <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
               <div className="w-8 h-8 flex items-center justify-center bg-white shadow-[0_2px_4px_-1px_#00000030] p-2 rounded-md">
                 <SlDiamond size={16} />
               </div>
@@ -396,7 +396,7 @@ export default function AdminDashboardLayout() {
                   {t("documentation")}
                 </Button>
               </div>
-            </div>
+            </div> */}
           </nav>
         </aside>
 

@@ -161,7 +161,7 @@ const Navbar = () => {
         >
           {t("home")}
         </NavLink>
-        <NavLink
+        {/* <NavLink
           to="/blog"
           className={`text-base text-[18px] font-medium ${
             activeLink === "blog"
@@ -171,7 +171,7 @@ const Navbar = () => {
           onClick={() => handleLinkClick("blog", "/blog")}
         >
           {t("blog")}
-        </NavLink>
+        </NavLink> */}
         <NavLink
           to="/tourPlans"
           className={`text-base text-[18px] font-medium ${
@@ -215,6 +215,17 @@ const Navbar = () => {
           onClick={() => handleLinkClick("contact", "/contact")}
         >
           {t("contact")}
+        </NavLink>
+        <NavLink
+          to="/contact"
+          className={`text-base text-[18px] font-medium ${
+            activeLink === "contact"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-blue-600"
+          }`}
+          onClick={() => handleLinkClick("contact", "/contact")}
+        >
+          {t("who_work")}
         </NavLink>
       </div>
 
