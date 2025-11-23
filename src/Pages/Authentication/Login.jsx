@@ -176,7 +176,7 @@ const Login = () => {
 
           {/* Register Link */}
           <div className="text-center mt-6">
-            <NavLink to="/register" className="text-sm text-gray-600">
+            <NavLink to="/register" className="text-md text-gray-600">
               {t("no_account")}{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
                 {t("register")}

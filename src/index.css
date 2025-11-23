@@ -217,3 +217,85 @@
 }
 
 
+
+
+
+
+
+.blog-content-raw * {
+  all: revert; /* Tailwind/Prose এর সব ওভাররাইড রিমুভ করে ব্রাউজার ডিফল্টে ফিরিয়ে দেয় */
+}
+
+.blog-content-raw h1 {
+  font-size: 2.5rem;     /* 40px */
+  font-weight: 800;
+  margin: 2.5rem 0 1.5rem;
+  line-height: 1.2;
+  color: #1a1a1a;
+}
+
+.blog-content-raw h2 {
+  font-size: 2rem;       /* 32px */
+  font-weight: 700;
+  margin: 2.2rem 0 1.2rem;
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.blog-content-raw h3 {
+  font-size: 1.65rem;    /* 26px */
+  font-weight: 600;
+  margin: 1.8rem 0 1rem;
+  color: #2d2d2d;
+}
+
+.blog-content-raw h4 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.8rem;
+}
+
+.blog-content-raw p {
+  margin-bottom: 1.3rem;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.blog-content-raw img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 2.5rem auto;
+  display: block;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.blog-content-raw ul,
+.blog-content-raw ol {
+  margin: 1.5rem 0;
+  padding-left: 2rem;
+}
+
+.blog-content-raw li {
+  margin: 0.6rem 0;
+  line-height: 1.7;
+}
+
+.blog-content-raw blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: #555;
+}
+
+.blog-content-raw a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.blog-content-raw a:hover {
+  opacity: 0.8;
+}
+

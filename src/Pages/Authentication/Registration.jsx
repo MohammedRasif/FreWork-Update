@@ -34,7 +34,10 @@ const Register = () => {
       try {
         const parsedPlan = JSON.parse(pendingPlan);
         if (parsedPlan.email) {
-          console.log("Setting default email from pendingPlan:", parsedPlan.email);
+          console.log(
+            "Setting default email from pendingPlan:",
+            parsedPlan.email
+          );
           setValue("email", parsedPlan.email);
         }
       } catch (err) {
@@ -157,7 +160,9 @@ const Register = () => {
                       selectedUserType ? "text-gray-900" : "text-gray-400"
                     }
                   >
-                    {selectedUserType ? t(`user_type_${selectedUserType}`) : t("select_one")}
+                    {selectedUserType
+                      ? t(`user_type_${selectedUserType}`)
+                      : t("select_one")}
                   </span>
                   <ChevronDown
                     className={`h-4 sm:h-4 w-3 sm:w-4 text-gray-400 transition-transform ${
@@ -292,16 +297,71 @@ const Register = () => {
             {/* Register Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || !watch("termsAccepted")}
+              className={`w-full mt-6 py-3.5 px-4 rounded-lg font-medium text-white transition-all duration-200 shadow-md
+                ${
+                  isLoading || !watch("termsAccepted")
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
+                }`}
             >
-              {isLoading ? t("registering") : t("register")}
+              {isLoading ? t("registering") + "..." : t("register")}
             </button>
           </form>
+          <div className="mt-8 pb-6 border-b border-gray-200">
+            <label className="flex items-start gap-4 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                {...register("termsAccepted", {
+                  required: t("please_accept_terms"),
+                })}
+                className="w-6 h-6 text-blue-600 bg-white border-2 border-gray-300 rounded-md focus:ring-blue-500 focus:ring-2 cursor-pointer transition-all"
+              />
+              <span className="text-sm text-gray-700 leading-relaxed">
+                {t("by_registering_agree")}{" "}
+                <a
+                  href="/terms-and-conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-blue-600 hover:text-blue-700 underline"
+                >
+                  {t("terms_and_conditions")}
+                </a>{" "}
+                &{" "}
+                <a
+                  href="/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-blue-600 hover:text-blue-700 underline"
+                >
+                  {t("privacy_policy")}
+                </a>
+                
+              </span>
+            </label>
+
+            {/* Error Message */}
+            {errors.termsAccepted && (
+              <p className="text-red-500 text-xs mt-3 flex items-center gap-1 ml-10">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {errors.termsAccepted.message}
+              </p>
+            )}
+          </div>
 
           {/* Login Link */}
           <div className="text-center mt-6">
-            <NavLink to="/login" className="text-sm text-gray-600">
+            <NavLink to="/login" className="text-md text-gray-600">
               {t("already_have_account")}{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
                 {t("login")}

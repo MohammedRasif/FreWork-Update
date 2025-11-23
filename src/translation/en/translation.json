@@ -658,6 +658,11 @@
   "error_resetting_password": "Error resetting password. Please try again.",
   "blog": "Blog",
   "blog_title":"Our Travel Blog",
-  "blog_description":"Stories, tips, and inspiration from the road. Join thousands of travelers who read our blog every week."
+  "blog_description":"Stories, tips, and inspiration from the road. Join thousands of travelers who read our blog every week.",
+  "by_registering_agree": "By registering, I accept the",
+  
+  "please_accept_terms": "Please accept the Terms & Conditions to continue",
+  "terms_and_conditions": "Terms and Conditions",
+  "privacy_policy": "Privacy Policy"
 
 }

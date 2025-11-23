@@ -1,13 +1,13 @@
 {
-  "home": "Casa",
+  "home": "Home",
   "agencies": "Agenzie",
   "tour_plans": "Piani Turistici",
   "accepted_offers": "Offerte Accettate",
-  "for_agencies": "Per agenzie",
+  "for_agencies": "Per Agenzie",
   "contact": "Contatto",
   "login": "Accedi",
   "register": "Registrati",
-  "dashboard": "Pannello",
+  "dashboard": "Dashboard",
   "logout": "Esci",
   "loading": "Caricamento...",
   "banner_tagline": "La mia vacanza al mio prezzo",
@@ -651,5 +651,10 @@
   "error_resetting_password": "Errore nel reimpostare la password. Riprova.",
   "blog": "Blog",
   "blog_title":"Il nostro blog di viaggi",
-  "blog_description":"Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana."
+  "blog_description":"Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana.",
+  "by_registering_agree": "Registrandomi, accetto i",
+ 
+  "please_accept_terms": "Accetta i Termini e Condizioni per continuare",
+  "terms_and_conditions": "Termini e Condizioni",
+  "privacy_policy": "Informativa sulla Privacy"
  }

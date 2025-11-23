@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useParams } from "react-router-dom"; 
+import { useParams } from "react-router-dom";
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import { format } from "date-fns";
 
@@ -14,11 +14,11 @@ const formatDate = (dateString) => {
 };
 
 export default function BlogDetails() {
-  const { id } = useParams(); 
-  const numericId = id ? parseInt(id, 10) : null; 
+  const { id } = useParams();
+  const numericId = id ? parseInt(id, 10) : null;
 
   const {
-    data: postsArray = [], 
+    data: postsArray = [],
     isLoading,
     isError,
     error,
@@ -26,7 +26,7 @@ export default function BlogDetails() {
     skip: !numericId,
   });
 
-  const post = postsArray.find(p => p.id === numericId);
+  const post = postsArray.find((p) => p.id === numericId);
 
   if (isLoading) {
     return (
@@ -49,11 +49,12 @@ export default function BlogDetails() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24">
-      <div className="mb-8 text-center md:text-left">
-        <h1 className="text-2xl md:text-[40px] font-bold text-gray-900 leading-tight">
+      {/* Title & Date */}
+      <div className="mb-10 text-center md:text-left">
+        <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
           {post.title}
         </h1>
-        <p className="text-[16px] text-gray-600 mt-4">
+        <p className="text-lg text-gray-600 mt-4">
           {formatDate(post.created_at)}
         </p>
       </div>
@@ -63,23 +64,20 @@ export default function BlogDetails() {
           <img
             src={post.image}
             alt={post.title}
-            className="w-full h-72 md:h-[400px] object-cover rounded-xl shadow-2xl"
+            className="w-full h-72 md:h-96 object-cover rounded-xl shadow-2xl"
           />
         </div>
       )}
 
-      <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6">
+      <article className="blog-content-raw mt-10">
         {post.content ? (
-          <div
-            dangerouslySetInnerHTML={{ __html: post.content }}
-            className="blog-content"
-          />
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
         ) : (
           <p className="text-gray-500 italic">
             {post.introductory_description || "No content available."}
           </p>
         )}
-      </div>
+      </article>
 
       {post.author && (
         <div className="mt-16 pt-8 border-t border-gray-200">

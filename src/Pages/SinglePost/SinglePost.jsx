@@ -27,12 +27,13 @@ import { ToastContainer } from "react-toastify";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { IoBed, IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
   const { id: paramId } = useParams();
   const finalId = paramId || prid?.id;
-
+ const { t } = useTranslation();
   const [token, setToken] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [role, setRole] = useState(null);
@@ -143,7 +144,7 @@ function SinglePost({ prid }) {
       id: finalId,
       data: formData,
     }).unwrap();
-    console.log("API Response:", response); // Debug: Check the API response
+    console.log("API Response:", response); 
 
     // Create new offer object
     const newOffer = {

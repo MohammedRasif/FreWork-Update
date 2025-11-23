@@ -35,14 +35,14 @@ const LanguageToggleButton = () => {
 
   return (
     <motion.div
-      className="w-[150px] h-11 bg-gray-200 rounded-full flex justify-between items-center py-1 cursor-pointer relative shadow-md"
+      className="w-[75px] h-9 bg-gray-200 rounded-full flex justify-between items-center py-1 cursor-pointer relative shadow-md"
       onClick={toggleLanguage}
       layout
       transition={spring}
     >
       <motion.div
-        className="w-[72px] h-9 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-[#8280FF]"
-        animate={{ x: isItalian ? 75 : 5 }}
+        className="w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-[#8280FF]"
+        animate={{ x: isItalian ? 40 : 8 }}
         transition={spring}
       />
 
@@ -51,7 +51,7 @@ const LanguageToggleButton = () => {
           isItalian ? "text-gray-500" : "text-white"
         }`}
       >
-        {t("English")}
+        {t("En")}
       </motion.span>
 
       <motion.span
@@ -59,7 +59,7 @@ const LanguageToggleButton = () => {
           isItalian ? "text-white" : "text-gray-500"
         }`}
       >
-        {t("Italian")}
+        {t("It")}
       </motion.span>
     </motion.div>
   );
