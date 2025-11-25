@@ -104,15 +104,17 @@ const Banner = () => {
         <p className="mt-2 text-[24px] md:text-[40px] lg:text-[42px] font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
           {t("banner_slogan")}
         </p>
+        <p className="py-3 lg:text-2xl text-[15px]">{t("show_short_description")}</p>
         {showCreateRequestButton && (
           <button
             onClick={handleButtonClick}
-            className="mt-3 md:mt-10 bg-[#FF6600] hover:bg-[#e55600] text-white text-[20px] md:text-[24px] font-medium py-[14px] md:py-[16px] px-[28px] md:px-[36px] rounded-[10px] md:rounded-[12px] max-w-[80%] md:w-[300px] lg:w-[350px] mx-auto"
+            className="mt-3 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[20px] md:text-[24px] font-medium py-[14px] md:py-[16px] px-[28px] md:px-[36px] rounded-[10px] md:rounded-[12px] max-w-[80%] md:w-[300px] lg:w-[350px] mx-auto"
           >
             {t("create_request")}
           </button>
         )}
       </div>
+      
       {isPopupOpen && (
         <motion.div
           initial={{ opacity: 0 }}

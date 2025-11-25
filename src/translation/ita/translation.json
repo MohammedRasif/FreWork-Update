@@ -275,9 +275,9 @@
   "my_board": "La Mia Bacheca",
   "respond_fast_for_free": "Vuoi rispondere velocemente per ottenere turisti \"Gratis\"?",
   "important_notice_for_agencies": "Avviso Importante per le Agenzie",
-  "confirm_deal_mandatory": "È <1>obbligatorio</1> cliccare su <1>\"Conferma Affare\"</1> ogni volta che chiudi un accordo con un cliente.",
-  "final_confirmation_client": "La <1>conferma finale spetta al cliente</1>: solo allora l'affare sarà valido, conterà nelle statistiche del sito e assegnerà il badge <1>\"Agenzia Vincente\"</1> visibile a tutti.",
-  "penalties_for_noncompliance": "Le agenzie che non confermano potrebbero subire <1>penalità o sospensioni temporanee</1>.",
+  "confirm_deal_mandatory": "Èobbligatorio cliccare su Conferma Affareogni volta che chiudi un accordo con un cliente.",
+  "final_confirmation_client": "La conferma finale spetta al cliente solo allora l'affare sarà valido, conterà nelle statistiche del sito e assegnerà il badge Agenzia Vincente visibile a tutti.",
+  "penalties_for_noncompliance": "Le agenzie che non confermano potrebbero subire penalità o sospensioni temporanee.",
   "tour_details": "Dettagli del Tour",
   "enter_your_budget": "Inserisci il tuo budget",
   "enter_your_comment": "Inserisci il tuo commento",
@@ -648,7 +648,8 @@
   "error_resetting_password": "Errore nel reimpostare la password. Riprova.",
   "blog": "Blog",
   "blog_title": "Il nostro blog di viaggi",
-  "blog_description": "Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana."
+  "blog_description": "Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana.",
+  "show_short_description": "Gratis, senza impegno"
 }
 
 
