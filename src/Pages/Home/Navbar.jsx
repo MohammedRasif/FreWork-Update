@@ -293,138 +293,151 @@ const Navbar = () => {
       </div>
 
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-lg lg:hidden z-50"
-          >
-            <div className="flex flex-col items-center space-y-4 py-4">
-              {isAuthenticated && userData && (
-                <div className="flex items-center space-x-2">
-                  <img
-                    src={
-                      userData.image_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                    }
-                    alt="User profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <span className="text-gray-700 text-[18px] font-medium">
-                    {isLoading ? t("loading") : userData.name}
-                  </span>
-                </div>
-              )}
-              <NavLink
-                to="/"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "home"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() => handleLinkClick("home", "/")}
-              >
-                {t("home")}
-              </NavLink>
-              <NavLink
-                to="/blog"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "blog"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() => handleLinkClick("blog", "/blog")}
-              >
-                {t("agencies")}
-              </NavLink>
-              <NavLink
-                to="/pricing"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "agencies"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() => handleLinkClick("agencies", "/pricing")}
-              >
-                {t("for_agencies")}
-              </NavLink>
-              <NavLink
-                to="/tourPlans"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "tours"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() => handleLinkClick("tours", "/tourPlans")}
-              >
-                {t("tour_plans")}
-              </NavLink>
-              <NavLink
-                to="/acceptedOffers"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "acceptedOffers"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() =>
-                  handleLinkClick("acceptedOffers", "/acceptedOffers")
-                }
-              >
-                {t("accepted_offers")}
-              </NavLink>
-              <NavLink
-                to="/contact"
-                className={`text-base text-[20px] font-medium ${
-                  activeLink === "contact"
-                    ? "text-[#2464EC] border-b-2 border-[#2464EC]"
-                    : "text-gray-700 hover:text-blue-600"
-                }`}
-                onClick={() => handleLinkClick("contact", "/contact")}
-              >
-                {t("contact")}
-              </NavLink>
-              <LanguageToggleButton />
-              {isAuthenticated && userData ? (
-                <>
-                  <button
-                    onClick={handleDashboardClick}
-                    className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"
-                  >
-                    {t("dashboard")}
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"
-                  >
-                    {t("logout")}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <NavLink to="/login">
-                    <button
-                      className="px-6 py-2 text-[20px] bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors cursor-pointer w-full text-center"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {t("login")}
-                    </button>
-                  </NavLink>
-                  <NavLink to="/register">
-                    <button
-                      className="px-6 py-2 text-[20px] bg-[#3776E2] text-white rounded-md hover:bg-blue-600 transition-colors cursor-pointer w-full text-center"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {t("register")}
-                    </button>
-                  </NavLink>
-                </>
-              )}
-            </div>
-          </motion.div>
+  {isOpen && (
+    <motion.div
+      initial="closed"
+      animate="open"
+      exit="closed"
+      variants={menuVariants}
+      className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-lg lg:hidden z-50"
+    >
+      <div className="flex flex-col items-center space-y-1 py-6 px-4">
+
+        {/* User Profile (if logged in) */}
+        {isAuthenticated && userData && (
+          <div className="flex flex-col items-center space-y-3 pb-4 border-b border-gray-200 w-full">
+            <img
+              src={
+                userData.image_url ||
+                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+              }
+              alt="User"
+              className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
+            />
+            <span className="text-lg font-semibold text-gray-800">
+              {userData.name}
+            </span>
+          </div>
         )}
-      </AnimatePresence>
+
+        {/* Navigation Links - ডেস্কটপের সাথে ১০০% মিল */}
+        <NavLink
+          to="/"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "home"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("home", "/")}
+        >
+          {t("home")}
+        </NavLink>
+
+        <NavLink
+          to="/tourPlans"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "tours"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("tours", "/tourPlans")}
+        >
+          {t("tour_plans")}
+        </NavLink>
+
+        <NavLink
+          to="/acceptedOffers"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "acceptedOffers"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("acceptedOffers", "/acceptedOffers")}
+        >
+          {t("accepted_offers")}
+        </NavLink>
+
+        <NavLink
+          to="/pricing"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "agencies"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("agencies", "/pricing")}
+        >
+          {t("for_agencies")}
+        </NavLink>
+
+        <NavLink
+          to="/contact"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "contact"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("contact", "/contact")}
+        >
+          {t("contact")}
+        </NavLink>
+
+        <NavLink
+          to="/contact"
+          className={`text-lg font-medium py-2 ${
+            activeLink === "contact"
+              ? "text-[#2464EC] border-b-2 border-[#2464EC]"
+              : "text-gray-700 hover:text-[#2464EC]"
+          }`}
+          onClick={() => handleLinkClick("contact", "/contact")}
+        >
+          {t("who_work")}
+        </NavLink>
+
+        {/* Language Toggle */}
+        <div className="pt-4">
+          <LanguageToggleButton />
+        </div>
+
+        {/* Auth Buttons */}
+        {isAuthenticated && userData ? (
+          <>
+            <button
+              onClick={handleDashboardClick}
+              className="w-full max-w-xs px-8 py-3 text-lg font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
+            >
+              {t("dashboard")}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full max-w-xs px-8 py-3 text-lg font-medium bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all"
+            >
+              {t("logout")}
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login" className="w-full max-w-xs">
+              <button
+                className="w-full px-8 py-3 text-lg font-medium bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-all"
+                onClick={() => setIsOpen(false)}
+              >
+                {t("login")}
+              </button>
+            </NavLink>
+            <NavLink to="/register" className="w-full max-w-xs">
+              <button
+                className="w-full px-8 py-3 text-lg font-medium bg-[#3776E2] text-white rounded-lg hover:bg-blue-700 transition-all shadow-md"
+                onClick={() => setIsOpen(false)}
+              >
+                {t("register")}
+              </button>
+            </NavLink>
+          </>
+        )}
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </nav>
   );
 };
