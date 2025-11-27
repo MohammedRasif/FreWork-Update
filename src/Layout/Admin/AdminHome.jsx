@@ -586,9 +586,9 @@ const AdminHome = () => {
               <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible">
                 {[
                   t("all_plans_tab"),
-                  t("decline_plans_tab"),
                   t("offered_plans_tab"),
                   t("accepted_plans_tab"),
+                   t("decline_plans_tab"),
                 ].map((tab) => (
                   <button
                     key={tab}

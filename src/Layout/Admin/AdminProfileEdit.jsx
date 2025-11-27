@@ -308,6 +308,7 @@ const AdminProfileEdit = () => {
           </label>
           <textarea
             {...register("description", {
+              required: t("description_required"),
               maxLength: {
                 value: 500,
                 message: t("description_max_500"),

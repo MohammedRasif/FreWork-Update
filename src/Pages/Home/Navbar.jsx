@@ -205,7 +205,7 @@ const Navbar = () => {
         >
           {t("for_agencies")}
         </NavLink>
-        <NavLink
+        {/* <NavLink
           to="/contact"
           className={`text-base text-[18px] font-medium ${
             activeLink === "contact"
@@ -215,7 +215,7 @@ const Navbar = () => {
           onClick={() => handleLinkClick("contact", "/contact")}
         >
           {t("contact")}
-        </NavLink>
+        </NavLink> */}
         <NavLink
           to="/contact"
           className={`text-base text-[18px] font-medium ${

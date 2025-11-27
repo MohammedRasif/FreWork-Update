@@ -275,7 +275,7 @@
   "my_board": "La Mia Bacheca",
   "respond_fast_for_free": "Vuoi rispondere velocemente per ottenere turisti \"Gratis\"?",
   "important_notice_for_agencies": "Avviso Importante per le Agenzie",
-  "confirm_deal_mandatory": "Èobbligatorio cliccare su Conferma Affareogni volta che chiudi un accordo con un cliente.",
+  "confirm_deal_mandatory": "È obbligatorio cliccare su Conferma Affare ogni volta che chiudi un accordo con un cliente.",
   "final_confirmation_client": "La conferma finale spetta al cliente solo allora l'affare sarà valido, conterà nelle statistiche del sito e assegnerà il badge Agenzia Vincente visibile a tutti.",
   "penalties_for_noncompliance": "Le agenzie che non confermano potrebbero subire penalità o sospensioni temporanee.",
   "tour_details": "Dettagli del Tour",
@@ -383,7 +383,7 @@
   "cover_size_error": "La foto di copertina deve essere inferiore a 10MB",
   "max_size_10mb": "Dimensione max: 10MB",
   "upload_images_mandatory": "Il caricamento del logo e delle foto è obbligatorio. Senza immagini, il tuo profilo non verrà attivato e non potrai utilizzare tutte le funzioni.",
-  "short_description": "Descrizione Breve",
+  "short_description": "Chi Siamo",
   "enter_short_description": "Inserisci una breve descrizione",
   "description_max_500": "La descrizione non può superare i 500 caratteri",
   "main_categories": "Categorie Principali",
@@ -649,7 +649,39 @@
   "blog": "Blog",
   "blog_title": "Il nostro blog di viaggi",
   "blog_description": "Storie, consigli e ispirazione dalla strada. Unisciti a migliaia di viaggiatori che leggono il nostro blog ogni settimana.",
-  "show_short_description": "Gratis, senza impegno"
+  "show_short_description": "Gratis, senza impegno",
+      "description_required" : "La descrizione è obbligatoria",
+      "create_your_tour_plan": "Crea il tuo Piano di Viaggio",
+  "step_of": "Passo {{current}} di {{total}}",
+  "complete": "Completato",
+
+  "adults": "Adulti",
+  "children": "Bambini",
+
+  "previous": "Indietro",
+
+  "ok": "OK",
+  "budget_warning_message": "Nota: il budget è a persona e include voli, alloggio, trasferimenti e pasti come selezionato.",
+  "review_your_information": "Rivedi le tue informazioni",
+
+  "travelers": "Viaggiatori",
+  "not_specified": "Non specificato",
+  "included": "Incluso",
+  "not_included": "Non incluso",
+
+  "select_stars": "Seleziona stelle",
+  "star": "{{count}} Stella",
+  "star_plural": "{{count}} Stelle",
+
+  "family_trip": "Viaggio in famiglia",
+  "solo_travel": "Viaggio da solo",
+  "couple": "In coppia",
+  "group_travel": "Viaggio di gruppo",
+  "business_travel": "Viaggio di lavoro",
+  "select_travel_type": "Seleziona tipo di viaggio",
+
+  "select_destination_type": "Seleziona destinazione"
+
 }
 
 

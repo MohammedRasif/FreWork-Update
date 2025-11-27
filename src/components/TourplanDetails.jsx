@@ -80,7 +80,7 @@ export default function TourPlanDetails({ id, closeModal }) {
             Tour to {tourData.location_to}
           </h2>
           <p className="text-sm text-gray-500 mb-4">
-            Posted by User {tourData.user} ·{" "}
+            Posted by User {tourData.name} ·{" "}
             {new Date(
               tourData.offers[0]?.tour_plan.created_at || Date.now()
             ).toLocaleDateString()}
@@ -103,9 +103,10 @@ export default function TourPlanDetails({ id, closeModal }) {
               <p>
                 <strong>Members:</strong> {tourData.total_members}
               </p>
-              <p>
-                <strong>Budget:</strong> ${tourData.budget}
-              </p>
+             <p>
+  <strong>Budget:</strong> €{Number(tourData.budget).toLocaleString()}
+</p>
+
               <p>
                 <strong>Duration:</strong> {tourData.duration} days
               </p>
@@ -125,6 +126,16 @@ export default function TourPlanDetails({ id, closeModal }) {
                 <p>
                   <strong>Description:</strong>{" "}
                   {tourData.description || "No description provided."}
+                </p>
+                 <p className="pt-5">
+                  <strong>Email:</strong>{" "}
+                  {tourData.email || "No description provided."}
+                </p>
+              </div>
+              <div className="flex items-center justify-between">
+                <p>
+                  <strong>Phone:</strong>{" "}
+                  {tourData.phone_number || "No description provided."}
                 </p>
               </div>
             </div>
@@ -152,15 +163,15 @@ export default function TourPlanDetails({ id, closeModal }) {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  {/* <p className="text-xs text-gray-500">
                     Agency ID: {offer.agency.id}
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <div className="text-sm text-gray-600">
-                <p>
-                  <strong>Offered Budget:</strong> ${offer.offered_budget}
-                </p>
+                {/* <p>
+                  <strong>Offered Budget:</strong> ${offer?.offers?.[0]?.offered_budget}
+                </p> */}
                 <p>
                   <strong>Message:</strong>{" "}
                   {offer.message || "No message provided."}
@@ -182,7 +193,7 @@ export default function TourPlanDetails({ id, closeModal }) {
           )}
 
           {/* Interactions */}
-          <div className="border-t border-gray-200 pt-4">
+          {/* <div className="border-t border-gray-200 pt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Interactions
             </h3>
@@ -212,7 +223,7 @@ export default function TourPlanDetails({ id, closeModal }) {
                 </ul>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Footer */}

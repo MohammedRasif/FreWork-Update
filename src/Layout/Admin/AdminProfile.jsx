@@ -357,14 +357,14 @@ const AdminProfile = () => {
           </div>
         </div>
 
-        <div className="bg-white p-3 sm:p-4 rounded-md">
+        {/* <div className="bg-white p-3 sm:p-4 rounded-md">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
             {t("our_aim")}
           </h3>
           <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed">
             {profileData?.our_aim || t("no_aim_description")}
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

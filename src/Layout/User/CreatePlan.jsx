@@ -647,14 +647,14 @@ const CreatePlan = () => {
           )}
 
           <div className="flex items-center justify-center gap-4 mt-8 pt-6">
-            <button
+            {/* <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "draft"))}
               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
               disabled={isSavingDraft || isPublishing}
             >
               {isSavingDraft ? t("saving") : t("save_for_future")}
-            </button>
+            </button> */}
             <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "published"))}

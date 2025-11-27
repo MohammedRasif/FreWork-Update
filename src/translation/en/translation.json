@@ -383,7 +383,7 @@
   "cover_size_error": "Cover photo must be under 10MB",
   "max_size_10mb": "Max size: 10MB",
   "upload_images_mandatory": "Uploading logo and photos is mandatory. Without images, your profile will not be activated and you will not be able to use all functions.",
-  "short_description": "Short Description",
+  "short_description": "About",
   "enter_short_description": "Enter a short description",
   "description_max_500": "Description cannot exceed 500 characters",
   "main_categories": "Main Categories",
@@ -665,7 +665,40 @@
   "terms_and_conditions": "Terms and Conditions",
   "privacy_policy": "Privacy Policy",
   "who_work": "How it works",
-    "show_short_description": "Free, without obligation"
+    "show_short_description": "Free, without obligation",
+    "description_required" : "Description is required",
+    "create_your_tour_plan": "Create Your Tour Plan",
+  "step_of": "Step {{current}} of {{total}}",
+  "complete": "Complete",
+
+  "adults": "Adults",
+  "children": "Children",
+
+  "description_optional": "Description (Optional)",
+
+  "previous": "Previous",
+
+  "ok": "OK",
+  "budget_warning_message": "Please note that the budget is per person and includes flights, accommodation, transfers and meals as selected.",
+  "review_your_information": "Review Your Information",
+
+  "travelers": "Travelers",
+  "not_specified": "Not specified",
+  "included": "Included",
+  "not_included": "Not included",
+
+  "select_stars": "Select Stars",
+  "star": "{{count}} Star",
+  "star_plural": "{{count}} Stars",
+
+  "family_trip": "Family Trip",
+  "solo_travel": "Solo Travel",
+  "couple": "Couple",
+  "group_travel": "Group Travel",
+  "business_travel": "Business Travel",
+  "select_travel_type": "Select Travel Type",
+
+  "select_destination_type": "Select Destination Type"
 
 
 }
