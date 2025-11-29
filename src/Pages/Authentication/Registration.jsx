@@ -319,23 +319,23 @@ const Register = () => {
               />
               <span className="text-sm text-gray-700 leading-relaxed">
                 {t("by_registering_agree")}{" "}
-                <a
-                  href="/terms-and-conditions"
+                <NavLink
+                  to="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-blue-600 hover:text-blue-700 underline"
                 >
                   {t("terms_and_conditions")}
-                </a>{" "}
+                </NavLink>{" "}
                 &{" "}
-                <a
-                  href="/privacy-policy"
+                <NavLink
+                  to="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-blue-600 hover:text-blue-700 underline"
                 >
                   {t("privacy_policy")}
-                </a>
+                </NavLink>
                 
               </span>
             </label>
