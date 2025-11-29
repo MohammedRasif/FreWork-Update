@@ -39,6 +39,7 @@ import Blog from "@/Pages/Home/Blog";
 import BlogDetails from "@/Pages/Home/BlogDetails";
 import Privacy from "@/Pages/Home/Privacy";
 import Terms from "@/Pages/Home/Terms";
+import WhoItWork from "@/Pages/Home/WhoItWork";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: "/acceptedOffers", element: <AcceptedOffers /> },
       { path: "/contact", element: <Contact /> },
       { path: "/viewall", element: <ViewAllPost /> },
+      { path: "/who_it_work", element: <WhoItWork /> },
       { path: "/privacy", element: <Privacy /> },
       { path: "/terms", element: <Terms /> },
     ],

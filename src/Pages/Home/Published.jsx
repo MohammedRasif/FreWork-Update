@@ -11,7 +11,7 @@ import BeachCard from "@/components/ui/BeachCard";
 import MountainCard from "@/components/ui/MountainCard";
 import RelaxCard from "@/components/ui/RelaxCard";
 import GroupCard from "@/components/ui/GroupCard";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { GoChevronRight } from "react-icons/go";
 import { useGetTourPlanPublicQuery } from "@/redux/features/withAuth";
 import { useTranslation } from "react-i18next";
@@ -31,8 +31,11 @@ const Published = () => {
     data: publishedData = [],
     isLoading,
     isError,
+    refetch,
   } = useGetTourPlanPublicQuery();
-
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   const beachTrips = publishedData?.filter(
     (p) => p.destination_type?.trim().toLowerCase() === "beach"
   );

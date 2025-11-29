@@ -92,13 +92,14 @@
   "ongoing": "Ongoing",
   "trip_to_rome": "Trip to Rome",
   "progress_40": "40% Completed",
-  "start_earning": "Start Earning",
-  "add_your_agency": "Add Your Agency to",
-  "agency_desc_1": "List your agency and reach thousands of travelers looking for personalized trips.",
-  "agency_desc_2": "Receive direct inquiries, manage bookings, and grow your business effortlessly.",
+  "start_earning": "Start Earning on VacanzaMyCost.it",
+  "add_your_agency": "Register Your Agency and Receive Real Requests",
+  "agency_desc_1": "Join the platform where travelers publish verified requests and look for reliable agencies for personalized offers.",
+  "agency_desc_2": "Manage everything easily: receive direct inquiries, send complete offers, and grow your business with zero commissions.",
   "benefit_1": "Get verified and build trust with travelers",
   "benefit_2": "Receive direct client requests instantly",
-  "benefit_3": "Manage offers and bookings in one place",
+  "benefit_3": "Manage offers, negotiations, and bookings in one dashboard",
+  "benefit_4": "Boost your visibility with highly interested travelers",
   "address_line1": "Villa No. 45, Street 12, Khalifa City,",
   "address_line2": "Abu Dhabi, United Arab Emirates",
   "email": "Demovacanz@vacanzmycost.it",
@@ -895,6 +896,39 @@
     "17": {
       "title": "Jurisdiction",
       "text": "Any dispute shall be subject exclusively to the jurisdiction of the Court of Verona (VR)."
+    }
+  },
+  "howItWorks": {
+    "pageTitle": "How VacanzaMyCost.it Works",
+    "subtitle": "In 7 simple steps you find the perfect vacation – free and with no middlemen",
+
+    "1": {
+      "title": "Publish your request",
+      "desc": "Enter destination, dates, budget and preferences in under 2 minutes. Before publication, you receive an email to confirm your request. This prevents fake submissions and ensures reliability for agencies."
+    },
+    "2": {
+      "title": "Receive up to 3 personalized offers",
+      "desc": "Only verified agencies can reply to your request. Each offer includes:\n– photos and proposed accommodation\n– included services\n– total price\n– agency logo and name\nMaximum 3 offers, all real and customized."
+    },
+    "3": {
+      "title": "Compare and choose the best offer",
+      "desc": "You compare offers with quality badges such as:\n– Top Response\n– Recommended\n– Ultra-fast response\n– Offer confirmed by verified user\nThe system may also suggest a smart discount based on real parameters."
+    },
+    "4": {
+      "title": "Contact the agency directly",
+      "desc": "When you find the right offer, you contact the agency by phone, WhatsApp, or email. VacanzaMyCost.it does not apply commissions and does not manage payments. Negotiation is direct and transparent."
+    },
+    "5": {
+      "title": "Offer confirmed",
+      "desc": "When you choose an offer, the agency updates the status to Confirmed. The offer appears in the Accepted Offers section with:\n– agency logo\n– trip details\n– verification badge"
+    },
+    "6": {
+      "title": "VacanzaMyCheck: smart security",
+      "desc": "Every request undergoes automatic checks:\n– email verification\n– realistic budget control\n– anti-spam systems\n– request quality scoring\n– Reliable User badge for those who interact actively\nIf a request appears suspicious, it is verified before publication."
+    },
+    "7": {
+      "title": "Completely free for users",
+      "desc": "The service is 100% free for users. No commissions. No intermediaries. Agencies only pay an optional Premium subscription for extra services."
     }
   }
 

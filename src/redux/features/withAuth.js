@@ -308,14 +308,14 @@ export const sqQuery = createApi({
     // Tour plan-related queries
     getTourPlanPublic: builder.query({
       query: () => `/public/tour-plans/`,
-      providesTags: ["TourPlan"], // Cache this query with TourPlan tag
+      providesTags: ["TourPlan"], 
     }),
 
     // seen notification
     seenNotification: builder.mutation({
       query: (data) => ({
         url: "read-all/",
-        method: "POST", // Assuming POST method for marking as seen action
+        method: "POST", 
       }),
       invalidatesTags: ["Notification"],
     }),

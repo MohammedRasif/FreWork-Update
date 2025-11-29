@@ -92,13 +92,14 @@
   "ongoing": "In corso",
   "trip_to_rome": "Viaggio a Roma",
   "progress_40": "40% Completato",
-  "start_earning": "Diventa Partner",
-  "add_your_agency": "Registra la tua Agenzia su VacanzaMyCost.it",
-  "agency_desc_1": "Pubblica la tua agenzia e raggiungi migliaia di viaggiatori in cerca di esperienze personalizzate.",
-  "agency_desc_2": "Ricevi richieste dirette, invia preventivi e fai crescere il tuo business.",
+  "start_earning": "Inizia a Guadagnare su VacanzaMyCost.it",
+  "add_your_agency": "Registra la tua Agenzia e Ricevi Richieste Reali",
+  "agency_desc_1": "Entra nella piattaforma dove i viaggiatori pubblicano richieste verificate e cercano agenzie affidabili per offerte personalizzate.",
+  "agency_desc_2": "Gestisci tutto facilmente: ricevi richieste dirette, invia preventivi completi e fai crescere il tuo business senza commissioni.",
   "benefit_1": "Ottieni il badge Agenzia Verificata",
-  "benefit_2": "Ricevi richieste clienti dirette all'istante",
-  "benefit_3": "Gestisci offerte e prenotazioni in un unico posto",
+  "benefit_2": "Ricevi richieste dirette dai clienti all'istante",
+  "benefit_3": "Gestisci offerte, trattative e prenotazioni in un unico pannello",
+  "benefit_4": "Aumenta la tua visibilità con clienti realmente interessati",
   "address_line1": "Sede Legale:",
   "address_line2": "Italia",
   "email": "info@vacanzamycost.it",
@@ -876,6 +877,39 @@
     "17": {
       "title": "Foro competente",
       "text": "Per ogni controversia è competente esclusivamente il Foro di Verona (VR)."
+    }
+  },
+  "howItWorks": {
+    "pageTitle": "Come Funziona VacanzaMyCost.it",
+    "subtitle": "In 7 semplici passaggi trovi la vacanza perfetta, gratis e senza intermediazioni",
+
+    "1": {
+      "title": "Pubblica la tua richiesta",
+      "desc": "Inserisci destinazione, date, budget e preferenze in meno di 2 minuti. Prima della pubblicazione ricevi un’email per confermare la tua richiesta. Questo evita richieste finte e garantisce serietà alle agenzie."
+    },
+    "2": {
+      "title": "Ricevi fino a 3 offerte personalizzate",
+      "desc": "Solo agenzie verificate rispondono alla tua richiesta. Ogni offerta include:\n– foto e struttura proposta\n– servizi inclusi\n– prezzo totale\n– logo e nome dell’agenzia\nMassimo 3 offerte, tutte reali e personalizzate."
+    },
+    "3": {
+      "title": "Confronta e scegli l’offerta migliore",
+      "desc": "Confronti le offerte con badge di qualità come:\n– Risposta Top\n– Consigliata\n– Risposta ultra-veloce\n– Offerta confermata da utente verificato\nIl sistema può suggerirti anche uno sconto intelligente, basato su parametri reali."
+    },
+    "4": {
+      "title": "Contatta direttamente l’agenzia",
+      "desc": "Quando trovi l’offerta giusta, contatti l’agenzia via telefono, WhatsApp o email. VacanzaMyCost.it non applica commissioni e non gestisce pagamenti. La trattativa è diretta e trasparente."
+    },
+    "5": {
+      "title": "Offerta confermata",
+      "desc": "Quando scegli un’offerta, l’agenzia aggiorna lo stato su Confermata. L’offerta appare nella sezione Offerte Accettate con:\n– logo dell’agenzia\n– dettagli del viaggio\n– badge di verifica"
+    },
+    "6": {
+      "title": "VacanzaMyCheck: sicurezza intelligente",
+      "desc": "Ogni richiesta passa controlli automatici:\n– verifica email\n– controllo budget realistico\n– sistemi anti-spam\n– punteggio qualità della richiesta\n– badge Utente Affidabile per chi interagisce davvero\nSe una richiesta è sospetta, viene verificata prima della pubblicazione."
+    },
+    "7": {
+      "title": "Tutto gratis per l’utente",
+      "desc": "Il servizio è 100% gratuito per gli utenti. Nessuna commissione. Nessuna intermediazione. Le agenzie pagano solo un eventuale abbonamento Premium per servizi extra."
     }
   }
 
