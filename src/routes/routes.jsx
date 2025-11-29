@@ -37,6 +37,8 @@ import TourPlanDouble from "@/Pages/Home/TourPlanDouble";
 import AcceptedOffers from "@/Pages/Home/AcceptedOffers";
 import Blog from "@/Pages/Home/Blog";
 import BlogDetails from "@/Pages/Home/BlogDetails";
+import Privacy from "@/Pages/Home/Privacy";
+import Terms from "@/Pages/Home/Terms";
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +55,8 @@ export const router = createBrowserRouter([
       { path: "/acceptedOffers", element: <AcceptedOffers /> },
       { path: "/contact", element: <Contact /> },
       { path: "/viewall", element: <ViewAllPost /> },
+      { path: "/privacy", element: <Privacy /> },
+      { path: "/terms", element: <Terms /> },
     ],
   },
 

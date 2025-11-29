@@ -680,7 +680,205 @@
   "business_travel": "Viaggio di lavoro",
   "select_travel_type": "Seleziona tipo di viaggio",
 
-  "select_destination_type": "Seleziona destinazione"
+  "select_destination_type": "Seleziona destinazione",
+  "privacy": {
+    "title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Versione aggiornata 2025 – conforme a GDPR (UE 2016/679) + Direttiva ePrivacy",
+
+    "1": {
+      "title": "Titolare del trattamento",
+      "type": "Imprenditore individuale",
+      "address": "Sede",
+      "text": "Il titolare è responsabile del trattamento dei dati personali raccolti tramite il sito VacanzaMyCost.it."
+    },
+
+    "2": { "title": "Tipologia di dati raccolti" },
+    "2_1": {
+      "title": "Dati forniti volontariamente dagli utenti",
+      "list5": "Dati inseriti nella richiesta di viaggio (periodo, budget, preferenze)"
+    },
+    "2_2": { "title": "Dati forniti dalle agenzie" },
+    "2_3": {
+      "title": "Dati tecnici di navigazione",
+      "last": "Tempo di permanenza e pagine visitate (in forma anonima)"
+    },
+
+    "3": {
+      "title": "Finalità del trattamento",
+      "intro": "I dati personali vengono trattati per:",
+      "item1": "Gestire le richieste inviate dagli utenti",
+      "item2": "Permettere la comunicazione tra utenti e agenzie",
+      "item3": "Inviare notifiche operative (es. conferma richiesta, avvisi, reminder)",
+      "item4": "Prevenire abusi del sistema e attività fraudolente",
+      "item5": "Migliorare la sicurezza del portale",
+      "item6": "Soddisfare obblighi legali e fiscali",
+      "item7": "Gestire gli abbonamenti delle agenzie (Stripe / PayPal)",
+      "no_sale": "I dati NON vengono venduti, ceduti o utilizzati per finalità commerciali non dichiarate."
+    },
+
+    "4": {
+      "title": "Base giuridica del trattamento",
+      "text": "Consenso dell’utente (art. 6.1.a GDPR)\nEsecuzione di misure precontrattuali (es. contatto con agenzie)\nObblighi di legge (art. 6.1.c GDPR)\nLegittimo interesse alla sicurezza del sito (art. 6.1.f GDPR)"
+    },
+
+    "5": {
+      "title": "Modalità del trattamento",
+      "text": "I dati sono trattati tramite strumenti informatici nel rispetto dei principi di: liceità, correttezza, trasparenza, minimizzazione, integrità e riservatezza, limitazione della conservazione. Sono adottate misure tecniche e organizzative adeguate alla protezione dei dati."
+    },
+
+    "6": {
+      "title": "Conservazione dei dati",
+      "text": "I dati vengono conservati per:\nMax 24 mesi per le richieste utenti\nPeriodo necessario per gli obblighi di legge (per agenzie)\nDurata dell’abbonamento per le agenzie\nLog tecnici: secondo policy di sicurezza (30–180 giorni)\nAlla scadenza, i dati vengono cancellati o anonimizzati."
+    },
+
+    "7": {
+      "title": "Comunicazione dei dati",
+      "text": "I dati possono essere comunicati esclusivamente a:\nAgenzie di viaggio registrate (solo in relazione alle richieste degli utenti)\nFornitori tecnici: hosting, email, analisi, sicurezza\nAutorità competenti, solo se richiesto dalla legge\nNessun dato viene trasferito a terzi per finalità commerciali."
+    },
+
+    "8": {
+      "title": "Diritti dell’interessato (artt. 15–22 GDPR)",
+      "text": "L’utente può esercitare in qualsiasi momento:\naccesso ai dati · rettifica · cancellazione (“diritto all’oblio”) · limitazione · portabilità · opposizione · revoca del consenso\nRichieste via email: privacy@vacanzamycost.it\nIl titolare risponde entro 30 giorni."
+    },
+
+    "9": {
+      "title": "Misure di sicurezza tecniche e organizzative",
+      "text": "Il sito utilizza:\nconnessione protetta HTTPS · sistemi anti-intrusione · firewall · crittografia dei dati trasmessi · backup periodici · accesso limitato al database · sistemi anti-spam e anti-bot · monitoraggio attività anomale"
+    },
+
+    "10": { "integrated": "(parte integrata nella Privacy Policy)" },
+    "10_1": {
+      "title": "Cosa sono i cookie",
+      "text": "I cookie sono piccoli file di testo che migliorano la navigazione dell’utente e permettono il funzionamento del sito."
+    },
+    "10_2": {
+      "title": "Tipologie di cookie utilizzati",
+      "a_title": "Cookie tecnici (necessari)",
+      "a_text": "Permettono: autenticazione e login · gestione sessione · moduli di richiesta e pannelli agenzia · sicurezza e prevenzione abusi\nNon richiedono consenso.",
+      "b_title": "Cookie analitici anonimi",
+      "b_text": "Usati per statistiche aggregate: pagine più visitate · durata delle sessioni · traffico anonimo\nSe completamente anonimizzati → non richiedono consenso.",
+      "c_title": "Cookie di terze parti",
+      "c_text": "Attivati solo se presenti: Google Analytics · Google Ads · Facebook Pixel · Mappe o contenuti incorporati\nIl trattamento segue le policy dei rispettivi provider.",
+      "d_title": "Cookie di marketing / profilazione",
+      "d_text": "Utilizzati solo se attivi strumenti pubblicitari (es. Remarketing).\nRichiedono consenso esplicito."
+    },
+    "10_3": {
+      "title": "Banner Cookie",
+      "text": "Al primo accesso l’utente visualizza un banner che permette di:\naccettare tutti i cookie · rifiutare cookie non necessari · personalizzare le preferenze\nLe scelte rimangono valide per 12 mesi."
+    },
+    "10_4": {
+      "title": "Come gestire/disattivare i cookie",
+      "text": "L’utente può gestire i cookie nelle impostazioni del browser:\nChrome · Safari · Edge · Firefox · Opera\nDisattivare cookie tecnici può compromettere alcune funzionalità del sito."
+    },
+    "10_5": {
+      "title": "Modifiche alla Cookie Policy",
+      "text": "Il titolare può aggiornare la presente informativa.\nL’uso continuato del sito implica l’accettazione delle modifiche."
+    },
+
+    "11": {
+      "title": "Trasferimento dati extra-UE",
+      "text": "Eventuali trasferimenti (es. Google, Meta, Stripe) avvengono solo verso fornitori conformi a:\nGDPR · Clausole Contrattuali Standard (SCC) · decisioni di adeguatezza UE"
+    },
+
+    "12": {
+      "title": "Modifiche alla presente informativa",
+      "text": "Il titolare può aggiornare in qualsiasi momento la presente Privacy & Cookie Policy.\nLe modifiche diventano efficaci al momento della pubblicazione."
+    },
+
+    "13": {
+      "title": "Contatti",
+      "text": "Per informazioni, chiarimenti o esercizio diritti GDPR:\nprivacy@vacanzamycost.it"
+    }
+  },
+
+  "terms": {
+    "title": "TERMINI E CONDIZIONI D’USO – VACANZAMYCOST.IT Versione 2025 – Italia & UE",
+
+    "1": {
+      "title": "Titolare del sito",
+      "text": "VacanzaMyCost.it è un portale web gestito da:\nIlie Fabian – Imprenditore individuale\nP.IVA: [INSERISCI] – Verona (VR)\nEmail: info@vacanzamycost.it – PEC: [INSERISCI SE ATTIVA]"
+    },
+
+    "2": {
+      "title": "Natura del servizio",
+      "text": "VacanzaMyCost.it non è un’agenzia di viaggi e non vende pacchetti turistici.\nIl sito offre un servizio digitale per:\n• pubblicazione richieste degli utenti\n• condivisione alle agenzie registrate\n• ricezione di massimo 3 offerte\n• contatto diretto tra utenti e agenzie\nTutte le trattative avvengono fuori dal portale."
+    },
+
+    "3": {
+      "title": "Nessun rapporto di mediazione",
+      "text": "VacanzaMyCost.it non svolge attività di mediazione.\nNon percepisce commissioni o provvigioni.\nNon partecipa alla conclusione dei contratti tra utenti e agenzie."
+    },
+
+    "4": {
+      "title": "Limitazione di responsabilità",
+      "text": "Il titolare non è responsabile per:\n• informazioni non corrette fornite dalle agenzie\n• contenuti generati da utenti e agenzie\n• disservizi o cancellazioni derivanti dai rapporti tra le parti\n• malfunzionamenti temporanei del sito\n• uso improprio o illecito del portale\nGli utenti usano il sito sotto la propria responsabilità."
+    },
+
+    "5": {
+      "title": "Nessuna garanzia delle offerte",
+      "text": "VacanzaMyCost.it non garantisce:\n• qualità delle offerte\n• disponibilità dei servizi\n• correttezza dei prezzi\n• conformità delle informazioni"
+    },
+
+    "6": {
+      "title": "Esclusione responsabilità pagamenti",
+      "text": "VacanzaMyCost.it non gestisce caparre, depositi, rimborsi o pagamenti tra utenti e agenzie."
+    },
+
+    "7": {
+      "title": "Proprietà intellettuale",
+      "text": "Tutti i contenuti (testi, immagini, loghi, codice) sono protetti da copyright.\nÈ vietata la copia senza autorizzazione."
+    },
+
+    "8": {
+      "title": "Obblighi degli utenti e delle agenzie",
+      "text": "Gli utenti e le agenzie devono:\n• fornire dati veritieri\n• usare il sito per scopi leciti\n• non inviare contenuti falsi o fraudolenti\n• rispettare la normativa vigente\nIl titolare può sospendere profili non conformi."
+    },
+
+    "9": {
+      "title": "File e allegati",
+      "text": "VacanzaMyCost.it non è responsabile per file o documenti caricati da terzi."
+    },
+
+    "10": {
+      "title": "Abbonamenti agenzie",
+      "text": "• Pagamenti tramite Stripe / PayPal\n• Rinnovo automatico\n• Nessun rimborso per periodi non utilizzati\n• L’agenzia è responsabile dei contenuti pubblicati\n• Il titolare può sospendere profili non conformi\nForo competente: Verona"
+    },
+
+    "11": {
+      "title": "Clausola di modifica unilaterale",
+      "text": "Il titolare può modificare in qualsiasi momento i presenti Termini.\nL’uso continuato del sito vale come accettazione."
+    },
+
+    "12": {
+      "title": "Clausola lingua prevalente",
+      "text": "In caso di differenze tra versioni, prevale la versione italiana."
+    },
+
+    "13": {
+      "title": "Forza maggiore",
+      "text": "Nessuna responsabilità per eventi esterni (blackout, cyber attacchi, guasti, calamità naturali)."
+    },
+
+    "14": {
+      "title": "Limitazione economica",
+      "text": "La responsabilità del titolare non potrà superare l’importo pagato dall’agenzia nei 12 mesi precedenti."
+    },
+
+    "15": {
+      "title": "Clausola di manleva",
+      "text": "Utenti e agenzie manlevano il titolare da reclami causati da uso illecito o violazioni."
+    },
+
+    "16": {
+      "title": "Clausola ODR (Obbligatoria UE)",
+      "text": "I reclami possono essere inviati a info@vacanzamycost.it.\nPiattaforma UE ODR: https://ec.europa.eu/consumers/odr\nIl titolare non è obbligato a partecipare a procedure ADR."
+    },
+
+    "17": {
+      "title": "Foro competente",
+      "text": "Per ogni controversia è competente esclusivamente il Foro di Verona (VR)."
+    }
+  }
+
 
 }
 

@@ -86,18 +86,18 @@ const Footer = () => {
             © 2024 {t("company_name")}. {t("all_rights_reserved")}
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-6 text-sm">
-            <a
-              href="#"
+            <NavLink
+              to="/privacy"
               className="text-gray-400 font-semibold text-base hover:text-white transition-colors duration-300"
             >
               {t("privacy_notice")}
-            </a>
-            <a
-              href="#"
+            </NavLink>
+            <NavLink
+              to="/terms"
               className="text-gray-400 font-semibold text-base hover:text-white transition-colors duration-300"
             >
               {t("terms_of_service")}
-            </a>
+            </NavLink>
           </div>
         </div>
       </div>

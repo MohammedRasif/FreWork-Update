@@ -698,7 +698,205 @@
   "business_travel": "Business Travel",
   "select_travel_type": "Select Travel Type",
 
-  "select_destination_type": "Select Destination Type"
+  "select_destination_type": "Select Destination Type",
+
+ "privacy": {
+    "title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Updated Version 2025 – GDPR compliant (EU 2016/679) + ePrivacy Directive",
+
+    "1": {
+      "title": "Data Controller",
+      "type": "Individual Entrepreneur",
+      "address": "Registered Office",
+      "text": "The controller is responsible for the processing of personal data collected through the website VacanzaMyCost.it."
+    },
+
+    "2": { "title": "Types of Data Collected" },
+    "2_1": {
+      "title": "Data Voluntarily Provided by Users",
+      "list5": "Data entered in the travel request (period, budget, preferences)"
+    },
+    "2_2": { "title": "Data Provided by Agencies" },
+    "2_3": {
+      "title": "Technical Navigation Data",
+      "last": "Time spent and pages visited (in anonymized form)"
+    },
+
+    "3": {
+      "title": "Purpose of Processing",
+      "intro": "Personal data is processed for:",
+      "item1": "Manage requests sent by users",
+      "item2": "Enable communication between users and agencies",
+      "item3": "Send operational notifications (e.g. request confirmation, alerts, reminders)",
+      "item4": "Prevent system abuse and fraudulent activities",
+      "item5": "Improve portal security",
+      "item6": "Comply with legal and tax obligations",
+      "item7": "Manage agency subscriptions (Stripe / PayPal)",
+      "no_sale": "Data is NOT sold, transferred or used for undeclared commercial purposes."
+    },
+
+    "4": {
+      "title": "Legal Basis for Processing",
+      "text": "User consent (Art. 6.1.a GDPR)\nPerformance of pre-contractual measures (e.g. contact with agencies)\nLegal obligations (Art. 6.1.c GDPR)\nLegitimate interest in website security (Art. 6.1.f GDPR)"
+    },
+
+    "5": {
+      "title": "Processing Methods",
+      "text": "Data is processed using IT tools in compliance with the principles of: lawfulness, fairness, transparency, data minimization, integrity and confidentiality, storage limitation. Appropriate technical and organizational measures are adopted to protect the data."
+    },
+
+    "6": {
+      "title": "Data Retention",
+      "text": "Data is retained for:\nMax 24 months for user requests\nPeriod necessary to fulfill legal obligations (for agencies)\nDuration of the agency subscription\nTechnical logs: according to security policy (30–180 days)\nUpon expiry, data is deleted or anonymized."
+    },
+
+    "7": {
+      "title": "Data Disclosure",
+      "text": "Data may be disclosed exclusively to:\nRegistered travel agencies (only in relation to user requests)\nTechnical suppliers: hosting, email, analytics, security\nCompetent authorities, only if required by law\nNo data is transferred to third parties for commercial purposes."
+    },
+
+    "8": {
+      "title": "Data Subject Rights (Art. 15–22 GDPR)",
+      "text": "The user may at any time exercise the following rights:\naccess to data · rectification · erasure (“right to be forgotten”) · restriction of processing · data portability · objection · withdrawal of consent\nRequests via email: privacy@vacanzamycost.it\nThe controller replies within 30 days."
+    },
+
+    "9": {
+      "title": "Technical and Organizational Security Measures",
+      "text": "The website uses:\nsecure HTTPS connection · anti-intrusion systems · firewall · data transmission encryption · periodic backups · restricted database access · anti-spam and anti-bot systems · monitoring of anomalous activities"
+    },
+
+    "10": { "integrated": "(integrated part of the Privacy Policy)" },
+    "10_1": {
+      "title": "What are cookies",
+      "text": "Cookies are small text files that improve user navigation and enable the website to function properly."
+    },
+    "10_2": {
+      "title": "Types of cookies used",
+      "a_title": "Technical cookies (necessary)",
+      "a_text": "They enable: authentication and login · session management · request forms and agency panels · security and abuse prevention\nThey do not require consent.",
+      "b_title": "Anonymous analytical cookies",
+      "b_text": "Used for aggregated statistics: most visited pages · session duration · anonymous traffic\nIf fully anonymized → no consent required.",
+      "c_title": "Third-party cookies",
+      "c_text": "Activated only if present: Google Analytics · Google Ads · Facebook Pixel · Maps or embedded content\nProcessing follows the respective providers’ policies.",
+      "d_title": "Marketing / profiling cookies",
+      "d_text": "Used only if advertising tools are active (e.g. Remarketing).\nThey require explicit consent."
+    },
+    "10_3": {
+      "title": "Cookie Banner",
+      "text": "On first access, the user sees a banner allowing them to:\naccept all cookies · reject non-essential cookies · customize preferences\nThe choices remain valid for 12 months."
+    },
+    "10_4": {
+      "title": "How to manage/disable cookies",
+      "text": "The user can manage cookies in browser settings:\nChrome · Safari · Edge · Firefox · Opera\nDisabling technical cookies may impair some site features."
+    },
+    "10_5": {
+      "title": "Changes to the Cookie Policy",
+      "text": "The controller may update this policy.\nContinued use of the site implies acceptance of the changes."
+    },
+
+    "11": {
+      "title": "Transfer of data outside the EU",
+      "text": "Any transfers (e.g. Google, Meta, Stripe) occur only to providers compliant with:\nGDPR · Standard Contractual Clauses (SCC) · EU adequacy decisions"
+    },
+
+    "12": {
+      "title": "Changes to this policy",
+      "text": "The controller may update this Privacy & Cookie Policy at any time.\nChanges take effect upon publication."
+    },
+
+    "13": {
+      "title": "Contact",
+      "text": "For information, clarifications or to exercise GDPR rights:\nprivacy@vacanzamycost.it"
+    }
+  },
+
+  "terms": {
+    "title": "TERMS AND CONDITIONS OF USE – VACANZAMYCOST.IT Version 2025 – Italy & EU",
+
+    "1": {
+      "title": "Website Owner",
+      "text": "VacanzaMyCost.it is a web portal managed by:\nIlie Fabian – Individual Entrepreneur\nVAT: [INSERT] – Verona (VR)\nEmail: info@vacanzamycost.it – PEC: [INSERT IF ACTIVE]"
+    },
+
+    "2": {
+      "title": "Nature of the Service",
+      "text": "VacanzaMyCost.it is not a travel agency and does not sell travel packages.\nThe site provides a digital service for:\n• publishing user requests\n• sharing them with registered agencies\n• receiving up to 3 offers\n• direct contact between users and agencies\nAll negotiations take place outside the portal."
+    },
+
+    "3": {
+      "title": "No Mediation Activity",
+      "text": "VacanzaMyCost.it does not carry out mediation activities.\nIt does not receive commissions or fees.\nIt does not participate in the conclusion of contracts between users and agencies."
+    },
+
+    "4": {
+      "title": "Limitation of Liability",
+      "text": "The owner is not liable for:\n• incorrect information provided by agencies\n• content generated by users and agencies\n• service disruptions or cancellations arising from relationships between the parties\n• temporary site malfunctions\n• improper or unlawful use of the portal\nUsers use the site at their own risk."
+    },
+
+    "5": {
+      "title": "No Guarantee on Offers",
+      "text": "VacanzaMyCost.it does not guarantee:\n• quality of offers\n• availability of services\n• price accuracy\n• conformity of information"
+    },
+
+    "6": {
+      "title": "Exclusion of Liability for Payments",
+      "text": "VacanzaMyCost.it does not handle deposits, refunds or payments between users and agencies."
+    },
+
+    "7": {
+      "title": "Intellectual Property",
+      "text": "All content (texts, images, logos, code) is protected by copyright.\nCopying without authorization is prohibited."
+    },
+
+    "8": {
+      "title": "Obligations of Users and Agencies",
+      "text": "Users and agencies must:\n• provide truthful data\n• use the site for lawful purposes\n• not send false or fraudulent content\n• comply with applicable law\nThe owner may suspend non-compliant accounts."
+    },
+
+    "9": {
+      "title": "Files and Attachments",
+      "text": "VacanzaMyCost.it is not responsible for files or documents uploaded by third parties."
+    },
+
+    "10": {
+      "title": "Agency Subscriptions",
+      "text": "• Payments via Stripe / PayPal\n• Automatic renewal\n• No refund for unused periods\n• The agency is responsible for published content\n• The owner may suspend non-compliant accounts\nJurisdiction: Verona"
+    },
+
+    "11": {
+      "title": "Unilateral Modification Clause",
+      "text": "The owner may modify these Terms at any time.\nContinued use of the site constitutes acceptance."
+    },
+
+    "12": {
+      "title": "Prevailing Language Clause",
+      "text": "In case of discrepancies between versions, the Italian version prevails."
+    },
+
+    "13": {
+      "title": "Force Majeure",
+      "text": "No liability for external events (blackouts, cyber attacks, failures, natural disasters)."
+    },
+
+    "14": {
+      "title": "Economic Limitation",
+      "text": "The owner’s liability shall not exceed the amount paid by the agency in the previous 12 months."
+    },
+
+    "15": {
+      "title": "Indemnification Clause",
+      "text": "Users and agencies indemnify the owner against claims caused by unlawful use or violations."
+    },
+
+    "16": {
+      "title": "ODR Clause (EU Mandatory)",
+      "text": "Complaints can be sent to info@vacanzamycost.it.\nEU ODR Platform: https://ec.europa.eu/consumers/odr\nThe owner is not obliged to participate in ADR procedures."
+    },
+
+    "17": {
+      "title": "Jurisdiction",
+      "text": "Any dispute shall be subject exclusively to the jurisdiction of the Court of Verona (VR)."
+    }
+  }
 
 
 }
