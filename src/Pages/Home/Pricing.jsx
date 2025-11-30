@@ -12,9 +12,11 @@ import { useTranslation } from "react-i18next";
 const Pricing = () => {
   const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState("monthly");
-  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery();
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] = useSubscriptionMutation();
+  const [langParam, setLangParam] = useState("lang=en");
   const navigate = useNavigate();
+  const language = localStorage.getItem("i18nextLng")
+  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery(language);
 
   useEffect(() => {
     if (subscriptionError) {

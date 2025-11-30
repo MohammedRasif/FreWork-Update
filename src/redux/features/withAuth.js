@@ -86,7 +86,7 @@ export const sqQuery = createApi({
 
     // showSubscription data
     showSubscriptionData: builder.query({
-      query: () => "subscriptions/plans/",
+      query: (data) => `subscriptions/plans/${data}`,
       providesTags: ["Subscription"],
     }),
 
@@ -308,14 +308,14 @@ export const sqQuery = createApi({
     // Tour plan-related queries
     getTourPlanPublic: builder.query({
       query: () => `/public/tour-plans/`,
-      providesTags: ["TourPlan"], 
+      providesTags: ["TourPlan"],
     }),
 
     // seen notification
     seenNotification: builder.mutation({
       query: (data) => ({
         url: "read-all/",
-        method: "POST", 
+        method: "POST",
       }),
       invalidatesTags: ["Notification"],
     }),
