@@ -561,7 +561,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                  {t("budget")}
