@@ -5,7 +5,7 @@ import {
   useInviteToChatMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import img from "../../assets/img/badge.png";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -26,14 +26,15 @@ import toast, { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { IoBed, IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
-import { FaListUl } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
+  useNavigate();
   const { id: paramId } = useParams();
   const finalId = paramId || prid?.id;
- const { t } = useTranslation();
+  const { t } = useTranslation();
+
   const [token, setToken] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [role, setRole] = useState(null);
@@ -83,7 +84,7 @@ function SinglePost({ prid }) {
   useEffect(() => {
     if (postError) {
       console.error("Failed to fetch post:", postError);
-      toast.error("Failed to load post data");
+      toast.error(t("error_loading"));
     }
     if (post && isLocalStorageLoaded) {
       setPostData({
@@ -106,144 +107,133 @@ function SinglePost({ prid }) {
     setSelectedFile(file);
   };
 
- const handleOfferSubmit = async (e) => {
-  e.preventDefault();
-  if (!token) {
-    navigate("/login");
-    toast.error("Please log in to submit an offer");
-    return;
-  }
-  if (!offerForm.budget || !offerForm.comment.trim()) {
-    toast.error("Please provide a budget and a comment");
-    return;
-  }
-  if (
-    offerForm.applyDiscount &&
-    (!offerForm.discount || Number(offerForm.discount) <= 0)
-  ) {
-    toast.error("Please provide a valid discount percentage");
-    return;
-  }
-
-  setIsOfferSubmitting(true);
-  try {
-    const formData = new FormData();
-    formData.append("offered_budget", Number.parseFloat(offerForm.budget));
-    formData.append("message", offerForm.comment);
-    formData.append("apply_discount", offerForm.applyDiscount);
-    formData.append(
-      "discount",
-      offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
-    );
-    if (selectedFile) {
-      formData.append("file", selectedFile);
-    }
-
-    // Make the API call and log the response
-    const response = await offerBudgetToBack({
-      id: finalId,
-      data: formData,
-    }).unwrap();
-    console.log("API Response:", response); 
-
-    // Create new offer object
-    const newOffer = {
-      id: `${currentUserId}-${Date.now()}`,
-      offered_budget: Number.parseFloat(offerForm.budget), // Fixed: Use offerForm.budget
-      message: offerForm.comment,
-      apply_discount: offerForm.applyDiscount,
-      discount: offerForm.applyDiscount
-        ? Number.parseFloat(offerForm.discount)
-        : 0,
-      file_name: selectedFile ? selectedFile.name : null,
-      agency: {
-        agency_name: localStorage.getItem("name") || "Unknown Agency",
-        logo_url:
-          localStorage.getItem("user_image") ||
-          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-        is_verified: false,
-      },
-    };
-
-    // Update postData with the new offer
-    setPostData((prev) => ({
-      ...prev,
-      offers: [...(prev.offers || []), newOffer],
-      offer_count: (prev.offer_count || 0) + 1,
-    }));
-
-    // Reset form
-    setOfferForm({
-      budget: "",
-      comment: "",
-      discount: "",
-      applyDiscount: false,
-    });
-    setSelectedFile(null);
-    setIsPopupOpen(false);
-
-    // Clear previous toasts and show success message
-    toast.dismiss();
-    toast.success("Offer submitted successfully");
-  } catch (error) {
-    // Log detailed error information
-    console.error("Failed to submit offer:", {
-      error,
-      status: error.status,
-      data: error.data,
-      originalStatus: error.originalStatus,
-    });
-    // Show a specific error message
-    toast.error(error.data?.error || error.message || "Failed to submit offer");
-  } finally {
-    setIsOfferSubmitting(false);
-  }
-};
-
-  const acceptOfferHandler = async (offerId, tourId) => {
+  const handleOfferSubmit = async (e) => {
+    e.preventDefault();
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to accept an offer");
+      toast.error(t("login_to_submit_offer"));
+      return;
+    }
+    if (!offerForm.budget || !offerForm.comment.trim()) {
+      toast.error(t("provide_budget_and_comment"));
+      return;
+    }
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || Number(offerForm.discount) <= 0)
+    ) {
+      toast.error(t("provide_valid_discount"));
+      return;
+    }
+
+    setIsOfferSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("offered_budget", Number.parseFloat(offerForm.budget));
+      formData.append("message", offerForm.comment);
+      formData.append("apply_discount", offerForm.applyDiscount);
+      formData.append(
+        "discount",
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+      );
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
+
+      const response = await offerBudgetToBack({
+        id: finalId,
+        data: formData,
+      }).unwrap();
+
+      const newOffer = {
+        id: `${currentUserId}-${Date.now()}`,
+        offered_budget: Number.parseFloat(offerForm.budget),
+        message: offerForm.comment,
+        apply_discount: offerForm.applyDiscount,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
+        file_name: selectedFile ? selectedFile.name : null,
+        agency: {
+          agency_name: localStorage.getItem("name") || t("unknown_agency"),
+          logo_url:
+            localStorage.getItem("user_image") ||
+            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+          is_verified: false,
+        },
+      };
+
+      setPostData((prev) => ({
+        ...prev,
+        offers: [...(prev.offers || []), newOffer],
+        offer_count: (prev.offer_count || 0) + 1,
+      }));
+
+      setOfferForm({
+        budget: "",
+        comment: "",
+        discount: "",
+        applyDiscount: false,
+      });
+      setSelectedFile(null);
+      setIsPopupOpen(false);
+
+      toast.dismiss();
+      toast.success(t("offer_submitted_success"));
+    } catch (error) {
+      console.error("Failed to submit offer:", error);
+      toast.error(error.data?.error || t("failed_to_submit_offer"));
+    } finally {
+      setIsOfferSubmitting(false);
+    }
+  };
+
+  const acceptOfferHandler = async (offerId) => {
+    if (!token) {
+      navigate("/login");
+      toast.error(t("login_to_accept_offer"));
       return;
     }
     try {
       await acceptOffer(offerId).unwrap();
       navigate(-1);
-      toast.success("Offer accepted successfully");
+      toast.success(t("offer_accepted_success"));
     } catch (error) {
       console.error("Failed to accept offer:", error);
-      toast.error(error.data?.detail || "Failed to accept offer");
+      toast.error(error.data?.detail || t("failed_to_accept_offer"));
     }
   };
 
   const handleMessage = async (otherUserId) => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to send a message");
+      toast.error(t("login_to_send_message"));
       return;
     }
     if (!otherUserId) {
-      toast.error("Agency user ID not found");
+      toast.error(t("recipient_id_not_found"));
       return;
     }
     if (String(otherUserId) === String(currentUserId)) {
-      toast.error("Cannot message yourself");
+      toast.error(
+        t("cannot_message_yourself") || "Non puoi mandare messaggi a te stesso"
+      );
       return;
     }
     try {
       await invite({ other_user_id: otherUserId }).unwrap();
-      toast.success("Chat initiated successfully");
+      toast.success(t("chat_initiated_success"));
       navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
     } catch (error) {
       console.error("Failed to initiate chat:", error);
-      toast.error(error.data?.detail || "Failed to initiate chat");
+      toast.error(error.data?.detail || t("failed_to_initiate_chat"));
     }
   };
 
   if (!isLocalStorageLoaded || isUserLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading user data...
+        {t("loading_user_data")}
       </div>
     );
   }
@@ -251,7 +241,7 @@ function SinglePost({ prid }) {
   if (isPostLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading post...
+        {t("loading")}...
       </div>
     );
   }
@@ -259,7 +249,7 @@ function SinglePost({ prid }) {
   if (postError) {
     return (
       <div className="flex justify-center items-center min-h-screen text-red-600">
-        Error loading post. Please try again later.
+        {t("error_loading")}
       </div>
     );
   }
@@ -270,19 +260,17 @@ function SinglePost({ prid }) {
   const handleSentOfferClick = () => {
     if (!token) {
       navigate("/login");
-      toast.error("Please log in to submit an offer");
+      toast.error(t("login_to_submit_offer"));
       return;
     }
 
     if (tour.status === "accepted") {
-      toast.info("Your offer has been accepted!");
+      toast.info(t("offer_accepted"));
       return;
     }
 
     if (hasMaxOffers) {
-      toast.info(
-        "This post already has 3+ offers. No more offers can be submitted."
-      );
+      toast.info(t("offer_limit_reached"));
       return;
     }
 
@@ -309,7 +297,7 @@ function SinglePost({ prid }) {
                 tour.spot_picture_url ||
                 "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
               }
-              alt={`${tour.location_to} destination`}
+              alt={`${tour.location_to} ${t("destination")}`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white">
@@ -317,6 +305,8 @@ function SinglePost({ prid }) {
                 {tour.location_to}
               </h2>
             </div>
+
+            {/* Offerte mostrate come loghi */}
             {tour.offers && tour.offers.length > 0 && (
               <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center">
                 <div className="flex justify-center items-center space-x-12  w-full px-4">
@@ -334,18 +324,19 @@ function SinglePost({ prid }) {
                         {isAccepted && (
                           <img
                             src={img}
-                            alt="Accepted Badge"
+                            alt={t("accepted_badge")}
                             className="absolute inset-0 "
                           />
                         )}
 
-                        {/* Logo on Top (Always) */}
                         <img
                           src={
                             offer.agency?.logo_url ||
                             "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                           }
-                          alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                          alt={`${
+                            offer.agency?.agency_name || t("unknown_agency")
+                          } logo`}
                           className="
                             relative z-10 w-[60px] h-[60px] mt-[1px]
                             object-contain rounded-full bg-white 
@@ -359,13 +350,12 @@ function SinglePost({ prid }) {
                 </div>
               </div>
             )}
-            {tour.offers?.length >= 3 ? (
+
+            {tour.offers?.length >= 3 && (
               <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
                 <IoCheckmarkCircleSharp className="mr-1" size={16} />
-                Offers completed
+                {t("offers_completed")}
               </div>
-            ) : (
-              <div></div>
             )}
           </div>
         </div>
@@ -388,41 +378,45 @@ function SinglePost({ prid }) {
                 />
               </svg>
               <span className="text-sm text-green-600 font-medium">
-                Real Request
+                {t("real_request")}
               </span>
             </div>
           </div>
 
           <div className="space-y-1 text-md text-gray-700">
             <p className=" font-bold">
-              <span className="font-medium">Date:</span> {tour.start_date} to{" "}
-              {tour.end_date || "N/A"} ({tour.duration})days
+              <span className="font-medium">{t("date")}:</span>{" "}
+              {tour.start_date} {t("to")} {tour.end_date || t("na")} (
+              {tour.duration} {t("days")})
             </p>
           </div>
           <p>
-            <span className="font-medium">Categoria:</span>{" "}
-            {tour.destination_type || "N/A"}
+            <span className="font-medium">{t("category")}:</span>{" "}
+            {tour.destination_type || t("na")}
           </p>
 
           <div className="">
             <p className="text-xl font-bold text-gray-900">
-              Budget: €{tour.budget}
+              {t("budget")}: €{tour.budget}
             </p>
           </div>
 
           <div className="flex items-center space-x-10">
             <span className="text-md text-gray-700 ">
-              <span className="font-bold">Total:</span> {tour.total_members}{" "}
-              {tour.total_members > 1 ? "people" : "person"}
+              <span className="font-bold">{t("total")}:</span>{" "}
+              {tour.total_members}{" "}
+              {tour.total_members > 1 ? t("people") : t("person")}
             </span>
 
             <div className="flex items-center space-x-4">
               <h1 className="text-md text-gray-700">
-                <span className="font-bold">Child :</span> {tour.child_count}
+                <span className="font-bold">{t("child")} :</span>{" "}
+                {tour.child_count}
               </h1>
               <h1 className="text-md text-gray-700">
                 {" "}
-                <span className="font-bold">Adult :</span> {tour.adult_count}
+                <span className="font-bold">{t("adult")} :</span>{" "}
+                {tour.adult_count}
               </h1>
             </div>
           </div>
@@ -431,61 +425,65 @@ function SinglePost({ prid }) {
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaLocationDot className="w-6 h-5 text-black size-4" />
               <span>
-                <span className="font-medium">Points of travel:</span>{" "}
-                {tour.tourist_spots || "None"}
+                <span className="font-medium">{t("points_of_travel")}:</span>{" "}
+                {tour.tour_spots || t("none")}
               </span>
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaLocationArrow className="w-6 h-5 text-black" />
               <span>
-                <span className="font-medium">Departure from:</span>{" "}
-                {tour.location_from || "N/A"}
+                <span className="font-medium">{t("departure_from")}:</span>{" "}
+                {tour.location_from || t("na")}
               </span>
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdOutlineNoMeals className="w-6 h-5 text-black" />
               <span>
-                <span className="font-medium">Meal plan:</span>{" "}
-                {tour.meal_plan || "N/A"}
+                <span className="font-medium">{t("meal_plan")}:</span>{" "}
+                {tour.meal_plan || t("na")}
               </span>
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <IoBed className="w-6 h-5 text-black" />
               <span>
-                <span className="font-medium">Type of accommodation:</span>{" "}
-                {tour.type_of_accommodation || "N/A"}
+                <span className="font-medium">
+                  {t("type_of_accommodation")}:
+                </span>{" "}
+                {tour.type_of_accommodation || t("na")}
               </span>
             </p>
+
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaStar className="w-6 h-5 text-black" />
               <span>
-                <span className="font-medium">Minimum rating:</span>{" "}
-                {tour.minimum_star_hotel || "N/A"}
+                <span className="font-medium">{t("minimum_rating")}:</span>{" "}
+                {tour.minimum_star_hotel || t("na")}
               </span>
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaClock className="w-6 h-5 text-black" />
               <span>
-                <span className="font-medium">Duration:</span>{" "}
-                {tour.duration || "N/A"}
+                <span className="font-medium">{t("duration")}:</span>{" "}
+                {tour.duration || t("na")}
               </span>
             </p>
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdVerifiedUser className="w-7 h-6 text-green-500" />
               <span>
-                <span className="font-medium">Contact verified via email</span>
+                <span className="font-medium">{t("contact_verified")}</span>
               </span>
             </p>
 
-            <h1 className="text-[16px]   py-2 font-bold ">
-              * Image generated automatically
+            <h1 className="text-[16px] py-2 font-bold ">
+              * {t("image_generated_automatically")}
             </h1>
           </div>
+
           <div className="pt-2 w-full">
             <Dialog
               open={isPopupOpen}
@@ -518,21 +516,21 @@ function SinglePost({ prid }) {
         `}
                     >
                       {tour.status === "accepted"
-                        ? "Offer Accepted"
-                        : "Sent Offer"}
+                        ? t("offer_accepted")
+                        : t("sent_offer")}
                     </button>
 
-                    {/* Tooltip on Hover */}
                     {(tour.status === "accepted" || hasMaxOffers) && (
                       <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 pointer-events-none transition-opacity group-hover:opacity-100">
                         {tour.status === "accepted"
-                          ? "Your offer has been accepted!"
-                          : "This post already has 3+ offers. No more offers can be submitted."}
+                          ? t("offer_accepted")
+                          : t("offer_limit_reached")}
                       </div>
                     )}
                   </div>
                 </DialogTrigger>
               )}
+
               <DialogContent className="lg:w-[60vh]">
                 <button
                   onClick={() => setIsPopupOpen(false)}
@@ -542,15 +540,16 @@ function SinglePost({ prid }) {
                   <X size={24} />
                 </button>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Place Your Offer
+                  {t("place_your_offer")}
                 </h3>
+
                 <form onSubmit={handleOfferSubmit} className="space-y-2">
                   <div>
                     <label
                       htmlFor="budget"
                       className="block text-md font-medium text-gray-700 mb-1"
                     >
-                      Offer
+                      {t("offer")}
                     </label>
                     <input
                       type="number"
@@ -558,7 +557,7 @@ function SinglePost({ prid }) {
                       id="budget"
                       value={offerForm.budget}
                       onChange={handleOfferChange}
-                      placeholder="Enter your budget (e.g., 6000)"
+                      placeholder={t("enter_budget_placeholder")}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
@@ -569,7 +568,7 @@ function SinglePost({ prid }) {
                       htmlFor="comment"
                       className="block text-md font-medium text-gray-700 mb-1"
                     >
-                      Message
+                      {t("message")}
                     </label>
                     <textarea
                       name="comment"
@@ -577,7 +576,7 @@ function SinglePost({ prid }) {
                       value={offerForm.comment}
                       onChange={handleOfferChange}
                       rows="4"
-                      placeholder="Enter your message"
+                      placeholder={t("enter_message_placeholder")}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
                     />
@@ -588,7 +587,7 @@ function SinglePost({ prid }) {
                       htmlFor="file"
                       className="block text-md font-medium text-gray-700 mb-1"
                     >
-                      Upload File (Optional)
+                      {t("upload_file_optional")}
                     </label>
                     <input
                       type="file"
@@ -599,7 +598,7 @@ function SinglePost({ prid }) {
                     />
                     {selectedFile && (
                       <p className="text-xs text-gray-600 mt-1">
-                        Selected: {selectedFile.name}
+                        {t("selected")}: {selectedFile.name}
                       </p>
                     )}
                   </div>
@@ -615,12 +614,11 @@ function SinglePost({ prid }) {
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <span className="ml-2 text-md text-gray-700">
-                        Apply an additional discount
+                        {t("apply_additional_discount")}
                       </span>
                     </label>
                     <p className="text-xs text-gray-500 mt-1">
-                      Website suggests extra discount, increases conversions by
-                      30%. Check to offer more.
+                      {t("discount_suggestion")}
                     </p>
                   </div>
 
@@ -629,7 +627,7 @@ function SinglePost({ prid }) {
                       htmlFor="discount"
                       className="block text-md font-medium text-gray-700 mb-1"
                     >
-                      Discount
+                      {t("discount_percent")}
                     </label>
                     <input
                       type="number"
@@ -637,7 +635,7 @@ function SinglePost({ prid }) {
                       id="discount"
                       value={offerForm.discount}
                       onChange={handleOfferChange}
-                      placeholder="Enter discount percentage"
+                      placeholder={t("discount_placeholder")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                       disabled={!offerForm.applyDiscount}
                     />
@@ -659,12 +657,14 @@ function SinglePost({ prid }) {
                     }`}
                   >
                     <IoIosSend size={20} />
-                    {isOfferSubmitting ? "Submitting..." : "Submit Offer"}
+                    {isOfferSubmitting ? t("submitting") : t("submit_offer")}
                   </button>
                 </form>
-                <div className="space-y-4">
+
+                {/* Lista offerte già ricevute */}
+                <div className="space-y-4 mt-6">
                   {isUserLoading ? (
-                    <div>Loading user data...</div>
+                    <div>{t("loading_user_data")}</div>
                   ) : tour.offers && tour.offers.length > 0 ? (
                     tour.offers
                       .slice(0, expandedOffers ? tour.offers.length : 3)
@@ -685,7 +685,8 @@ function SinglePost({ prid }) {
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={`${
-                                  offer.agency?.agency_name || "Unknown Agency"
+                                  offer.agency?.agency_name ||
+                                  t("unknown_agency")
                                 } avatar`}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
                               />
@@ -693,26 +694,27 @@ function SinglePost({ prid }) {
                               <div>
                                 <span className="font-medium text-gray-900">
                                   {offer.agency?.agency_name ||
-                                    "Unknown Agency"}
+                                    t("unknown_agency")}
                                 </span>
                                 <p className="text-xs sm:text-sm text-gray-600">
                                   {offer.message}
                                 </p>
                                 {offer.file_name && (
                                   <p className="text-xs sm:text-sm text-gray-600">
-                                    File: {offer.file_name}
+                                    {t("file")}: {offer.file_name}
                                   </p>
                                 )}
                                 {offer.apply_discount && offer.discount > 0 && (
                                   <p className="text-xs sm:text-sm text-green-600">
-                                    Discount: {offer.discount}% off
+                                    {t("discount")}: {offer.discount}%{" "}
+                                    {t("off")}
                                   </p>
                                 )}
                               </div>
                             </div>
                             <div className="flex items-center justify-between sm:justify-end gap-3">
                               <span className="font-semibold text-lg sm:text-xl">
-                                💰 €{offer.offered_budget || "N/A"}
+                                €{offer.offered_budget || t("na")}
                               </span>
                               <div className="flex gap-2">
                                 <button
@@ -734,13 +736,14 @@ function SinglePost({ prid }) {
                                       : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
                                   }`}
                                 >
-                                  {isInviteLoading ? "Sending..." : "Message"}
+                                  {isInviteLoading
+                                    ? t("sending") + "..."
+                                    : t("message")}
                                 </button>
+
                                 {tour.user === currentUserId && (
                                   <button
-                                    onClick={() =>
-                                      acceptOfferHandler(offer.id, tour.id)
-                                    }
+                                    onClick={() => acceptOfferHandler(offer.id)}
                                     disabled={isAcceptLoading}
                                     className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
                                       isAcceptLoading
@@ -748,7 +751,7 @@ function SinglePost({ prid }) {
                                         : "bg-[#3776E2] text-white hover:bg-blue-700"
                                     }`}
                                   >
-                                    Accept
+                                    {t("accept")}
                                   </button>
                                 )}
                               </div>
@@ -757,14 +760,16 @@ function SinglePost({ prid }) {
                         ) : null;
                       })
                   ) : (
-                    <p className="text-gray-600 text-sm">No offers available</p>
+                    <p className="text-gray-600 text-sm">
+                      {t("no_offers_available")}
+                    </p>
                   )}
                   {tour.offers?.length > 3 && (
                     <button
                       onClick={() => setExpandedOffers(!expandedOffers)}
                       className="text-blue-600 hover:underline text-sm"
                     >
-                      {expandedOffers ? "Show Less" : "See More"}
+                      {expandedOffers ? t("see_less") : t("see_more")}
                     </button>
                   )}
                 </div>

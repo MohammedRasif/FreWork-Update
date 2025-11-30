@@ -57,7 +57,7 @@
   "points_of_travel": "Punti di interesse",
   "none": "Nessuno",
   "departure_from": "Partenza da",
-  "minimum_rating": "",
+  "minimum_rating": "Voto minimo",
   "meal_plan": "Piano pasti",
   "type_of_accommodation": "Tipo di alloggio",
   "duration": "Durata",
@@ -202,6 +202,8 @@
   "free_feature_3": "Nessun requisito tecnico per iniziare",
   "per_month": "/mese",
   "measurable_results": "Funzionalità incluse",
+    "measurable_title": "Piano di lancio: gratis per 2 mesi",
+  "measurable_result": "Nessun pagamento subito.",
   "select": "Scegli Piano",
   "contact_for_details": "Contattaci per maggiori dettagli",
   "features": "Caratteristiche",
@@ -889,11 +891,11 @@
     },
     "2": {
       "title": "Ricevi fino a 3 offerte personalizzate",
-      "desc": "Solo agenzie verificate rispondono alla tua richiesta. Ogni offerta include:\n– foto e struttura proposta\n– servizi inclusi\n– prezzo totale\n– logo e nome dell’agenzia\nMassimo 3 offerte, tutte reali e personalizzate."
+      "desc": "Solo agenzie verificate rispondono alla tua richiesta. Ogni offerta include: foto e struttura proposta servizi inclusi prezzo totale logo e nome dell’agenzia\nMassimo 3 offerte, tutte reali e personalizzate."
     },
     "3": {
       "title": "Confronta e scegli l’offerta migliore",
-      "desc": "Confronti le offerte con badge di qualità come:\n– Risposta Top\n– Consigliata\n– Risposta ultra-veloce\n– Offerta confermata da utente verificato\nIl sistema può suggerirti anche uno sconto intelligente, basato su parametri reali."
+      "desc": "Confronti le offerte con badge di qualità come: Risposta Top Consigliata Risposta ultra-veloce Offerta confermata da utente verificato\nIl sistema può suggerirti anche uno sconto intelligente, basato su parametri reali."
     },
     "4": {
       "title": "Contatta direttamente l’agenzia",
@@ -901,17 +903,52 @@
     },
     "5": {
       "title": "Offerta confermata",
-      "desc": "Quando scegli un’offerta, l’agenzia aggiorna lo stato su Confermata. L’offerta appare nella sezione Offerte Accettate con:\n– logo dell’agenzia\n– dettagli del viaggio\n– badge di verifica"
+      "desc": "Quando scegli un’offerta, l’agenzia aggiorna lo stato su Confermata. L’offerta appare nella sezione Offerte Accettate con: logo dell’agenzia dettagli del viaggio badge di verifica"
     },
     "6": {
       "title": "VacanzaMyCheck: sicurezza intelligente",
-      "desc": "Ogni richiesta passa controlli automatici:\n– verifica email\n– controllo budget realistico\n– sistemi anti-spam\n– punteggio qualità della richiesta\n– badge Utente Affidabile per chi interagisce davvero\nSe una richiesta è sospetta, viene verificata prima della pubblicazione."
+      "desc": "Ogni richiesta passa controlli automatici: verifica email controllo budget realistico sistemi anti-spam punteggio qualità della richiesta badge Utente Affidabile per chi interagisce davvero\nSe una richiesta è sospetta, viene verificata prima della pubblicazione."
     },
     "7": {
       "title": "Tutto gratis per l’utente",
       "desc": "Il servizio è 100% gratuito per gli utenti. Nessuna commissione. Nessuna intermediazione. Le agenzie pagano solo un eventuale abbonamento Premium per servizi extra."
     }
-  }
+  },
+  "faq_title": "DOMANDE FREQUENTI",
+  "faq": [
+    {
+      "question": "Come funziona la configurazione del progetto con intelligenza artificiale?",
+      "answer": "La nostra IA analizza le tue esigenze e configura automaticamente la struttura ottimale del progetto, facendoti risparmiare ore di configurazione manuale."
+    },
+    {
+      "question": "I miei dati sono al sicuro?",
+      "answer": "Assolutamente sì, implementiamo misure di sicurezza di livello enterprise tra cui crittografia end-to-end, audit di sicurezza regolari e conformità a GDPR, HIPAA e altre normative. I tuoi dati sono conservati in data center conformi SOC 2."
+    },
+    {
+      "question": "Posso integrare con altri strumenti che già uso?",
+      "answer": "Sì, la nostra piattaforma supporta integrazioni con numerosi strumenti tra cui Slack, Trello e Google Workspace, garantendo una gestione fluida del flusso di lavoro."
+    },
+    {
+      "question": "Quanto tempo ci vuole la configurazione?",
+      "answer": "La configurazione richiede in genere meno di 15 minuti grazie al nostro processo di onboarding guidato dall'IA."
+    },
+    {
+      "question": "Posso personalizzare la piattaforma per il mio settore?",
+      "answer": "Certamente, offriamo template specifici per settore e opzioni di personalizzazione per adattarsi perfettamente alle tue esigenze."
+    },
+    {
+      "question": "Che tipo di assistenza offrite?",
+      "answer": "Forniamo assistenza clienti 24/7 via chat, email e telefono, con un account manager dedicato per gli utenti premium."
+    },
+    {
+      "question": "C'è una prova gratuita?",
+      "answer": "Sì, offriamo una prova gratuita di 14 giorni con accesso completo a tutte le funzionalità, senza bisogno di carta di credito."
+    },
+    {
+      "question": "Con quale frequenza rilasciate aggiornamenti?",
+      "answer": "Rilasciamo aggiornamenti ogni trimestre, con correzioni di bug regolari e nuove funzionalità basate sul feedback degli utenti."
+    }
+  ]
 
 
 }

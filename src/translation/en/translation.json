@@ -202,6 +202,8 @@
   "free_feature_3": "No technical requirements to get started",
   "per_month": "/month",
   "measurable_results": "Measurable results",
+  "measurable_title": "Launch plan: free for 2 months",
+  "measurable_result": "No upfront payment.",
   "select": "Select",
   "contact_for_details": "Contact us for more Details",
   "features": "Features",
@@ -930,7 +932,44 @@
       "title": "Completely free for users",
       "desc": "The service is 100% free for users. No commissions. No intermediaries. Agencies only pay an optional Premium subscription for extra services."
     }
-  }
+  },
+
+  "faq_title": "FREQUENTLY ASKED QUESTIONS",
+  "faq": [
+    {
+      "question": "How does the AI-powered project setup work?",
+      "answer": "Our AI analyzes your needs and automatically configures the optimal project structure, saving you hours of manual setup."
+    },
+    {
+      "question": "Is my data secure?",
+      "answer": "Absolutely, we implement enterprise-grade security measures including end-to-end encryption, regular security audits, and compliance with GDPR, HIPAA, and other regulations. Your data is stored in SOC 2 compliant data centers."
+    },
+    {
+      "question": "Can I integrate with other tools we already use?",
+      "answer": "Yes, our platform supports integrations with a wide range of tools, including Slack, Trello, and Google Workspace, ensuring seamless workflow management."
+    },
+    {
+      "question": "How long does it take to set up?",
+      "answer": "Setup typically takes less than 15 minutes with our AI-powered onboarding process, guiding you step-by-step."
+    },
+    {
+      "question": "Can I customize the platform for my industry?",
+      "answer": "Absolutely, our platform offers industry-specific templates and customization options to fit your needs."
+    },
+    {
+      "question": "What kind of support do you offer?",
+      "answer": "We provide 24/7 customer support via chat, email, and phone, along with a dedicated account manager for premium users."
+    },
+    {
+      "question": "Is there a free trial?",
+      "answer": "Yes, we offer a 14-day free trial with full access to all features, no credit card required."
+    },
+    {
+      "question": "How often do you release updates?",
+      "answer": "We release updates quarterly, with regular bug fixes and new features based on user feedback."
+    }
+  ]
+
 
 
 }

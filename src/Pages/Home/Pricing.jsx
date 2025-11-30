@@ -107,7 +107,7 @@ const Pricing = () => {
           <p className="text-center text-gray-600">{t("loading_plans")}</p>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto place-items-center  md:place-items-start">
           <AnimatePresence mode="wait">
             {/* Free Plan Card */}
             <motion.div
@@ -116,7 +116,7 @@ const Pricing = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, delay: 0 }}
-              className="bg-white w-[38vh] rounded-lg shadow-xl overflow-hidden flex flex-col h-full border border-gray-300 roboto"
+              className="bg-white w-full max-w-sm mx-auto md:mx-0 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
             >
               <div className="relative">
                 <div className="w-3/4 rounded-r-lg my-10 relative">
@@ -131,7 +131,7 @@ const Pricing = () => {
                 </div>
               </div>
               <div className="p-6 flex flex-col flex-grow">
-                <div className="mb-6">
+                <div className="lg:mb-14 mb-5">
                   <div className="flex items-end">
                     <span className="text-4xl font-bold text-slate-700">
                       0{t("per_month")}
@@ -183,7 +183,7 @@ const Pricing = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
-                className="bg-white w-[38vh] rounded-lg shadow-xl overflow-hidden flex flex-col h-full border border-gray-300 roboto"
+                className="bg-white w-full max-w-sm mx-auto md:mx-0 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200 "
               >
                 <div className="relative">
                   <div className="w-3/4 rounded-r-lg my-10 relative">
@@ -204,8 +204,9 @@ const Pricing = () => {
                         {subscriptionData.premium.price}
                       </span>
                     </div>
+                    <h1 className="text-[17px] pt-2 font-semibold">{t("measurable_title")}</h1>
                     <p className="text-slate-500 text-base mt-1">
-                      {t("measurable_results")}
+                      {t("measurable_result")}
                     </p>
                   </div>
                   <button
