@@ -1,32 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../i18n.js"; 
-
-const spring = {
-  type: "spring",
-  stiffness: 700,
-  damping: 30,
-};
+import i18n from "../../../i18n.js";
 
 const LanguageToggleButton = () => {
   const { t } = useTranslation();
-  const [currentLang, setCurrentLang] = useState(i18n.language);
+  const [currentLang, setCurrentLang] = useState(i18n.language || "en");
 
   useEffect(() => {
     const changeHandler = (lng) => {
       setCurrentLang(lng);
     };
-
     i18n.on("languageChanged", changeHandler);
-
-    // Cleanup
-    return () => {
-      i18n.off("languageChanged", changeHandler);
-    };
+    return () => i18n.off("languageChanged", changeHandler);
   }, []);
 
-  const isItalian = currentLang === "ita";
+  const isItalian = currentLang === "ita" || currentLang === "it";
 
   const toggleLanguage = () => {
     const newLang = isItalian ? "en" : "ita";
@@ -34,34 +22,35 @@ const LanguageToggleButton = () => {
   };
 
   return (
-    <motion.div
-      className="w-[75px] h-9 bg-gray-200 rounded-full flex justify-between items-center py-1 cursor-pointer relative shadow-md"
+    <div
       onClick={toggleLanguage}
-      layout
-      transition={spring}
+      className="w-[75px] h-9 bg-gray-200 rounded-full flex justify-between items-center py-1 cursor-pointer relative shadow-md"
     >
-      <motion.div
-        className="w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-[#8280FF]"
-        animate={{ x: isItalian ? 40 : 8 }}
-        transition={spring}
+      {/* Sliding Ball - Without framer-motion, using only Tailwind */}
+      <div
+        className={`w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-[#8280FF] transition-all duration-300 ease-in-out ${
+          isItalian ? "left-[40px]" : "left-[8px]"
+        }`}
       />
 
-      <motion.span
+      {/* EN */}
+      <span
         className={`text-sm w-1/2 pl-2 pt-[1px] text-center z-10 font-semibold ${
           isItalian ? "text-gray-500" : "text-white"
         }`}
       >
-        {t("En")}
-      </motion.span>
+        En
+      </span>
 
-      <motion.span
+      {/* IT */}
+      <span
         className={`text-sm w-1/2 pt-[1px] text-center z-10 font-semibold ${
           isItalian ? "text-white" : "text-gray-500"
         }`}
       >
-        {t("It")}
-      </motion.span>
-    </motion.div>
+        It
+      </span>
+    </div>
   );
 };
 

@@ -41,7 +41,9 @@ const Membership = () => {
 
   const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
     useInviteToChatMutation();
-
+ useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchTerm(value);

@@ -1,6 +1,6 @@
 import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
 import { MapPin, ShieldCheck } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaBed,
   FaClock,
@@ -25,7 +25,9 @@ function AcceptedOffers() {
   const handleSentOfferClick = () => {
     console.log("Sent Offer clicked");
   };
-
+ useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {[...Array(4)].map((_, i) => (

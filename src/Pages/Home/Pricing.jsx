@@ -4,7 +4,10 @@ import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
 import img from "../../assets/img/Vector 63.png";
 import { useNavigate } from "react-router-dom";
 import Faq from "./Faq";
-import { useShowSubscriptionDataQuery, useSubscriptionMutation } from "@/redux/features/withAuth";
+import {
+  useShowSubscriptionDataQuery,
+  useSubscriptionMutation,
+} from "@/redux/features/withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
@@ -12,15 +15,20 @@ import { useTranslation } from "react-i18next";
 const Pricing = () => {
   const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState("monthly");
-  const [subscription, { isLoading: isSubscribing, error: subscriptionError }] = useSubscriptionMutation();
+  const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
+    useSubscriptionMutation();
   const [langParam, setLangParam] = useState("lang=en");
   const navigate = useNavigate();
-  const language = localStorage.getItem("i18nextLng")
-  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery(language);
-
+  const language = localStorage.getItem("i18nextLng");
+  const { data: subscriptionData, isLoading } =
+    useShowSubscriptionDataQuery(language);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     if (subscriptionError) {
-      const errorMessage = subscriptionError?.data?.detail || t("failed_to_process_subscription");
+      const errorMessage =
+        subscriptionError?.data?.detail || t("failed_to_process_subscription");
       toast.error(errorMessage, {
         toastId: "subscription-error",
         position: "top-right",
@@ -38,11 +46,7 @@ const Pricing = () => {
     name: t("free_user"),
     limit: "3",
     limitUnit: t("query_per_day"),
-    features: [
-      t("free_feature_1"),
-      t("free_feature_2"),
-      t("free_feature_3"),
-    ],
+    features: [t("free_feature_1"), t("free_feature_2"), t("free_feature_3")],
   };
 
   const handleSelectPlan = async (planName) => {
@@ -204,7 +208,9 @@ const Pricing = () => {
                         {subscriptionData.premium.price}
                       </span>
                     </div>
-                    <h1 className="text-[17px] pt-2 font-semibold">{t("measurable_title")}</h1>
+                    <h1 className="text-[17px] pt-2 font-semibold">
+                      {t("measurable_title")}
+                    </h1>
                     <p className="text-slate-500 text-base mt-1">
                       {t("measurable_result")}
                     </p>

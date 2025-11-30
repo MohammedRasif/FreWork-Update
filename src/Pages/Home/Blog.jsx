@@ -1,7 +1,7 @@
 "use client";
 
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
