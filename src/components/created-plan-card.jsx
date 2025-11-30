@@ -164,10 +164,11 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
             <div className="flex items-center gap-4">
               <div className="flex flex-col items-end">
                 <span className="text-[#343E4B] font-medium">
-                  {t("budget")} ${plan.budget}
+                  {t("budget")} €{plan.budget}
                 </span>
                 <span className="text-xs text-[#70798F]">
-                  {plan.total_members} {plan.total_members > 1 ? t("people") : t("person")}
+                  {plan.total_members}{" "}
+                  {plan.total_members > 1 ? t("people") : t("person")}
                 </span>
               </div>
               <DropdownMenu>
@@ -226,81 +227,94 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                     </h3>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <div>
+                    <div className="flex  justify-between">
                       <div>
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
-                          <span>
-                            <span className="font-medium">
-                              {t("points_of_travel")}:
-                            </span>{" "}
-                            {plan.tourist_spots || t("none")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaLocationArrow className="w-6 h-5 text-gray-900" />
-                          <span>
-                            <span className="font-medium">{t("departure_from")}:</span>{" "}
-                            {plan.location_from || t("na")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaList className="w-6 h-5 text-gray-900" />
-                          <span>
-                            <span className="font-medium">{t("minimum_rating")}:</span>{" "}
-                            {plan.minimum_star_hotel || t("na")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                          <span>
-                            <span className="font-medium">{t("meal_plan")}:</span>{" "}
-                            {plan.meal_plan || t("na")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <IoBed className="w-6 h-5 text-gray-900" />
-                          <span>
-                            <span className="font-medium">
-                              {t("type_of_accommodation")}:
-                            </span>{" "}
-                            {plan.type_of_accommodation || t("na")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaClock className="w-6 h-5 text-gray-900" />
-                          <span>
-                            <span className="font-medium">{t("duration")}:</span>{" "}
-                            {plan.duration || t("na")}
-                          </span>
-                        </p>
-
-                        <p className="text-md text-gray-600 flex items-center gap-2">
-                          <MdVerifiedUser className="w-7 h-6 text-green-500" />
-                          <span>
-                            <span className="font-medium">
-                              {t("contact_verified")}
+                        <div>
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
+                            <span>
+                              <span className="font-medium">
+                                {t("points_of_travel")}:
+                              </span>{" "}
+                              {plan.tourist_spots || t("none")}
                             </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaLocationArrow className="w-6 h-5 text-gray-900" />
+                            <span>
+                              <span className="font-medium">
+                                {t("departure_from")}:
+                              </span>{" "}
+                              {plan.location_from || t("na")}
+                            </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaList className="w-6 h-5 text-gray-900" />
+                            <span>
+                              <span className="font-medium">
+                                {t("minimum_rating")}:
+                              </span>{" "}
+                              {plan.minimum_star_hotel || t("na")}
+                            </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
+                            <span>
+                              <span className="font-medium">
+                                {t("meal_plan")}:
+                              </span>{" "}
+                              {plan.meal_plan || t("na")}
+                            </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <IoBed className="w-6 h-5 text-gray-900" />
+                            <span>
+                              <span className="font-medium">
+                                {t("type_of_accommodation")}:
+                              </span>{" "}
+                              {plan.type_of_accommodation || t("na")}
+                            </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaClock className="w-6 h-5 text-gray-900" />
+                            <span>
+                              <span className="font-medium">
+                                {t("duration")}:
+                              </span>{" "}
+                              {plan.duration || t("na")}
+                            </span>
+                          </p>
+
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <MdVerifiedUser className="w-7 h-6 text-green-500" />
+                            <span>
+                              <span className="font-medium">
+                                {t("contact_verified")}
+                              </span>
+                            </span>
+                          </p>
+                        </div>
+
+                        <p className="text-sm text-[#70798F] mb-2 py-5">
+                          {plan.description || t("default_description")}
+                        </p>
+                        <p className="text-sm text-[#70798F]">
+                          {t("interested_tourist_points")}:{" "}
+                          <span className="text-[#343E4B] font-medium">
+                            {plan.tourist_spots || tող}
                           </span>
                         </p>
                       </div>
-                      <p className="text-sm text-[#70798F] mb-2 py-5">
-                        {plan.description ||
-                          t("default_description")}
-                      </p>
-                      <p className="text-sm text-[#70798F]">
-                        {t("interested_tourist_points")}:{" "}
-                        <span className="text-[#343E4B] font-medium">
-                          {plan.tourist_spots ||
-                            tող
-                          }
+                      <div>
+                        <span className="text-black text-xl font-medium">
+                          {t("budget")}: €{plan.budget}
                         </span>
-                      </p>
+                      </div>
                     </div>
 
                     <div className="w-full h-[300px] rounded-md overflow-hidden">
