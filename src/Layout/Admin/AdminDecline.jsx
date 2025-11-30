@@ -66,42 +66,42 @@ function AdminDecline() {
                 <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                   <div>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+                      <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                       <span>
                         <span className="font-medium">{t("points_of_travel")}:</span>{" "}
                         {plan.tour_plan.tourist_spots || t("none")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <FaLocationArrow className="w-6 h-5 text-gray-500" />
+                      <FaLocationArrow className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("departure_from")}:</span>{" "}
                         {plan.tour_plan.location_from || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <FaList className="w-6 h-5 text-gray-500" />
+                      <FaList className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("minimum_rating")}:</span>{" "}
                         {plan.tour_plan.minimum_star_hotel || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+                      <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("meal_plan")}:</span>{" "}
                         {plan.tour_plan.meal_plan || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <IoBed className="w-6 h-5 text-gray-500" />
+                      <IoBed className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
                         {plan.tour_plan.type_of_accommodation || t("na")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <FaClock className="w-6 h-5 text-gray-500" />
+                      <FaClock className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("duration")}:</span>{" "}
                         {plan.tour_plan.duration || t("na")}

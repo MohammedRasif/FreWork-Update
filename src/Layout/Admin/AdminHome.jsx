@@ -304,56 +304,56 @@ const AdminHome = () => {
                   <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                     <div>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+                        <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                         <span>
                           <span className="font-bold">{t("points_of_travel")}:</span>{" "}
                           {selectedPlan.tourist_spots || t("none")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaLocationArrow className="w-6 h-5 text-gray-500" />
+                        <FaLocationArrow className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("departure_from")}:</span>{" "}
                           {selectedPlan.location_from || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaList className="w-6 h-5 text-gray-500" />
+                        <FaList className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("minimum_rating")}:</span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+                        <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <IoBed className="w-6 h-5 text-gray-500" />
+                        <IoBed className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("type_of_accommodation")}:</span>{" "}
                           {selectedPlan.type_of_accommodation || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <Baby className="w-6 h-5 text-gray-500" />
+                        <Baby className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("child")}:</span>{" "}
                           {selectedPlan.child_count || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <User className="w-6 h-5 text-gray-500" />
+                        <User className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("adult")}:</span>{" "}
                           {selectedPlan.adult_count || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaClock className="w-6 h-5 text-gray-500" />
+                        <FaClock className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("duration")}:</span>{" "}
                           {selectedPlan.duration || t("na")}

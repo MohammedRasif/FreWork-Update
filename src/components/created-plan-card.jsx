@@ -229,7 +229,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                     <div>
                       <div>
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaLocationDot className="w-6 h-5 text-gray-500 size-4" />
+                          <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                           <span>
                             <span className="font-medium">
                               {t("points_of_travel")}:
@@ -239,44 +239,44 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         </p>
 
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaLocationArrow className="w-6 h-5 text-gray-500" />
+                          <FaLocationArrow className="w-6 h-5 text-gray-900" />
                           <span>
                             <span className="font-medium">{t("departure_from")}:</span>{" "}
-                            {plan.location_from || "N/A"}
+                            {plan.location_from || t("na")}
                           </span>
                         </p>
 
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaList className="w-6 h-5 text-gray-500" />
+                          <FaList className="w-6 h-5 text-gray-900" />
                           <span>
                             <span className="font-medium">{t("minimum_rating")}:</span>{" "}
-                            {plan.minimum_star_hotel || "N/A"}
+                            {plan.minimum_star_hotel || t("na")}
                           </span>
                         </p>
 
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <MdOutlineNoMeals className="w-6 h-5 text-gray-500" />
+                          <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                           <span>
                             <span className="font-medium">{t("meal_plan")}:</span>{" "}
-                            {plan.meal_plan || "N/A"}
+                            {plan.meal_plan || t("na")}
                           </span>
                         </p>
 
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <IoBed className="w-6 h-5 text-gray-500" />
+                          <IoBed className="w-6 h-5 text-gray-900" />
                           <span>
                             <span className="font-medium">
                               {t("type_of_accommodation")}:
                             </span>{" "}
-                            {plan.type_of_accommodation || "N/A"}
+                            {plan.type_of_accommodation || t("na")}
                           </span>
                         </p>
 
                         <p className="text-md text-gray-600 flex items-center gap-2">
-                          <FaClock className="w-6 h-5 text-gray-500" />
+                          <FaClock className="w-6 h-5 text-gray-900" />
                           <span>
                             <span className="font-medium">{t("duration")}:</span>{" "}
-                            {plan.duration || "N/A"}
+                            {plan.duration || t("na")}
                           </span>
                         </p>
 
