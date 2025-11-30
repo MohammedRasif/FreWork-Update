@@ -301,7 +301,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         </div>
 
                         <p className="text-sm text-[#70798F] mb-2 py-5">
-                          {plan.description || t("default_description")}
+                          {plan.description }
                         </p>
                         <p className="text-sm text-[#70798F]">
                           {t("interested_tourist_points")}:{" "}
