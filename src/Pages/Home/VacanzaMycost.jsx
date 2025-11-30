@@ -47,7 +47,7 @@ const VacanzaMycost = () => {
             </div>
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[300px] lg:bg-white">
               <div className="relative">
-                <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center ">
                   <img
                     src={img2}
                     alt="Personalized Offers"
@@ -66,7 +66,7 @@ const VacanzaMycost = () => {
             </div>
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[280px] lg:bg-white lg:-mt-0 -mt-4">
               <div className="relative">
-                <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-28 md:h-28 flex items-center justify-center lg:mt-0 mt-3">
                   <img
                     src={img3}
                     alt="Free Booking"
