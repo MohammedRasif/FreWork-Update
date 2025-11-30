@@ -36,7 +36,7 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[15px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
                 {t("publish_requests")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
@@ -55,7 +55,7 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[15px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
                 {t("receive_personalized_offers")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
@@ -74,7 +74,7 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-base md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[15px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
                 {t("choose_and_go")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
