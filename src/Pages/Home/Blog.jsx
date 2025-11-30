@@ -28,8 +28,9 @@ const formatDate = (dateString) => {
 
 function BlogCard({ post }) {
   const [expanded, setExpanded] = useState(false);
-
-  // content থেকে plain text বের করবো + 80 শব্দ পর্যন্ত দেখাবো
+ useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const fullText = stripHtmlAndTruncate(
     post.content || post.introductory_description,
     200

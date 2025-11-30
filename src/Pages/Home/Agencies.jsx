@@ -9,7 +9,7 @@ import "swiper/css";
 
 import { useGetTopAgencyQuery } from "@/redux/features/baseApi";
 import AgencyCard from "@/components/ui/AgencyCard";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -18,6 +18,9 @@ const Agencies = () => {
   const mountainPrevRef = useRef(null);
   const mountainNextRef = useRef(null);
   const { data: topAgency = [], isLoading, isError } = useGetTopAgencyQuery();
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   return (
     <div className="pb-8 px-4 sm:px-6 lg:px-8">

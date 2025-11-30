@@ -3,9 +3,13 @@
 import { useForm } from "react-hook-form";
 import img from "../../assets/img/contact.jpg";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 const Contact = () => {
   const { t } = useTranslation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const {
     register,
     handleSubmit,

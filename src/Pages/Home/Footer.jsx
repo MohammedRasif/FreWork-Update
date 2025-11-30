@@ -7,7 +7,8 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white py-10">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4 md:px-6 lg:px-8">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 
+            flex flex-col md:flex-row md:justify-between gap-4">
         {/* VacanzaMyCost.it Column */}
         <div className="space-y-4">
           <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">
@@ -20,16 +21,7 @@ const Footer = () => {
           <p className="text-sm text-gray-400">{t("email")}</p>
         </div>
 
-        {/* Our Collaborators Column */}
-        {/* <div className="space-y-[1px]">
-          <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">
-            {t("our_collaborators")}
-          </h3>
-          <p className="text-sm text-gray-400 pt-5">{t("collaborator_1")}</p>
-          <p className="text-sm text-gray-400">{t("collaborator_2")}</p>
-        </div> */}
-        <div></div>
-
+  
         {/* About Us Column */}
         <div className="space-y-[1px]">
           <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">

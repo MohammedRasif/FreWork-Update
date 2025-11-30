@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Terms() {
   const { t } = useTranslation();
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 font-sans text-gray-800 leading-relaxed text-base pt-24">
