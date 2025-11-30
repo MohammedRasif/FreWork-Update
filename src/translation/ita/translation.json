@@ -79,6 +79,8 @@
   "error_loading_agencies": "Errore nel caricamento delle agenzie. Riprova più tardi.",
   "no_agencies_available": "Al momento non ci sono agenzie in evidenza.",
   "easy_and_fast": "Facile e Veloce",
+  "verified_agencies_contact":"LE TUE INFORMAZIONI DI CONTATTO RESTANO PRIVATE",
+  "verified_agencies_desc_decide":"Sarai tu a decidere quando e a chi comunicarle, solo dopo aver scelto l’offerta che preferisci",
   "why_use_vacanza": "Perché usare VacanzaMyCost.it",
   "no_commission": "NESSUNA COMMISSIONE",
   "no_commission_desc": "Tieni il 100% dei tuoi guadagni. Nessuna tariffa nascosta.",
@@ -666,7 +668,7 @@
   "ok": "OK",
   "budget_warning_message": "Nota: il budget è a persona e include voli, alloggio, trasferimenti e pasti come selezionato.",
   "review_your_information": "Rivedi le tue informazioni",
-
+"who_work": "Come Funziona",
   "travelers": "Viaggiatori",
   "not_specified": "Non specificato",
   "included": "Incluso",

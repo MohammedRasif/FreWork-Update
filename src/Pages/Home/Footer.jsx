@@ -21,22 +21,35 @@ const Footer = () => {
         </div>
 
         {/* Our Collaborators Column */}
-        <div className="space-y-[1px]">
+        {/* <div className="space-y-[1px]">
           <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">
             {t("our_collaborators")}
           </h3>
           <p className="text-sm text-gray-400 pt-5">{t("collaborator_1")}</p>
           <p className="text-sm text-gray-400">{t("collaborator_2")}</p>
-        </div>
+        </div> */}
+        <div></div>
 
         {/* About Us Column */}
         <div className="space-y-[1px]">
           <h3 className="lg:text-3xl text-[22px] font-bold text-gray-100">
             {t("about_us")}
           </h3>
-         <p className="pt-5"> <NavLink to="/contact" className="text-sm text-gray-400 ">{t("contact_us")}</NavLink></p>
-          <p><NavLink to="/membership" className="text-sm text-gray-400">{t("agencies")}</NavLink></p>
-          <NavLink to="/blog" className="text-sm text-gray-400"> {t("blog")}</NavLink>
+          <p className="pt-5">
+            {" "}
+            <NavLink to="/contact" className="text-sm text-gray-400 ">
+              {t("contact_us")}
+            </NavLink>
+          </p>
+          <p>
+            <NavLink to="/membership" className="text-sm text-gray-400">
+              {t("agencies")}
+            </NavLink>
+          </p>
+          <NavLink to="/blog" className="text-sm text-gray-400">
+            {" "}
+            {t("blog")}
+          </NavLink>
         </div>
 
         {/* Follow us on Column */}

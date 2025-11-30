@@ -35,7 +35,7 @@ const EasyandFast = () => {
               </span>
               <h1 className="text-[20px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight lg:px-2 sm:px-4">
                 {t("why_use_vacanza")} <br />
-                VacanzaMyCost.it?
+               
               </h1>
             </div>
 
@@ -87,6 +87,22 @@ const EasyandFast = () => {
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
                     {t("verified_agencies_desc")}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
+                  <img
+                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1764484092/Image20251130122412_qqwgzn.jpg"
+                    alt=""
+                  />
+                </div>
+                <div className="px-2 sm:px-4">
+                  <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
+                    {t("verified_agencies_contact")}
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    {t("verified_agencies_desc_decide")}
                   </p>
                 </div>
               </div>
