@@ -56,9 +56,9 @@ const Agencies = () => {
       `}</style>
 
       <div className="text-center py-10 lg:py-12">
-        <p className="text-gray-700 text-[16px] md:text-lg lg:mb-4 font-medium">
+        {/* <p className="text-gray-700 text-[16px] md:text-lg lg:mb-4 font-medium">
           {t("top_agencies_here")}
-        </p>
+        </p> */}
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
           {t("currently_top_agencies")}
         </h1>

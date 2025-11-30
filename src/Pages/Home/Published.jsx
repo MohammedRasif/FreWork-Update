@@ -98,9 +98,9 @@ const Published = () => {
       `}</style>
 
       <div className="text-center py-1 mb-6 sm:py-12 lg:py-16">
-        <p className="text-gray-700 text-[13px] md:text-lg lg:mb-4 font-medium">
+        {/* <p className="text-gray-700 text-[13px] md:text-lg lg:mb-4 font-medium">
           {t("top_requests_here")}
-        </p>
+        </p> */}
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
           {t("last_request_published")}
         </h1>
