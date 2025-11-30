@@ -685,7 +685,78 @@
   "business_travel": "Viaggio di lavoro",
   "select_travel_type": "Seleziona tipo di viaggio",
 
-  "select_destination_type": "Seleziona destinazione",
+  "posted_by": "Posted by",
+  "route": "Route",
+  "members": "Members",
+
+  "not_provided": "Not provided",
+  "accepted_offer": "Offerta accettata",
+  "no_message": "No message provided.",
+  "posted_on": "Posted on",
+  "view_full_image": "View Full Image",
+
+  "tbd": "TBD",
+
+
+
+
+  "adults_required": "È richiesto almeno un adulto o bambino",
+  "adults_negative": "Il numero di adulti non può essere negativo",
+  "adults_placeholder": "Adulti",
+
+  "children_negative": "Il numero di bambini non può essere negativo",
+  "children_placeholder": "Bambini",
+
+
+  "starting_location_placeholder": "Luogo di partenza",
+
+  "destination_placeholder": "Destinazione",
+
+  "budget_placeholder": "Budget (EUR)",
+
+
+  "tourist_spots_required": "Indica i luoghi o preferenze di viaggio",
+  "tourist_spots_placeholder": "Mare, Monumenti, Ristorante...",
+
+  "description_optional": "Descrizione (Facoltativa)",
+
+
+
+
+  "star_one": "Stella",
+  "star_other": "Stelle",
+
+
+
+
+
+  "destination_type_required": "Seleziona tipologia destinazione",
+  "select_destination_type": "Seleziona Tipologia",
+
+
+
+  "accommodation": "Alloggio",
+  "hotel_stars": "Stelle Hotel",
+  "flight": "Volo A/R",
+
+
+  "name_required": "Il nome è obbligatorio",
+  "full_name": "Nome completo",
+
+
+  "confirmation_required": "Devi confermare la richiesta",
+
+
+
+  "please_login": "Effettua il login per creare un piano",
+
+  "plan_submitted_success": "La tua richiesta di viaggio è stata inviata con successo!",
+  "error_submitting": "Errore durante l'invio",
+  "google_maps_load_failed": "Impossibile caricare Google Maps",
+  "google_maps_not_available": "Google Places non disponibile",
+
+
+
   "privacy": {
     "title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Versione aggiornata 2025 – conforme a GDPR (UE 2016/679) + Direttiva ePrivacy",
 

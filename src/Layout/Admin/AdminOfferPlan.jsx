@@ -171,9 +171,7 @@ function AdminOfferPlan() {
                           <p className="text-xs sm:text-sm lg:text-md text-gray-800">
                             {t("total_persons", { count: tourPlan.total_members })}
                           </p>
-                          <p className="text-xs sm:text-sm lg:text-md text-gray-500 mt-1">
-                            {t("status")}: {tourPlan.status || t("pending")}
-                          </p>
+                          
                         </div>
                       </div>
                     </div>

@@ -704,6 +704,86 @@
   "select_travel_type": "Select Travel Type",
 
   "select_destination_type": "Select Destination Type",
+  "posted_by": "Posted by",
+  "route": "Route",
+  "members": "Members",
+
+  "not_provided": "Not provided",
+  "accepted_offer": "Accepted Offer",
+  "no_message": "No message provided.",
+  "posted_on": "Posted on",
+  "view_full_image": "View Full Image",
+  "tbd": "TBD",
+
+
+
+
+
+
+
+
+  "adults_required": "At least one adult or child is required",
+  "adults_negative": "Adults cannot be negative",
+  "adults_placeholder": "Adults",
+  "children_negative": "Children cannot be negative",
+  "children_placeholder": "Children",
+
+  "destination_placeholder": "Destination",
+
+
+  "tourist_spots_required": "Tourist spots or preferences are required",
+  "tourist_spots_placeholder": "Beach, Monuments, Restaurant...",
+
+
+
+
+  "star_one": "Star",
+  "star_other": "Stars",
+
+
+  "travel_type_required": "Travel type is required",
+
+
+  "destination_type_required": "Destination type is required",
+
+
+
+  "accommodation": "Accommodation",
+  "hotel_stars": "Hotel Stars",
+  "flight": "Round-trip Flight",
+
+
+
+  "full_name": "Your full name",
+
+
+  "confirmation_required": "You must confirm the request",
+
+  "please_login": "Please log in to create a plan",
+
+  "plan_submitted_success": "Your tour plan has been submitted successfully!",
+  "error_submitting": "Error submitting plan",
+  "google_maps_load_failed": "Failed to load Google Maps",
+  "google_maps_not_available": "Google Places not available",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  "privacy": {
     "title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Updated Version 2025 – GDPR compliant (EU 2016/679) + ePrivacy Directive",
