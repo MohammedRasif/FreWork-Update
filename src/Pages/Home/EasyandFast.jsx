@@ -30,9 +30,9 @@ const EasyandFast = () => {
           {/* Benefits List */}
           <div className="w-full lg:w-1/2 px-4 sm:px-6">
             <div className="mb-8 sm:mb-10 lg:mb-10">
-              <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium">
+              {/* <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium">
                 {t("easy_and_fast")}
-              </span>
+              </span> */}
               <h1 className="text-[20px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight lg:px-2 sm:px-4">
                 {t("why_use_vacanza")} <br />
               </h1>

@@ -105,13 +105,15 @@ const HomeLayout = ({ children }) => {
               <p className="text-sm text-gray-900 font-semibold mb-2">
                 {t("need_fast_response")}
               </p>
-              <Button
+             <NavLink to="/contact">
+               <Button
                 variant="link"
                 size="sm"
                 className="p-0 underline text-left w-min text-xs"
               >
                 {t("click_here")}
               </Button>
+             </NavLink>
             </div>
           </div>
         </div>

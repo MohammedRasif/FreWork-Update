@@ -201,7 +201,7 @@ const UserAccepte = () => {
                         <div className="flex items-center gap-2 mb-2">
                           <FiUsers className="text-gray-600" />
                           <span className="text-base sm:text-lg font-semibold">
-                            ${offer.offered_budget} / {t("total")} {offer.tour_plan.total_members} {t("person", { count: offer.tour_plan.total_members })}
+                            €{offer.offered_budget} / {t("total")} {offer.tour_plan.total_members} {t("person", { count: offer.tour_plan.total_members })}
                           </span>
                         </div>
                         <p className="text-gray-600 mb-2 sm:mb-4">

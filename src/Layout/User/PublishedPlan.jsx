@@ -349,7 +349,7 @@ function PublishedPlan() {
                       <div className="flex items-center relative mt-4 sm:mt-0">
                         <div>
                           <p className="text-base sm:text-lg font-bold text-gray-700">
-                            {t("budget")} ${plan.budget}
+                            {t("budget")} €{plan.budget}
                           </p>
                           <p className="text-xs sm:text-md text-gray-800">
                             {t("total_members", {
@@ -440,11 +440,11 @@ function PublishedPlan() {
                           <p>{t("all_offers")}</p>
                         </h3>
                       </div>
-                      <div className="flex items-center space-x-8 sm:space-x-16 pt-2">
+                      {/* <div className="flex items-center space-x-8 sm:space-x-16 pt-2">
                         <div className="text-xs sm:text-sm text-gray-600">
                           {t("offered_budget")}
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                   <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 py-4 sm:py-6">
@@ -596,7 +596,7 @@ function PublishedPlan() {
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                         <div>
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                            {t("budget")} ${selectedTour.budget}
+                            {t("budget")} €{selectedTour.budget}
                           </p>
                           <p className="text-xs sm:text-sm text-gray-800">
                             {t("total_members", {

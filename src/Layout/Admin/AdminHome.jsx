@@ -18,6 +18,7 @@ import {
   FaList,
   FaLocationArrow,
   FaLocationDot,
+  FaStar,
 } from "react-icons/fa6";
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
@@ -318,7 +319,7 @@ const AdminHome = () => {
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaList className="w-6 h-5 text-gray-900" />
+                        <FaStar className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("minimum_rating")}:</span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}

@@ -803,7 +803,7 @@ const TourPlanWithPopup = () => {
                                   <div className="flex items-center justify-between sm:justify-end gap-3">
                                     <div className="flex items-center gap-2">
                                       <span className="font-semibold text-lg sm:text-xl">
-                                        💰 ${offer.offered_budget}
+                                        💰€{offer.offered_budget}
                                       </span>
                                     </div>
                                     <div className="flex gap-2">

@@ -331,7 +331,7 @@ const TourPlanDouble = () => {
   const displayTours = tours;
 
   return (
-    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
+    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto h-screen">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -741,7 +741,7 @@ const TourPlanDouble = () => {
                     </select>
                   )}
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("travel_type")}
                   </label>
@@ -754,7 +754,7 @@ const TourPlanDouble = () => {
                       handleFilterChange("travel_type", e.target.value)
                     }
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
