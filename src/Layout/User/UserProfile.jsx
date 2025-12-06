@@ -40,7 +40,7 @@ function UserProfile() {
       <div className="flex flex-col sm:flex-row items-start mb-6 bg-white p-4 sm:p-5 rounded-md">
         {/* User Image and Details */}
         <div className="w-full sm:w-2/5 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-5">
-          <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-300 rounded-full mb-2 mx-auto sm:mx-0 overflow-hidden md:hidden">
+          <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-300 rounded-full mb-2 mx-auto sm:mx-0 overflow-hidden ">
             <img
               src={
                 user.profile_picture_url ||
@@ -115,7 +115,7 @@ function UserProfile() {
           <div>
             <p className="text-sm text-gray-500">{t("phone_home")}</p>
             <p className="text-md font-medium text-gray-800">
-              {user.phone_home || t("na")}
+              {user.phone_personal || t("na")}
             </p>
           </div>
           <div>

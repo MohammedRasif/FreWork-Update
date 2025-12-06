@@ -27,7 +27,7 @@ import { useTranslation } from "react-i18next";
 
 const AdminHome = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("All Plans");
+  const [activeTab, setActiveTab] = useState(t("all_plans_tab"));
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [isPopupOpen, setIsPopupOpen] = useState(false);

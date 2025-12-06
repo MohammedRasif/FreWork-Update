@@ -36,11 +36,7 @@ const HomeLayout = ({ children }) => {
           <div className="w-full flex items-center gap-2 px-4">
             <div className="min-w-max">
               <h4 className="text-xl font-semibold text-[#343E4B]">
-                {new Date().toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+                {new Date().toLocaleDateString("en-GB", )}
               </h4>
             </div>
 

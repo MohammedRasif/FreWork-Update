@@ -41,6 +41,7 @@ import {
   FaList,
   FaLocationArrow,
   FaLocationDot,
+  FaStar,
 } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
 
@@ -251,7 +252,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaList className="w-6 h-5 text-gray-900" />
+                            <FaStar className="w-6 h-5 text-gray-900" />
                             <span>
                               <span className="font-medium">
                                 {t("minimum_rating")}:

@@ -309,7 +309,7 @@ export default function UserDashboardLayout() {
             <div className="flex flex-col w-full justify-center items-center mt-16">
               <div className="relative">
                 <div
-                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50 ${
+                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50  ${
                     isCollapsed
                       ? "opacity-0 -translate-x-full"
                       : "opacity-100 translate-x-0"
@@ -427,7 +427,7 @@ export default function UserDashboardLayout() {
                 <img
                   src={
                     (!isProfileLoading && profileData?.profile_picture_url) ||
-                    UserAvatar
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                   }
                   alt={t("user_avatar")}
                   className="w-full h-full rounded-full"

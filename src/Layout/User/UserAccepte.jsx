@@ -178,7 +178,9 @@ const UserAccepte = () => {
                       offer.tour_plan.spot_picture_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
                     }
-                    alt={t("tour_to", { location: offer.tour_plan.location_to })}
+                    alt={t("tour_to", {
+                      location: offer.tour_plan.location_to,
+                    })}
                     className="w-full h-48 md:h-full object-cover"
                   />
                 </div>
@@ -189,7 +191,9 @@ const UserAccepte = () => {
                       <div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-2">
                           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                            {t("tour_to", { location: offer.tour_plan.location_to })}
+                            {t("tour_to", {
+                              location: offer.tour_plan.location_to,
+                            })}
                           </h2>
                           {offer.tour_plan.is_completed === false && (
                             <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
@@ -201,7 +205,11 @@ const UserAccepte = () => {
                         <div className="flex items-center gap-2 mb-2">
                           <FiUsers className="text-gray-600" />
                           <span className="text-base sm:text-lg font-semibold">
-                            €{offer.offered_budget} / {t("total")} {offer.tour_plan.total_members} {t("person", { count: offer.tour_plan.total_members })}
+                            €{offer.offered_budget} / {t("total")}{" "}
+                            {offer.tour_plan.total_members}{" "}
+                            {offer.tour_plan.total_members === 1
+                              ? t("person")
+                              : t("persons")}
                           </span>
                         </div>
                         <p className="text-gray-600 mb-2 sm:mb-4">
@@ -228,10 +236,7 @@ const UserAccepte = () => {
                               {t("starting_date")}:
                             </span>
                             <span className="text-xs sm:text-sm">
-                              {new Date(offer.tour_plan.start_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
-                                { day: "numeric", month: "long", year: "numeric" }
-                              )}
+                              {offer.tour_plan.start_date}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -240,10 +245,7 @@ const UserAccepte = () => {
                               {t("ending_date")}:
                             </span>
                             <span className="text-xs sm:text-sm">
-                              {new Date(offer.tour_plan.end_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
-                                { day: "numeric", month: "long", year: "numeric" }
-                              )}
+                              { offer.tour_plan.end_date}
                             </span>
                           </div>
                         </div>
@@ -312,7 +314,9 @@ const UserAccepte = () => {
                       offer.tour_plan.spot_picture_url ||
                       "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                     }
-                    alt={t("tour_to", { location: offer.tour_plan.location_to })}
+                    alt={t("tour_to", {
+                      location: offer.tour_plan.location_to,
+                    })}
                     className="w-full h-40 sm:h-48 p-2 rounded-md object-cover"
                   />
                   <div className="p-4">
