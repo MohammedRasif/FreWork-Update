@@ -331,7 +331,7 @@ const TourPlanDouble = () => {
   const displayTours = tours;
 
   return (
-    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto h-screen">
+    <div className="bg-gray-50 p-3 sm:p-4 md:p-6 lg:pb-20 roboto ">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -341,7 +341,7 @@ const TourPlanDouble = () => {
           <Menu size={18} />
           <span>{t("filters")}</span>
         </button>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 pt-20">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 pt-4 lg:pt-20">
           <div className="w-full md:w-3/4 lg:w-4/5 order-2 md:order-1">
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">

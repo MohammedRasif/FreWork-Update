@@ -23,7 +23,7 @@ import {
   useOfferBudgetMutation,
 } from "@/redux/features/withAuth";
 import FullScreenInfinityLoader from "@/lib/Loading";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
@@ -460,14 +460,16 @@ function PublishedPlan() {
                             className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-4 rounded-lg"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
-                              <img
+                             <button className="cursor-pointer"  onClick={() =>
+                                  handleResponseClick(offer, offer.agency.user)
+                                }> <img
                                 src={
                                   offer.agency.logo_url ||
                                   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                 }
                                 alt={t("agency_avatar", { name: offer.company })}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                              />
+                              /></button>
                               <div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-gray-900 text-xs sm:text-sm">
@@ -516,14 +518,22 @@ function PublishedPlan() {
                                   {offer.offered_budget}
                                 </span>
                               </div>
-                              <button
+                              {/* <button
                                 onClick={() =>
                                   handleResponseClick(offer, offer.agency.user)
                                 }
                                 className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                               >
                                 {t("response")}
+                              </button> */}
+                              <Link to={`/user/chat/${offer.room_id}`}>
+                              <button
+                                
+                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                              >
+                                {t("response")}
                               </button>
+                              </Link>
                             </div>
                           </div>
                         );
