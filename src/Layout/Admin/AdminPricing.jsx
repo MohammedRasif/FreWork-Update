@@ -14,12 +14,21 @@ import { useTranslation } from "react-i18next";
 
 const AdminPricing = () => {
   const { t } = useTranslation();
-  const [billingCycle, setBillingCycle] = useState("monthly");
-  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery();
-  const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
-    useSubscriptionMutation();
   const navigate = useNavigate();
 
+  // Language support for subscription data
+  const language = localStorage.getItem("i18nextLng") || "en";
+  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery(language);
+
+  const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
+    useSubscriptionMutation();
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Show subscription error
   useEffect(() => {
     if (subscriptionError) {
       const errorMessage =
@@ -40,7 +49,6 @@ const AdminPricing = () => {
     name: t("free_user"),
     limit: "5",
     limitUnit: t("query_per_day"),
-    price: t("free_price"),
     features: [
       t("includes_general_databases"),
       t("limited_free_queries"),
@@ -81,7 +89,7 @@ const AdminPricing = () => {
           });
         }
       } catch (error) {
-        // Error handled by useEffect
+        // Error handled by useEffect above
       }
     } else {
       toast.info(t("free_plan_selected"), {
@@ -106,7 +114,7 @@ const AdminPricing = () => {
           {t("find_best_package")}
         </h1>
 
-        {/* Membership Info */}
+        {/* Membership Info - তোমার আগের ডিজাইন অক্ষত আছে */}
         <div className="flex items-center justify-between border border-gray-400 m-5 p-3 rounded-md">
           <div>
             <h1 className="text-[16px] text-gray-700 font-medium">
@@ -131,7 +139,7 @@ const AdminPricing = () => {
           <p className="text-center text-gray-600">{t("loading_plans")}</p>
         )}
 
-        {/* Pricing cards */}
+        {/* Pricing cards - তোমার পুরো ডিজাইন অপরিবর্তিত */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-16">
           <AnimatePresence mode="wait">
             {/* Free Plan Card */}
@@ -159,7 +167,7 @@ const AdminPricing = () => {
                 <div className="mb-6">
                   <div className="flex items-end">
                     <span className="text-4xl font-bold text-slate-700">
-                      {freePlan.price}
+                      0{t("per_month")}
                     </span>
                   </div>
                   <p className="text-slate-500 text-base mt-1">
