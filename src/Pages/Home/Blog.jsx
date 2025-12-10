@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
-// Helper: HTML tags remove করে plain text বানাবে + short description
 const stripHtmlAndTruncate = (html, wordLimit = 80) => {
   if (!html) return "";
   const div = document.createElement("div");
@@ -28,7 +27,8 @@ const formatDate = (dateString) => {
 
 function BlogCard({ post }) {
   const [expanded, setExpanded] = useState(false);
- useEffect(() => {
+  const { t } = useTranslation();
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   const fullText = stripHtmlAndTruncate(
@@ -93,7 +93,7 @@ function BlogCard({ post }) {
                       }}
                       className="ml-2 font-semibold text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors"
                     >
-                      {expanded ? "See less" : "Read more"}
+                      {expanded ? t("show_less") : t("read_more")}
                     </button>
                   )}
                 </p>
@@ -101,7 +101,7 @@ function BlogCard({ post }) {
                 {/* Continue Reading */}
                 <div>
                   <button className="inline-flex items-center gap-2 text-blue-600 font-medium hover:gap-4 transition-all">
-                    <span>Continue reading</span>
+                    <span>{t("continue_reading")}</span>
                     <svg
                       className="w-5 h-5"
                       fill="none"
