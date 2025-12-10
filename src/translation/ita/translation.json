@@ -916,36 +916,38 @@
 "faq_title": "DOMANDE FREQUENTI",
 "faq": [
 {
-"question": "Come funziona la configurazione del progetto con intelligenza artificiale?",
-"answer": "La nostra IA analizza le tue esigenze e configura automaticamente la struttura ottimale del progetto, facendoti risparmiare ore di configurazione manuale."
+"question": "Perché scegliere VacanzaMyCost.it?",
+"answer": "Perché non ricevi offerte generiche: ottieni solo proposte personalizzate da agenzie reali, basate sulla tua richiesta. Il servizio è gratuito, trasparente e senza commissioni. Contatti direttamente l’agenzia e scegli l’offerta migliore per te."
 },
 {
-"question": "I miei dati sono al sicuro?",
-"answer": "Assolutamente sì, implementiamo misure di sicurezza di livello enterprise tra cui crittografia end-to-end, audit di sicurezza regolari e conformità a GDPR, HIPAA e altre normative. I tuoi dati sono conservati in data center conformi SOC 2."
+"question": "Quanto costa il servizio?",
+"answer": "Per gli utenti è sempre gratuito.
+Le agenzie possono usare il piano Base senza costi oppure attivare il piano Premium per ottenere maggiore visibilità, risposte illimitate e funzionalità avanzate."
 },
 {
-"question": "Posso integrare con altri strumenti che già uso?",
-"answer": "Sì, la nostra piattaforma supporta integrazioni con numerosi strumenti tra cui Slack, Trello e Google Workspace, garantendo una gestione fluida del flusso di lavoro."
+"question": "Chi può rispondere alle richieste di viaggio?",
+"answer": "Solo agenzie verificate con profilo completo. Il sistema VacanzaMyCheck filtra richieste false e blocca offerte incomplete, garantendo qualità e affidabilità per tutti."
 },
 {
-"question": "Quanto tempo ci vuole la configurazione?",
-"answer": "La configurazione richiede in genere meno di 15 minuti grazie al nostro processo di onboarding guidato dall'IA."
+"question": "Perché ricevo massimo 3 offerte?",
+"answer": "Perché puntiamo sulla qualità.
+Il sistema permette fino a 3 offerte personalizzate per evitare spam e confusione. Le agenzie inviano solo proposte complete e realmente utili, così scegli più facilmente."
 },
 {
-"question": "Posso personalizzare la piattaforma per il mio settore?",
-"answer": "Certamente, offriamo template specifici per settore e opzioni di personalizzazione per adattarsi perfettamente alle tue esigenze."
+"question": "Cosa significa “Offerta confermata”?",
+"answer": "Quando un utente sceglie un’offerta, l’agenzia la segna come confermata. Il sistema mostra un badge ufficiale con logo e nome dell’agenzia: una garanzia di trasparenza e un segnale di affidabilità per tutte le altre richieste."
 },
 {
-"question": "Che tipo di assistenza offrite?",
-"answer": "Forniamo assistenza clienti 24/7 via chat, email e telefono, con un account manager dedicato per gli utenti premium."
+"question": "Come vengono utilizzati i miei dati?",
+"answer": "I tuoi dati servono solo per permettere alle agenzie di inviarti offerte personalizzate. Non vengono venduti o condivisi con terzi. Tutto è protetto da verifica email, filtri anti-fake e dal sistema VacanzaMyCheck."
 },
 {
-"question": "C'è una prova gratuita?",
-"answer": "Sì, offriamo una prova gratuita di 14 giorni con accesso completo a tutte le funzionalità, senza bisogno di carta di credito."
+"question": "Come posso diventare un’agenzia Premium?",
+"answer": "Dal pannello agenzia puoi attivare il piano Premium e ottenere: risposte illimitate, posizionamento prioritario nelle richieste, badge speciali, statistiche avanzate, richieste dirette dagli utenti e visibilità nelle classifiche pubbliche."
 },
 {
-"question": "Con quale frequenza rilasciate aggiornamenti?",
-"answer": "Rilasciamo aggiornamenti ogni trimestre, con correzioni di bug regolari e nuove funzionalità basate sul feedback degli utenti."
+"question": "Posso modificare o cancellare la mia richiesta dopo l’invio?",
+"answer": "Sì. Dopo la conferma via email puoi accedere al tuo pannello utente, aggiornare le informazioni, correggere eventuali dettagli oppure cancellare la richiesta se non ti serve più. Le agenzie vedranno sempre la versione aggiornata, così ricevi offerte corrette e rilevanti."
 }
 ]
 }
