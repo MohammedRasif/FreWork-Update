@@ -95,7 +95,7 @@ export default function TourPlanDetails({ id, closeModal }) {
               </p>
               <p>
                 <strong>{t("dates") || "Dates"}:</strong>{" "}
-                {formatDateRange(tourData.start_date, tourData.end_date)}
+                {tourData.start_date, tourData.end_date}
               </p>
               <p>
                 <strong>{t("members") || "Members"}:</strong> {tourData.total_members}
@@ -110,12 +110,12 @@ export default function TourPlanDetails({ id, closeModal }) {
                 <strong>{t("status") || "Status"}:</strong>{" "}
                 <span
                   className={`capitalize ${
-                    tourData.status === "accepted"
+                    tourData.approval_status === "Verificato"
                       ? "text-green-500"
                       : "text-gray-500"
                   }`}
                 >
-                  {t(tourData.status) || tourData.status}
+                  {t(tourData.approval_status) || tourData.approval_status}
                 </span>
               </p>
               <div className="sm:col-span-2">
@@ -184,7 +184,7 @@ export default function TourPlanDetails({ id, closeModal }) {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-4 sm:px-6 py-3 flex justify-between items-center text-sm text-gray-500">
+        {/* <div className="bg-gray-50 px-4 sm:px-6 py-3 flex justify-between items-center text-sm text-gray-500">
           <p>
             {t("posted_on") || "Posted on"}{" "}
             {new Date(
@@ -199,7 +199,7 @@ export default function TourPlanDetails({ id, closeModal }) {
           >
             {t("view_full_image") || "View Full Image"}
           </a>
-        </div>
+        </div> */}
       </div>
     </div>
   );

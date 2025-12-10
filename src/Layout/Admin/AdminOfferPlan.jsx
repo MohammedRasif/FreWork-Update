@@ -131,7 +131,7 @@ function AdminOfferPlan() {
             });
             const formattedDate = startDate.toLocaleDateString("en-US", {
               day: "numeric",
-              month: "long",
+              month: "numeric",
               year: "numeric",
             });
 

@@ -79,10 +79,10 @@ export default function AdminAcceptPlan() {
 
               <div className="p-4 flex flex-col flex-grow">
                 <div className="text-sm text-gray-600 mb-2">
-                  {formatDateRange(
+                  {
                     tour.tour_plan.start_date,
                     tour.tour_plan.end_date
-                  )}
+                  }
                 </div>
 
                 <h2 className="text-xl font-bold text-gray-900 mb-1">
