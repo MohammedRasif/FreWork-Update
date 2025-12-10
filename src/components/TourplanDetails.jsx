@@ -166,7 +166,7 @@ export default function TourPlanDetails({ id, closeModal }) {
                   <strong>{t("message") || "Message"}:</strong>{" "}
                   {offer.message || t("no_message") || "No message provided."}
                 </p>
-                <p>
+                {/* <p>
                   <strong>{t("status") || "Status"}:</strong>{" "}
                   <span
                     className={`capitalize ${
@@ -177,7 +177,7 @@ export default function TourPlanDetails({ id, closeModal }) {
                   >
                     {t(offer.status) || offer.status}
                   </span>
-                </p>
+                </p> */}
               </div>
             </div>
           )}
