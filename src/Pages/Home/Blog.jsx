@@ -52,7 +52,7 @@ function BlogCard({ post }) {
                   "https://via.placeholder.com/800x600?text=No+Image"
                 }
                 alt={post.title}
-                className="w-full h-52 md:h-65 object-cover group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-auto md:h-auto object-cover group-hover:scale-105 transition-transform duration-700"
               />
             </div>
 
