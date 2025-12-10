@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Baby, User, X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import {
   useDeclineRequestMutation,
@@ -24,6 +24,7 @@ import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 import AdminDecline from "./AdminDecline";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 
 const AdminHome = () => {
   const { t } = useTranslation();
@@ -363,7 +364,7 @@ const AdminHome = () => {
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
-                          <span className="font-medium">{t("contact_verified_via_email")}</span>
+                          <span className="font-medium">{t("contact_verified")}</span>
                         </span>
                       </p>
                     </div>
@@ -605,9 +606,20 @@ const AdminHome = () => {
                 ))}
               </div>
               <div className="pt-4 lg:pt-6 hidden md:block">
-                <p className="text-xs sm:text-sm lg:text-sm text-gray-900 font-semibold mb-2">
-                  {t("respond_fast_for_free")}
-                </p>
+                <div className="flex flex-col gap-1 mt-6">
+              <p className="text-sm text-gray-900 font-semibold mb-2">
+                {t("need_fast_response")}
+              </p>
+             <NavLink to="/contact">
+               <Button
+                variant="link"
+                size="sm"
+                className="p-0 underline text-left w-min text-xs"
+              >
+                {t("click_here")}
+              </Button>
+             </NavLink>
+            </div>
               </div>
             </div>
 
