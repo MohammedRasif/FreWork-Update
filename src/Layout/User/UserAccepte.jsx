@@ -331,12 +331,14 @@ const UserAccepte = () => {
                         { day: "numeric", month: "short", year: "numeric" }
                       )}
                     </div>
-                    <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
+                   <div className="flex space-x-2">
+                     <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
                       {t("tour_to", { location: offer.tour_plan.location_to })}
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-4 line-clamp-3">
-                      {offer.tour_plan.description}
+                    <p className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
+                      {offer.tour_plan.location_to}
                     </p>
+                   </div>
                     <button
                       onClick={() => {
                         setSelectedOffer(offer);
