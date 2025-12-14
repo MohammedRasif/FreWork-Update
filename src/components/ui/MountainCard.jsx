@@ -126,8 +126,17 @@ export default function MountainCard({ tourPlan }) {
           </p>
           <p>
             <span className="font-medium">{t("category")}:</span>{" "}
-            {localTourPlan.destination_type}
+            {localTourPlan.destination_type === "mountain"
+                ? "Montagna"
+                : localTourPlan.destination_type}
           </p>
+
+          {/* <p>
+              <span className="font-medium">{t("category")}:</span>{" "}
+              {localTourPlan.destination_type === "beach"
+                ? "Mare"
+                : localTourPlan.destination_type}
+            </p> */}
         </div>
 
         <div>

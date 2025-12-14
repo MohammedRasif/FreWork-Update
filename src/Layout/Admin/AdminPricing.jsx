@@ -105,44 +105,19 @@ const AdminPricing = () => {
   };
 
   return (
-    <section className="pt-5 roboto bg-gray-50">
+    <section className="pt-5 roboto ">
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-5 tracking-wider">
           {t("pricing_and_packages")}
         </h1>
-        <h1 className="text-[16px] text-center font-medium text-gray-600 mb-5">
-          {t("find_best_package")}
-        </h1>
-
-        {/* Membership Info - তোমার আগের ডিজাইন অক্ষত আছে */}
-        <div className="flex items-center justify-between border border-gray-400 m-5 p-3 rounded-md">
-          <div>
-            <h1 className="text-[16px] text-gray-700 font-medium">
-              {t("date_of_starting")}
-            </h1>
-            <h1 className="text-[13px] text-gray-700">12 July, 2025</h1>
-          </div>
-          <div>
-            <h1 className="text-[16px] text-gray-700 font-medium">
-              {t("membership_current")}
-            </h1>
-            <h1 className="text-[13px] text-gray-700">{t("freebie")}</h1>
-          </div>
-          <div>
-            <h1 className="text-[16px] text-gray-700 font-medium">{t("date_of_end")}</h1>
-            <h1 className="text-[13px] text-gray-700">12 July, 2025</h1>
-          </div>
-        </div>
-
         {/* Loading state */}
         {isLoading && (
           <p className="text-center text-gray-600">{t("loading_plans")}</p>
         )}
 
-        {/* Pricing cards - তোমার পুরো ডিজাইন অপরিবর্তিত */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-16">
           <AnimatePresence mode="wait">
-            {/* Free Plan Card */}
+            {/* Free Plan Card hello*/} 
             <motion.div
               key="free-plan"
               initial={{ opacity: 0, y: 20 }}
@@ -164,7 +139,7 @@ const AdminPricing = () => {
                 </div>
               </div>
               <div className="p-6 flex flex-col flex-grow">
-                <div className="mb-6">
+                <div className="mb-[58px]">
                   <div className="flex items-end">
                     <span className="text-4xl font-bold text-slate-700">
                       0{t("per_month")}
@@ -237,8 +212,11 @@ const AdminPricing = () => {
                         {subscriptionData.premium.price}
                       </span>
                     </div>
+                    <h1 className="text-[17px] pt-2 font-semibold">
+                      {t("measurable_title")}
+                    </h1>
                     <p className="text-slate-500 text-base mt-1">
-                      {t("measurable_results")}
+                      {t("measurable_result")}
                     </p>
                   </div>
                   <button

@@ -78,7 +78,9 @@ export default function TourCard({ tourPlan }) {
                   return (
                     <div
                       key={offer.agency?.id || Math.random()}
-                      className={`relative flex items-center justify-center flex-shrink-0 ${isAccepted ? "w-14 h-14" : "w-12 h-12"}`}
+                      className={`relative flex items-center justify-center flex-shrink-0 ${
+                        isAccepted ? "w-14 h-14" : "w-12 h-12"
+                      }`}
                     >
                       {isAccepted && (
                         <img
@@ -93,7 +95,11 @@ export default function TourCard({ tourPlan }) {
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
                         alt={`${offer.agency?.agency_name || "Agency"} logo`}
-                        className={`relative z-10 ${isAccepted ? "w-10 h-10" : "w-12 h-12"} object-contain rounded-full border bg-white ${isAccepted ? "" : "border-white"} flex-shrink-0`}
+                        className={`relative z-10 ${
+                          isAccepted ? "w-10 h-10" : "w-12 h-12"
+                        } object-contain rounded-full border bg-white ${
+                          isAccepted ? "" : "border-white"
+                        } flex-shrink-0`}
                       />
                     </div>
                   );
@@ -138,7 +144,9 @@ export default function TourCard({ tourPlan }) {
             </p>
             <p>
               <span className="font-medium">{t("category")}:</span>{" "}
-              {localTourPlan.destination_type}
+              {localTourPlan.destination_type === "beach"
+                ? "Mare"
+                : localTourPlan.destination_type}
             </p>
           </div>
 
@@ -156,7 +164,13 @@ export default function TourCard({ tourPlan }) {
             </span>
           </div>
 
-          <div className={localTourPlan.offer_count < 3 ? "pt-2 w-full relative" : "pt-2 w-full"}>
+          <div
+            className={
+              localTourPlan.offer_count < 3
+                ? "pt-2 w-full relative"
+                : "pt-2 w-full"
+            }
+          >
             <button
               onClick={handleViewDetails}
               className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"

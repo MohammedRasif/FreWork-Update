@@ -118,9 +118,12 @@ export default function GroupCard({ tourPlan }) {
               ? localTourPlan.offers[0].tour_plan.end_date
               : localTourPlan.end_date || "N/A"}
           </p>
+          
           <p>
             <span className="font-medium">{t("category")}:</span>{" "}
-            {localTourPlan.destination_type}
+            {localTourPlan.destination_type === "group"
+                ? "gruppi"
+                : localTourPlan.destination_type}
           </p>
         </div>
 
