@@ -34,7 +34,7 @@
 "error_loading": "Errore nel caricamento dei piani di viaggio. Riprova più tardi.",
 "no_tour_plans": "Nessun piano di viaggio disponibile al momento.",
 "loading_user_data": "Caricamento dati utente...",
-"real_request": "Richiesta Reale",
+"real_request": "Richiesta Verificata",
 "date": "Data",
 "to": "a",
 "category": "Categoria",
@@ -62,7 +62,7 @@
 "meal_plan": "Trattamento",
 "type_of_accommodation": "Tipo di alloggio",
 "duration": "Durata",
-"contact_verified": "Contatto verificato via e-mail",
+"contact_verified": "Richiesta verificata",
 "default_description": "Lorem Ipsum è un testo segnaposto... vedi di più",
 "interested_tourist_points": "Punti di interesse",
 "agencies_who_made_offers": "Agenzie che hanno fatto offerte",
@@ -548,8 +548,7 @@
 "all_offers": "Tutte le Offerte",
 "offered_budget": "Budget del Piano",
 "agency_avatar": "Avatar di {{name}}",
-"show_less": "Vedi di meno",
-"continue_reading": "Continua a leggere",
+"show_less": "Mostra meno",
 "response": "Vedi Offerta",
 "no_offers_available": "Nessuna offerta disponibile",
 "likes": "Mi Piace",
@@ -669,7 +668,7 @@
 "children": "Bambini",
 "previous": "Indietro",
 "ok": "OK",
-"budget_warning_message": "Nota: il budget è a persona e include voli, alloggio, trasferimenti e pasti come selezionato.",
+"budget_warning_message": "Assicurati di inserire un prezzo ragionevole. Prezzi irrealisticamente bassi possono comportare limitazioni o penalità.",
 "review_your_information": "Rivedi le tue informazioni",
 "who_work": "Come Funziona",
 "travelers": "Viaggiatori",
@@ -699,12 +698,12 @@
 "adults_placeholder": "Adulti",
 "children_negative": "Il numero di bambini non può essere negativo",
 "children_placeholder": "Bambini",
-"starting_location_placeholder": "Luogo di partenza",
-"destination_placeholder": "Destinazione",
+"starting_location_placeholder": "Inserisci la tua città (dove vivi)",
+"destination_placeholder": "Dove vuoi andare? (zona o città)",
 "budget_placeholder": "Budget (EUR)",
 "tourist_spots_required": "Indica i luoghi o preferenze di viaggio",
 "tourist_spots_placeholder": "Mare, Monumenti, Ristorante...",
-"description_optional": "Descrizione (Facoltativa)",
+"description_optional": "Vorremmo una settimana di relax al mare con 2 bambini, in hotel con piscina…",
 "star_one": "Stella",
 "star_other": "Stelle",
 "destination_type_required": "Seleziona tipologia destinazione",
@@ -926,7 +925,7 @@
 },
 {
 "question": "Quanto costa il servizio?",
-"answer": "Per gli utenti è sempre gratuito.Le agenzie possono usare il piano Base senza costi oppure attivare il piano Premium per ottenere maggiore visibilità, risposte illimitate e funzionalità avanzate."
+"answer": "Per gli utenti è sempre gratuito. Le agenzie possono usare il piano Base senza costi oppure attivare il piano Premium per ottenere maggiore visibilità, risposte illimitate e funzionalità avanzate."
 },
 {
 "question": "Chi può rispondere alle richieste di viaggio?",
@@ -934,7 +933,7 @@
 },
 {
 "question": "Perché ricevo massimo 3 offerte?",
-"answer": "Perché puntiamo sulla qualità.Il sistema permette fino a 3 offerte personalizzate per evitare spam e confusione. Le agenzie inviano solo proposte complete e realmente utili, così scegli più facilmente."
+"answer": "Perché puntiamo sulla qualità. Il sistema permette fino a 3 offerte personalizzate per evitare spam e confusione. Le agenzie inviano solo proposte complete e realmente utili, così scegli più facilmente."
 },
 {
 "question": "Cosa significa “Offerta confermata”?",
