@@ -321,15 +321,7 @@ const UserAccepte = () => {
                   />
                   <div className="p-4">
                     <div className="text-xs sm:text-sm text-gray-500 mb-2">
-                      {new Date(offer.tour_plan.start_date).toLocaleDateString(
-                        i18n.language === "it" ? "it-IT" : "en-GB",
-                        { day: "numeric", month: "short", year: "numeric" }
-                      )}{" "}
-                      -{" "}
-                      {new Date(offer.tour_plan.end_date).toLocaleDateString(
-                        i18n.language === "it" ? "it-IT" : "en-GB",
-                        { day: "numeric", month: "short", year: "numeric" }
-                      )}
+                      <span>{offer.tour_plan.start_date}</span> - <span>{offer.tour_plan.end_date}</span>
                     </div>
                    <div className="flex space-x-2">
                      <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">

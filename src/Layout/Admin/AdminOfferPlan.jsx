@@ -157,10 +157,10 @@ function AdminOfferPlan() {
                             {t("include")}:{" "}
                             <span className="font-medium">{duration}</span>
                           </p>
-                          <p>
+                          {/* <p>
                             {t("category")}:{" "}
                             <span className="font-medium">{tourPlan.category}</span>
-                          </p>
+                          </p> */}
                         </div>
                       </div>
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">

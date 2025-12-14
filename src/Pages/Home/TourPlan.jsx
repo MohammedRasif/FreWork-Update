@@ -5,10 +5,7 @@ import { HiDotsVertical } from "react-icons/hi";
 import { ThumbsUp, Heart, MessageCircle, Share2, Menu, X } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
-import {
-  useFilterTourPlanPublicQuery,
- 
-} from "@/redux/features/baseApi";
+import { useFilterTourPlanPublicQuery } from "@/redux/features/baseApi";
 import { debounce } from "lodash";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useNavigate } from "react-router-dom";
@@ -270,7 +267,7 @@ const TourPlanWithPopup = () => {
       setOfferComment("");
       setOfferForm({ applyDiscount: false, discount: "" });
       toast.success("Offer submitted successfully");
-      navigate("/admin/chat")
+      navigate("/admin/chat");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
@@ -878,7 +875,6 @@ const TourPlanWithPopup = () => {
               )}
             </div>
           </div>
-
           <div
             className={`w-full md:w-1/4 lg:w-1/5 order-1 md:order-2 lg:mt-24 ${
               isMobileFilterOpen ? "block" : "hidden md:block"

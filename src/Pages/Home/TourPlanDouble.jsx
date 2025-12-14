@@ -357,7 +357,9 @@ const TourPlanDouble = () => {
                     >
                       <option value="">{t("select_category")}</option>
                       <option value="beach">{t("beach_trips")}</option>
-                      <option value="mountain">{t("mountain_adventures")}</option>
+                      <option value="mountain">
+                        {t("mountain_adventures")}
+                      </option>
                       <option value="relax">{t("relaxing_tours")}</option>
                       <option value="group">{t("group_packages")}</option>
                     </select>
@@ -486,12 +488,14 @@ const TourPlanDouble = () => {
                                         className="absolute inset-0 object-contain pointer-events-none"
                                       />
                                     )}
-                                    < img
+                                    <img
                                       src={
                                         offer.agency?.logo_url ||
                                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                                       }
-                                      alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                                      alt={`${
+                                        offer.agency?.agency_name || "Agency"
+                                      } logo`}
                                       className={`relative z-10 ${
                                         isAccepted
                                           ? "w-[52px] h-[52px]"
@@ -548,11 +552,22 @@ const TourPlanDouble = () => {
                         <div className="space-y-1 text-md text-gray-700">
                           <p>
                             <span className="font-medium">{t("date")}:</span>{" "}
-                            {tour.start_date} to {tour.end_date }
+                            {tour.start_date} to {tour.end_date}
                           </p>
+
                           <p>
-                            <span className="font-medium">{t("category")}:</span>{" "}
-                            {tour.destination_type || "N/A"}
+                            <span className="font-medium">
+                              {t("category")}:
+                            </span>{" "}
+                            {tour.destination_type === "beach"
+                              ? "Mare"
+                              : tour.destination_type === "mountain"
+                              ? "Montagna"
+                              : tour.destination_type === "relax"
+                              ? "Relax"
+                              : tour.destination_type === "group"
+                              ? "Gruppi"
+                              : t("na")}
                           </p>
                         </div>
                         <div>
@@ -568,11 +583,15 @@ const TourPlanDouble = () => {
                           </span>
                           <div className="flex items-center space-x-4">
                             <h1 className="text-md text-gray-700">
-                              <span className="font-medium">{t("child")} :</span>{" "}
+                              <span className="font-medium">
+                                {t("child")} :
+                              </span>{" "}
                               {tour.child_count}
                             </h1>
                             <h1>
-                              <span className="font-medium">{t("adult")} :</span>{" "}
+                              <span className="font-medium">
+                                {t("adult")} :
+                              </span>{" "}
                               {tour.adult_count}
                             </h1>
                           </div>
@@ -602,8 +621,16 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-black" />
                             <span>
-                              <span className="font-medium">{t("meal_plan")}:</span>{" "}
-                              {tour.meal_plan || "N/A"}
+                              <span className="font-medium">
+                                {t("meal_plan")}:
+                              </span>{" "}
+                              {tour.meal_plan === "breakfast"
+                                ? "Colazione"
+                                : tour.meal_plan === "half-board"
+                                ? "Mezza Pensione (Colazione & Cena)"
+                                : tour.meal_plan === "full-board"
+                                ? "Pensione Completa (Tutti i Pasti)"
+                                : "N/A"}
                             </span>
                           </p>
                           <p className="text-md text-gray-600 flex items-center gap-2">
@@ -612,7 +639,17 @@ const TourPlanDouble = () => {
                               <span className="font-medium">
                                 {t("type_of_accommodation")}:
                               </span>{" "}
-                              {tour.type_of_accommodation || "N/A"}
+                              {tour.type_of_accommodation === "hotel"
+                                ? "Hotel"
+                                : tour.type_of_accommodation === "resort"
+                                ? "Resort"
+                                : tour.type_of_accommodation === "homestay"
+                                ? "B&B"
+                                : tour.type_of_accommodation === "apartment"
+                                ? "Appartamento"
+                                : tour.type_of_accommodation === "hostel"
+                                ? "Ostello"
+                                : "N/A"}
                             </span>
                           </p>
                           <p className="text-md text-gray-600 flex items-center gap-2">
@@ -627,7 +664,9 @@ const TourPlanDouble = () => {
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
-                              <span className="font-medium">{t("duration")}:</span>{" "}
+                              <span className="font-medium">
+                                {t("duration")}:
+                              </span>{" "}
                               {tour.duration || "N/A"}
                             </span>
                           </p>
@@ -678,7 +717,9 @@ const TourPlanDouble = () => {
           >
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 top-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{t("filters")}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t("filters")}
+                </h3>
                 <button
                   className="md:hidden text-gray-500"
                   onClick={toggleMobileFilter}

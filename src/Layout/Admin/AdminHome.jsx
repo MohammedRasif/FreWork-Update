@@ -236,10 +236,21 @@ const AdminHome = () => {
                       {t("total_members")}:{" "}
                       <span className="font-medium">{plan.total_members}</span>
                     </p>
+                    
                     <p>
-                      {t("category")}:{" "}
-                      <span className="font-medium">{plan.destination_type}</span>
-                    </p>
+            <span className="">{t("category")}:</span>{" "}
+            <span className="font-medium">
+              {plan.destination_type === "beach"
+              ? "Mare"
+              : plan.destination_type === "mountain"
+              ? "Montagna"
+              : plan.destination_type === "relax"
+              ? "Relax"
+              : plan.destination_type === "group"
+              ? "Gruppi"
+              : t("na")}
+            </span>
+          </p>
                   </div>
                 </div>
                 <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
@@ -332,6 +343,16 @@ const AdminHome = () => {
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan || t("na")}
                         </span>
+                        <span>
+  <span className="font-medium">{t("meal_plan")}:</span>{" "}
+  {selectedPlan.meal_plan === "breakfast"
+    ? "Colazione"
+    : selectedPlan.meal_plan === "half-board"
+    ? "Mezza Pensione (Colazione & Cena)"
+    : selectedPlan.meal_plan === "full-board"
+    ? "Pensione Completa (Tutti i Pasti)"
+    : "N/A"}
+</span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-900" />
@@ -339,6 +360,23 @@ const AdminHome = () => {
                           <span className="font-bold">{t("type_of_accommodation")}:</span>{" "}
                           {selectedPlan.type_of_accommodation || t("na")}
                         </span>
+                        <span>
+  <span className="font-medium">
+    {t("type_of_accommodation")}:
+  </span>{" "}
+  {selectedPlan.type_of_accommodation === "hotel"
+    ? "Hotel"
+    : selectedPlan.type_of_accommodation === "resort"
+    ? "Resort"
+    : selectedPlan.type_of_accommodation === "homestay"
+    ? "B&B"
+    : selectedPlan.type_of_accommodation === "apartment"
+    ? "Appartamento"
+    : selectedPlan.type_of_accommodation === "hostel"
+    ? "Ostello"
+    : "N/A"}
+</span>
+
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <Baby className="w-6 h-5 text-gray-900" />

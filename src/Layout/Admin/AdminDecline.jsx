@@ -88,10 +88,20 @@ function AdminDecline() {
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                      <span>
+                      {/* <span>
                         <span className="font-medium">{t("meal_plan")}:</span>{" "}
                         {plan.tour_plan.meal_plan || t("na")}
-                      </span>
+                      </span> */}
+                      <span>
+  <span className="font-medium">{t("meal_plan")}:</span>{" "}
+  {plan.tour_plan.meal_plan === "breakfast"
+    ? "Colazione"
+    : plan.tour_plan.meal_plan === "half-board"
+    ? "Mezza Pensione (Colazione & Cena)"
+    : plan.tour_plan.meal_plan === "full-board"
+    ? "Pensione Completa (Tutti i Pasti)"
+    : "N/A"}
+</span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <IoBed className="w-6 h-5 text-gray-900" />
@@ -99,6 +109,23 @@ function AdminDecline() {
                         <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
                         {plan.tour_plan.type_of_accommodation || t("na")}
                       </span>
+                      <span>
+  <span className="font-medium">
+    {t("type_of_accommodation")}:
+  </span>{" "}
+  {plan.tour_plan.type_of_accommodation === "hotel"
+    ? "Hotel"
+    : plan.tour_plan.type_of_accommodation === "resort"
+    ? "Resort"
+    : plan.tour_plan.type_of_accommodation === "homestay"
+    ? "B&B"
+    : plan.tour_plan.type_of_accommodation === "apartment"
+    ? "Appartamento"
+    : plan.tour_plan.type_of_accommodation === "hostel"
+    ? "Ostello"
+    : "N/A"}
+</span>
+
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaClock className="w-6 h-5 text-gray-900" />

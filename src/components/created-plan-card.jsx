@@ -139,12 +139,21 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                 {plan.total_members}
               </span>
             </p>
-            <p className="text-sm text-[#70798F]">
-              {t("category")}:{" "}
-              <span className="text-[#343E4B] font-medium">
-                {plan.destination_type}
-              </span>
-            </p>
+            
+            <p className="text-sm text-[#70798F] ">
+            <span className="font-medium">{t("category")}:</span>{" "}
+            <span className="text-[#343E4B] font-medium">
+              {plan.destination_type === "beach"
+              ? "Mare"
+              : plan.destination_type === "mountain"
+              ? "Montagna"
+              : plan.destination_type === "relax"
+              ? "Relax"
+              : plan.destination_type === "group"
+              ? "Gruppi"
+              : t("na")}
+            </span>
+          </p>
             <p className="text-sm text-[#70798F] flex items-center gap-1">
               {t("approval_status")}:{" "}
               <span
@@ -263,22 +272,37 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                            <span>
-                              <span className="font-medium">
-                                {t("meal_plan")}:
-                              </span>{" "}
-                              {plan.meal_plan || t("na")}
-                            </span>
+                           <span>
+  <span className="font-medium">{t("meal_plan")}:</span>{" "}
+  {plan.meal_plan === "breakfast"
+    ? "Colazione"
+    : plan.meal_plan === "half-board"
+    ? "Mezza Pensione (Colazione & Cena)"
+    : plan.meal_plan === "full-board"
+    ? "Pensione Completa (Tutti i Pasti)"
+    : "N/A"}
+</span>
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <IoBed className="w-6 h-5 text-gray-900" />
-                            <span>
-                              <span className="font-medium">
-                                {t("type_of_accommodation")}:
-                              </span>{" "}
-                              {plan.type_of_accommodation || t("na")}
-                            </span>
+                           <span>
+  <span className="font-medium">
+    {t("type_of_accommodation")}:
+  </span>{" "}
+  {plan.type_of_accommodation === "hotel"
+    ? "Hotel"
+    : plan.type_of_accommodation === "resort"
+    ? "Resort"
+    : plan.type_of_accommodation === "homestay"
+    ? "B&B"
+    : plan.type_of_accommodation === "apartment"
+    ? "Appartamento"
+    : plan.type_of_accommodation === "hostel"
+    ? "Ostello"
+    : "N/A"}
+</span>
+
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">

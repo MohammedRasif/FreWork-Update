@@ -340,10 +340,7 @@ function PublishedPlan() {
                               {plan.duration} {t("days")}
                             </span>
                           </p>
-                          <p>
-                            {t("category")}:{" "}
-                            <span className="font-medium">{plan.category}</span>
-                          </p>
+                          
                         </div>
                       </div>
                       <div className="flex items-center relative mt-4 sm:mt-0">

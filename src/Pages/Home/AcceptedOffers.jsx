@@ -176,10 +176,22 @@ function AcceptedOffers() {
                   <p>
                     <span className="font-medium">{t("date")}:</span> {tour.start_date}
                   </p>
-                  <p>
+                  {/* <p>
                     <span className="font-medium">{t("category")}:</span>{" "}
                     {tour.destination_type || "N/A"}
-                  </p>
+                  </p> */}
+                  <p>
+            <span className="font-medium">{t("category")}:</span>{" "}
+            {tour.destination_type === "beach"
+              ? "Mare"
+              : tour.destination_type === "mountain"
+              ? "Montagna"
+              : tour.destination_type === "relax"
+              ? "Relax"
+              : tour.destination_type === "group"
+              ? "Gruppi"
+              : t("na")}
+          </p>
                 </div>
 
                 <div>
@@ -226,16 +238,35 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">{t("meal_plan")}:</span>{" "}
-                      {tour.meal_plan || "N/A"}
-                    </span>
+  <span className="font-medium">{t("meal_plan")}:</span>{" "}
+  {tour.meal_plan === "breakfast"
+    ? "Colazione"
+    : tour.meal_plan === "half-board"
+    ? "Mezza Pensione (Colazione & Cena)"
+    : tour.meal_plan === "full-board"
+    ? "Pensione Completa (Tutti i Pasti)"
+    : "N/A"}
+</span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <IoBed className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
-                      {tour.type_of_accommodation || "N/A"}
-                    </span>
+                   <span>
+  <span className="font-medium">
+    {t("type_of_accommodation")}:
+  </span>{" "}
+  {tour.type_of_accommodation === "hotel"
+    ? "Hotel"
+    : tour.type_of_accommodation === "resort"
+    ? "Resort"
+    : tour.type_of_accommodation === "homestay"
+    ? "B&B"
+    : tour.type_of_accommodation === "apartment"
+    ? "Appartamento"
+    : tour.type_of_accommodation === "hostel"
+    ? "Ostello"
+    : "N/A"}
+</span>
+
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaStar className="w-6 h-5 text-black" />
