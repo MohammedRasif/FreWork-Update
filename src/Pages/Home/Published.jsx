@@ -36,18 +36,34 @@ const Published = () => {
   useEffect(() => {
     refetch();
   }, [refetch]);
-  const beachTrips = publishedData?.filter(
-    (p) => p.destination_type?.trim().toLowerCase() === "beach"
-  );
-  const mountainTrips = publishedData.filter(
-    (p) => p.destination_type?.trim().toLowerCase() === "mountain"
-  );
-  const relaxTrips = publishedData.filter(
-    (p) => p.destination_type?.trim().toLowerCase() === "relax"
-  );
-  const groupTrips = publishedData.filter(
-    (p) => p.destination_type?.trim().toLowerCase() === "group"
-  );
+  const sortByLatest = (data = []) => {
+    return [...data].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  };
+  const beachTrips = sortByLatest(
+    publishedData.filter(
+      (p) => p.destination_type?.trim().toLowerCase() === "beach"
+    )
+  ).slice(0, 6);
+
+  const mountainTrips = sortByLatest(
+    publishedData.filter(
+      (p) => p.destination_type?.trim().toLowerCase() === "mountain"
+    )
+  ).slice(0, 6);
+
+  const relaxTrips = sortByLatest(
+    publishedData.filter(
+      (p) => p.destination_type?.trim().toLowerCase() === "relax"
+    )
+  ).slice(0, 6);
+
+  const groupTrips = sortByLatest(
+    publishedData.filter(
+      (p) => p.destination_type?.trim().toLowerCase() === "group"
+    )
+  ).slice(0, 6);
 
   const handleCategoryClick = (category) => {
     localStorage.setItem("selectedCategory", category);
@@ -139,10 +155,10 @@ const Published = () => {
                       clickable: true,
                       renderBullet: (index, className) => {
                         return `
-          <span class="${className} custom-pagination-bullet">
-            <span class="pagination-number">${index + 1}</span>
-          </span>
-        `;
+                        <span class="${className} custom-pagination-bullet">
+                          <span class="pagination-number">${index + 1}</span>
+                        </span>
+                      `;
                       },
                     }}
                     navigation={{
@@ -189,10 +205,10 @@ const Published = () => {
                       clickable: true,
                       renderBullet: (index, className) => {
                         return `
-          <span class="${className} custom-pagination-bullet">
-            <span class="pagination-number">${index + 1}</span>
-          </span>
-        `;
+                      <span class="${className} custom-pagination-bullet">
+                        <span class="pagination-number">${index + 1}</span>
+                      </span>
+                    `;
                       },
                     }}
                     navigation={{

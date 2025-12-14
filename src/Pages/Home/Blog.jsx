@@ -15,12 +15,11 @@ const stripHtmlAndTruncate = (html, wordLimit = 80) => {
   return words.slice(0, wordLimit).join(" ") + "...";
 };
 
-// Helper: Date format → "November 16, 2025"
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "numeric",
     day: "numeric",
   });
 };
@@ -44,7 +43,6 @@ function BlogCard({ post }) {
       <NavLink to={`/blog_details/${post.id}`}>
         <article className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100">
           <div className="flex flex-col md:flex-row">
-            {/* Image */}
             <div className="md:w-96 flex-shrink-0">
               <img
                 src={
@@ -98,7 +96,6 @@ function BlogCard({ post }) {
                   )}
                 </p>
 
-                {/* Continue Reading */}
                 <div>
                   <button className="inline-flex items-center gap-2 text-blue-600 font-medium hover:gap-4 transition-all">
                     <span>{t("continue_reading")}</span>
@@ -130,7 +127,6 @@ export default function Blog() {
   const { t } = useTranslation();
   const { data: blogResponse, isLoading, isError } = useShowBlogPostQuery();
 
-  // API থেকে আসা ডাটা
   const blogPosts = blogResponse || [];
 
   if (isLoading) {
