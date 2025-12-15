@@ -144,7 +144,7 @@ export default function TourPlanDetails({ id, closeModal }) {
                 {t("accepted_offer") }
               </h3>
 
-              <div className="flex items-center mb-3">
+              {/* <div className="flex items-center mb-3">
                 <img
                   src={offer.agency.logo_url || placeholderImage}
                   alt={`${offer.agency.agency_name} logo`}
@@ -160,13 +160,13 @@ export default function TourPlanDetails({ id, closeModal }) {
                     )}
                   </p>
                 </div>
-              </div>
-              <div className="text-sm text-gray-600">
+              </div> */}
+              {/* <div className="text-sm text-gray-600">
                 <p>
                   <strong>{t("message") || "Message"}:</strong>{" "}
                   {offer.message || t("no_message") || "No message provided."}
                 </p>
-                {/* <p>
+                <p>
                   <strong>{t("status") || "Status"}:</strong>{" "}
                   <span
                     className={`capitalize ${
@@ -177,8 +177,8 @@ export default function TourPlanDetails({ id, closeModal }) {
                   >
                     {t(offer.status) || offer.status}
                   </span>
-                </p> */}
-              </div>
+                </p>
+              </div> */}
             </div>
           )}
         </div>

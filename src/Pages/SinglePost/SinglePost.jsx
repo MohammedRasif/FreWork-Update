@@ -255,6 +255,7 @@ function SinglePost({ prid }) {
   }
 
   const tour = postData;
+  console.log("Tour data:", tour);
   const hasMaxOffers = tour.offers?.length >= 3;
 
   const handleSentOfferClick = () => {

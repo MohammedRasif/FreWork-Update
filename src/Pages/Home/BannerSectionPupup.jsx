@@ -656,7 +656,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   {t("type_of_accommodation")}
                 </label>
-                <select {...register("typeOfAccommodation", { required: t("accommodation_required") || "Accommodation is required" })}>
+                <select className="border-2 border-slate-300 rounded-sm" {...register("typeOfAccommodation", { required: t("accommodation_required") || "Accommodation is required" })}>
                   <option value="">{t("select_accommodation") || "Select Accommodation"}</option>
                   <option value="hotel">{t("hotel")}</option>
                   <option value="resort">{t("resort")}</option>
@@ -669,7 +669,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   {t("minimum_hotel_stars")}
                 </label>
-                <select {...register("minimumHotelStars")}>
+                <select className="border-2 border-slate-300 rounded-sm" {...register("minimumHotelStars")}>
                   <option value="">{t("select_stars") || "Select Stars"}</option>
                   {[1,2,3,4,5].map(s => <option key={s} value={s}>{s} {t("star", { count: s })}</option>)}
                 </select>
@@ -677,10 +677,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 mt-4">
                 {t("meal_plan")}
               </label>
-              <select {...register("mealPlan", { required: t("meal_plan_required") || "Meal plan is required" })}>
+              <select className="border-2 border-slate-300 rounded-sm" {...register("mealPlan", { required: t("meal_plan_required") || "Meal plan is required" })}>
                 <option value="">{t("select_meal_plan") || "Select Meal Plan"}</option>
                 <option value="none">{t("no_meals")}</option>
                 <option value="breakfast">{t("breakfast")}</option>
@@ -691,7 +691,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </>
         )}
         {currentStep === 4 && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3 sm:space-y-4 ">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
