@@ -333,18 +333,20 @@ const AdminHome = () => {
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaStar className="w-6 h-5 text-gray-900" />
                         <span>
-                          <span className="font-bold">{t("minimum_rating")}:</span>{" "}
+                          <span className="font-bold">
+                            {/* {t("minimum_rating")}: */}
+                            </span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                        <span>
+                        {/* <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan || t("na")}
-                        </span>
+                        </span> */}
                         <span>
-  <span className="font-medium">{t("meal_plan")}:</span>{" "}
+  <span className="font-bold">{t("meal_plan")}:</span>{" "}
   {selectedPlan.meal_plan === "breakfast"
     ? "Colazione"
     : selectedPlan.meal_plan === "half-board"
