@@ -138,7 +138,7 @@ const Pricing = () => {
                 <div className="lg:mb-14 mb-5">
                   <div className="flex items-end">
                     <span className="text-4xl font-bold text-slate-700">
-                      0{t("per_month")}
+                      €0{t("per_month")}
                     </span>
                   </div>
                   <p className="text-slate-500 text-base mt-1">

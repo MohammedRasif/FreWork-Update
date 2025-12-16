@@ -1,5 +1,5 @@
 "use client";
-
+import { useMemo } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -33,37 +33,30 @@ const Published = () => {
     isError,
     refetch,
   } = useGetTourPlanPublicQuery();
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-  const sortByLatest = (data = []) => {
-    return [...data].sort(
+  // useEffect(() => {
+  //   refetch();
+  // }, [refetch]);
+  const sortedPublishedData = useMemo(() => {
+    return [...publishedData].sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
     );
-  };
-  const beachTrips = sortByLatest(
-    publishedData.filter(
-      (p) => p.destination_type?.trim().toLowerCase() === "beach"
-    )
-  ).slice(0, 6);
+  }, [publishedData]);
 
-  const mountainTrips = sortByLatest(
-    publishedData.filter(
-      (p) => p.destination_type?.trim().toLowerCase() === "mountain"
-    )
-  ).slice(0, 6);
+  const beachTrips = sortedPublishedData
+    .filter((p) => p.destination_type?.trim().toLowerCase() === "beach")
+    .slice(0, 6);
 
-  const relaxTrips = sortByLatest(
-    publishedData.filter(
-      (p) => p.destination_type?.trim().toLowerCase() === "relax"
-    )
-  ).slice(0, 6);
+  const mountainTrips = sortedPublishedData
+    .filter((p) => p.destination_type?.trim().toLowerCase() === "mountain")
+    .slice(0, 6);
 
-  const groupTrips = sortByLatest(
-    publishedData.filter(
-      (p) => p.destination_type?.trim().toLowerCase() === "group"
-    )
-  ).slice(0, 6);
+  const relaxTrips = sortedPublishedData
+    .filter((p) => p.destination_type?.trim().toLowerCase() === "relax")
+    .slice(0, 6);
+
+  const groupTrips = sortedPublishedData
+    .filter((p) => p.destination_type?.trim().toLowerCase() === "group")
+    .slice(0, 6);
 
   const handleCategoryClick = (category) => {
     localStorage.setItem("selectedCategory", category);
@@ -149,8 +142,10 @@ const Published = () => {
                 </button>
                 <div className="relative">
                   <Swiper
+                    key={beachTrips.map((p) => p.id).join("-")}
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
+                    loop={true}
                     pagination={{
                       clickable: true,
                       renderBullet: (index, className) => {
@@ -199,8 +194,10 @@ const Published = () => {
                 </button>
                 <div className="relative">
                   <Swiper
+                    key={beachTrips.map((p) => p.id).join("-")}
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
+                    loop={true}
                     pagination={{
                       clickable: true,
                       renderBullet: (index, className) => {
@@ -248,8 +245,10 @@ const Published = () => {
                 </button>
                 <div className="relative">
                   <Swiper
+                    key={beachTrips.map((p) => p.id).join("-")}
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
+                    loop={true}
                     pagination={{
                       clickable: true,
                       renderBullet: (index, className) => {
@@ -297,8 +296,10 @@ const Published = () => {
                 </button>
                 <div className="relative">
                   <Swiper
+                    key={beachTrips.map((p) => p.id).join("-")}
                     modules={[Pagination, Navigation]}
                     spaceBetween={12}
+                    loop={true}
                     pagination={{
                       clickable: true,
                       renderBullet: (index, className) => {

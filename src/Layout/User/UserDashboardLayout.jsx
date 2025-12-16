@@ -1,5 +1,5 @@
 "use client";
-import img from "../../assets/img/removebg.png";
+import img from "../../assets/img/1000062305-removebg-preview.png";
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {

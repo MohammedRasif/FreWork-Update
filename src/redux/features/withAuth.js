@@ -54,6 +54,7 @@ export const sqQuery = createApi({
     "SentMessages",
     "createPlanOne",
     "updatePlan",
+    "final"
   ],
 
   endpoints: (builder) => ({
@@ -362,7 +363,7 @@ export const sqQuery = createApi({
         url: `final-offer/${id}/`,
         method: "PATCH",
       }),
-      invalidatesTags: "final",
+      invalidatesTags: ["Offer"],
     }),
 
     // final offer response
@@ -372,7 +373,7 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: "final_confrimation",
+      invalidatesTags: ["final_confrimation"],
     }),
 
     messageSent: builder.mutation({
@@ -381,7 +382,7 @@ export const sqQuery = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: "SentMessage",
+      invalidatesTags: ["SentMessage"],
     }),
 
     declineOffer: builder.query({

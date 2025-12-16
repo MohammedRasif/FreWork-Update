@@ -25,7 +25,7 @@ function AcceptedOffers() {
   const handleSentOfferClick = () => {
     console.log("Sent Offer clicked");
   };
- useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   const LoadingSkeleton = () => (
@@ -174,24 +174,25 @@ function AcceptedOffers() {
 
                 <div className="space-y-1 text-md text-gray-700">
                   <p>
-                    <span className="font-medium">{t("date")}:</span> {tour.start_date}
+                    <span className="font-medium">{t("date")}:</span>{" "}
+                    {tour.start_date}
                   </p>
                   {/* <p>
                     <span className="font-medium">{t("category")}:</span>{" "}
                     {tour.destination_type || "N/A"}
                   </p> */}
                   <p>
-            <span className="font-medium">{t("category")}:</span>{" "}
-            {tour.destination_type === "beach"
-              ? "Mare"
-              : tour.destination_type === "mountain"
-              ? "Montagna"
-              : tour.destination_type === "relax"
-              ? "Relax"
-              : tour.destination_type === "group"
-              ? "Gruppi"
-              : t("na")}
-          </p>
+                    <span className="font-medium">{t("category")}:</span>{" "}
+                    {tour.destination_type === "beach"
+                      ? "Mare"
+                      : tour.destination_type === "mountain"
+                      ? "Montagna"
+                      : tour.destination_type === "relax"
+                      ? "Relax"
+                      : tour.destination_type === "group"
+                      ? "Gruppi"
+                      : t("na")}
+                  </p>
                 </div>
 
                 <div>
@@ -222,7 +223,9 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
-                      <span className="font-medium">{t("points_of_travel")}:</span>{" "}
+                      <span className="font-medium">
+                        {t("points_of_travel")}:
+                      </span>{" "}
                       {tour.tourist_spots.length > 14
                         ? `${tour.tourist_spots.slice(0, 14)}...`
                         : tour.tourist_spots}
@@ -231,50 +234,59 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationArrow className="w-6 h-5 text-black" />
                     <span>
-                      <span className="font-medium">{t("departure_from")}:</span>{" "}
+                      <span className="font-medium">
+                        {t("departure_from")}:
+                      </span>{" "}
                       {tour.location_from || "N/A"}
                     </span>
                   </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
-  <span className="font-medium">{t("meal_plan")}:</span>{" "}
-  {tour.meal_plan === "breakfast"
-    ? "Colazione"
-    : tour.meal_plan === "half-board"
-    ? "Mezza Pensione (Colazione & Cena)"
-    : tour.meal_plan === "full-board"
-    ? "Pensione Completa (Tutti i Pasti)"
-    : "N/A"}
-</span>
-                  </p>
-                  <p className="text-md text-gray-600 flex items-center gap-2">
-                    <IoBed className="w-6 h-5 text-black" />
-                   <span>
-  <span className="font-medium">
-    {t("type_of_accommodation")}:
-  </span>{" "}
-  {tour.type_of_accommodation === "hotel"
-    ? "Hotel"
-    : tour.type_of_accommodation === "resort"
-    ? "Resort"
-    : tour.type_of_accommodation === "homestay"
-    ? "B&B"
-    : tour.type_of_accommodation === "apartment"
-    ? "Appartamento"
-    : tour.type_of_accommodation === "hostel"
-    ? "Ostello"
-    : "N/A"}
-</span>
-
-                  </p>
-                  <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaStar className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">{t("minimum_rating")}:</span>{" "}
-                      {tour.minimum_star_hotel || "N/A"}
+                      <span className="font-medium">{t("meal_plan")}:</span>{" "}
+                      {tour.meal_plan === "breakfast"
+                        ? "Colazione"
+                        : tour.meal_plan === "half-board"
+                        ? "Mezza Pensione (Colazione & Cena)"
+                        : tour.meal_plan === "full-board"
+                        ? "Pensione Completa (Tutti i Pasti)"
+                        : "N/A"}
                     </span>
                   </p>
+                  <div className="flex items-center  space-x-2">
+                                <p className="text-md text-gray-600 flex items-center gap-2">
+                                  <IoBed className="w-6 h-5 text-black" />
+                                  <span>
+                                    <span className="font-medium">
+                                      {t("type_of_accommodation")}:
+                                    </span>{" "}
+                                    {tour.type_of_accommodation === "hotel"
+                                      ? "Hotel"
+                                      : tour.type_of_accommodation === "resort"
+                                      ? "Resort"
+                                      : tour.type_of_accommodation === "homestay"
+                                      ? "B&B"
+                                      : tour.type_of_accommodation === "apartment"
+                                      ? "Appartamento"
+                                      : tour.type_of_accommodation === "hostel"
+                                      ? "Ostello"
+                                      : "N/A"}
+                                  </span>
+                                </p>
+                                <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
+                                  
+                                  <span>{tour.minimum_star_hotel|| t("0")}</span><FaStar className="w-4 h-4 text-black" />
+                                </p>
+                              </div>
+                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
+                    <FaStar className="w-6 h-5 text-black" />
+                    <span>
+                      <span className="font-medium">
+                        {t("minimum_rating")}:
+                      </span>{" "}
+                      {tour.minimum_star_hotel || "N/A"}
+                    </span>
+                  </p> */}
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaClock className="w-6 h-5 text-black" />
                     <span>
@@ -285,7 +297,9 @@ function AcceptedOffers() {
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <ShieldCheck className="w-6 h-5 text-green-500" />
                     <span>
-                      <span className="font-medium">{t("contact_verified")}</span>
+                      <span className="font-medium">
+                        {t("contact_verified")}
+                      </span>
                     </span>
                   </p>
                 </div>

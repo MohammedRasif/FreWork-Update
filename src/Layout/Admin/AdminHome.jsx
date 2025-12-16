@@ -334,7 +334,7 @@ const AdminHome = () => {
                         <FaStar className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">
-                            {/* {t("minimum_rating")}: */}
+                            {t("minimum_rating")}:
                             </span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
@@ -384,21 +384,21 @@ const AdminHome = () => {
                         <Baby className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("child")}:</span>{" "}
-                          {selectedPlan.child_count || t("na")}
+                          {selectedPlan.child_count }
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <User className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("adult")}:</span>{" "}
-                          {selectedPlan.adult_count || t("na")}
+                          {selectedPlan.adult_count }
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("duration")}:</span>{" "}
-                          {selectedPlan.duration || t("na")}
+                          {selectedPlan.duration }
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">

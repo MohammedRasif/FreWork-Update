@@ -5,7 +5,6 @@ import { useShowUserInpormationQuery } from "@/redux/features/withAuth";
 import img from "../../assets/img/1000062305-removebg-preview.png";
 import LanguageToggleButton from "./LanguageToggleButton";
 import { useTranslation } from "react-i18next";
-
 const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
@@ -25,7 +24,6 @@ const Navbar = () => {
 
   const isAuthenticated = !!localStorage.getItem("access_token");
 
-  // এই ম্যাপ দিয়ে active link চেক করি
   const routeMap = {
     "/": "home",
     "/blog": "blog",
@@ -33,7 +31,7 @@ const Navbar = () => {
     "/tourPlans": "tours",
     "/acceptedOffers": "acceptedOffers",
     "/contact": "contact",
-    "/who_it_work": "howitworks", // নতুন রুট যোগ করলাম
+    "/who_it_work": "howitworks", 
     "/user/editProfile": "profile",
     "/user/profile": "profile",
   };

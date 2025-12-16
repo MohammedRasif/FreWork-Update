@@ -66,20 +66,23 @@ function AdminOfferPlan() {
   };
 
   const handleConfirmFinalOffer = async () => {
-    if (!selectedOfferId) return;
-    setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: true }));
-    try {
-      await finalOfferSent(selectedOfferId).unwrap();
-      toast.success(t("final_offer_sent_success"));
-      setIsPopupOpen(false);
-      setSelectedOfferId(null);
-    } catch (error) {
-      console.error("Failed to send final offer:", error);
-      toast.error(t("failed_to_send_final_offer"));
-    } finally {
-      setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: false }));
-    }
-  };
+  if (!selectedOfferId) return;
+
+  try {
+    setIsConfirming(prev => ({ ...prev, [selectedOfferId]: true }));
+    
+    await finalOfferSent(selectedOfferId).unwrap();
+    
+    toast.success(t("final_offer_sent_success"));
+
+  } catch (error) {
+    toast.error(t("failed_to_send_final_offer"));
+  } finally {
+    setIsConfirming(prev => ({ ...prev, [selectedOfferId]: false }));
+    setIsPopupOpen(false);
+    setSelectedOfferId(null);
+  }
+};
 
   const handleCancel = () => {
     setIsPopupOpen(false);

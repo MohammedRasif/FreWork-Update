@@ -16,17 +16,17 @@ export default function ChatInterface() {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [chatsList, setChatsList] = useState([]);
-  
+
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("activeChatTab") || "inbox";
   });
-  
+
   const {
     data: chatList,
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
-
+  
   useEffect(() => {
     localStorage.setItem("activeChatTab", activeTab);
   }, [activeTab]);
@@ -115,6 +115,7 @@ export default function ChatInterface() {
       ? "/admin/chat"
       : "/user/chat";
     navigate(`${basePath}/${agency.id}`, { state: { agency } });
+     window.location.href = `${basePath}/${agency.id}`;
   };
 
   const isBaseRoute =
@@ -224,7 +225,7 @@ export default function ChatInterface() {
         </div>
         {!isBaseRoute && (
           <div className="fixed inset-0 bg-gray-900 z-50">
-            <Outlet />
+            <Outlet  key={selectedAgencyId}/>
           </div>
         )}
       </div>
@@ -342,7 +343,7 @@ export default function ChatInterface() {
               </div>
             </div>
           ) : (
-            <Outlet />
+            <Outlet  key={selectedAgencyId}/>
           )}
         </div>
       </div>

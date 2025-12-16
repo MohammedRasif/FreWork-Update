@@ -284,26 +284,31 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 </span>
                           </p>
 
-                          <p className="text-md text-gray-600 flex items-center gap-2">
-                            <IoBed className="w-6 h-5 text-gray-900" />
-                           <span>
-  <span className="font-medium">
-    {t("type_of_accommodation")}:
-  </span>{" "}
-  {plan.type_of_accommodation === "hotel"
-    ? "Hotel"
-    : plan.type_of_accommodation === "resort"
-    ? "Resort"
-    : plan.type_of_accommodation === "homestay"
-    ? "B&B"
-    : plan.type_of_accommodation === "apartment"
-    ? "Appartamento"
-    : plan.type_of_accommodation === "hostel"
-    ? "Ostello"
-    : "N/A"}
-</span>
-
-                          </p>
+                         <div className="flex items-center space-x-2">
+              <p className="text-md text-gray-600 flex items-center gap-2">
+                <IoBed className="w-6 h-5 text-black" />
+                <span>
+                  <span className="font-medium">
+                    {t("type_of_accommodation")}:
+                  </span>{" "}
+                  {plan.type_of_accommodation === "hotel"
+                    ? "Hotel"
+                    : plan.type_of_accommodation === "resort"
+                    ? "Resort"
+                    : plan.type_of_accommodation === "homestay"
+                    ? "B&B"
+                    : plan.type_of_accommodation === "apartment"
+                    ? "Appartamento"
+                    : plan.type_of_accommodation === "hostel"
+                    ? "Ostello"
+                    : "N/A"}
+                </span>
+              </p>
+              <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
+                
+                <span>{plan.minimum_star_hotel|| t("na")}</span><FaStar className="w-4 h-4 text-black" />
+              </p>
+            </div>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-gray-900" />

@@ -49,11 +49,7 @@ const AdminPricing = () => {
     name: t("free_user"),
     limit: "5",
     limitUnit: t("query_per_day"),
-    features: [
-      t("includes_general_databases"),
-      t("limited_free_queries"),
-      t("no_access_to_specific_db"),
-    ],
+    features: [t("free_feature_1"), t("free_feature_2"), t("free_feature_3")],
   };
 
   const handleSelectPlan = async (planName) => {
@@ -142,7 +138,7 @@ const AdminPricing = () => {
                 <div className="mb-[58px]">
                   <div className="flex items-end">
                     <span className="text-4xl font-bold text-slate-700">
-                      0{t("per_month")}
+                      €0{t("per_month")}
                     </span>
                   </div>
                   <p className="text-slate-500 text-base mt-1">
