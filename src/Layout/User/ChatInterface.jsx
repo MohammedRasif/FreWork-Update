@@ -225,7 +225,7 @@ export default function ChatInterface() {
         </div>
         {!isBaseRoute && (
           <div className="fixed inset-0 bg-gray-900 z-50">
-            <Outlet  key={selectedAgencyId}/>
+            <Outlet  />
           </div>
         )}
       </div>
@@ -343,7 +343,7 @@ export default function ChatInterface() {
               </div>
             </div>
           ) : (
-            <Outlet  key={selectedAgencyId}/>
+            <Outlet  />
           )}
         </div>
       </div>
