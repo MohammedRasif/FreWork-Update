@@ -156,9 +156,16 @@ function AdminOfferPlan() {
                             <span className="font-medium">{formattedDate}</span>
                           </p>
                           <p>
-                            {t("include")}:{" "}
-                            <span className="font-medium">{duration}</span>
-                          </p>
+  <span>
+    <span className="font-medium">{t("duration")}:</span>{" "}
+    {duration
+      ? `${parseInt(duration)} ${
+          parseInt(duration) === 1 ? t("day") : t("days")
+        }`
+      : "N/A"}
+  </span>
+</p>
+
                           {/* <p>
                             {t("category")}:{" "}
                             <span className="font-medium">{tourPlan.category}</span>

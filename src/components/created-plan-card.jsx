@@ -258,16 +258,6 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                           </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaStar className="w-6 h-5 text-gray-900" />
-                            <span>
-                              <span className="font-medium">
-                                {t("minimum_rating")}:
-                              </span>{" "}
-                              {plan.minimum_star_hotel || t("na")}
-                            </span>
-                          </p>
-
-                          <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                             <span>
                               <span className="font-medium">
@@ -304,20 +294,25 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                               </span>
                             </p>
                             <p className="text-md text-gray-600 flex items-center gap-2">
-  {plan.minimum_star_hotel
-    ? "⭐".repeat(Number(plan.minimum_star_hotel))
-    : t("na")}
-</p>
-
+                              {plan.minimum_star_hotel
+                                ? "⭐".repeat(Number(plan.minimum_star_hotel))
+                                : t("na")}
+                            </p>
                           </div>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaClock className="w-6 h-5 text-gray-900" />
+                            <FaClock className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
                                 {t("duration")}:
                               </span>{" "}
-                              {plan.duration || t("na")}
+                              {plan.duration
+                                ? `${plan.duration} ${
+                                    Number(plan.duration) === 1
+                                      ? t("day")
+                                      : t("days")
+                                  }`
+                                : "N/A"}
                             </span>
                           </p>
 

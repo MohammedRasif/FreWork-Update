@@ -68,24 +68,30 @@ function AdminDecline() {
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                       <span>
-                        <span className="font-medium">{t("points_of_travel")}:</span>{" "}
+                        <span className="font-medium">
+                          {t("points_of_travel")}:
+                        </span>{" "}
                         {plan.tour_plan.tourist_spots || t("none")}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaLocationArrow className="w-6 h-5 text-gray-900" />
                       <span>
-                        <span className="font-medium">{t("departure_from")}:</span>{" "}
+                        <span className="font-medium">
+                          {t("departure_from")}:
+                        </span>{" "}
                         {plan.tour_plan.location_from || t("na")}
                       </span>
                     </p>
-                    <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                    {/* <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaList className="w-6 h-5 text-gray-900" />
                       <span>
-                        <span className="font-medium">{t("minimum_rating")}:</span>{" "}
+                        <span className="font-medium">
+                          {t("minimum_rating")}:
+                        </span>{" "}
                         {plan.tour_plan.minimum_star_hotel || t("na")}
                       </span>
-                    </p>
+                    </p> */}
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                       {/* <span>
@@ -93,47 +99,54 @@ function AdminDecline() {
                         {plan.tour_plan.meal_plan || t("na")}
                       </span> */}
                       <span>
-  <span className="font-medium">{t("meal_plan")}:</span>{" "}
-  {plan.tour_plan.meal_plan === "breakfast"
-    ? "Colazione"
-    : plan.tour_plan.meal_plan === "half-board"
-    ? "Mezza Pensione (Colazione & Cena)"
-    : plan.tour_plan.meal_plan === "full-board"
-    ? "Pensione Completa (Tutti i Pasti)"
-    : "N/A"}
-</span>
-                    </p>
-                    <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <IoBed className="w-6 h-5 text-gray-900" />
-                      <span>
-                        <span className="font-medium">{t("type_of_accommodation")}:</span>{" "}
-                        {plan.tour_plan.type_of_accommodation || t("na")}
+                        <span className="font-medium">{t("meal_plan")}:</span>{" "}
+                        {plan.tour_plan.meal_plan === "breakfast"
+                          ? "Colazione"
+                          : plan.tour_plan.meal_plan === "half-board"
+                          ? "Mezza Pensione (Colazione & Cena)"
+                          : plan.tour_plan.meal_plan === "full-board"
+                          ? "Pensione Completa (Tutti i Pasti)"
+                          : "N/A"}
                       </span>
-                      <span>
-  <span className="font-medium">
-    {t("type_of_accommodation")}:
-  </span>{" "}
-  {plan.tour_plan.type_of_accommodation === "hotel"
-    ? "Hotel"
-    : plan.tour_plan.type_of_accommodation === "resort"
-    ? "Resort"
-    : plan.tour_plan.type_of_accommodation === "homestay"
-    ? "Famiglia"
-    : plan.tour_plan.type_of_accommodation === "apartment"
-    ? "Appartamento"
-    : plan.tour_plan.type_of_accommodation === "hostel"
-    ? "Ostello"
-    : "N/A"}
-</span>
-
                     </p>
-                    <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                    <div className="flex gap-2 pb-2">
+                      <p className="text-md text-gray-600 flex items-center gap-2">
+                        <IoBed className="w-6 h-5 text-gray-900" />
+
+                        <span>
+                          <span className="font-medium">
+                            {t("type_of_accommodation")}:
+                          </span>{" "}
+                          {plan.tour_plan.type_of_accommodation === "hotel"
+                            ? "Hotel"
+                            : plan.tour_plan.type_of_accommodation === "resort"
+                            ? "Resort"
+                            : plan.tour_plan.type_of_accommodation ===
+                              "homestay"
+                            ? "Famiglia"
+                            : plan.tour_plan.type_of_accommodation ===
+                              "apartment"
+                            ? "Appartamento"
+                            : plan.tour_plan.type_of_accommodation === "hostel"
+                            ? "Ostello"
+                            : "N/A"}
+                        </span>
+                      </p>
+                      <p className="text-md text-gray-600 flex items-center gap-2">
+                        {plan.tour_plan.minimum_star_hotel
+                          ? "⭐".repeat(
+                              Number(plan.tour_plan.minimum_star_hotel)
+                            )
+                          : t("na")}
+                      </p>
+                    </div>
+                    {/* <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaClock className="w-6 h-5 text-gray-900" />
                       <span>
                         <span className="font-medium">{t("duration")}:</span>{" "}
                         {plan.tour_plan.duration || t("na")}
                       </span>
-                    </p>
+                    </p> */}
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <MdVerifiedUser className="w-7 h-6 text-green-500" />
                       <span>
@@ -151,11 +164,10 @@ function AdminDecline() {
                     {t("budget")} <FaEuroSign /> {plan.tour_plan.budget}
                   </p>
                   <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                    {t("total")}{" "}
-                            {plan.tour_plan.total_members}{" "}
-                            {plan.tour_plan.total_members === 1
-                              ? t("person")
-                              : t("persons")}
+                    {t("total")} {plan.tour_plan.total_members}{" "}
+                    {plan.tour_plan.total_members === 1
+                      ? t("person")
+                      : t("persons")}
                   </p>
                 </div>
               </div>

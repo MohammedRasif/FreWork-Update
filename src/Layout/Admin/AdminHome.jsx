@@ -258,10 +258,10 @@ const AdminHome = () => {
                         {plan.start_date} — {plan.end_date || plan.start_date}
                       </span>
                     </p>
-                    <p>
+                    {/* <p>
                       {t("total_members")}:{" "}
                       <span className="font-medium">{plan.total_members}</span>
-                    </p>
+                    </p> */}
 
                     <p>
                       <span className="">{t("category")}:</span>{" "}

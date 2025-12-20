@@ -212,12 +212,7 @@ const UserAccepte = () => {
                               : t("persons")}
                           </span>
                         </div>
-                        <p className="text-gray-600 mb-2 sm:mb-4">
-                          {t("category")}:{" "}
-                          <span className="font-medium">
-                            {offer.tour_plan.category}
-                          </span>
-                        </p>
+                       
                         <div className="flex items-center gap-2 mb-2 sm:mb-4">
                           <FiMapPin className="text-gray-600" />
                           <span className="font-medium">

@@ -28,6 +28,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { FaClock } from "react-icons/fa6";
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -334,10 +335,19 @@ function PublishedPlan() {
                               )}
                             </span>
                           </p>
-                          <p>
-                            {t("duration")}:{" "}
-                            <span className="font-medium">
-                              {plan.duration} {t("days")}
+                          <p className="text-md text-gray-600 flex items-center gap-2">
+                            <FaClock className="w-6 h-5 text-black" />
+                            <span>
+                              <span className="font-medium">
+                                {t("duration")}:
+                              </span>{" "}
+                              {plan.duration
+                                ? `${plan.duration} ${
+                                    Number(plan.duration) === 1
+                                      ? t("day")
+                                      : t("days")
+                                  }`
+                                : "N/A"}
                             </span>
                           </p>
                           
