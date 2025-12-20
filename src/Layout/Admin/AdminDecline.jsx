@@ -151,7 +151,11 @@ function AdminDecline() {
                     {t("budget")} <FaEuroSign /> {plan.tour_plan.budget}
                   </p>
                   <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                    {t("total_persons", { count: plan.tour_plan.total_members })}
+                    {t("total")}{" "}
+                            {plan.tour_plan.total_members}{" "}
+                            {plan.tour_plan.total_members === 1
+                              ? t("person")
+                              : t("persons")}
                   </p>
                 </div>
               </div>

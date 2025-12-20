@@ -66,23 +66,22 @@ function AdminOfferPlan() {
   };
 
   const handleConfirmFinalOffer = async () => {
-  if (!selectedOfferId) return;
+    if (!selectedOfferId) return;
 
-  try {
-    setIsConfirming(prev => ({ ...prev, [selectedOfferId]: true }));
-    
-    await finalOfferSent(selectedOfferId).unwrap();
-    
-    toast.success(t("final_offer_sent_success"));
+    try {
+      setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: true }));
 
-  } catch (error) {
-    toast.error(t("failed_to_send_final_offer"));
-  } finally {
-    setIsConfirming(prev => ({ ...prev, [selectedOfferId]: false }));
-    setIsPopupOpen(false);
-    setSelectedOfferId(null);
-  }
-};
+      await finalOfferSent(selectedOfferId).unwrap();
+
+      toast.success(t("final_offer_sent_success"));
+    } catch (error) {
+      toast.error(t("failed_to_send_final_offer"));
+    } finally {
+      setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: false }));
+      setIsPopupOpen(false);
+      setSelectedOfferId(null);
+    }
+  };
 
   const handleCancel = () => {
     setIsPopupOpen(false);
@@ -172,9 +171,11 @@ function AdminOfferPlan() {
                             {t("budget")} €{tourPlan.budget}
                           </p>
                           <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                            {t("total_persons", { count: tourPlan.total_members })}
+                            {t("total")} {tourPlan.total_members}{" "}
+                            {tourPlan.total_members === 1
+                              ? t("person")
+                              : t("persons")}
                           </p>
-                          
                         </div>
                       </div>
                     </div>
@@ -223,7 +224,10 @@ function AdminOfferPlan() {
                               </span>
                               {offer.agency.is_verified && (
                                 <span className="text-blue-500">
-                                  <MdVerified size={16} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                                  <MdVerified
+                                    size={16}
+                                    className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
+                                  />
                                 </span>
                               )}
                             </div>
@@ -256,7 +260,9 @@ function AdminOfferPlan() {
                                   : "bg-yellow-500 hover:bg-yellow-600"
                               }`}
                             >
-                              {isDeleting[offer.id] ? t("deleting") : t("no_agreement")}
+                              {isDeleting[offer.id]
+                                ? t("deleting")
+                                : t("no_agreement")}
                             </button>
                           </div>
                         </div>

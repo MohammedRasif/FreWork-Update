@@ -84,10 +84,13 @@ const AdminHome = () => {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesFilter =
-      filter === "All" || (filter === "Offered" && plan.offered_status === true);
+      filter === "All" ||
+      (filter === "Offered" && plan.offered_status === true);
     const hasUserOffered =
       Array.isArray(plan.offers) &&
-      plan.offers.some((offer) => offer.agency?.contact_email === currentUserEmail);
+      plan.offers.some(
+        (offer) => offer.agency?.contact_email === currentUserEmail
+      );
     const isOwnPlan = plan.user === currentUserEmail;
     return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan;
   });
@@ -114,7 +117,10 @@ const AdminHome = () => {
       toast.error(t("provide_budget_and_comment"));
       return;
     }
-    if (offerForm.applyDiscount && (!offerForm.discount || offerForm.discount <= 0)) {
+    if (
+      offerForm.applyDiscount &&
+      (!offerForm.discount || offerForm.discount <= 0)
+    ) {
       toast.error(t("provide_valid_discount"));
       return;
     }
@@ -138,7 +144,9 @@ const AdminHome = () => {
         offered_budget: Number.parseFloat(budget),
         message: comment,
         apply_discount: offerForm.applyDiscount,
-        discount: offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
+        discount: offerForm.applyDiscount
+          ? Number.parseFloat(offerForm.discount)
+          : 0,
         file_name: selectedFile ? selectedFile.name : null,
         agency: {
           agency_name: localStorage.getItem("name") || t("unknown_agency"),
@@ -150,11 +158,15 @@ const AdminHome = () => {
       };
 
       if (selectedPlan && selectedPlan.id === planId) {
-        setSelectedPlan((prev) => prev ? {
-          ...prev,
-          offers: [...(prev.offers || []), newOffer],
-          offer_count: (prev.offer_count || 0) + 1,
-        } : prev);
+        setSelectedPlan((prev) =>
+          prev
+            ? {
+                ...prev,
+                offers: [...(prev.offers || []), newOffer],
+                offer_count: (prev.offer_count || 0) + 1,
+              }
+            : prev
+        );
       }
 
       setOfferBudget(0);
@@ -205,17 +217,31 @@ const AdminHome = () => {
     switch (activeTab) {
       case t("all_plans_tab"):
         if (isTourPlanPublicLoading) {
-          return <div className="text-center text-gray-600">{t("loading_plans")}</div>;
+          return (
+            <div className="text-center text-gray-600">
+              {t("loading_plans")}
+            </div>
+          );
         }
         if (!filteredPlans.length) {
-          return <div className="text-center text-gray-600">{t("no_plans_found")}</div>;
+          return (
+            <div className="text-center text-gray-600">
+              {t("no_plans_found")}
+            </div>
+          );
         }
         return filteredPlans.map((plan) => (
-          <div key={plan.id} className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto">
+          <div
+            key={plan.id}
+            className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
+          >
             <div className="flex flex-col lg:flex-row">
               <div className="lg:flex relative">
                 <img
-                  src={plan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"}
+                  src={
+                    plan.spot_picture_url ||
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                  }
                   alt={t("tourist_spot")}
                   className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
                 />
@@ -236,31 +262,32 @@ const AdminHome = () => {
                       {t("total_members")}:{" "}
                       <span className="font-medium">{plan.total_members}</span>
                     </p>
-                    
+
                     <p>
-            <span className="">{t("category")}:</span>{" "}
-            <span className="font-medium">
-              {plan.destination_type === "beach"
-              ? "Mare"
-              : plan.destination_type === "mountain"
-              ? "Montagna"
-              : plan.destination_type === "relax"
-              ? "Relax"
-              : plan.destination_type === "group"
-              ? "Gruppi"
-              : t("na")}
-            </span>
-          </p>
+                      <span className="">{t("category")}:</span>{" "}
+                      <span className="font-medium">
+                        {plan.destination_type === "beach"
+                          ? "Mare"
+                          : plan.destination_type === "mountain"
+                          ? "Montagna"
+                          : plan.destination_type === "relax"
+                          ? "Relax"
+                          : plan.destination_type === "group"
+                          ? "Gruppi"
+                          : t("na")}
+                      </span>
+                    </p>
                   </div>
                 </div>
                 <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
-                  <div className="lg:flex lg:items-start lg:justify-between lg:flex-col lg:items-end lg:space-x-0">
+                  <div className="lg:flex lg:items-end lg:justify-between lg:flex-col lg:space-x-0">
                     <div className="text-center lg:text-right">
                       <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
                         {t("budget")} <FaEuroSign /> {plan.budget}
                       </p>
                       <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                        {t("total_persons", { count: plan.total_members })}
+                        {t("total")} {plan.total_members}{" "}
+                        {plan.total_members === 1 ? t("person") : t("persons")}
                       </p>
                     </div>
                     <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
@@ -280,10 +307,14 @@ const AdminHome = () => {
                         onClick={() => handleDeclineRequest(plan.id)}
                         disabled={isDeclineRequestLoading}
                         className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                          isDeclineRequestLoading ? "opacity-50 cursor-not-allowed" : ""
+                          isDeclineRequestLoading
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
                         }`}
                       >
-                        {isDeclineRequestLoading ? t("declining") : t("decline_request")}
+                        {isDeclineRequestLoading
+                          ? t("declining")
+                          : t("decline_request")}
                       </button>
                     </div>
                   </div>
@@ -319,14 +350,18 @@ const AdminHome = () => {
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                         <span>
-                          <span className="font-bold">{t("points_of_travel")}:</span>{" "}
+                          <span className="font-bold">
+                            {t("points_of_travel")}:
+                          </span>{" "}
                           {selectedPlan.tourist_spots || t("none")}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-900" />
                         <span>
-                          <span className="font-bold">{t("departure_from")}:</span>{" "}
+                          <span className="font-bold">
+                            {t("departure_from")}:
+                          </span>{" "}
                           {selectedPlan.location_from || t("na")}
                         </span>
                       </p>
@@ -335,7 +370,7 @@ const AdminHome = () => {
                         <span>
                           <span className="font-bold">
                             {t("minimum_rating")}:
-                            </span>{" "}
+                          </span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
                       </p>
@@ -346,65 +381,68 @@ const AdminHome = () => {
                           {selectedPlan.meal_plan || t("na")}
                         </span> */}
                         <span>
-  <span className="font-bold">{t("meal_plan")}:</span>{" "}
-  {selectedPlan.meal_plan === "breakfast"
-    ? "Colazione"
-    : selectedPlan.meal_plan === "half-board"
-    ? "Mezza Pensione (Colazione & Cena)"
-    : selectedPlan.meal_plan === "full-board"
-    ? "Pensione Completa (Tutti i Pasti)"
-    : "N/A"}
-</span>
+                          <span className="font-bold">{t("meal_plan")}:</span>{" "}
+                          {selectedPlan.meal_plan === "breakfast"
+                            ? "Colazione"
+                            : selectedPlan.meal_plan === "half-board"
+                            ? "Mezza Pensione (Colazione & Cena)"
+                            : selectedPlan.meal_plan === "full-board"
+                            ? "Pensione Completa (Tutti i Pasti)"
+                            : "N/A"}
+                        </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-900" />
                         <span>
-                          <span className="font-bold">{t("type_of_accommodation")}:</span>{" "}
+                          <span className="font-bold">
+                            {t("type_of_accommodation")}:
+                          </span>{" "}
                           {selectedPlan.type_of_accommodation || t("na")}
                         </span>
                         <span>
-  <span className="font-medium">
-    {t("type_of_accommodation")}:
-  </span>{" "}
-  {selectedPlan.type_of_accommodation === "hotel"
-    ? "Hotel"
-    : selectedPlan.type_of_accommodation === "resort"
-    ? "Resort"
-    : selectedPlan.type_of_accommodation === "homestay"
-    ? "B&B"
-    : selectedPlan.type_of_accommodation === "apartment"
-    ? "Appartamento"
-    : selectedPlan.type_of_accommodation === "hostel"
-    ? "Ostello"
-    : "N/A"}
-</span>
-
+                          <span className="font-medium">
+                            {t("type_of_accommodation")}:
+                          </span>{" "}
+                          {selectedPlan.type_of_accommodation === "hotel"
+                            ? "Hotel"
+                            : selectedPlan.type_of_accommodation === "resort"
+                            ? "Resort"
+                            : selectedPlan.type_of_accommodation === "homestay"
+                            ? "B&B"
+                            : selectedPlan.type_of_accommodation === "apartment"
+                            ? "Appartamento"
+                            : selectedPlan.type_of_accommodation === "hostel"
+                            ? "Ostello"
+                            : "N/A"}
+                        </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <Baby className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("child")}:</span>{" "}
-                          {selectedPlan.child_count }
+                          {selectedPlan.child_count}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <User className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("adult")}:</span>{" "}
-                          {selectedPlan.adult_count }
+                          {selectedPlan.adult_count}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("duration")}:</span>{" "}
-                          {selectedPlan.duration }
+                          {selectedPlan.duration}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
-                          <span className="font-medium">{t("contact_verified")}</span>
+                          <span className="font-medium">
+                            {t("contact_verified")}
+                          </span>
                         </span>
                       </p>
                     </div>
@@ -416,7 +454,13 @@ const AdminHome = () => {
                       {t("budget")} <FaEuroSign /> {selectedPlan.budget}
                     </p>
                     <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                      {t("total_persons", { count: selectedPlan.total_members })}
+                      {/* {t("total_persons", {
+                        count: selectedPlan.total_members,
+                      })} */}
+                      {t("total")} {selectedPlan.total_members}{" "}
+                      {selectedPlan.total_members === 1
+                        ? t("person")
+                        : t("persons")}
                     </p>
                   </div>
                 </div>
@@ -432,15 +476,19 @@ const AdminHome = () => {
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {selectedPlan.tourist_spots ? (
-                    selectedPlan.tourist_spots.split(",").map((location, index) => (
-                      <span
-                        key={index}
-                        className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-                      >
-                        {location.trim()}
-                        {index < selectedPlan.tourist_spots.split(",").length - 1 && ", "}
-                      </span>
-                    ))
+                    selectedPlan.tourist_spots
+                      .split(",")
+                      .map((location, index) => (
+                        <span
+                          key={index}
+                          className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {location.trim()}
+                          {index <
+                            selectedPlan.tourist_spots.split(",").length - 1 &&
+                            ", "}
+                        </span>
+                      ))
                   ) : (
                     <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
                       {t("none")}
@@ -450,7 +498,10 @@ const AdminHome = () => {
               </div>
               <div className="mb-4 relative">
                 <img
-                  src={selectedPlan.spot_picture_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"}
+                  src={
+                    selectedPlan.spot_picture_url ||
+                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                  }
                   alt={t("tour_destination")}
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                 />
@@ -514,7 +565,10 @@ const AdminHome = () => {
                 </p>
               </div>
               <div className="mt-4 mb-2">
-                <label htmlFor="discount" className="block lg:text-md font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="discount"
+                  className="block lg:text-md font-medium text-gray-700 mb-1"
+                >
                   {t("discount")}
                 </label>
                 <input
@@ -528,16 +582,22 @@ const AdminHome = () => {
                 />
               </div>
               <button
-                onClick={() => handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)}
+                onClick={() =>
+                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
+                }
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
-                disabled={isOfferSubmitting || !offerBudget || !offerComment.trim()}
+                disabled={
+                  isOfferSubmitting || !offerBudget || !offerComment.trim()
+                }
               >
                 <IoIosSend size={24} />
-                <span>{isOfferSubmitting ? t("submitting") : t("submit_offer")}</span>
+                <span>
+                  {isOfferSubmitting ? t("submitting") : t("submit_offer")}
+                </span>
               </button>
             </div>
           </div>
@@ -547,7 +607,10 @@ const AdminHome = () => {
                 {t("offers")}
               </h3>
               {selectedPlan.offers.map((offer) => (
-                <div key={offer.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3">
+                <div
+                  key={offer.id}
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
+                >
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
                     <img
                       src={offer.agency.logo_url || "/placeholder.svg"}
@@ -583,7 +646,8 @@ const AdminHome = () => {
         <div className="w-full lg:w-4/5">
           <div className="mb-24 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              {t("welcome")}, <span className="font-semibold">{t("choose_perfect_offer")}</span>
+              {t("welcome")},{" "}
+              <span className="font-semibold">{t("choose_perfect_offer")}</span>
             </h1>
             {activeTab === t("all_plans_tab") && (
               <div className="flex items-center space-x-4">
@@ -602,7 +666,12 @@ const AdminHome = () => {
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </div>
                 <select
@@ -630,7 +699,7 @@ const AdminHome = () => {
                   t("all_plans_tab"),
                   t("offered_plans_tab"),
                   t("accepted_plans_tab"),
-                   t("decline_plans_tab"),
+                  t("decline_plans_tab"),
                 ].map((tab) => (
                   <button
                     key={tab}
@@ -647,19 +716,19 @@ const AdminHome = () => {
               </div>
               <div className="pt-4 lg:pt-6 hidden md:block">
                 <div className="flex flex-col gap-1 mt-6">
-              <p className="text-sm text-gray-900 font-semibold mb-2">
-                {t("need_fast_response")}
-              </p>
-             <NavLink to="/contact">
-               <Button
-                variant="link"
-                size="sm"
-                className="p-0 underline text-left w-min text-xs"
-              >
-                {t("click_here")}
-              </Button>
-             </NavLink>
-            </div>
+                  <p className="text-sm text-gray-900 font-semibold mb-2">
+                    {t("need_fast_response")}
+                  </p>
+                  <NavLink to="/contact">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="p-0 underline text-left w-min text-xs"
+                    >
+                      {t("click_here")}
+                    </Button>
+                  </NavLink>
+                </div>
               </div>
             </div>
 
@@ -691,12 +760,18 @@ const AdminHome = () => {
 
       {isPopupOpen && selectedPlan && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div ref={popupRef} className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            ref={popupRef}
+            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">
                 {modalType === "view" ? t("tour_details") : t("send_offer")}
               </h2>
-              <button onClick={closePopup} className="text-gray-500 hover:text-gray-700 transition-colors">
+              <button
+                onClick={closePopup}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
                 <X size={24} />
               </button>
             </div>
