@@ -678,7 +678,13 @@ const TourPlanDouble = () => {
                               <span className="font-medium">
                                 {t("duration")}:
                               </span>{" "}
-                              {tour.duration || "N/A"}
+                              {tour.duration
+                                ? `${tour.duration} ${
+                                    Number(tour.duration) === 1
+                                      ? t("day")
+                                      : t("days")
+                                  }`
+                                : "N/A"}
                             </span>
                           </p>
                           <p className="text-md text-gray-600 flex items-center gap-2">

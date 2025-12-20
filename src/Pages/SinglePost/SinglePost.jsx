@@ -436,7 +436,7 @@ function SinglePost({ prid }) {
               <FaLocationDot className="w-6 h-5 text-black size-4" />
               <span>
                 <span className="font-medium">{t("points_of_travel")}:</span>{" "}
-                {tour.tour_spots || t("none")}
+                {tour.tourist_spots || t("none")}
               </span>
             </p>
 
@@ -483,11 +483,10 @@ function SinglePost({ prid }) {
                 </span>
               </p>
               <p className="text-md text-gray-600 flex items-center gap-2">
-  {tour.minimum_star_hotel
-    ? "⭐".repeat(Number(tour.minimum_star_hotel))
-    : t("na")}
-</p>
-
+                {tour.minimum_star_hotel
+                  ? "⭐".repeat(Number(tour.minimum_star_hotel))
+                  : t("na")}
+              </p>
             </div>
 
             {/* <p className="text-md text-gray-600 flex items-center gap-2">
@@ -499,7 +498,11 @@ function SinglePost({ prid }) {
               <FaClock className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">{t("duration")}:</span>{" "}
-                {tour.duration || t("na")}
+                {tour.duration
+                  ? `${tour.duration} ${
+                      Number(tour.duration) === 1 ? t("day") : t("days")
+                    }`
+                  : "N/A"}
               </span>
             </p>
 

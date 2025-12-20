@@ -259,7 +259,8 @@
 "confirm_new_password": "Conferma nuova password",
 "enter_password": "Inserisci password",
 "contact_verified_via_email": "Contatto verificato via email",
-
+"Day": "giorno",
+"Days": "giorni",
 "confirm": "Conferma",
 "loading_declined_plans": "Caricamento piani rifiutati in corso...",
 "no_declined_plans": "Nessun piano rifiutato ancora.",

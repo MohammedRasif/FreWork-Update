@@ -266,6 +266,9 @@
 "total_persons_plural": "Total {{count}} persons",
 "interested_travel_points": "Interested Travel Points",
 "na": "",
+"Day": "Day",
+"Days": "Days",
+
 "tour_destination": "Tour destination",
 "image_generated_automatically": "Image generated automatically",
 "restoring": "Restoring...",

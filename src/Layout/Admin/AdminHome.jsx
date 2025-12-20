@@ -376,7 +376,7 @@ const AdminHome = () => {
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                        
+
                         <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan === "breakfast"
@@ -409,7 +409,9 @@ const AdminHome = () => {
                         </span>
                         <p className="text-md text-gray-600 flex items-center gap-2">
                           {selectedPlan.minimum_star_hotel
-                            ? "⭐".repeat(Number(selectedPlan.minimum_star_hotel))
+                            ? "⭐".repeat(
+                                Number(selectedPlan.minimum_star_hotel)
+                              )
                             : t("na")}
                         </p>
                       </p>
@@ -429,9 +431,16 @@ const AdminHome = () => {
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-900" />
+
                         <span>
-                          <span className="font-bold">{t("duration")}:</span>{" "}
-                          {selectedPlan.duration}
+                          <span className="font-medium">{t("duration")}:</span>{" "}
+                          {selectedPlan.duration
+                            ? `${selectedPlan.duration} ${
+                                Number(selectedPlan.duration) === 1
+                                  ? t("day")
+                                  : t("days")
+                              }`
+                            : "N/A"}
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
