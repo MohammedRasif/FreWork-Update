@@ -376,10 +376,7 @@ const AdminHome = () => {
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                        {/* <span>
-                          <span className="font-bold">{t("meal_plan")}:</span>{" "}
-                          {selectedPlan.meal_plan || t("na")}
-                        </span> */}
+                        
                         <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan === "breakfast"
