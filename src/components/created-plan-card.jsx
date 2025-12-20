@@ -295,7 +295,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                   : plan.type_of_accommodation === "resort"
                                   ? "Resort"
                                   : plan.type_of_accommodation === "homestay"
-                                  ? "B&B"
+                                  ? "Famiglia"
                                   : plan.type_of_accommodation === "apartment"
                                   ? "Appartamento"
                                   : plan.type_of_accommodation === "hostel"
@@ -303,10 +303,12 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                   : "N/A"}
                               </span>
                             </p>
-                            <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
-                              <span>{plan.minimum_star_hotel || t("na")}</span>
-                              <FaStar className="w-4 h-4 text-black" />
-                            </p>
+                            <p className="text-md text-gray-600 flex items-center gap-2">
+  {plan.minimum_star_hotel
+    ? "⭐".repeat(Number(plan.minimum_star_hotel))
+    : t("na")}
+</p>
+
                           </div>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">

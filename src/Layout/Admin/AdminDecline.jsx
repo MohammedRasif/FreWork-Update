@@ -118,7 +118,7 @@ function AdminDecline() {
     : plan.tour_plan.type_of_accommodation === "resort"
     ? "Resort"
     : plan.tour_plan.type_of_accommodation === "homestay"
-    ? "B&B"
+    ? "Famiglia"
     : plan.tour_plan.type_of_accommodation === "apartment"
     ? "Appartamento"
     : plan.tour_plan.type_of_accommodation === "hostel"

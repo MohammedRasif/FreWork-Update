@@ -634,30 +634,35 @@ const TourPlanDouble = () => {
                             </span>
                           </p>
                           <div className="flex items-center space-x-2">
-                                        <p className="text-md text-gray-600 flex items-center gap-2">
-                                          <IoBed className="w-6 h-5 text-black" />
-                                          <span>
-                                            <span className="font-medium">
-                                              {t("type_of_accommodation")}:
-                                            </span>{" "}
-                                            {tour.type_of_accommodation === "hotel"
-                                              ? "Hotel"
-                                              : tour.type_of_accommodation === "resort"
-                                              ? "Resort"
-                                              : tour.type_of_accommodation === "homestay"
-                                              ? "B&B"
-                                              : tour.type_of_accommodation === "apartment"
-                                              ? "Appartamento"
-                                              : tour.type_of_accommodation === "hostel"
-                                              ? "Ostello"
-                                              : "N/A"}
-                                          </span>
-                                        </p>
-                                        <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
+                            <p className="text-md text-gray-600 flex items-center gap-2">
+                              <IoBed className="w-6 h-5 text-black" />
+                              <span>
+                                <span className="font-medium">
+                                  {t("type_of_accommodation")}:
+                                </span>{" "}
+                                {tour.type_of_accommodation === "hotel"
+                                  ? "Hotel"
+                                  : tour.type_of_accommodation === "resort"
+                                  ? "Resort"
+                                  : tour.type_of_accommodation === "homestay"
+                                  ? "Famiglia"
+                                  : tour.type_of_accommodation === "apartment"
+                                  ? "Appartamento"
+                                  : tour.type_of_accommodation === "hostel"
+                                  ? "Ostello"
+                                  : "N/A"}
+                              </span>
+                            </p>
+                            {/* <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
                                           
                                           <span>{tour.minimum_star_hotel|| t("na")}</span><FaStar className="w-4 h-4 text-black" />
-                                        </p>
-                                      </div>
+                                        </p> */}
+                            <p className="text-md text-gray-600 flex items-center gap-2">
+                              {tour.minimum_star_hotel
+                                ? "⭐".repeat(Number(tour.minimum_star_hotel))
+                                : t("na")}
+                            </p>
+                          </div>
                           {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaStar className="w-6 h-5 text-black" />
                             <span>

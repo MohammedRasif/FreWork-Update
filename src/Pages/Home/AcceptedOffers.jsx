@@ -265,7 +265,7 @@ function AcceptedOffers() {
                                       : tour.type_of_accommodation === "resort"
                                       ? "Resort"
                                       : tour.type_of_accommodation === "homestay"
-                                      ? "B&B"
+                                      ? "Famiglia"
                                       : tour.type_of_accommodation === "apartment"
                                       ? "Appartamento"
                                       : tour.type_of_accommodation === "hostel"
@@ -273,10 +273,12 @@ function AcceptedOffers() {
                                       : "N/A"}
                                   </span>
                                 </p>
-                                <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
-                                  
-                                  <span>{tour.minimum_star_hotel|| t("0")}</span><FaStar className="w-4 h-4 text-black" />
-                                </p>
+                                <p className="text-md text-gray-600 flex items-center gap-2">
+  {tour.minimum_star_hotel
+    ? "⭐".repeat(Number(tour.minimum_star_hotel))
+    : t("na")}
+</p>
+
                               </div>
                   {/* <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaStar className="w-6 h-5 text-black" />

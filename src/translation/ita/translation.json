@@ -258,6 +258,8 @@
 "new_password": "Nuova password",
 "confirm_new_password": "Conferma nuova password",
 "enter_password": "Inserisci password",
+"contact_verified_via_email": "Contatto verificato via email",
+
 "confirm": "Conferma",
 "loading_declined_plans": "Caricamento piani rifiutati in corso...",
 "no_declined_plans": "Nessun piano rifiutato ancora.",
@@ -266,7 +268,7 @@
 "total_persons": "Totale {{count}} persona",
 "total_persons_plural": "Totale {{count}} persone",
 "interested_travel_points": "Punti di interesse",
-"na": "–",
+"na": "",
 "tour_destination": "Destinazione del tour",
 "image_generated_automatically": "Immagine generata automaticamente",
 "restoring": "Ripristino in corso...",

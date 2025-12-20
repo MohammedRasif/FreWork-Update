@@ -512,7 +512,7 @@ function PublishedPlan() {
                             <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold text-base sm:text-xl">
-                                  {offer.offered_budget}
+                                  €{offer.offered_budget}
                                 </span>
                               </div>
                               {/* <button

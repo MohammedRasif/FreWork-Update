@@ -393,14 +393,9 @@ const AdminHome = () => {
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <IoBed className="w-6 h-5 text-gray-900" />
+
                         <span>
                           <span className="font-bold">
-                            {t("type_of_accommodation")}:
-                          </span>{" "}
-                          {selectedPlan.type_of_accommodation || t("na")}
-                        </span>
-                        <span>
-                          <span className="font-medium">
                             {t("type_of_accommodation")}:
                           </span>{" "}
                           {selectedPlan.type_of_accommodation === "hotel"
@@ -408,13 +403,18 @@ const AdminHome = () => {
                             : selectedPlan.type_of_accommodation === "resort"
                             ? "Resort"
                             : selectedPlan.type_of_accommodation === "homestay"
-                            ? "B&B"
+                            ? "Famiglia"
                             : selectedPlan.type_of_accommodation === "apartment"
                             ? "Appartamento"
                             : selectedPlan.type_of_accommodation === "hostel"
                             ? "Ostello"
                             : "N/A"}
                         </span>
+                        <p className="text-md text-gray-600 flex items-center gap-2">
+                          {selectedPlan.minimum_star_hotel
+                            ? "⭐".repeat(Number(selectedPlan.minimum_star_hotel))
+                            : t("na")}
+                        </p>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <Baby className="w-6 h-5 text-gray-900" />
