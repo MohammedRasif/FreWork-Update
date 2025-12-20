@@ -134,26 +134,27 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
               </span>
             </p>
             <p className="text-sm text-[#70798F]">
-              {t("total_members")}:{" "}
-              <span className="text-[#343E4B] font-medium">
-                {plan.total_members}
+              <span className="text-sm text-gray-700">
+                <span className="font-medium">{t("total")}:</span>{" "}
+                {plan.total_members}{" "}
+                {plan.total_members === 1 ? t("person") : t("persons")}
               </span>
             </p>
-            
+
             <p className="text-sm text-[#70798F] ">
-            <span className="font-medium">{t("category")}:</span>{" "}
-            <span className="text-[#343E4B] font-medium">
-              {plan.destination_type === "beach"
-              ? "Mare"
-              : plan.destination_type === "mountain"
-              ? "Montagna"
-              : plan.destination_type === "relax"
-              ? "Relax"
-              : plan.destination_type === "group"
-              ? "Gruppi"
-              : t("na")}
-            </span>
-          </p>
+              <span className="font-medium">{t("category")}:</span>{" "}
+              <span className="text-[#343E4B] font-medium">
+                {plan.destination_type === "beach"
+                  ? "Mare"
+                  : plan.destination_type === "mountain"
+                  ? "Montagna"
+                  : plan.destination_type === "relax"
+                  ? "Relax"
+                  : plan.destination_type === "group"
+                  ? "Gruppi"
+                  : t("na")}
+              </span>
+            </p>
             <p className="text-sm text-[#70798F] flex items-center gap-1">
               {t("approval_status")}:{" "}
               <span
@@ -175,10 +176,6 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
               <div className="flex flex-col items-end">
                 <span className="text-[#343E4B] font-medium">
                   {t("budget")} €{plan.budget}
-                </span>
-                <span className="text-xs text-[#70798F]">
-                  {plan.total_members}{" "}
-                  {plan.total_members > 1 ? t("people") : t("person")}
                 </span>
               </div>
               <DropdownMenu>
@@ -272,43 +269,45 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-                           <span>
-  <span className="font-medium">{t("meal_plan")}:</span>{" "}
-  {plan.meal_plan === "breakfast"
-    ? "Colazione"
-    : plan.meal_plan === "half-board"
-    ? "Mezza Pensione (Colazione & Cena)"
-    : plan.meal_plan === "full-board"
-    ? "Pensione Completa (Tutti i Pasti)"
-    : "N/A"}
-</span>
+                            <span>
+                              <span className="font-medium">
+                                {t("meal_plan")}:
+                              </span>{" "}
+                              {plan.meal_plan === "breakfast"
+                                ? "Colazione"
+                                : plan.meal_plan === "half-board"
+                                ? "Mezza Pensione (Colazione & Cena)"
+                                : plan.meal_plan === "full-board"
+                                ? "Pensione Completa (Tutti i Pasti)"
+                                : "N/A"}
+                            </span>
                           </p>
 
-                         <div className="flex items-center space-x-2">
-              <p className="text-md text-gray-600 flex items-center gap-2">
-                <IoBed className="w-6 h-5 text-black" />
-                <span>
-                  <span className="font-medium">
-                    {t("type_of_accommodation")}:
-                  </span>{" "}
-                  {plan.type_of_accommodation === "hotel"
-                    ? "Hotel"
-                    : plan.type_of_accommodation === "resort"
-                    ? "Resort"
-                    : plan.type_of_accommodation === "homestay"
-                    ? "B&B"
-                    : plan.type_of_accommodation === "apartment"
-                    ? "Appartamento"
-                    : plan.type_of_accommodation === "hostel"
-                    ? "Ostello"
-                    : "N/A"}
-                </span>
-              </p>
-              <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
-                
-                <span>{plan.minimum_star_hotel|| t("na")}</span><FaStar className="w-4 h-4 text-black" />
-              </p>
-            </div>
+                          <div className="flex items-center space-x-2">
+                            <p className="text-md text-gray-600 flex items-center gap-2">
+                              <IoBed className="w-6 h-5 text-black" />
+                              <span>
+                                <span className="font-medium">
+                                  {t("type_of_accommodation")}:
+                                </span>{" "}
+                                {plan.type_of_accommodation === "hotel"
+                                  ? "Hotel"
+                                  : plan.type_of_accommodation === "resort"
+                                  ? "Resort"
+                                  : plan.type_of_accommodation === "homestay"
+                                  ? "B&B"
+                                  : plan.type_of_accommodation === "apartment"
+                                  ? "Appartamento"
+                                  : plan.type_of_accommodation === "hostel"
+                                  ? "Ostello"
+                                  : "N/A"}
+                              </span>
+                            </p>
+                            <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
+                              <span>{plan.minimum_star_hotel || t("na")}</span>
+                              <FaStar className="w-4 h-4 text-black" />
+                            </p>
+                          </div>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-gray-900" />
@@ -331,7 +330,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         </div>
 
                         <p className="text-sm text-[#70798F] mb-2 py-5">
-                          {plan.description }
+                          {plan.description}
                         </p>
                         <p className="text-sm text-[#70798F]">
                           {t("interested_tourist_points")}:{" "}

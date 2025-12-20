@@ -160,7 +160,7 @@ export default function TourCard({ tourPlan }) {
             <span className="text-sm text-gray-700">
               <span className="font-medium">{t("total")}:</span>{" "}
               {localTourPlan.total_members}{" "}
-              {localTourPlan.total_members > 1 ? t("people") : t("person")}
+              {localTourPlan.total_members === 1 ? t("person") : t("persons")}
             </span>
           </div>
 

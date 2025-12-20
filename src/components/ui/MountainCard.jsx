@@ -127,8 +127,8 @@ export default function MountainCard({ tourPlan }) {
           <p>
             <span className="font-medium">{t("category")}:</span>{" "}
             {localTourPlan.destination_type === "mountain"
-                ? "Montagna"
-                : localTourPlan.destination_type}
+              ? "Montagna"
+              : localTourPlan.destination_type}
           </p>
 
           {/* <p>
@@ -149,7 +149,7 @@ export default function MountainCard({ tourPlan }) {
           <span className="text-sm text-gray-700">
             <span className="font-medium">{t("total")}:</span>{" "}
             {localTourPlan.total_members}{" "}
-            {localTourPlan.total_members > 1 ? t("people") : t("person")}
+            {localTourPlan.total_members === 1 ? t("person") : t("persons")}
           </span>
         </div>
 

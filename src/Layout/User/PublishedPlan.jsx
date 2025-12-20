@@ -348,12 +348,12 @@ function PublishedPlan() {
                           <p className="text-base sm:text-lg font-bold text-gray-700">
                             {t("budget")} €{plan.budget}
                           </p>
-                          <p className="text-xs sm:text-md text-gray-800">
+                          {/* <p className="text-xs sm:text-md text-gray-800">
                             {t("total_members", {
                               count: plan.total_members,
                               suffix: plan.total_members > 1 ? "s" : "",
                             })}
-                          </p>
+                          </p> */}
                         </div>
                         <button
                           onClick={(e) => {
