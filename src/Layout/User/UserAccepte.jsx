@@ -212,7 +212,6 @@ const UserAccepte = () => {
                               : t("persons")}
                           </span>
                         </div>
-                       
                         <div className="flex items-center gap-2 mb-2 sm:mb-4">
                           <FiMapPin className="text-gray-600" />
                           <span className="font-medium">
