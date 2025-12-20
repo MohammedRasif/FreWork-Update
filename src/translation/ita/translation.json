@@ -325,7 +325,9 @@
 "failed_to_delete_offer": "Eliminazione offerta fallita",
 "final_offer_sent_success": "Offerta finale inviata con successo",
 "failed_to_send_final_offer": "Invio offerta finale fallito",
+
 "days": "giorni",
+"day": "giorno",
 "tour_from_to": "Tour da {{from}} a {{to}}",
 "willing_to_go_on": "Disponibile a partire dal",
 "include": "Include",
