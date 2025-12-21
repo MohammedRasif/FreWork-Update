@@ -365,7 +365,7 @@ const AdminHome = () => {
                           {selectedPlan.location_from || t("na")}
                         </span>
                       </p>
-                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaStar className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">
@@ -373,7 +373,7 @@ const AdminHome = () => {
                           </span>{" "}
                           {selectedPlan.minimum_star_hotel || t("na")}
                         </span>
-                      </p>
+                      </p> */}
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
 
