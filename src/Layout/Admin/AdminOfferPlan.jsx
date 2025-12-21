@@ -142,7 +142,7 @@ function AdminOfferPlan() {
               : [t("no_specific_locations")];
 
             return (
-              <div key={tourPlan.id} className="mb-6">
+              <div key={tourPlan.id} className="mb-6 lg:pt-0 pt-10">
                 <div className="bg-white rounded-t-lg border-x border-t border-gray-200">
                   <div className="p-3 sm:p-4 lg:p-6 pb-2 sm:pb-3 lg:pb-4">
                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
