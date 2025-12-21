@@ -646,7 +646,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div className=" relative min-h-screen">
+    <div className="min-h-screen">
       <Toaster />
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-4/5">
@@ -694,7 +694,7 @@ const AdminHome = () => {
           {renderContent()}
         </div>
 
-        <div className="absolute lg:right-3 right-[2px] lg:top-20 top-25 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40">
+        <div className="fixed lg:right-3 right-[2px] lg:top-20 top-45 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40">
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center hidden md:block">
