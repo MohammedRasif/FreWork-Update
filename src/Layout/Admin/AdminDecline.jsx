@@ -55,9 +55,9 @@ function AdminDecline() {
       {declineData.map((plan) => (
         <div
           key={plan.id}
-          className="rounded-lg bg-white shadow-sm border border-gray-200 mx-auto max-w-4xl"
+          className="rounded-lg bg-white shadow-sm border border-gray-200 mx-auto max-w-4xl mt-36"
         >
-          <div className="p-3 sm:p-4 lg:p-6">
+          <div className="p-3 sm:p-4 lg:p-6 ">
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-3 lg:space-y-0">
               <div className="flex-1">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
