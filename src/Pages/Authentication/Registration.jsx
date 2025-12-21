@@ -4,7 +4,7 @@ import { ChevronDown, Mail, Lock } from "lucide-react";
 import img from "../../assets/img/Mask group (3).png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "@/redux/features/baseApi";
-import img1 from "../../assets/img/removebg.png";
+import img1 from "../../assets/img/1000062305-removebg-preview.png";
 import { useTranslation } from "react-i18next";
 
 const Register = () => {
