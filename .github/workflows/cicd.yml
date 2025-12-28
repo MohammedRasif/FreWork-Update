@@ -33,4 +33,7 @@ jobs:
         run: |
           npm install -g cloudinary-cli
           cloudinary config set cloud_name=$CLOUDINARY_CLOUD_NAME api_key=$CLOUDINARY_API_KEY api_secret=$CLOUDINARY_API_SECRET
-          cloudinary upload_dir dist react-frontend --overwrite
+          cloudinary upload_dir dist react-frontend \
+          --resource_type raw \
+          --overwrite
+
