@@ -12,7 +12,6 @@ export default function AgencyCard({ agency }) {
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 p-1 rounded-lg"
           />
         </div>
-
         {/* Agency Logo */}
         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
           <img
@@ -22,13 +21,11 @@ export default function AgencyCard({ agency }) {
           />
         </div>
       </div>
-
       <div className="flex flex-col flex-grow p-2 sm:p-4 justify-between">
         {/* Agency Name */}
         <h3 className="font-bold text-gray-900 text-base sm:text-xl text-start mb-1 sm:mb-2">
           {agency.agency_name}
         </h3>
-
         {/* Rating and Review Count */}
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-0.5 sm:gap-1">
