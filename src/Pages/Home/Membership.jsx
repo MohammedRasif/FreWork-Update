@@ -1,4 +1,4 @@
-import { Search, Star, MessageCircle } from "lucide-react";
+import { Search, Star, MessageCircle, X } from "lucide-react";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { FaHeart } from "react-icons/fa";
 import {
@@ -403,28 +403,28 @@ const Membership = () => {
       </div>
      {showReviewModal && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-    <div className="bg-white w-full max-w-lg sm:max-w-xl rounded-2xl shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-hidden">
+    <div className="bg-white w-full max-w-lg sm:max-w-xl rounded-2xl shadow-2xl p-6 sm:px-8 relative max-h-[90vh] overflow-hidden">
       
       {/* Close Button */}
       <button
         onClick={handleCloseReviews}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors text-xl font-bold"
+        className="absolute top-4  text-gray-500 hover:text-gray-800 transition-colors text-xl font-bold"
         aria-label="Close"
       >
-        ×
+        <X className="w-6 h-6 text-gray-600 " />
       </button>
 
       {/* Header */}
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 pr-10">
+      {/* <h2 className="text-2xl font-bold text-gray-800 mb-6 pr-10">
         {selectedPlan?.agency || selectedPlan?.name} – {t("reviews")}
         <span className="text-gray-500 text-lg ml-2">
           ({selectedPlan?.reviews || 0})
         </span>
-      </h2>
+      </h2> */}
 
       {/* Reviews List */}
       {selectedPlan?.received_reviews?.length > 0 ? (
-        <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mt-5">
           {selectedPlan.received_reviews.map((review, index) => (
             <div
               key={index}
