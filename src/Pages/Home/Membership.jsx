@@ -333,12 +333,20 @@ const Membership = () => {
                             key={index}
                             className="text-gray-700 text-sm bg-gray-100 px-2 py-1 rounded"
                           >
-                            {category}
+                            {category === "beach"
+                              ? "Mare"
+                              : category === "mountain"
+                              ? "Montagna"
+                              : category === "relax"
+                              ? "Relax"
+                              : category === "group"
+                              ? "Gruppi"
+                              : category}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <span>{t("no_categories_available")}</span>
+                      <span></span>
                     )}
                   </div>
                   <div className="mb-4">
@@ -401,99 +409,104 @@ const Membership = () => {
           </div>
         )}
       </div>
-     {showReviewModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-    <div className="bg-white w-full max-w-lg sm:max-w-xl rounded-2xl shadow-2xl p-6 sm:px-8 relative max-h-[90vh] overflow-hidden">
-      
-      {/* Close Button */}
-      <button
-        onClick={handleCloseReviews}
-        className="absolute top-4  text-gray-500 hover:text-gray-800 transition-colors text-xl font-bold"
-        aria-label="Close"
-      >
-        <X className="w-6 h-6 text-gray-600 " />
-      </button>
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-lg sm:max-w-xl rounded-2xl shadow-2xl p-6 sm:px-8 relative max-h-[90vh] overflow-hidden">
+            {/* Close Button */}
+            <button
+              onClick={handleCloseReviews}
+              className="absolute top-4  text-gray-500 hover:text-gray-800 transition-colors text-xl font-bold"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6 text-gray-600 " />
+            </button>
 
-      {/* Header */}
-      {/* <h2 className="text-2xl font-bold text-gray-800 mb-6 pr-10">
+            {/* Header */}
+            {/* <h2 className="text-2xl font-bold text-gray-800 mb-6 pr-10">
         {selectedPlan?.agency || selectedPlan?.name} – {t("reviews")}
         <span className="text-gray-500 text-lg ml-2">
           ({selectedPlan?.reviews || 0})
         </span>
       </h2> */}
 
-      {/* Reviews List */}
-      {selectedPlan?.received_reviews?.length > 0 ? (
-        <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mt-5">
-          {selectedPlan.received_reviews.map((review, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-xl p-5 bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-start gap-4">
-                {/* Tourist Image */}
-                <img
-                  src={
-                    review.tourist_image ||
-                    "https://ui-avatars.com/api/?name=" + (review.tourist_first_name || "User") + "&background=random"
-                  }
-                  alt={review.tourist_first_name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
-                  onError={(e) => {
-                    e.target.src = "https://ui-avatars.com/api/?name=User&background=random";
-                  }}
-                />
+            {/* Reviews List */}
+            {selectedPlan?.received_reviews?.length > 0 ? (
+              <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mt-5">
+                {selectedPlan.received_reviews.map((review, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-xl p-5 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Tourist Image */}
+                      <img
+                        src={
+                          review.tourist_image ||
+                          "https://ui-avatars.com/api/?name=" +
+                            (review.tourist_first_name || "User") +
+                            "&background=random"
+                        }
+                        alt={review.tourist_first_name}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://ui-avatars.com/api/?name=User&background=random";
+                        }}
+                      />
 
-                <div className="flex-1 min-w-0">
-                  {/* Name + Rating */}
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="font-semibold text-gray-800 text-base">
-                      {review.tourist_first_name || "Anonymous"}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(review.rating)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                      <span className="text-sm font-medium text-gray-600 ml-1">
-                        {review.rating.toFixed(1)}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        {/* Name + Rating */}
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="font-semibold text-gray-800 text-base">
+                            {review.tourist_first_name || "Anonymous"}
+                          </p>
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(review.rating)
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                            <span className="text-sm font-medium text-gray-600 ml-1">
+                              {review.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Comment */}
+                        <p className="text-gray-700 text-sm leading-relaxed mb-2">
+                          {review.comment?.trim() || t("no_comment_provided")}
+                        </p>
+
+                        {/* Date */}
+                        <p className="text-xs text-gray-500">
+                          {new Date(review.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </p>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Comment */}
-                  <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                    {review.comment?.trim() || t("no_comment_provided")}
-                  </p>
-
-                  {/* Date */}
-                  <p className="text-xs text-gray-500">
-                    {new Date(review.created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 text-gray-500">
-          <p className="text-lg font-medium">{t("no_reviews_yet")}</p>
-          <p className="text-sm mt-2">{t("be_the_first_to_review")}</p>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-medium">{t("no_reviews_yet")}</p>
+                <p className="text-sm mt-2">{t("be_the_first_to_review")}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
-  </div>
-)}
 
       <ToastContainer />
     </div>
