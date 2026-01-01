@@ -30,8 +30,8 @@ const AdminNotification = () => {
   }, []);
 
   useEffect(() => {
-    const baseUrl = "31.97.39.215";
-    const socketUrl = `ws://${baseUrl}/ws/notifications/?token=${token}`;
+    const baseUrl = "api.vacanzamycost.com";
+    const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
     socket.onopen = () => {

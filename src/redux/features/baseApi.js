@@ -4,7 +4,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: "http://31.97.39.215/",
+    baseUrl: "https://api.vacanzamycost.com/",
     
     prepareHeaders: (headers) => {
       headers.set("ngrok-skip-browser-warning", "true");
