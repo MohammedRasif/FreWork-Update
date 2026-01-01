@@ -6,10 +6,10 @@ export const baseApi = createApi({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
     baseUrl: "https://api.vacanzamycost.com/",
     
-    prepareHeaders: (headers) => {
-      headers.set("ngrok-skip-browser-warning", "true");
-      return headers;
-    },
+    // prepareHeaders: (headers) => {
+    //   headers.set("ngrok-skip-browser-warning", "true");
+    //   return headers;
+    // },
   }),
   tagTypes: ["User", "Agency", "TourPlan"],
   endpoints: (builder) => ({
