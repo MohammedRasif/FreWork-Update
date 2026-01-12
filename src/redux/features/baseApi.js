@@ -5,6 +5,7 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
     baseUrl: "https://api.vacanzamycost.com/",
+    // baseUrl: "http://31.97.39.215/",
     
     // prepareHeaders: (headers) => {
     //   headers.set("ngrok-skip-browser-warning", "true");

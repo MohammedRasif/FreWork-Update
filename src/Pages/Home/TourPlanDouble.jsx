@@ -424,14 +424,34 @@ const TourPlanDouble = () => {
 
                   const handleSentOfferClick = () => {
                     if (!token) {
-                      toast.error(t("login_to_submit_offer"));
                       navigate("/login");
+                      toast.error(t("login_to_submit_offer"));
                       return;
                     }
 
-                    if (isDisabled) return;
+                    const role = localStorage.getItem("role"); 
+                    const agencyVerified =
+                      localStorage.getItem("agency_is_verified") === "true";
 
-                    openPopup(tour);
+                    if (role === "agency" && !agencyVerified) {
+                      navigate("/pandding");
+                      toast.info(
+                        t("agency_verification_pending") ||
+                          "Your agency profile is under verification. Please wait."
+                      );
+                      return;
+                    }
+                    if (tour.status === "accepted") {
+                      toast.info(t("offer_accepted"));
+                      return;
+                    }
+
+                    if (hasMaxOffers) {
+                      toast.info(t("offer_limit_reached"));
+                      return;
+                    }
+
+                    setIsPopupOpen(true);
                   };
                   return (
                     <div

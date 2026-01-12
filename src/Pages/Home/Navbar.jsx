@@ -83,22 +83,37 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  // const handleDashboardClick = () => {
+  //   const role = userData?.role;
+  //   const path = role === "tourist" ? "/user" : role === "agency" ? "/admin" : "/";
+  //   setIsProfileOpen(false);
+  //   setIsOpen(false);
+  //   navigate(path);
+  // };
   const handleDashboardClick = () => {
-    const role = userData?.role;
-    const path = role === "tourist" ? "/user" : role === "agency" ? "/admin" : "/";
-    setIsProfileOpen(false);
-    setIsOpen(false);
-    navigate(path);
-  };
+  const role = userData?.role;
+  const isAgencyVerified = userData?.agency_is_verified;
 
-  // একই লিংকগুলো Desktop + Mobile দুজায়গাতেই ব্যবহার করবো
+  let path = "/"; // default fallback
+
+  if (role === "tourist") {
+    path = "/user";
+  } else if (role === "agency") {
+    // শুধু agency-র ক্ষেত্রে verification চেক
+    path = isAgencyVerified ? "/dashboard" : "/pandding";
+  }
+
+  setIsProfileOpen(false);
+  setIsOpen(false);
+  navigate(path);
+};
+
   const navItems = [
     { key: "home", path: "/", label: t("home") },
     { key: "tours", path: "/tourPlans", label: t("tour_plans") },
     { key: "acceptedOffers", path: "/acceptedOffers", label: t("accepted_offers") },
     { key: "agencies", path: "/pricing", label: t("for_agencies") },
     { key: "howitworks", path: "/who_it_work", label: t("who_work") },
-    // যদি পরে ব্লগ/কন্টাক্ট চালু করো তাহলে এখানে যোগ করো
   ];
 
   return (

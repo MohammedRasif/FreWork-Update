@@ -258,25 +258,33 @@ function SinglePost({ prid }) {
   console.log("Tour data:", tour);
   const hasMaxOffers = tour.offers?.length >= 3;
 
-  const handleSentOfferClick = () => {
-    if (!token) {
-      navigate("/login");
-      toast.error(t("login_to_submit_offer"));
-      return;
-    }
+// ধরে নিচ্ছি userData আছে (useShowUserInpormationQuery থেকে)
+const handleSentOfferClick = () => {
+  if (!token) {
+    navigate("/login");
+    toast.error(t("login_to_submit_offer"));
+    return;
+  }
 
-    if (tour.status === "accepted") {
-      toast.info(t("offer_accepted"));
-      return;
-    }
+  // userData থেকে চেক করা (সবচেয়ে নির্ভরযোগ্য)
+  if (userData?.role === "agency" && !userData?.agency_is_verified) {
+    navigate("/pandding");
+    toast.info(t("agency_verification_pending") || "Your agency profile is under verification");
+    return;
+  }
 
-    if (hasMaxOffers) {
-      toast.info(t("offer_limit_reached"));
-      return;
-    }
+  if (tour.status === "accepted") {
+    toast.info(t("offer_accepted"));
+    return;
+  }
 
-    setIsPopupOpen(true);
-  };
+  if (hasMaxOffers) {
+    toast.info(t("offer_limit_reached"));
+    return;
+  }
+
+  setIsPopupOpen(true);
+};
 
   const showSentOfferButton = !token || role === "agency";
 
@@ -541,13 +549,13 @@ function SinglePost({ prid }) {
                       onClick={handleSentOfferClick}
                       disabled={tour.status === "accepted" || hasMaxOffers}
                       className={`
-          block w-full text-center py-2.5 px-4 rounded-lg font-medium transition-all duration-200 text-md
-          ${
-            tour.status === "accepted" || hasMaxOffers
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
-          }
-        `}
+                        block w-full text-center py-2.5 px-4 rounded-lg font-medium transition-all duration-200 text-md
+                        ${
+                          tour.status === "accepted" || hasMaxOffers
+                            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
+                        }
+                      `}
                     >
                       {tour.status === "accepted"
                         ? t("offer_accepted")

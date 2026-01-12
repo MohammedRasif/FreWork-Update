@@ -40,6 +40,7 @@ import BlogDetails from "@/Pages/Home/BlogDetails";
 import Privacy from "@/Pages/Home/Privacy";
 import Terms from "@/Pages/Home/Terms";
 import WhoItWork from "@/Pages/Home/WhoItWork";
+import PendingForAdmin from "@/Pages/Home/PanndingForAdmin";
 
 export const router = createBrowserRouter([
   {
@@ -135,6 +136,7 @@ export const router = createBrowserRouter([
   { path: "/otp_verify", element: <OTP_Verification /> },
   { path: "/reset_password", element: <ResetPassword /> },
   { path: "/success", element: <SubscriptionSuccess /> },
+  { path: "/pandding", element: <PendingForAdmin /> },
   {
     path: "/user",
     element: <UserDashboardLayout />,
