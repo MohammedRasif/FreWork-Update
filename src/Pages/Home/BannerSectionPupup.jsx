@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 let isGoogleScriptLoaded = false;
 
 export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
-  const totalSteps = 5;
+  const totalSteps = 6;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [formData, setFormData] = useState({
     name: "",
@@ -385,7 +385,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     closeForm();
   };
 
-  const progressPercentage = (currentStep / totalSteps) * 100;
+  const progressPercentage = (Math.min(currentStep, 5) / 5) * 100;
 
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: t("location_from_required") || "Location (From) is required",
@@ -400,7 +400,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
         <div className="flex justify-between items-center mb-2 sm:mb-3">
           <span className="text-xs sm:text-sm font-semibold text-white">
-            {t("step_of", { current: currentStep, total: totalSteps })}
+            {t("step_of", { current: Math.min(currentStep, 5), total: 5 })}
           </span>
           <span className="text-xs sm:text-sm font-semibold text-white">
             {Math.round(progressPercentage)}% {t("complete")}
@@ -914,9 +914,19 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
           </div>
         )}
+        {currentStep === 6 && (
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-gray-700 text-xs sm:text-sm">
+              📞 Verifica qualità richiesta<br />
+              Per garantire serietà, alcune richieste vengono verificate telefonicamente<br />
+              (chiamata breve, max 2 minuti).<br />
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte su misura.
+            </p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 sm:mb-0 w-full sm:w-auto">
-            {currentStep > 1 && (
+            {currentStep > 1 && currentStep !== 6 && (
               <button
                 onClick={prevStep}
                 className="px-2 py-1 sm:px-2 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
@@ -947,7 +957,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 }
                 className="bg-[#FF6600] hover:bg-[#e55600] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
-                {isPublishing ? t("publishing") || "Publishing..." : t("publish_now") || "Publish Now"}
+                {isPublishing ? t("publishing") || "Publishing..." : t("ok") || "OK"}
               </button>
             )}
           </div>
