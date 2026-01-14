@@ -52,7 +52,7 @@ const OTP_Verification = () => {
         setTimeout(() => {
           setShowPopup(false);
           if (userType === "agency") {
-            navigate("/admin/editProfile", {
+            navigate("/pandding", {
               state: { email: location.state.email },
             });
           } else {

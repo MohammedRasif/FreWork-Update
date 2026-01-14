@@ -31,7 +31,7 @@ const Navbar = () => {
     "/tourPlans": "tours",
     "/acceptedOffers": "acceptedOffers",
     "/contact": "contact",
-    "/who_it_work": "howitworks", 
+    "/who_it_work": "howitworks",
     "/user/editProfile": "profile",
     "/user/profile": "profile",
   };
@@ -91,27 +91,37 @@ const Navbar = () => {
   //   navigate(path);
   // };
   const handleDashboardClick = () => {
-  const role = userData?.role;
-  const isAgencyVerified = userData?.agency_is_verified;
+    const role = userData?.role;
+    const isAgencyVerified = userData?.agency_is_verified;
+    const isProfileComplete = userData?.is_profile_complete;
 
-  let path = "/"; // default fallback
+    let path = "/"; // default fallback
 
-  if (role === "tourist") {
-    path = "/user";
-  } else if (role === "agency") {
-    // শুধু agency-র ক্ষেত্রে verification চেক
-    path = isAgencyVerified ? "/dashboard" : "/pandding";
-  }
+    if (role === "tourist") {
+      path = "/user";
+    } else if (role === "agency") {
+      if (!isAgencyVerified) {
+        path = "/pandding";
+      } else if (!isProfileComplete) {
+        path = "/admin/editProfile";
+      } else {
+        path = "/admin";
+      }
+    }
 
-  setIsProfileOpen(false);
-  setIsOpen(false);
-  navigate(path);
-};
+    setIsProfileOpen(false);
+    setIsOpen(false);
+    navigate(path);
+  };
 
   const navItems = [
     { key: "home", path: "/", label: t("home") },
     { key: "tours", path: "/tourPlans", label: t("tour_plans") },
-    { key: "acceptedOffers", path: "/acceptedOffers", label: t("accepted_offers") },
+    {
+      key: "acceptedOffers",
+      path: "/acceptedOffers",
+      label: t("accepted_offers"),
+    },
     { key: "agencies", path: "/pricing", label: t("for_agencies") },
     { key: "howitworks", path: "/who_it_work", label: t("who_work") },
   ];
@@ -129,7 +139,12 @@ const Navbar = () => {
         className="lg:hidden text-gray-700"
         whileTap={{ scale: 0.9 }}
       >
-        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="w-7 h-7"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -167,7 +182,10 @@ const Navbar = () => {
               onClick={toggleProfileDropdown}
             >
               <img
-                src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                src={
+                  userData.image_url ||
+                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                }
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-100"
               />
@@ -224,16 +242,20 @@ const Navbar = () => {
             className="absolute top-full left-0 w-full bg-white shadow-xl border-b border-gray-200 lg:hidden z-40"
           >
             <div className="px-6 py-8 flex flex-col space-y-2">
-
               {/* Logged-in User Info */}
               {isAuthenticated && userData && (
                 <div className="flex flex-col items-center pb-6 border-b border-gray-200">
                   <img
-                    src={userData.image_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"}
+                    src={
+                      userData.image_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                    }
                     alt="User"
                     className="w-20 h-20 rounded-full object-cover ring-4 ring-blue-100"
                   />
-                  <p className="mt-3 text-lg font-semibold text-gray-800">{userData.name}</p>
+                  <p className="mt-3 text-lg font-semibold text-gray-800">
+                    {userData.name}
+                  </p>
                 </div>
               )}
 

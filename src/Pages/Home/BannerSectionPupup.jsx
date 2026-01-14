@@ -593,8 +593,17 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
                     <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 lg:w-96 w-72">
                       <p className="lg:text-[15px] text-[13px] text-gray-700">
-                       {t("budget_warning_message")}
+                        {t("budget_warning_message")
+                          .split(/([.:])/)
+                          .map((part, index) => (
+                            <span key={index}>
+                              {part}
+                              {(part === "." || part === ":") && <br />}
+                            </span>
+                          ))}
                       </p>
+
+                      
                       <button
                         onClick={handleOkClick}
                         className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
