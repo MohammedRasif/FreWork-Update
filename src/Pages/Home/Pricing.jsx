@@ -44,14 +44,7 @@ const Pricing = () => {
 
   // Combine free plan + backend plans
   const allPlans = [
-    {
-      name: t("free_user"),
-      price: "€0",
-      priceSuffix: t("per_month"),
-      features: [t("free_feature_1"), t("free_feature_2"), t("free_feature_3")],
-      isFree: true,
-      plan_id: "free", // for handleSelectPlan
-    },
+    
     ...(subscriptionData?.plans || []).map((plan) => ({
       ...plan,
       isFree: false,
@@ -133,7 +126,7 @@ const Pricing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="bg-white w-full max-w-sm mx-auto md:mx-0 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
+                  className="bg-white w-[45vh] max-w-sm mx-auto md:mx-0 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
                 >
                   <div className="relative">
                     <div className="w-3/4 rounded-r-lg my-10 relative">
@@ -142,7 +135,7 @@ const Pricing = () => {
                         alt={t("plan_background")}
                         className="w-full h-auto"
                       />
-                      <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
+                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold text-[] z-10">
                         {plan.name}
                       </h3>
                     </div>
