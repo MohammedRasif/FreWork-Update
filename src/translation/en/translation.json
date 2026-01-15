@@ -828,6 +828,26 @@
 "text": "For information, clarifications or to exercise GDPR rights:\nprivacy@vacanzamycost.it"
 }
 },
+
+
+
+ "pendings": {
+  "title": "Application Pending",
+  "subtitle": "Waiting for Admin Approval",
+  "underReview": "Under Review",
+  "thankYou": "Thank you for submitting your request/application. Our admin team is currently reviewing it. This process usually takes",
+  "timeframe": "24–48 hours",
+  "currentStatus": "Current Status",
+  "thankYouPatience": "Thank you for your patience",
+  "steps": {
+    "1": { "title": "Request Received", "subtitle": "Successfully submitted" },
+    "2": { "title": "Under Review", "subtitle": "Admin team is checking" },
+    "3": { "title": "Approved / Rejected", "subtitle": "You'll be notified soon" }
+  }
+},
+
+
+
 "terms": {
 "title": "TERMS AND CONDITIONS OF USE – VACANZAMYCOST.IT Version 2025 – Italy & EU",
 "1": {
@@ -899,6 +919,11 @@
 "text": "Any dispute shall be subject exclusively to the jurisdiction of the Court of Verona (VR)."
 }
 },
+
+
+
+
+
 "howItWorks": {
 "pageTitle": "How VacanzaMyCost.it Works",
 "subtitle": "In 7 simple steps you find the perfect vacation – free and with no middlemen",

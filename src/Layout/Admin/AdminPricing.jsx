@@ -17,7 +17,8 @@ const AdminPricing = () => {
   const navigate = useNavigate();
 
   const language = localStorage.getItem("i18nextLng") || "en";
-  const { data: subscriptionData, isLoading } = useShowSubscriptionDataQuery(language);
+  const { data: subscriptionData, isLoading } =
+    useShowSubscriptionDataQuery(language);
 
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
     useSubscriptionMutation();
@@ -185,7 +186,8 @@ const AdminPricing = () => {
                       </div>
 
                       <ul className="space-y-3 text-base text-slate-600">
-                        {Array.isArray(plan.features) && plan.features.length > 0 ? (
+                        {Array.isArray(plan.features) &&
+                        plan.features.length > 0 ? (
                           plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start">
                               <IoCheckmarkDoneSharp

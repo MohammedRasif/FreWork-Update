@@ -732,6 +732,12 @@
 "error_submitting": "Errore durante l'invio",
 "google_maps_load_failed": "Impossibile caricare Google Maps",
 "google_maps_not_available": "Google Places non disponibile",
+
+
+
+
+
+
 "privacy": {
 "title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Versione aggiornata 2025 – conforme a GDPR (UE 2016/679) + Direttiva ePrivacy",
 "1": {
@@ -791,6 +797,29 @@
 "title": "Cosa sono i cookie",
 "text": "I cookie sono piccoli file di testo che migliorano la navigazione dell’utente e permettono il funzionamento del sito."
 },
+
+"pendings": {
+  "title": "Domanda in attesa",
+  "subtitle": "In attesa di approvazione dall'amministratore",
+  "underReview": "In revisione",
+  "thankYou": "Grazie per aver inviato la tua richiesta. Il nostro team la sta esaminando. Questo processo richiede solitamente",
+  "timeframe": "24-48 ore",
+  "currentStatus": "Stato attuale",
+  "thankYouPatience": "Grazie per la tua pazienza",
+  "steps": {
+    "1": { "title": "Richiesta ricevuta", "subtitle": "Inviata con successo" },
+    "2": { "title": "In revisione", "subtitle": "Il team sta controllando" },
+    "3": { "title": "Approvata / Rifiutata", "subtitle": "Sarai avvisato a breve" }
+  }
+},
+
+
+
+
+
+
+
+
 "10_2": {
 "title": "Tipologie di cookie utilizzati",
 "a_title": "Cookie tecnici (necessari)",

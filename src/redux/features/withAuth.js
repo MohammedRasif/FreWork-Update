@@ -9,7 +9,6 @@ export const sqQuery = createApi({
     prepareHeaders: (headers, { endpoint }) => {
       // headers.set("ngrok-skip-browser-warning", "true");
 
-      // Include token for all requests if available, letting the server handle authentication
       const token = localStorage.getItem("access_token");
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
