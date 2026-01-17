@@ -27,6 +27,12 @@ const Register = () => {
 
   const password = watch("password");
   const userType = watch("userType");
+  
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("pricing_status");
+    };
+  }, []);
 
   useEffect(() => {
     const pricingStatus = localStorage.getItem("pricing_status");
