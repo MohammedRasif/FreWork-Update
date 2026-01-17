@@ -337,9 +337,9 @@ const Membership = () => {
                               ? "Mare"
                               : category === "mountain"
                               ? "Montagna"
-                              : category === "relax"
+                              : category === "desert"
                               ? "Relax"
-                              : category === "group"
+                              : category === "island"
                               ? "Gruppi"
                               : category}
                           </span>

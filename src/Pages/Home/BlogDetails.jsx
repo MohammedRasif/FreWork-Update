@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { use, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import { format } from "date-fns";
@@ -25,6 +25,9 @@ export default function BlogDetails() {
   } = useShowBlogPostQuery(numericId, {
     skip: !numericId,
   });
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const post = postsArray.find((p) => p.id === numericId);
 
@@ -41,7 +44,8 @@ export default function BlogDetails() {
       <div className="max-w-4xl mx-auto px-4 py-24 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Post Not Found</h1>
         <p className="text-gray-600">
-          {error?.data?.message || "The blog post you're looking for doesn't exist."}
+          {error?.data?.message ||
+            "The blog post you're looking for doesn't exist."}
         </p>
       </div>
     );
