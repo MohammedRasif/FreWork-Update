@@ -15,6 +15,7 @@ const Register = () => {
     useCreateUserMutation();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  localStorage.getItem("pricing_status") === "from_pricing";
 
   const {
     register,
@@ -27,7 +28,14 @@ const Register = () => {
   const password = watch("password");
   const userType = watch("userType");
 
-  // Load email from localStorage pendingPlan
+  useEffect(() => {
+    const pricingStatus = localStorage.getItem("pricing_status");
+    if (pricingStatus === "from_pricing") {
+      setSelectedUserType("agency");
+      setValue("userType", "agency");
+    }
+  }, [setValue]);
+
   useEffect(() => {
     const pendingPlan = localStorage.getItem("pendingPlan");
     if (pendingPlan) {
@@ -336,7 +344,6 @@ const Register = () => {
                 >
                   {t("privacy_policy")}
                 </NavLink>
-                
               </span>
             </label>
 

@@ -53,8 +53,14 @@ const Pricing = () => {
     })),
   ];
   const visiblePlans = role === "agency" ? allPlans : allPlans.slice(0, 1);
+  const isSingleCardView = role !== "agency";
 
   const handleSelectPlan = async (plan) => {
+    if (isSingleCardView) {
+      localStorage.setItem("pricing_status", "from_pricing");
+      navigate("/register");
+      return;
+    }
     if (plan.isFree) {
       toast.info(t("free_plan_selected"), {
         toastId: "free-plan-selected",
@@ -185,13 +191,15 @@ const Pricing = () => {
                         {t("measurable_results")}
                       </p>
                     </div>
-                    <button
-                      className="w-full bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
-                      onClick={() => handleSelectPlan(plan)}
-                      disabled={isSubscribing}
-                    >
-                      {isSubscribing ? t("subscribing") : t("select")}
-                    </button>
+                    {!(role === "agency" && index === 0) && (
+                      <button
+                        className="w-full bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
+                        onClick={() => handleSelectPlan(plan, index)}
+                      >
+                        {isSingleCardView ? t("register") : t("select")}
+                      </button>
+                    )}
+
                     <p className="text-slate-500 text-base mb-6">
                       {t("contact_for_details")}
                     </p>
