@@ -45,18 +45,14 @@ const Pricing = () => {
   }, [subscriptionError, t]);
 
   const allPlans = [
-    
     ...(subscriptionData?.plans || []).map((plan) => ({
       ...plan,
       isFree: false,
-      plan_id: plan.price_id || "premium", 
-      priceSuffix: "", 
+      plan_id: plan.price_id || "premium",
+      priceSuffix: "",
     })),
   ];
-  const visiblePlans =
-  role === "agency"
-    ? allPlans
-    : allPlans.slice(0, 1);
+  const visiblePlans = role === "agency" ? allPlans : allPlans.slice(0, 1);
 
   const handleSelectPlan = async (plan) => {
     if (plan.isFree) {
@@ -110,6 +106,34 @@ const Pricing = () => {
     }
   };
 
+  const PricingSkeleton = ({ count = 3 }) => {
+    return (
+      <>
+        {Array.from({ length: count }).map((_, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white w-[45vh] max-w-sm rounded-2xl shadow-xl border border-gray-200 p-6"
+          >
+            <div className="animate-pulse space-y-4">
+              <div className="h-32 bg-gray-200 rounded-lg"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-10 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-12 bg-gray-300 rounded"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <section className="pt-24 roboto bg-gray-50 ">
       <div className="container mx-auto px-4">
@@ -118,7 +142,9 @@ const Pricing = () => {
         </h1>
 
         {isLoading && (
-          <p className="text-center text-gray-600">{t("loading_plans")}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto place-items-center md:place-items-start">
+            <PricingSkeleton count={role === "agency" ? 3 : 1} />
+          </div>
         )}
 
         {!isLoading && (
