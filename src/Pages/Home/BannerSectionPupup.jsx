@@ -434,7 +434,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   onChange={(e) =>
                     updateFormData("startingDate", e.target.value)
                   }
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                  className="date-input w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 />
                 {errors.startingDate && (
                   <span className="text-red-500 text-xs mt-1">

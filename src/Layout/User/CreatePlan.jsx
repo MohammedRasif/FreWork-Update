@@ -461,7 +461,7 @@ const CreatePlan = () => {
                     required: t("starting_date_required"),
                   })}
                 />
-                <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                {/* <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" /> */}
               </div>
               {errors.startingDate && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -481,7 +481,7 @@ const CreatePlan = () => {
                     required: t("ending_date_required"),
                   })}
                 />
-                <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                {/* <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" /> */}
               </div>
               {errors.endingDate && (
                 <p className="text-red-500 text-[14px] mt-1">

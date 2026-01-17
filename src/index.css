@@ -5,6 +5,13 @@
 @import "tw-animate-css";
 @plugin "daisyui";
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(48%) sepia(93%) saturate(2405%) hue-rotate(4deg)
+    brightness(102%) contrast(104%);
+  cursor: pointer;
+}
+
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
