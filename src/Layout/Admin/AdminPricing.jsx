@@ -43,18 +43,16 @@ const AdminPricing = () => {
     }
   }, [subscriptionError, t]);
 
-  // ────────────────────────────────────────────────
-  // Combine Free plan + backend plans
-  // ────────────────────────────────────────────────
+  
   const allPlans = [
-    {
-      name: t("free_user"),
-      price: "€0",
-      priceSuffix: t("per_month"),
-      features: [t("free_feature_1"), t("free_feature_2"), t("free_feature_3")],
-      isFree: true,
-      plan_id: "free",
-    },
+    // {
+    //   name: t("free_user"),
+    //   price: "€0",
+    //   priceSuffix: t("per_month"),
+    //   features: [t("free_feature_1"), t("free_feature_2"), t("free_feature_3")],
+    //   isFree: true,
+    //   plan_id: "free",
+    // },
     ...(subscriptionData?.plans || []).map((plan) => ({
       ...plan,
       isFree: false,
@@ -142,7 +140,7 @@ const AdminPricing = () => {
                         alt={t("plan_background")}
                         className="w-full h-auto"
                       />
-                      <h3 className="absolute top-4 left-4 text-slate-700 font-bold text-xl z-10">
+                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold  z-10">
                         {plan.name}
                       </h3>
                     </div>

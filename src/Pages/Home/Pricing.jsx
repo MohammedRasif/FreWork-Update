@@ -25,6 +25,8 @@ const Pricing = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  const role = localStorage.getItem("role");
+
   useEffect(() => {
     if (subscriptionError) {
       const errorMessage =
@@ -42,16 +44,19 @@ const Pricing = () => {
     }
   }, [subscriptionError, t]);
 
-  // Combine free plan + backend plans
   const allPlans = [
     
     ...(subscriptionData?.plans || []).map((plan) => ({
       ...plan,
       isFree: false,
-      plan_id: plan.price_id || "premium", // fallback
-      priceSuffix: "", // already included in price string
+      plan_id: plan.price_id || "premium", 
+      priceSuffix: "", 
     })),
   ];
+  const visiblePlans =
+  role === "agency"
+    ? allPlans
+    : allPlans.slice(0, 1);
 
   const handleSelectPlan = async (plan) => {
     if (plan.isFree) {
@@ -119,7 +124,7 @@ const Pricing = () => {
         {!isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto place-items-center md:place-items-start">
             <AnimatePresence mode="wait">
-              {allPlans.map((plan, index) => (
+              {visiblePlans.map((plan, index) => (
                 <motion.div
                   key={plan.name || index}
                   initial={{ opacity: 0, y: 20 }}

@@ -23,8 +23,6 @@ const Navbar = () => {
   });
 
   const isAuthenticated = !!localStorage.getItem("access_token");
-  const role = localStorage.getItem("role");
-
 
   const routeMap = {
     "/": "home",
@@ -124,9 +122,7 @@ const Navbar = () => {
       path: "/acceptedOffers",
       label: t("accepted_offers"),
     },
-    ...(role === "agency"
-    ? [{ key: "agencies", path: "/pricing", label: t("for_agencies") }]
-    : []),
+    { key: "agencies", path: "/pricing", label: t("for_agencies") },
     { key: "howitworks", path: "/who_it_work", label: t("who_work") },
   ];
 
