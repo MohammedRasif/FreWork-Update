@@ -20,6 +20,7 @@ import {
   FaLocationDot,
   FaStar,
 } from "react-icons/fa6";
+import { BsFillCalendarDateFill } from "react-icons/bs";
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 import AdminDecline from "./AdminDecline";
@@ -282,6 +283,8 @@ const AdminHome = () => {
                 <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
                   <div className="lg:flex lg:items-end lg:justify-between lg:flex-col lg:space-x-0">
                     <div className="text-center lg:text-right">
+                      
+                      
                       <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
                         {t("budget")} <FaEuroSign /> {plan.budget}
                       </p>
@@ -347,6 +350,19 @@ const AdminHome = () => {
                   </h2>
                   <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                     <div>
+                      
+                     
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                        <BsFillCalendarDateFill  className="w-6 h-5 text-gray-900 size-4" />
+                        <span>
+                          <span className="font-bold">
+                            {t("dates")}:
+                          </span>{" "}
+                          <span className="font-medium">
+                        {selectedPlan.start_date} — {selectedPlan.end_date || selectedPlan.start_date}
+                      </span>
+                        </span>
+                      </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                         <span>
