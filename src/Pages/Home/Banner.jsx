@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import img from "../../assets/img/background.jpg";
-import img1 from "../../assets/img/banner.png";
+import img1 from "../../assets/img/removebg1.png";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BannerSectionPopup from "./BannerSectionPupup";
