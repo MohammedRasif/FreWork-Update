@@ -686,7 +686,10 @@
 "description_optional": "Description (Optional)",
 "previous": "Previous",
 "ok": "OK",
-"budget_warning_message": "Please note that the budget is per person and includes flights, accommodation, transfers and meals as selected.",
+
+  "budget_warning_message": "💰 <1>Total group budget</1><br/>Enter the <3>maximum total budget.</3><br/><br/><5>Minimum to publish: €2,000</5><br/>For lower budgets, agencies are unlikely to send <7>tailored proposals.</7>"
+,
+
 "review_your_information": "Review Your Information",
 "travelers": "Travelers",
 "not_specified": "Not specified",

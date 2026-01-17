@@ -681,7 +681,7 @@
 "children": "Bambini",
 "previous": "Indietro",
 "ok": "OK",
-"budget_warning_message": "💰 Budget totale del gruppo Inserisci il budget massimo complessivo. Minimo per pubblicare:  2000€ Per budget inferiori, le agenzie difficilmente inviano proposte su misura.",
+"budget_warning_message": "💰 <1>Budget totale del gruppo</1><br/>Inserisci il <3>budget massimo complessivo.</3><br/><br/><5>Minimo per pubblicare: 2.000 €</5><br/>Con budget inferiori, le agenzie difficilmente inviano <7>proposte su misura.</7>",
 "review_your_information": "Rivedi le tue informazioni",
 "who_work": "Come Funziona",
 "travelers": "Viaggiatori",

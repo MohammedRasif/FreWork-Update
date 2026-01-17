@@ -153,7 +153,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         };
         script.onerror = () => {
           console.error("Failed to load Google Maps API");
-          toast.error(t("google_maps_load_failed") || "Failed to load Google Maps API");
+          toast.error(
+            t("google_maps_load_failed") || "Failed to load Google Maps API"
+          );
         };
         document.head.appendChild(script);
       }
@@ -166,7 +168,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
         console.error("Google Maps Places API is not available");
-        toast.error(t("google_maps_not_available") || "Google Maps Places API is not available");
+        toast.error(
+          t("google_maps_not_available") ||
+            "Google Maps Places API is not available"
+        );
         return;
       }
       console.log("Initializing autocomplete for all fields...");
@@ -200,7 +205,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       } else {
         console.warn("locationToRef is null");
       }
-      
     };
     if (window.google) {
       setTimeout(initAutocomplete, 100);
@@ -246,7 +250,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     const result = await trigger(fieldsToValidate);
     if (!result) {
-      toast.error(t("fill_all_required") || "Please fill all required fields before proceeding.");
+      toast.error(
+        t("fill_all_required") ||
+          "Please fill all required fields before proceeding."
+      );
     }
     return result;
   };
@@ -275,11 +282,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       return;
     }
     if (data.endingDate < data.startingDate) {
-      toast.error(t("end_date_after_start") || "End date must be after start date");
+      toast.error(
+        t("end_date_after_start") || "End date must be after start date"
+      );
       return;
     }
     if (!data.adults && !data.children) {
-      toast.error(t("at_least_one_person") || "At least one adult or child is required");
+      toast.error(
+        t("at_least_one_person") || "At least one adult or child is required"
+      );
       return;
     }
     const formDataToSend = new FormData();
@@ -334,7 +345,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       }
 
       toast.success(
-        t("plan_submitted_success") || "Your data successfully submitted! When approved by admin, this tour plan will be published.",
+        t("plan_submitted_success") ||
+          "Your data successfully submitted! When approved by admin, this tour plan will be published.",
         {
           autoClose: 4000,
           style: {
@@ -363,7 +375,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     } catch (error) {
       console.error("API Error:", error);
       toast.error(
-        t("error_submitting") || `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
+        t("error_submitting") ||
+          `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
       );
     } finally {
       if (status === "draft") {
@@ -423,11 +436,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                 {t("starting_date")}
+                  {t("starting_date")}
                 </label>
                 <input
                   {...register("startingDate", {
-                    required: t("starting_date_required") || "Starting Date is required",
+                    required:
+                      t("starting_date_required") ||
+                      "Starting Date is required",
                   })}
                   type="date"
                   defaultValue={formData.startingDate}
@@ -448,7 +463,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <input
                   {...register("endingDate", {
-                    required: t("ending_date_required") || "Ending Date is required",
+                    required:
+                      t("ending_date_required") || "Ending Date is required",
                   })}
                   type="date"
                   defaultValue={formData.endingDate}
@@ -469,8 +485,14 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <input
                   {...register("adults", {
-                    required: t("adults_required") || "At least one adult or child is required",
-                    min: { value: 0, message: t("adults_negative") || "Adults cannot be negative" },
+                    required:
+                      t("adults_required") ||
+                      "At least one adult or child is required",
+                    min: {
+                      value: 0,
+                      message:
+                        t("adults_negative") || "Adults cannot be negative",
+                    },
                   })}
                   type="number"
                   placeholder={t("adults_placeholder") || "Adults"}
@@ -490,7 +512,11 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <input
                   {...register("children", {
-                    min: { value: 0, message: t("children_negative") || "Children cannot be negative" },
+                    min: {
+                      value: 0,
+                      message:
+                        t("children_negative") || "Children cannot be negative",
+                    },
                   })}
                   type="number"
                   placeholder={t("children_placeholder") || "Children"}
@@ -512,12 +538,14 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                 {t("location_from")}
+                  {t("location_from")}
                 </label>
                 <input
                   {...fromRest}
                   type="text"
-                  placeholder={t("starting_location_placeholder") || "Starting location"}
+                  placeholder={
+                    t("starting_location_placeholder") || "Starting location"
+                  }
                   defaultValue={formData.locationFrom}
                   onChange={(e) => {
                     updateFormData("locationFrom", e.target.value);
@@ -537,7 +565,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                 {t("location_to")}
+                  {t("location_to")}
                 </label>
                 <input
                   {...toRest}
@@ -564,13 +592,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                 {t("budget")}
+                  {t("budget")}
                 </label>
                 <input
                   {...register("budget", {
                     required: t("budget_required") || "Budget is required",
                     validate: (value) =>
-                      value.trim() !== "" || t("budget_empty") || "Budget cannot be empty",
+                      value.trim() !== "" ||
+                      t("budget_empty") ||
+                      "Budget cannot be empty",
                   })}
                   type="text"
                   placeholder={t("budget_placeholder") || "Budget (EUR)"}
@@ -589,26 +619,38 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     {errors.budget.message}
                   </span>
                 )}
+
+                {/* budget_warning_message */}
                 {showBudgetMessage && (
-                  <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
-                    <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 lg:w-96 w-72">
-                      <p className="lg:text-[15px] text-[13px] text-gray-700">
-                        {t("budget_warning_message")
-                          .split(/([.:])/)
-                          .map((part, index) => (
-                            <span key={index}>
-                              {part}
-                              {(part === "." || part === ":") && <br />}
-                            </span>
-                          ))}
+                  <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4 ">
+                    <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 shadow-2xl lg:w-96 w-72">
+                      <p className="lg:text-[15px] text-[13px] text-gray-800 leading-relaxed">
+                        💰{" "}
+                        <span className="font-semibold">
+                          Budget totale del gruppo
+                        </span>
+                        <br />
+                        Inserisci il{" "}
+                        <span className="font-semibold">
+                          budget massimo complessivo.
+                        </span>
+                        <br />
+                        <br />
+                        <span className="font-semibold">
+                          Minimo per pubblicare: 2.000 €
+                        </span>
+                        <br />
+                        Con budget inferiori, le agenzie difficilmente inviano{" "}
+                        <span className="font-semibold">
+                          proposte su misura.
+                        </span>
                       </p>
 
-                      
                       <button
                         onClick={handleOkClick}
                         className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
                       >
-                       {t("ok")}
+                        {t("ok")}
                       </button>
                     </div>
                   </div>
@@ -620,10 +662,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <input
                   {...register("touristSpots", {
-                    required: t("tourist_spots_required") || "Tourist Spots is required",
+                    required:
+                      t("tourist_spots_required") ||
+                      "Tourist Spots is required",
                   })}
                   type="text"
-                  placeholder={t("tourist_spots_placeholder") || "Mare, Monumenti, Ristorante..."}
+                  placeholder={
+                    t("tourist_spots_placeholder") ||
+                    "Mare, Monumenti, Ristorante..."
+                  }
                   defaultValue={formData.touristSpots}
                   onChange={(e) => {
                     updateFormData("touristSpots", e.target.value);
@@ -649,7 +696,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </label>
               <textarea
                 {...register("description")}
-                placeholder={t("description_placeholder") || "Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."}
+                placeholder={
+                  t("description_placeholder") ||
+                  "Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
+                }
                 rows="4"
                 defaultValue={formData.description}
                 onChange={(e) => updateFormData("description", e.target.value)}
@@ -665,8 +715,17 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   {t("type_of_accommodation")}
                 </label>
-                <select className="border-2 border-slate-300 rounded-sm" {...register("typeOfAccommodation", { required: t("accommodation_required") || "Accommodation is required" })}>
-                  <option value="">{t("select_accommodation") || "Select Accommodation"}</option>
+                <select
+                  className="border-2 border-slate-300 rounded-sm"
+                  {...register("typeOfAccommodation", {
+                    required:
+                      t("accommodation_required") ||
+                      "Accommodation is required",
+                  })}
+                >
+                  <option value="">
+                    {t("select_accommodation") || "Select Accommodation"}
+                  </option>
                   <option value="hotel">{t("hotel")}</option>
                   <option value="resort">{t("resort")}</option>
                   <option value="homestay">{t("homestay")}</option>
@@ -678,9 +737,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   {t("minimum_hotel_stars")}
                 </label>
-                <select className="border-2 border-slate-300 rounded-sm" {...register("minimumHotelStars")}>
-                  <option value="">{t("select_stars") || "Select Stars"}</option>
-                  {[1,2,3,4,5].map(s => <option key={s} value={s}>{s} {t("star", { count: s })}</option>)}
+                <select
+                  className="border-2 border-slate-300 rounded-sm"
+                  {...register("minimumHotelStars")}
+                >
+                  <option value="">
+                    {t("select_stars") || "Select Stars"}
+                  </option>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <option key={s} value={s}>
+                      {s} {t("star", { count: s })}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -689,8 +757,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 mt-4">
                 {t("meal_plan")}
               </label>
-              <select className="border-2 border-slate-300 rounded-sm" {...register("mealPlan", { required: t("meal_plan_required") || "Meal plan is required" })}>
-                <option value="">{t("select_meal_plan") || "Select Meal Plan"}</option>
+              <select
+                className="border-2 border-slate-300 rounded-sm"
+                {...register("mealPlan", {
+                  required: t("meal_plan_required") || "Meal plan is required",
+                })}
+              >
+                <option value="">
+                  {t("select_meal_plan") || "Select Meal Plan"}
+                </option>
                 <option value="none">{t("no_meals")}</option>
                 <option value="breakfast">{t("breakfast")}</option>
                 <option value="half-board">{t("half_board")}</option>
@@ -708,18 +783,29 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <select
                   {...register("travelType", {
-                    required: t("travel_type_required") || "Travel Type is required",
+                    required:
+                      t("travel_type_required") || "Travel Type is required",
                   })}
                   defaultValue={formData.travelType}
                   onChange={(e) => updateFormData("travelType", e.target.value)}
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
-                  <option value="">{t("select_travel_type") || "Select Travel Type"}</option>
-                  <option value="family">{t("family_trip") || "Family Trip"}</option>
-                  <option value="solo">{t("solo_travel") || "Solo Travel"}</option>
+                  <option value="">
+                    {t("select_travel_type") || "Select Travel Type"}
+                  </option>
+                  <option value="family">
+                    {t("family_trip") || "Family Trip"}
+                  </option>
+                  <option value="solo">
+                    {t("solo_travel") || "Solo Travel"}
+                  </option>
                   <option value="couple">{t("couple") || "Couple"}</option>
-                  <option value="group">{t("group_travel") || "Group Travel"}</option>
-                  <option value="business">{t("business_travel") || "Business Travel"}</option>
+                  <option value="group">
+                    {t("group_travel") || "Group Travel"}
+                  </option>
+                  <option value="business">
+                    {t("business_travel") || "Business Travel"}
+                  </option>
                 </select>
                 {errors.travelType && (
                   <span className="text-red-500 text-xs mt-1">
@@ -733,7 +819,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 </label>
                 <select
                   {...register("destinationType", {
-                    required: t("destination_type_required") || "Destination Type is required",
+                    required:
+                      t("destination_type_required") ||
+                      "Destination Type is required",
                   })}
                   defaultValue={formData.destinationType}
                   onChange={(e) =>
@@ -741,11 +829,21 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   }
                   className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
                 >
-                  <option value="">{t("select_destination_type") || "Select Destination Type"}</option>
-                  <option value="beach">{t("beach_trips") || "Beach trips"}</option>
-                  <option value="mountain">{t("mountain_adventures") || "Mountain adventures"}</option>
-                  <option value="relax">{t("relaxing_tours") || "Relaxing tours"}</option>
-                  <option value="group">{t("group_packages") || "Group packages"}</option>
+                  <option value="">
+                    {t("select_destination_type") || "Select Destination Type"}
+                  </option>
+                  <option value="beach">
+                    {t("beach_trips") || "Beach trips"}
+                  </option>
+                  <option value="mountain">
+                    {t("mountain_adventures") || "Mountain adventures"}
+                  </option>
+                  <option value="relax">
+                    {t("relaxing_tours") || "Relaxing tours"}
+                  </option>
+                  <option value="group">
+                    {t("group_packages") || "Group packages"}
+                  </option>
                 </select>
                 {errors.destinationType && (
                   <span className="text-red-500 text-xs mt-1">
@@ -761,7 +859,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                 <p>
                   <span className="font-medium">{t("from") || "From:"}</span>{" "}
-                  {formData.locationFrom || t("not_specified") || "Not specified"}
+                  {formData.locationFrom ||
+                    t("not_specified") ||
+                    "Not specified"}
                 </p>
                 <p>
                   <span className="font-medium">{t("to") || "To:"}</span>{" "}
@@ -774,7 +874,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     : t("not_specified") || "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("travelers") || "Travelers:"}</span>{" "}
+                  <span className="font-medium">
+                    {t("travelers") || "Travelers:"}
+                  </span>{" "}
                   {formData.adults || formData.children
                     ? `${formData.adults || 0} ${t("adults")}, ${
                         formData.children || 0
@@ -782,35 +884,59 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     : t("not_specified") || "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("budget") || "Budget:"}</span>{" "}
+                  <span className="font-medium">
+                    {t("budget") || "Budget:"}
+                  </span>{" "}
                   {formData.budget || t("not_specified") || "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("tourist_spots") || "Tourist Spots:"}</span>{" "}
-                  {formData.touristSpots || t("not_specified") || "Not specified"}
+                  <span className="font-medium">
+                    {t("tourist_spots") || "Tourist Spots:"}
+                  </span>{" "}
+                  {formData.touristSpots ||
+                    t("not_specified") ||
+                    "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("accommodation") || "Accommodation:"}</span>{" "}
-                  {formData.typeOfAccommodation || t("not_specified") || "Not specified"}
+                  <span className="font-medium">
+                    {t("accommodation") || "Accommodation:"}
+                  </span>{" "}
+                  {formData.typeOfAccommodation ||
+                    t("not_specified") ||
+                    "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("hotel_stars") || "Hotel Stars:"}</span>{" "}
-                  {formData.minimumHotelStars || t("not_specified") || "Not specified"}
+                  <span className="font-medium">
+                    {t("hotel_stars") || "Hotel Stars:"}
+                  </span>{" "}
+                  {formData.minimumHotelStars ||
+                    t("not_specified") ||
+                    "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("meal_plan") || "Meal Plan:"}</span>{" "}
+                  <span className="font-medium">
+                    {t("meal_plan") || "Meal Plan:"}
+                  </span>{" "}
                   {formData.mealPlan || t("not_specified") || "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("travel_type") || "Travel Type:"}</span>{" "}
+                  <span className="font-medium">
+                    {t("travel_type") || "Travel Type:"}
+                  </span>{" "}
                   {formData.travelType || t("not_specified") || "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("destination_type") || "Destination Type:"}</span>{" "}
-                  {formData.destinationType || t("not_specified") || "Not specified"}
+                  <span className="font-medium">
+                    {t("destination_type") || "Destination Type:"}
+                  </span>{" "}
+                  {formData.destinationType ||
+                    t("not_specified") ||
+                    "Not specified"}
                 </p>
                 <p>
-                  <span className="font-medium">{t("flight") || "Flight:"}</span>{" "}
+                  <span className="font-medium">
+                    {t("flight") || "Flight:"}
+                  </span>{" "}
                   {formData.includeRoundTripFlight
                     ? t("included") || "Included"
                     : t("not_included") || "Not included"}
@@ -826,7 +952,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 {t("name")}
               </label>
               <input
-                {...register("name", { required: t("name_required") || "Name is required" })}
+                {...register("name", {
+                  required: t("name_required") || "Name is required",
+                })}
                 type="text"
                 placeholder={t("full_name") || "Full name"}
                 defaultValue={formData.name}
@@ -890,7 +1018,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <div className="flex items-start">
               <input
                 {...register("confirmation", {
-                  required: t("confirmation_required") || "You must confirm the request",
+                  required:
+                    t("confirmation_required") ||
+                    "You must confirm the request",
                 })}
                 type="checkbox"
                 id="confirmation"
@@ -904,7 +1034,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 htmlFor="confirmation"
                 className="ml-2 text-xs sm:text-sm text-gray-700"
               >
-                {t("confirmation_text") || "I confirm this is a travel request, and all provided information is valid and does not include any third party."}
+                {t("confirmation_text") ||
+                  "I confirm this is a travel request, and all provided information is valid and does not include any third party."}
               </label>
               {errors.confirmation && (
                 <span className="text-red-500 text-xs mt-1">
@@ -917,10 +1048,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         {currentStep === 6 && (
           <div className="space-y-3 sm:space-y-4">
             <p className="text-gray-700 text-xs sm:text-sm">
-              📞 Verifica qualità richiesta<br />
-              Per garantire serietà, alcune richieste vengono verificate telefonicamente<br />
-              (chiamata breve, max 2 minuti).<br />
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte su misura.
+              📞 Verifica qualità richiesta
+              <br />
+              Per garantire serietà, alcune richieste vengono verificate
+              telefonicamente
+              <br />
+              (chiamata breve, max 2 minuti).
+              <br />
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte su
+              misura.
             </p>
           </div>
         )}
@@ -957,7 +1093,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 }
                 className="bg-[#FF6600] hover:bg-[#e55600] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
-                {isPublishing ? t("publishing") || "Publishing..." : t("ok") || "OK"}
+                {isPublishing
+                  ? t("publishing") || "Publishing..."
+                  : t("ok") || "OK"}
               </button>
             )}
           </div>
