@@ -14,161 +14,160 @@ import { useTranslation } from "react-i18next";
 
 const Pricing = () => {
   const { t } = useTranslation();
-  const [billingCycle, setBillingCycle] = useState("monthly");
+  const navigate = useNavigate();
+  const language = localStorage.getItem("i18nextLng") || "en";
+  const accessToken = localStorage.getItem("access_token");
+  const { 
+    data: subscriptionData, 
+    isLoading, 
+    isFetching, 
+    isError, 
+    error,
+    refetch 
+  } = useShowSubscriptionDataQuery(language, {
+    refetchOnMountOrArgChange: true,   
+    skip: false,
+  });
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
     useSubscriptionMutation();
-  const navigate = useNavigate();
-  const language = localStorage.getItem("i18nextLng");
-
-  const { data: subscriptionData, isLoading } =
-    useShowSubscriptionDataQuery(language);
-
-  const accessToken = localStorage.getItem("access_token");
-  const role = localStorage.getItem("role");
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
+  useEffect(() => {
+    refetch();
+  }, [accessToken, language, refetch]);
   useEffect(() => {
     if (subscriptionError) {
       const errorMessage =
         subscriptionError?.data?.detail || t("failed_to_process_subscription");
-      toast.error(errorMessage, {
-        toastId: "subscription-error",
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.error(errorMessage);
     }
   }, [subscriptionError, t]);
-
-  const allPlans = [
-    ...(subscriptionData?.plans || []).map((plan) => ({
-      ...plan,
-      isFree: false,
-      plan_id: plan.price_id || "premium",
-      priceSuffix: "",
-    })),
-  ];
-
-  // Logged in হলে প্রথম প্ল্যান skip, না হলে শুধু প্রথমটা
+  const allPlans = (subscriptionData?.plans || []).map((plan) => ({
+    ...plan,
+    isFree: false,
+    plan_id: plan.price_id || "premium",
+    priceSuffix: "",
+  }));
   let visiblePlans = [];
   if (accessToken) {
-    visiblePlans = allPlans.slice(1); // প্রথমটা (free) বাদ
+    visiblePlans = allPlans.slice(1); 
   } else {
-    visiblePlans = allPlans.slice(0, 1); // শুধু প্রথমটা
+    visiblePlans = allPlans.slice(0, 1); 
   }
-
   const isSingleCardView = visiblePlans.length === 1;
-
+  const isLoadingState = isLoading || isFetching;
   const handleSelectPlan = async (plan) => {
     if (isSingleCardView) {
       localStorage.setItem("pricing_status", "from_pricing");
       navigate("/register");
       return;
     }
-
     if (plan.isFree) {
-      toast.info(t("free_plan_selected"), {
-        toastId: "free-plan-selected",
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.info(t("free_plan_selected"));
       return;
     }
-
     if (!accessToken) {
-      toast.info(t("login_required_for_premium"), {
-        toastId: "login-required",
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.info(t("login_required_for_premium"));
       navigate("/login", { state: { from: "/pricing" } });
       return;
     }
-
     try {
       const response = await subscription({ plan_id: plan.plan_id }).unwrap();
       if (response?.checkout_url) {
         window.location.href = response.checkout_url;
       } else {
-        toast.success(t("subscription_success"), {
-          toastId: "subscription-success",
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(t("subscription_success"));
       }
-    } catch (error) {
-      // Error toast already handled in useEffect
+    } catch (err) {
     }
   };
-
-  const PricingSkeleton = ({ count = 1 }) => {
-    return (
-      <>
-        {Array.from({ length: count }).map((_, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white w-[45vh] max-w-sm rounded-2xl shadow-xl border border-gray-200 p-6"
-          >
-            <div className="animate-pulse space-y-4">
-              <div className="h-32 bg-gray-200 rounded-lg"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-10 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-12 bg-gray-300 rounded"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-              </div>
+  const PricingSkeleton = ({ count = 1 }) => (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="bg-white w-[45vh] max-w-sm rounded-2xl shadow-xl border border-gray-200 p-6"
+        >
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 bg-gray-200 rounded-lg"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-10 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-12 bg-gray-300 rounded"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
             </div>
-          </motion.div>
-        ))}
-      </>
-    );
-  };
+          </div>
+        </motion.div>
+      ))}
+    </>
+  );
 
   return (
     <section className="pt-24 roboto bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
-        <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-8 tracking-wider">
+        <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
           {t("pricing")}
         </h1>
 
-        {isLoading ? (
+        {isLoadingState && (
           <div className="min-h-[60vh] flex items-center justify-center">
             <div className="grid gap-8 place-items-center">
-              <PricingSkeleton count={accessToken ? 2 : 1} /> {/* লগইন হলে ২টা skeleton, না হলে ১টা */}
+              <PricingSkeleton count={accessToken ? Math.min(2, allPlans.length - 1 || 2) : 1} />
             </div>
           </div>
-        ) : visiblePlans.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 text-xl">
-            {t("no_plans_available") || "No plans available at the moment."}
+        )}
+
+        {isError && !isLoadingState && (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+            <div className="text-2xl text-red-600 mb-4 font-semibold">
+              {t("error_loading_plans") || "Errore nel caricamento dei piani"}
+            </div>
+            <p className="text-gray-600 mb-6 max-w-md">
+              {error?.data?.message || t("something_went_wrong_try_again")}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-8 py-3 bg-[#3776E2] text-white rounded-md hover:bg-[#00669e] transition"
+            >
+              {t("try_again") || "Riprova"}
+            </button>
           </div>
-        ) : (
+        )}
+
+        {!isLoadingState && !isError && visiblePlans.length === 0 && (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+            <div className="text-2xl text-gray-600 mb-4">
+              {t("no_plans_available") || "Nessun piano disponibile al momento"}
+            </div>
+            <p className="text-gray-500 mb-8 max-w-md">
+              {accessToken
+                ? t("contact_support_subscription")
+                : t("please_register_or_wait")}
+            </p>
+            {!accessToken && (
+              <button
+                onClick={() => navigate("/register")}
+                className="px-8 py-3 bg-[#3776E2] text-white rounded-md hover:bg-[#00669e]"
+              >
+                {t("register_now")}
+              </button>
+            )}
+            <button
+              onClick={() => refetch()}
+              className="mt-4 px-6 py-2 border border-gray-400 rounded-md hover:bg-gray-100"
+            >
+              {t("refresh")}
+            </button>
+          </div>
+        )}
+
+        {!isLoadingState && !isError && visiblePlans.length > 0 && (
           <div
             className={`grid gap-8 mx-auto place-items-center
               ${isSingleCardView 
@@ -188,11 +187,7 @@ const Pricing = () => {
                 >
                   <div className="relative">
                     <div className="w-3/4 rounded-r-lg my-10 relative">
-                      <img
-                        src={img}
-                        alt={t("plan_background")}
-                        className="w-full h-auto"
-                      />
+                      <img src={img} alt="Plan background" className="w-full h-auto" />
                       <h3 className="absolute top-4 left-2 text-slate-700 font-bold text-xl z-10">
                         {plan.name}
                       </h3>
@@ -200,29 +195,19 @@ const Pricing = () => {
                   </div>
 
                   <div className="px-6 pb-6 flex flex-col flex-grow">
-                    <div className="lg:mb-5 mb-4">
+                    <div className="mb-5">
                       <div className="flex items-end">
-                        <span className="text-4xl font-bold text-slate-700">
-                          {plan.price}
-                        </span>
-                        <span className="text-xl text-slate-500 ml-1">
-                          {plan.priceSuffix}
-                        </span>
+                        <span className="text-4xl font-bold text-slate-700">{plan.price}</span>
+                        <span className="text-xl text-slate-500 ml-1">{plan.priceSuffix}</span>
                       </div>
-                      <p className="text-slate-500 text-base mt-1">
-                        {t("measurable_results")}
-                      </p>
+                      <p className="text-slate-500 text-base mt-1">{t("measurable_results")}</p>
                     </div>
 
-                    <p className="text-slate-500 text-base mb-6">
-                      {t("contact_for_details")}
-                    </p>
+                    <p className="text-slate-500 text-base mb-6">{t("contact_for_details")}</p>
 
                     <div className="mb-6 flex-grow">
                       <div className="flex items-center mb-3">
-                        <span className="text-slate-700 font-semibold text-lg">
-                          {t("features")}
-                        </span>
+                        <span className="text-slate-700 font-semibold text-lg">{t("features")}</span>
                         <div className="ml-2 text-[#3776E2]">
                           <IoCheckmarkCircleSharp size={20} />
                         </div>
@@ -240,10 +225,7 @@ const Pricing = () => {
                           ))
                         ) : (
                           <li className="flex items-start">
-                            <IoCheckmarkDoneSharp
-                              className="text-[#3776E2] mt-1 mr-2 flex-shrink-0"
-                              size={20}
-                            />
+                            <IoCheckmarkDoneSharp className="text-[#3776E2] mt-1 mr-2" size={20} />
                             <span>{t("no_features_available")}</span>
                           </li>
                         )}
@@ -253,6 +235,7 @@ const Pricing = () => {
                     <button
                       className="w-full bg-[#3776E2] text-white py-3 rounded-md hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold mt-auto"
                       onClick={() => handleSelectPlan(plan)}
+                      disabled={isSubscribing}
                     >
                       {isSingleCardView ? t("register") : t("select")}
                     </button>
@@ -264,7 +247,7 @@ const Pricing = () => {
         )}
       </div>
 
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={5000} />
       <Faq />
     </section>
   );
