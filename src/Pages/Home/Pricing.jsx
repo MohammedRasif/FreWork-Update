@@ -17,15 +17,18 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [subscription, { isLoading: isSubscribing, error: subscriptionError }] =
     useSubscriptionMutation();
-  const [langParam, setLangParam] = useState("lang=en");
   const navigate = useNavigate();
   const language = localStorage.getItem("i18nextLng");
+
   const { data: subscriptionData, isLoading } =
     useShowSubscriptionDataQuery(language);
+
+  const accessToken = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const role = localStorage.getItem("role");
 
   useEffect(() => {
     if (subscriptionError) {
@@ -52,8 +55,16 @@ const Pricing = () => {
       priceSuffix: "",
     })),
   ];
-  const visiblePlans = role === "agency" ? allPlans : allPlans.slice(0, 1);
-  const isSingleCardView = role !== "agency";
+
+  // Logged in হলে প্রথম প্ল্যান skip, না হলে শুধু প্রথমটা
+  let visiblePlans = [];
+  if (accessToken) {
+    visiblePlans = allPlans.slice(1); // প্রথমটা (free) বাদ
+  } else {
+    visiblePlans = allPlans.slice(0, 1); // শুধু প্রথমটা
+  }
+
+  const isSingleCardView = visiblePlans.length === 1;
 
   const handleSelectPlan = async (plan) => {
     if (isSingleCardView) {
@@ -61,6 +72,7 @@ const Pricing = () => {
       navigate("/register");
       return;
     }
+
     if (plan.isFree) {
       toast.info(t("free_plan_selected"), {
         toastId: "free-plan-selected",
@@ -75,7 +87,6 @@ const Pricing = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem("access_token");
     if (!accessToken) {
       toast.info(t("login_required_for_premium"), {
         toastId: "login-required",
@@ -108,11 +119,11 @@ const Pricing = () => {
         });
       }
     } catch (error) {
-      // Error toast handled by useEffect
+      // Error toast already handled in useEffect
     }
   };
 
-  const PricingSkeleton = ({ count = 3 }) => {
+  const PricingSkeleton = ({ count = 1 }) => {
     return (
       <>
         {Array.from({ length: count }).map((_, index) => (
@@ -141,20 +152,30 @@ const Pricing = () => {
   };
 
   return (
-    <section className="pt-24 roboto bg-gray-50 ">
+    <section className="pt-24 roboto bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
-        <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-5 tracking-wider">
+        <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-3 sm:mb-8 tracking-wider">
           {t("pricing")}
         </h1>
 
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto place-items-center md:place-items-start">
-            <PricingSkeleton count={role === "agency" ? 3 : 1} />
+        {isLoading ? (
+          <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="grid gap-8 place-items-center">
+              <PricingSkeleton count={accessToken ? 2 : 1} /> {/* লগইন হলে ২টা skeleton, না হলে ১টা */}
+            </div>
           </div>
-        )}
-
-        {!isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto place-items-center md:place-items-start">
+        ) : visiblePlans.length === 0 ? (
+          <div className="text-center py-20 text-gray-500 text-xl">
+            {t("no_plans_available") || "No plans available at the moment."}
+          </div>
+        ) : (
+          <div
+            className={`grid gap-8 mx-auto place-items-center
+              ${isSingleCardView 
+                ? "grid-cols-1 max-w-md" 
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl"}
+            `}
+          >
             <AnimatePresence mode="wait">
               {visiblePlans.map((plan, index) => (
                 <motion.div
@@ -163,7 +184,7 @@ const Pricing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="bg-white w-[45vh] max-w-sm mx-auto md:mx-0 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
+                  className="bg-white w-[45vh] max-w-sm rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
                 >
                   <div className="relative">
                     <div className="w-3/4 rounded-r-lg my-10 relative">
@@ -172,13 +193,14 @@ const Pricing = () => {
                         alt={t("plan_background")}
                         className="w-full h-auto"
                       />
-                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold text-[] z-10">
+                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold text-xl z-10">
                         {plan.name}
                       </h3>
                     </div>
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="lg:mb-14 mb-5">
+
+                  <div className="px-6 pb-6 flex flex-col flex-grow">
+                    <div className="lg:mb-5 mb-4">
                       <div className="flex items-end">
                         <span className="text-4xl font-bold text-slate-700">
                           {plan.price}
@@ -191,19 +213,12 @@ const Pricing = () => {
                         {t("measurable_results")}
                       </p>
                     </div>
-                    {!(role === "agency" && index === 0) && (
-                      <button
-                        className="w-full bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
-                        onClick={() => handleSelectPlan(plan, index)}
-                      >
-                        {isSingleCardView ? t("register") : t("select")}
-                      </button>
-                    )}
 
                     <p className="text-slate-500 text-base mb-6">
                       {t("contact_for_details")}
                     </p>
-                    <div className="mb-4 flex-grow">
+
+                    <div className="mb-6 flex-grow">
                       <div className="flex items-center mb-3">
                         <span className="text-slate-700 font-semibold text-lg">
                           {t("features")}
@@ -213,8 +228,7 @@ const Pricing = () => {
                         </div>
                       </div>
                       <ul className="space-y-3 text-base text-slate-600">
-                        {Array.isArray(plan.features) &&
-                        plan.features.length > 0 ? (
+                        {Array.isArray(plan.features) && plan.features.length > 0 ? (
                           plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start">
                               <IoCheckmarkDoneSharp
@@ -235,6 +249,13 @@ const Pricing = () => {
                         )}
                       </ul>
                     </div>
+
+                    <button
+                      className="w-full bg-[#3776E2] text-white py-3 rounded-md hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold mt-auto"
+                      onClick={() => handleSelectPlan(plan)}
+                    >
+                      {isSingleCardView ? t("register") : t("select")}
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -242,6 +263,7 @@ const Pricing = () => {
           </div>
         )}
       </div>
+
       <ToastContainer />
       <Faq />
     </section>
