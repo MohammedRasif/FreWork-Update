@@ -134,7 +134,7 @@ function SinglePost({ prid }) {
       formData.append("apply_discount", offerForm.applyDiscount);
       formData.append(
         "discount",
-        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
       );
       if (selectedFile) {
         formData.append("file", selectedFile);
@@ -216,7 +216,7 @@ function SinglePost({ prid }) {
     }
     if (String(otherUserId) === String(currentUserId)) {
       toast.error(
-        t("cannot_message_yourself") || "Non puoi mandare messaggi a te stesso"
+        t("cannot_message_yourself") || "Non puoi mandare messaggi a te stesso",
       );
       return;
     }
@@ -258,33 +258,36 @@ function SinglePost({ prid }) {
   console.log("Tour data:", tour);
   const hasMaxOffers = tour.offers?.length >= 3;
 
-// ধরে নিচ্ছি userData আছে (useShowUserInpormationQuery থেকে)
-const handleSentOfferClick = () => {
-  if (!token) {
-    navigate("/login");
-    toast.error(t("login_to_submit_offer"));
-    return;
-  }
+  const handleSentOfferClick = () => {
+    if (!token) {
+      navigate("/login");
+      toast.error(t("login_to_submit_offer"));
+      return;
+    }
 
-  // userData থেকে চেক করা (সবচেয়ে নির্ভরযোগ্য)
-  if (userData?.role === "agency" && !userData?.agency_is_verified) {
-    navigate("/pandding");
-    toast.info(t("agency_verification_pending") || "Your agency profile is under verification");
-    return;
-  }
+    if (userData?.role === "agency" && !userData?.agency_is_verified) {
+      navigate("/pandding");
+      toast.info(
+        t("agency_verification_pending") ||
+          "Your agency profile is under verification",
+      );
+      return;
+    }
+    // if (userData?.role === "agency" && !userData?.agency_is_verified) {
+    //   navigate("/dashboard");
+    // }
+    if (tour.status === "accepted") {
+      toast.info(t("offer_accepted"));
+      return;
+    }
 
-  if (tour.status === "accepted") {
-    toast.info(t("offer_accepted"));
-    return;
-  }
+    if (hasMaxOffers) {
+      toast.info(t("offer_limit_reached"));
+      return;
+    }
 
-  if (hasMaxOffers) {
-    toast.info(t("offer_limit_reached"));
-    return;
-  }
-
-  setIsPopupOpen(true);
-};
+    setIsPopupOpen(true);
+  };
 
   const showSentOfferButton = !token || role === "agency";
 
@@ -405,12 +408,12 @@ const handleSentOfferClick = () => {
             {tour.destination_type === "beach"
               ? "Mare"
               : tour.destination_type === "mountain"
-              ? "Montagna"
-              : tour.destination_type === "relax"
-              ? "Relax"
-              : tour.destination_type === "group"
-              ? "Gruppi"
-              : t("na")}
+                ? "Montagna"
+                : tour.destination_type === "relax"
+                  ? "Relax"
+                  : tour.destination_type === "group"
+                    ? "Gruppi"
+                    : t("na")}
           </p>
 
           <div className="">
@@ -463,10 +466,10 @@ const handleSentOfferClick = () => {
                 {tour.meal_plan === "breakfast"
                   ? "Colazione"
                   : tour.meal_plan === "half-board"
-                  ? "Mezza Pensione (Colazione & Cena)"
-                  : tour.meal_plan === "full-board"
-                  ? "Pensione Completa (Tutti i Pasti)"
-                  : "N/A"}
+                    ? "Mezza Pensione (Colazione & Cena)"
+                    : tour.meal_plan === "full-board"
+                      ? "Pensione Completa (Tutti i Pasti)"
+                      : "N/A"}
               </span>
             </p>
 
@@ -480,14 +483,14 @@ const handleSentOfferClick = () => {
                   {tour.type_of_accommodation === "hotel"
                     ? "Hotel"
                     : tour.type_of_accommodation === "resort"
-                    ? "Resort"
-                    : tour.type_of_accommodation === "homestay"
-                    ? "Famiglia"
-                    : tour.type_of_accommodation === "apartment"
-                    ? "Appartamento"
-                    : tour.type_of_accommodation === "hostel"
-                    ? "Ostello"
-                    : "N/A"}
+                      ? "Resort"
+                      : tour.type_of_accommodation === "homestay"
+                        ? "Famiglia"
+                        : tour.type_of_accommodation === "apartment"
+                          ? "Appartamento"
+                          : tour.type_of_accommodation === "hostel"
+                            ? "Ostello"
+                            : "N/A"}
                 </span>
               </p>
               <p className="text-md text-gray-600 flex items-center gap-2">

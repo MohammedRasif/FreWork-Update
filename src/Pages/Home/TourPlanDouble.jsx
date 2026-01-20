@@ -441,6 +441,9 @@ const TourPlanDouble = () => {
                       );
                       return;
                     }
+                    if (role === "agency" && agencyVerified){
+                      navigate("/dashboard");
+                    }
                     if (tour.status === "accepted") {
                       toast.info(t("offer_accepted"));
                       return;
