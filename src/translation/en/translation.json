@@ -102,9 +102,9 @@
 "benefit_2": "Receive direct client requests instantly",
 "benefit_3": "Manage offers, negotiations, and bookings in one dashboard",
 "benefit_4": "Boost your visibility with highly interested travelers",
-"address_line1": "Villa No. 45, Street 12, Khalifa City,",
-"address_line2": "Abu Dhabi, United Arab Emirates",
-"email": "E-mail",
+"address_line1": "Sede legale:",
+"address_line2": "Verona, Italia",
+"email": "info@vacanzamycost.it",
 "our_collaborators": "Our collaborators",
 "collaborator_1": "Demo company limited",
 "collaborator_2": "Demo task company",
@@ -959,6 +959,8 @@
 "desc": "The service is 100% free for users. No commissions. No intermediaries. Agencies only pay an optional Premium subscription for extra services."
 }
 },
+
+
 "faq_title": "FREQUENTLY ASKED QUESTIONS",
 "faq": [
 {

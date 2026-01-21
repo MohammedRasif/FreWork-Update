@@ -2,15 +2,22 @@
 import React from 'react';
 import { Clock, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
+import image from "../../assets/img/removebg.png"
+import { NavLink } from 'react-router-dom';
 function PendingForAdmin() {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-12 text-center">
+
+        
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3 text-center">
+         <NavLink to="/">
+           <div className='flex items-center justify-center pb-5'>
+          <img src={image} className='h-16' alt="" />
+        </div>
+         </NavLink>
           <div className="relative inline-block mb-6">
             <div className="absolute inset-0 bg-white/20 rounded-full blur-xl"></div>
             <div className="relative bg-white/10 backdrop-blur-sm p-6 rounded-full">
@@ -26,7 +33,6 @@ function PendingForAdmin() {
           </p>
         </div>
 
-        {/* Main Content */}
         <div className="p-8 space-y-6">
           <div className="text-center space-y-4">
             <div className="flex justify-center">
@@ -96,7 +102,6 @@ function PendingForAdmin() {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 text-center">
           <p className="text-sm text-gray-500">
             {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © VacanzaMyCost.it

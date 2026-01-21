@@ -22,6 +22,8 @@ const Navbar = () => {
     refetchOnMountOrArgChange: true,
   });
 
+  localStorage.setItem("agency_is_verified", userData?.agency_is_verified || "");
+
   const isAuthenticated = !!localStorage.getItem("access_token");
 
   const routeMap = {

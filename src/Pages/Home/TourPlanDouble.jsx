@@ -84,44 +84,44 @@ const TourPlanDouble = () => {
   const uniqueCountries = Array.from(
     new Set(
       tourPlanPublic?.map((tour) => tour.location_to?.trim()).filter(Boolean) ||
-        []
-    )
+        [],
+    ),
   ).sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
     let filteredData = tourPlanPublic || [];
     if (filters.search) {
       filteredData = filteredData.filter((tour) =>
-        tour.location_to?.toLowerCase().includes(filters.search.toLowerCase())
+        tour.location_to?.toLowerCase().includes(filters.search.toLowerCase()),
       );
     }
     if (filters.min) {
       filteredData = filteredData.filter(
-        (tour) => parseFloat(tour.budget) >= parseFloat(filters.min)
+        (tour) => parseFloat(tour.budget) >= parseFloat(filters.min),
       );
     }
     if (filters.max) {
       filteredData = filteredData.filter(
-        (tour) => parseFloat(tour.budget) <= parseFloat(filters.max)
+        (tour) => parseFloat(tour.budget) <= parseFloat(filters.max),
       );
     }
     if (filters.country) {
       filteredData = filteredData.filter((tour) =>
-        tour.location_to?.toLowerCase().includes(filters.country.toLowerCase())
+        tour.location_to?.toLowerCase().includes(filters.country.toLowerCase()),
       );
     }
     if (filters.destination_type) {
       filteredData = filteredData.filter(
         (tour) =>
           tour.destination_type?.toLowerCase() ===
-          filters.destination_type.toLowerCase()
+          filters.destination_type.toLowerCase(),
       );
     }
     if (filters.travel_type) {
       filteredData = filteredData.filter((tour) =>
         tour.travel_type
           ?.toLowerCase()
-          .includes(filters.travel_type.toLowerCase())
+          .includes(filters.travel_type.toLowerCase()),
       );
     }
     setTours(filteredData);
@@ -138,7 +138,7 @@ const TourPlanDouble = () => {
     debounce((name, value) => {
       setFilters((prev) => ({ ...prev, [name]: value }));
     }, 500),
-    []
+    [],
   );
 
   const handleFilterChange = (name, value) => {
@@ -171,7 +171,7 @@ const TourPlanDouble = () => {
     budget,
     comment,
     offerForm,
-    file
+    file,
   ) => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
@@ -209,7 +209,7 @@ const TourPlanDouble = () => {
       formData.append("apply_discount", offerForm.applyDiscount || false);
       formData.append(
         "discount",
-        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0
+        offerForm.applyDiscount ? Number.parseFloat(offerForm.discount) : 0,
       );
 
       if (file) {
@@ -248,8 +248,8 @@ const TourPlanDouble = () => {
                 offers: [...(tour.offers || []), newOffer],
                 offer_count: (tour.offer_count || 0) + 1,
               }
-            : tour
-        )
+            : tour,
+        ),
       );
 
       if (selectedTour && selectedTour.id === tourId) {
@@ -260,7 +260,7 @@ const TourPlanDouble = () => {
                 offers: [...(prev.offers || []), newOffer],
                 offer_count: (prev.offer_count || 0) + 1,
               }
-            : prev
+            : prev,
         );
       }
 
@@ -290,18 +290,18 @@ const TourPlanDouble = () => {
             ? {
                 ...tour,
                 offers: tour.offers.map((o) =>
-                  o.id === offerId ? { ...o, status: "accepted" } : o
+                  o.id === offerId ? { ...o, status: "accepted" } : o,
                 ),
               }
-            : tour
-        )
+            : tour,
+        ),
       );
 
       if (selectedTour && selectedTour.id === tourId) {
         setSelectedTour((prev) => ({
           ...prev,
           offers: prev.offers.map((o) =>
-            o.id === offerId ? { ...o, status: "accepted" } : o
+            o.id === offerId ? { ...o, status: "accepted" } : o,
           ),
         }));
       }
@@ -404,7 +404,7 @@ const TourPlanDouble = () => {
                 displayTours.map((tour) => {
                   const offerCount = tour.offer_count || 0;
                   const hasAcceptedOffer = tour.offers?.some(
-                    (o) => o.status === "accepted"
+                    (o) => o.status === "accepted",
                   );
                   const isOfferLimitReached = offerCount >= 3;
                   const isDisabled = hasAcceptedOffer || isOfferLimitReached;
@@ -429,21 +429,24 @@ const TourPlanDouble = () => {
                       return;
                     }
 
-                    const role = localStorage.getItem("role"); 
+                    const role = localStorage.getItem("role");
                     const agencyVerified =
                       localStorage.getItem("agency_is_verified") === "true";
 
-                    if (role === "agency" && !agencyVerified) {
-                      navigate("/pandding");
-                      toast.info(
-                        t("agency_verification_pending") ||
-                          "Your agency profile is under verification. Please wait."
-                      );
+                    if (role === "agency") {
+                      if (!agencyVerified) {
+                        navigate("/pandding");
+                        toast.info(
+                          t("agency_verification_pending") ||
+                            "Your agency profile is under verification. Please wait.",
+                        );
+                        return;
+                      }
+                      setSelectedTour(tour);
+                      setIsPopupOpen(true);
                       return;
                     }
-                    if (role === "agency" && agencyVerified){
-                      navigate("/dashboard");
-                    }
+
                     if (tour.status === "accepted") {
                       toast.info(t("offer_accepted"));
                       return;
@@ -585,12 +588,12 @@ const TourPlanDouble = () => {
                             {tour.destination_type === "beach"
                               ? "Mare"
                               : tour.destination_type === "mountain"
-                              ? "Montagna"
-                              : tour.destination_type === "relax"
-                              ? "Relax"
-                              : tour.destination_type === "group"
-                              ? "Gruppi"
-                              : t("na")}
+                                ? "Montagna"
+                                : tour.destination_type === "relax"
+                                  ? "Relax"
+                                  : tour.destination_type === "group"
+                                    ? "Gruppi"
+                                    : t("na")}
                           </p>
                         </div>
                         <div>
@@ -650,10 +653,10 @@ const TourPlanDouble = () => {
                               {tour.meal_plan === "breakfast"
                                 ? "Colazione"
                                 : tour.meal_plan === "half-board"
-                                ? "Mezza Pensione (Colazione & Cena)"
-                                : tour.meal_plan === "full-board"
-                                ? "Pensione Completa (Tutti i Pasti)"
-                                : "N/A"}
+                                  ? "Mezza Pensione (Colazione & Cena)"
+                                  : tour.meal_plan === "full-board"
+                                    ? "Pensione Completa (Tutti i Pasti)"
+                                    : "N/A"}
                             </span>
                           </p>
                           <div className="flex items-center space-x-2">
@@ -666,14 +669,16 @@ const TourPlanDouble = () => {
                                 {tour.type_of_accommodation === "hotel"
                                   ? "Hotel"
                                   : tour.type_of_accommodation === "resort"
-                                  ? "Resort"
-                                  : tour.type_of_accommodation === "homestay"
-                                  ? "Famiglia"
-                                  : tour.type_of_accommodation === "apartment"
-                                  ? "Appartamento"
-                                  : tour.type_of_accommodation === "hostel"
-                                  ? "Ostello"
-                                  : "N/A"}
+                                    ? "Resort"
+                                    : tour.type_of_accommodation === "homestay"
+                                      ? "Famiglia"
+                                      : tour.type_of_accommodation ===
+                                          "apartment"
+                                        ? "Appartamento"
+                                        : tour.type_of_accommodation ===
+                                            "hostel"
+                                          ? "Ostello"
+                                          : "N/A"}
                               </span>
                             </p>
                             {/* <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">

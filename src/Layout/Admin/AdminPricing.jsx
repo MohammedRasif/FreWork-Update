@@ -43,7 +43,6 @@ const AdminPricing = () => {
     }
   }, [subscriptionError, t]);
 
-  
   const allPlans = [
     // {
     //   name: t("free_user"),
@@ -58,8 +57,13 @@ const AdminPricing = () => {
       isFree: false,
       plan_id: plan.price_id || "unknown",
       priceSuffix: "", // price already contains /mese etc.
+      isSpecial: plan.price?.toString().includes("129"),
     })),
   ];
+
+  // Helpers for consistent theming
+  const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
+  const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
 
   const handleSelectPlan = async (plan) => {
     if (plan.isFree) {
@@ -140,7 +144,7 @@ const AdminPricing = () => {
                         alt={t("plan_background")}
                         className="w-full h-auto"
                       />
-                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold  z-10">
+                      <h3 className="absolute top-4 left-2 text-slate-700 font-bold z-10">
                         {plan.name}
                       </h3>
                     </div>
@@ -161,8 +165,6 @@ const AdminPricing = () => {
                       </p>
                     </div>
 
-                    
-
                     <p className="text-slate-500 text-base mb-6">
                       {t("contact_for_more_details")}
                     </p>
@@ -172,7 +174,7 @@ const AdminPricing = () => {
                         <span className="text-slate-700 font-semibold text-lg">
                           {t("features")}
                         </span>
-                        <div className="ml-2 text-[#3776E2]">
+                        <div className="ml-2" style={{ color: getPrimaryColor(plan) }}>
                           <IoCheckmarkCircleSharp size={20} />
                         </div>
                       </div>
@@ -183,7 +185,8 @@ const AdminPricing = () => {
                           plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start">
                               <IoCheckmarkDoneSharp
-                                className="text-[#3776E2] mt-1 mr-2 flex-shrink-0"
+                                style={{ color: getPrimaryColor(plan) }}
+                                className="mt-1 mr-2 flex-shrink-0"
                                 size={20}
                               />
                               <span>{feature}</span>
@@ -192,20 +195,28 @@ const AdminPricing = () => {
                         ) : (
                           <li className="flex items-start">
                             <IoCheckmarkDoneSharp
-                              className="text-[#3776E2] mt-1 mr-2 flex-shrink-0"
+                              style={{ color: getPrimaryColor(plan) }}
+                              className="mt-1 mr-2 flex-shrink-0"
                               size={20}
                             />
                             <span>{t("no_features_available")}</span>
                           </li>
                         )}
                       </ul>
+
                       <button
-                      className="w-full mt-5 bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
-                      onClick={() => handleSelectPlan(plan)}
-                      disabled={isSubscribing}
-                    >
-                      {isSubscribing ? t("subscribing") : t("select")}
-                    </button>
+                        className={`
+                          w-full mt-5 text-white py-3 rounded-md mb-4 
+                          transition-colors cursor-pointer text-lg font-semibold
+                          ${plan.isSpecial 
+                            ? "bg-[#3776E2] hover:bg-[#2a5bb5]" 
+                            : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                        `}
+                        onClick={() => handleSelectPlan(plan)}
+                        disabled={isSubscribing}
+                      >
+                        {isSubscribing ? t("subscribing") : t("select")}
+                      </button>
                     </div>
                   </div>
                 </motion.div>
