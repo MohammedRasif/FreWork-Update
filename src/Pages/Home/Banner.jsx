@@ -126,7 +126,7 @@ const Banner = () => {
             initial={{ scale: 0.7 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.7 }}
-            className="p-6 rounded-lg shadow-lg max-w-xl w-full mx-4"
+            className="p-6 rounded-lg  max-w-xl w-full mx-4"
           >
             <BannerSectionPopup
               closeForm={closePopup}

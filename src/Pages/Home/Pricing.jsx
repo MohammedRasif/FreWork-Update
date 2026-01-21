@@ -114,7 +114,6 @@ const Pricing = () => {
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
           {t("pricing")}
         </h1>
-
         {isLoadingState && (
           <div className="min-h-[60vh] flex items-center justify-center">
             <div className="grid gap-8 place-items-center">
@@ -122,7 +121,6 @@ const Pricing = () => {
             </div>
           </div>
         )}
-
         {isError && !isLoadingState && (
           <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
             <div className="text-2xl text-red-600 mb-4 font-semibold">
@@ -139,7 +137,6 @@ const Pricing = () => {
             </button>
           </div>
         )}
-
         {!isLoadingState && !isError && visiblePlans.length === 0 && (
           <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
             <div className="text-2xl text-gray-600 mb-4">
@@ -166,7 +163,6 @@ const Pricing = () => {
             </button>
           </div>
         )}
-
         {!isLoadingState && !isError && visiblePlans.length > 0 && (
           <div
             className={`grid gap-8 mx-auto place-items-center
@@ -202,9 +198,7 @@ const Pricing = () => {
                       </div>
                       <p className="text-slate-500 text-base mt-1">{t("measurable_results")}</p>
                     </div>
-
                     <p className="text-slate-500 text-base mb-6">{t("contact_for_details")}</p>
-
                     <div className="mb-6 flex-grow">
                       <div className="flex items-center mb-3">
                         <span className="text-slate-700 font-semibold text-lg">{t("features")}</span>
@@ -231,7 +225,6 @@ const Pricing = () => {
                         )}
                       </ul>
                     </div>
-
                     <button
                       className="w-full bg-[#3776E2] text-white py-3 rounded-md hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold mt-auto"
                       onClick={() => handleSelectPlan(plan)}
@@ -246,7 +239,6 @@ const Pricing = () => {
           </div>
         )}
       </div>
-
       <ToastContainer position="top-right" autoClose={5000} />
       <Faq />
     </section>
