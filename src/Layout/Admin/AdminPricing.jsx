@@ -122,9 +122,9 @@ const AdminPricing = () => {
         )}
 
         {!isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mt-16 place-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-3xl mx-auto mt-16 place-items-center">
             <AnimatePresence mode="wait">
-              {allPlans.map((plan, index) => (
+              {allPlans.slice(1).map((plan, index) => (
                 <motion.div
                   key={plan.name || index}
                   initial={{ opacity: 0, y: 20 }}
@@ -161,13 +161,7 @@ const AdminPricing = () => {
                       </p>
                     </div>
 
-                    <button
-                      className="w-full bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
-                      onClick={() => handleSelectPlan(plan)}
-                      disabled={isSubscribing}
-                    >
-                      {isSubscribing ? t("subscribing") : t("select")}
-                    </button>
+                    
 
                     <p className="text-slate-500 text-base mb-6">
                       {t("contact_for_more_details")}
@@ -205,6 +199,13 @@ const AdminPricing = () => {
                           </li>
                         )}
                       </ul>
+                      <button
+                      className="w-full mt-5 bg-[#3776E2] text-white py-3 rounded-md mb-4 hover:bg-[#00669e] transition-colors cursor-pointer text-lg font-semibold"
+                      onClick={() => handleSelectPlan(plan)}
+                      disabled={isSubscribing}
+                    >
+                      {isSubscribing ? t("subscribing") : t("select")}
+                    </button>
                     </div>
                   </div>
                 </motion.div>

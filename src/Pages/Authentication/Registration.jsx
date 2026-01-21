@@ -10,24 +10,29 @@ import { useTranslation } from "react-i18next";
 const Register = () => {
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState("");
+  const [selectedUserType, setSelectedUserType] = useState("tourist");
   const [createUser, { isLoading, isError, error, isSuccess }] =
     useCreateUserMutation();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   localStorage.getItem("pricing_status") === "from_pricing";
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm();
+ const {
+  register,
+  handleSubmit,
+  formState: { errors },
+  watch,
+  setValue,
+} = useForm({
+  defaultValues: {
+    userType: "tourist",
+  },
+});
+
 
   const password = watch("password");
   const userType = watch("userType");
-  
+
   useEffect(() => {
     return () => {
       localStorage.removeItem("pricing_status");
@@ -50,7 +55,7 @@ const Register = () => {
         if (parsedPlan.email) {
           console.log(
             "Setting default email from pendingPlan:",
-            parsedPlan.email
+            parsedPlan.email,
           );
           setValue("email", parsedPlan.email);
         }
