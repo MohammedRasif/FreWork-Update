@@ -11,12 +11,10 @@ import UserDashboardLayout from "../Layout/User/UserDashboardLayout";
 import Membership from "@/Pages/Home/Membership";
 import Pricing from "@/Pages/Home/Pricing";
 import AdminProfile from "../Layout/Admin/AdminProfile";
-
 import ChatInterface from "../Layout/User/ChatInterface";
 import UserProfile from "../Layout/User/UserProfile";
 import UserEditProfile from "@/Layout/User/UserEditProfile";
 import Messages from "@/Layout/User/Messages";
-
 import AdminProfileEdit from "../Layout/Admin/AdminProfileEdit";
 import AdminPricing from "@/Layout/Admin/AdminPricing";
 import AdminNotification from "@/Layout/Admin/AdminNotification";
@@ -107,7 +105,7 @@ export const router = createBrowserRouter([
             <PublishedPlan />
           </HomeLayout>
         ),
-      }, // Default route for /user (maps to /user/)
+      }, 
       {
         index: true,
         path: "accepted",
