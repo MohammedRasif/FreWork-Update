@@ -238,11 +238,26 @@ const Pricing = () => {
                     </p> */}
                     <p className="text-[15px]">{plan.description}</p>
                   </div>
-                  <p className="text-[14px]">{plan.features}</p>
+                  {/* <p className="text-[14px]">{plan.features}</p> */}
+                  {plan?.cta && (
+                    <div className="mb-4 text-[16px] text-slate-600">
+                      {plan.cta.label && (
+                        <p className="font-semibold text-slate-700">
+                          {plan.cta.label}
+                        </p>
+                      )}
 
-                  <p className="text-slate-500 text-base mb-6">
+                      {plan.cta.subLabel && (
+                        <p className="text-slate-500 text-[14px]">
+                          {plan.cta.subLabel}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* <p className="text-slate-500 text-base mb-6">
                     {t("contact_for_details")}
-                  </p>
+                  </p> */}
 
                   <div className="mb-6 flex-grow">
                     <div className="flex items-center mb-3">
@@ -283,10 +298,15 @@ const Pricing = () => {
                     </ul>
                   </div>
 
-                  <div className="shadow-2xl border-2 rounded-md p-2 text-[14px] font-semibold">
-                    <p><span className="">⚠️</span><span className="">{plan.warningBox.title}</span></p>
-                    <p>{plan.warningBox.text}</p>
-                  </div>
+                  {plan?.warningBox && (
+                    <div className="shadow-2xl border-2 rounded-md p-2 text-[14px] font-semibold">
+                      <p className="flex items-center gap-1">
+                        <span>⚠️</span>
+                        <span>{plan.warningBox.title}</span>
+                      </p>
+                      <p>{plan.warningBox.text}</p>
+                    </div>
+                  )}
 
                   <button
                     className={`
