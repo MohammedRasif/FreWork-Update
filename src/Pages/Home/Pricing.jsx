@@ -199,7 +199,7 @@ const Pricing = () => {
               ${
                 isSingleCardView
                   ? "grid-cols-1 max-w-md"
-                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 max-w-3xl"
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 max-w-4xl"
               }
             `}
           >
