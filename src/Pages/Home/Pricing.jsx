@@ -341,7 +341,7 @@ const Pricing = () => {
 
                       {/* SubLabel below button */}
                       {plan.cta.subLabel && (
-                        <p className="text-slate-500 text-[14px] mt-1">
+                        <p className="text-slate-500 text-center text-[14px] mt-1">
                           {plan.cta.subLabel}
                         </p>
                       )}
