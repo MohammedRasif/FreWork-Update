@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
 import img from "../../assets/img/Vector 63.png";
+import img1 from "../../assets/img/Rectangle 161124457.png";
 import { useNavigate } from "react-router-dom";
 import Faq from "./Faq";
 import {
@@ -211,11 +212,23 @@ const Pricing = () => {
                 <div className="relative">
                   <div className="w-3/4 rounded-r-lg my-10 relative">
                     <img
-                      src={img}
+                      src={
+                        plan.name === "Founder Partner" ||
+                        plan.name === "Partner Fondatore"
+                          ? img1
+                          : img
+                      }
                       alt="Plan background"
                       className="w-full h-auto"
                     />
-                    <h3 className="absolute top-4 left-2 text-slate-700 font-bold z-10">
+                    <h3
+                      className={`absolute top-5 left-2 z-10 font-bold ${
+                        plan.name === "Founder Partner" ||
+                        plan.name === "Partner Fondatore"
+                          ? "text-white"
+                          : "text-slate-700"
+                      }`}
+                    >
                       {plan.name}
                     </h3>
                   </div>
@@ -232,14 +245,18 @@ const Pricing = () => {
                         {plan.priceSuffix}
                       </span>
                     </div>
-                    {plan?.subtitle && <p className="text-[14px] font-semibold pb-5 pt-2">{plan.subtitle}</p>}
+                    {plan?.subtitle && (
+                      <p className="text-[14px] font-semibold pb-5 pt-2">
+                        {plan.subtitle}
+                      </p>
+                    )}
                     {/* <p className="text-slate-500 text-base mt-1">
                       {t("measurable_results")}
                     </p> */}
                     <p className="text-[15px]">{plan.description}</p>
                   </div>
                   {/* <p className="text-[14px]">{plan.features}</p> */}
-                  {plan?.cta && (
+                  {/* {plan?.cta && (
                     <div className="mb-4 text-[16px] text-slate-600">
                       {plan.cta.label && (
                         <p className="font-semibold text-slate-700">
@@ -253,7 +270,7 @@ const Pricing = () => {
                         </p>
                       )}
                     </div>
-                  )}
+                  )} */}
 
                   {/* <p className="text-slate-500 text-base mb-6">
                     {t("contact_for_details")}
@@ -308,21 +325,40 @@ const Pricing = () => {
                     </div>
                   )}
 
-                  <button
-                    className={`
-                      w-full mt-5 text-white py-3 rounded-md mb-4 
-                      transition-colors cursor-pointer text-lg font-semibold
-                      ${
-                        plan.isSpecial
-                          ? "bg-[#3776E2] hover:bg-[#2a5bb5]"
-                          : "bg-[#FF6600] hover:bg-[#e65f05]"
-                      }
-                    `}
-                    onClick={() => handleSelectPlan(plan)}
-                    disabled={isSubscribing}
-                  >
-                    {isSubscribing ? t("subscribing") : t("select")}
-                  </button>
+                  {plan?.cta ? (
+                    <div className="mb-4">
+                      <button
+                        className={`
+                          w-full mt-5 text-white py-3 rounded-md mb-2
+                          transition-colors cursor-pointer text-lg font-semibold
+                          ${plan.isSpecial ? "bg-[#3776E2] hover:bg-[#2a5bb5]" : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                        `}
+                        onClick={() => handleSelectPlan(plan)}
+                        disabled={isSubscribing}
+                      >
+                        {isSubscribing ? t("subscribing") : plan.cta.label}
+                      </button>
+
+                      {/* SubLabel below button */}
+                      {plan.cta.subLabel && (
+                        <p className="text-slate-500 text-[14px] mt-1">
+                          {plan.cta.subLabel}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      className={`
+                        w-full mt-5 text-white py-3 rounded-md mb-4
+                        transition-colors cursor-pointer text-lg font-semibold
+                        ${plan.isSpecial ? "bg-[#3776E2] hover:bg-[#2a5bb5]" : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                      `}
+                      onClick={() => handleSelectPlan(plan)}
+                      disabled={isSubscribing}
+                    >
+                      {isSubscribing ? t("subscribing") : t("select")}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
