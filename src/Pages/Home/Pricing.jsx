@@ -232,7 +232,7 @@ const Pricing = () => {
                         {plan.priceSuffix}
                       </span>
                     </div>
-
+                    {plan?.subtitle && <p className="text-[14px] font-semibold pb-5 pt-2">{plan.subtitle}</p>}
                     {/* <p className="text-slate-500 text-base mt-1">
                       {t("measurable_results")}
                     </p> */}
