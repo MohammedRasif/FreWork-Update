@@ -227,14 +227,18 @@ const Pricing = () => {
                       <span className="text-4xl font-bold text-slate-700">
                         {plan.price}
                       </span>
+
                       <span className="text-xl text-slate-500 ml-1">
                         {plan.priceSuffix}
                       </span>
                     </div>
-                    <p className="text-slate-500 text-base mt-1">
+
+                    {/* <p className="text-slate-500 text-base mt-1">
                       {t("measurable_results")}
-                    </p>
+                    </p> */}
+                    <p className="text-[15px]">{plan.description}</p>
                   </div>
+                  <p className="text-[14px]">{plan.features}</p>
 
                   <p className="text-slate-500 text-base mb-6">
                     {t("contact_for_details")}
@@ -245,13 +249,17 @@ const Pricing = () => {
                       <span className="text-slate-700 font-semibold text-lg">
                         {t("features")}
                       </span>
-                      <div className="ml-2" style={{ color: getPrimaryColor(plan) }}>
+                      <div
+                        className="ml-2"
+                        style={{ color: getPrimaryColor(plan) }}
+                      >
                         <IoCheckmarkCircleSharp size={20} />
                       </div>
                     </div>
 
                     <ul className="space-y-3 text-base text-slate-600">
-                      {Array.isArray(plan.features) && plan.features.length > 0 ? (
+                      {Array.isArray(plan.features) &&
+                      plan.features.length > 0 ? (
                         plan.features.map((feature, i) => (
                           <li key={i} className="flex items-start">
                             <IoCheckmarkDoneSharp
@@ -275,13 +283,20 @@ const Pricing = () => {
                     </ul>
                   </div>
 
+                  <div className="shadow-2xl border-2 rounded-md p-2 text-[14px] font-semibold">
+                    <p><span className="">⚠️</span><span className="">{plan.warningBox.title}</span></p>
+                    <p>{plan.warningBox.text}</p>
+                  </div>
+
                   <button
                     className={`
                       w-full mt-5 text-white py-3 rounded-md mb-4 
                       transition-colors cursor-pointer text-lg font-semibold
-                      ${plan.isSpecial 
-                        ? "bg-[#3776E2] hover:bg-[#2a5bb5]" 
-                        : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                      ${
+                        plan.isSpecial
+                          ? "bg-[#3776E2] hover:bg-[#2a5bb5]"
+                          : "bg-[#FF6600] hover:bg-[#e65f05]"
+                      }
                     `}
                     onClick={() => handleSelectPlan(plan)}
                     disabled={isSubscribing}
