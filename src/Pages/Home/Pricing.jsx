@@ -314,7 +314,6 @@ const Pricing = () => {
                       )}
                     </ul>
                   </div>
-
                   {plan?.warningBox && (
                     <div className="shadow-2xl border-2 rounded-md p-2 text-[14px] font-semibold">
                       <p className="flex items-center gap-1">
@@ -324,7 +323,6 @@ const Pricing = () => {
                       <p>{plan.warningBox.text}</p>
                     </div>
                   )}
-
                   {plan?.cta ? (
                     <div className="mb-4">
                       <button
@@ -338,8 +336,6 @@ const Pricing = () => {
                       >
                         {isSubscribing ? t("subscribing") : plan.cta.label}
                       </button>
-
-                      {/* SubLabel below button */}
                       {plan.cta.subLabel && (
                         <p className="text-slate-500 text-center text-[14px] mt-1">
                           {plan.cta.subLabel}
@@ -365,7 +361,6 @@ const Pricing = () => {
           </div>
         )}
       </div>
-
       <ToastContainer position="top-right" autoClose={5000} />
       <Faq />
     </section>

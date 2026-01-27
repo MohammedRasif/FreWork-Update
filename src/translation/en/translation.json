@@ -961,41 +961,36 @@
 },
 
 
-"faq_title": "FREQUENTLY ASKED QUESTIONS",
-"faq": [
-{
-"question": "How does the AI-powered project setup work?",
-"answer": "Our AI analyzes your needs and automatically configures the optimal project structure, saving you hours of manual setup."
-},
-{
-"question": "Is my data secure?",
-"answer": "Absolutely, we implement enterprise-grade security measures including end-to-end encryption, regular security audits, and compliance with GDPR, HIPAA, and other regulations. Your data is stored in SOC 2 compliant data centers."
-},
-{
-"question": "Can I integrate with other tools we already use?",
-"answer": "Yes, our platform supports integrations with a wide range of tools, including Slack, Trello, and Google Workspace, ensuring seamless workflow management."
-},
-{
-"question": "How long does it take to set up?",
-"answer": "Setup typically takes less than 15 minutes with our AI-powered onboarding process, guiding you step-by-step."
-},
-{
-"question": "Can I customize the platform for my industry?",
-"answer": "Absolutely, our platform offers industry-specific templates and customization options to fit your needs."
-},
-{
-"question": "What kind of support do you offer?",
-"answer": "We provide 24/7 customer support via chat, email, and phone, along with a dedicated account manager for premium users."
-},
-{
-"question": "Is there a free trial?",
-"answer": "Yes, we offer a 14-day free trial with full access to all features, no credit card required."
-},
-{
-"question": "How often do you release updates?",
-"answer": "We release updates quarterly, with regular bug fixes and new features based on user feedback."
-}
-]
+  "faq": [
+    {
+      "question": "Why choose VacanzaMyCost.it instead of an automated site?",
+      "answer": "Because your holiday is not an algorithm. We are the only portal that manually verifies every request to ensure that only serious travelers meet the best professionals. We eliminate stress, clutter, and wasted time, putting human quality first."
+    },
+    {
+      "question": "How much does the service cost for those looking for a trip?",
+      "answer": "The service is completely free for travelers. We do not apply commissions on sales and there are no hidden costs. This allows agencies to offer you the best possible price, without having to mark up brokerage fees."
+    },
+    {
+      "question": "Who are the agencies that respond to my requests?",
+      "answer": "We collaborate exclusively with regularly authorized Italian travel agencies, equipped with licenses and mandatory insurance. Each partner is personally selected and verified by us to guarantee you competence, ethics, and maximum reliability."
+    },
+    {
+      "question": "Why do I receive a maximum of 3 travel offers?",
+      "answer": "To protect the value of your choice. Instead of overwhelming you with emails and confusing proposals, we select only the 3 most qualified specialists for your specific destination. Less noise, more competence, easier decision."
+    },
+    {
+      "question": "How is my personal data protected?",
+      "answer": "Your privacy is a sacred asset. Your contact details (email and phone) are not public and are unlocked to the agency only when you decide to look into a proposal. You have full control over who can contact you and when."
+    },
+    {
+      "question": "What happens when I click on \"Offer Accepted\"?",
+      "answer": "It is the moment your holiday takes shape. By clicking 'Accept', you confirm your interest in that quote and unlock direct contact with the expert. From that moment, you can define the final details and book in total safety with the chosen agency."
+    },
+    {
+      "question": "I am an agency: how can I enter the marketplace?",
+      "answer": "Entry is selective and occurs only upon application. We do not accept everyone, but only those who demonstrate high service standards. If you are a serious professional and want to access manually verified leads, send your request in the dedicated area. We will evaluate your profile within 48 hours."
+    }
+  ]
 }
 
 
