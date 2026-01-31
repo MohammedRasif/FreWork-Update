@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import Faq from "./Faq";
 import {
   CheckCircle,
   Shield,
@@ -93,6 +94,7 @@ const WhoItWork = () => {
           </div>
         ))}
       </div>
+      <Faq />
     </div>
   );
 };

@@ -592,7 +592,6 @@
 "describe_yourself": "Describe yourself in short",
 "gender": "Gender",
 "age": "Age",
-
   "no_reviews_yet": "No reviews yet",
   "be_the_first_to_review": "Be the first to review!",
   "reviews_for": "Reviews for",
@@ -600,7 +599,6 @@
   "no_comment_provided": "No comment provided",
  
   "see_all_reviews": "See all reviews",
-
 "language": "Language",
 "upload_picture": "Upload picture",
 "choose_a_file": "Choose a file",
@@ -961,6 +959,7 @@
 },
 
 
+"faq_title": "FREQUENTLY ASKED QUESTIONS",
   "faq": [
     {
       "question": "Why choose VacanzaMyCost.it instead of an automated site?",
@@ -992,5 +991,6 @@
     }
   ]
 }
+
 
 

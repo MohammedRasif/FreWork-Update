@@ -4,7 +4,6 @@ import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
 import img from "../../assets/img/Vector 63.png";
 import img1 from "../../assets/img/Rectangle 161124457.png";
 import { useNavigate } from "react-router-dom";
-import Faq from "./Faq";
 import {
   useShowSubscriptionDataQuery,
   useSubscriptionMutation,
@@ -53,7 +52,7 @@ const Pricing = () => {
   const allPlans = (subscriptionData?.plans || []).map((plan) => ({
     ...plan,
     isFree: false,
-    plan_id: plan.price_id || "premium",
+    price_id: plan.price_id || "premium",
     priceSuffix: "",
     isSpecial: plan.price?.toString().includes("129"),
   }));
@@ -72,33 +71,35 @@ const Pricing = () => {
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
   const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
 
-  const handleSelectPlan = async (plan) => {
-    if (isSingleCardView) {
-      localStorage.setItem("pricing_status", "from_pricing");
-      navigate("/register");
-      return;
-    }
+ const handleSelectPlan = async (plan) => {
+  if (plan?.cta?.action === "apply_partner") {
+    navigate("/apply-partner", {
+      state: {
+        pricing_id: plan.price_id, 
+      },
+    });
+    return;
+  }
 
-    if (plan.isFree) {
-      toast.info(t("free_plan_selected"));
-      return;
-    }
+  if (!accessToken) {
+    toast.info(t("login_required_for_premium"));
+    navigate("/login", { state: { from: "/pricing" } });
+    return;
+  }
 
-    if (!accessToken) {
-      toast.info(t("login_required_for_premium"));
-      navigate("/login", { state: { from: "/pricing" } });
-      return;
-    }
+  try {
+    const response = await subscription({
+      price_id: plan.price_id, 
+    }).unwrap();
 
-    try {
-      const response = await subscription({ plan_id: plan.plan_id }).unwrap();
-      if (response?.checkout_url) {
-        window.location.href = response.checkout_url;
-      } else {
-        toast.success(t("subscription_success"));
-      }
-    } catch (err) {}
-  };
+    if (response?.checkout_url) {
+      window.location.href = response.checkout_url;
+    } else {
+      toast.success(t("subscription_success"));
+    }
+  } catch (err) {}
+};
+
 
   const PricingSkeleton = ({ count = 1 }) => (
     <>
@@ -124,7 +125,7 @@ const Pricing = () => {
   );
 
   return (
-    <section className="pt-24 roboto bg-gray-50 min-h-screen">
+    <section className="pt-24 roboto bg-gray-50 min-h-screen pb-14">
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
           {t("pricing")}
@@ -362,7 +363,7 @@ const Pricing = () => {
         )}
       </div>
       <ToastContainer position="top-right" autoClose={5000} />
-      <Faq />
+      
     </section>
   );
 };
