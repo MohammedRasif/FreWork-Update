@@ -103,7 +103,7 @@ const Banner = () => {
         </h1> */}
 
         
-        <p className="mt-2 text-[24px] md:text-[40px] lg:text-[48px] font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
+        <p className="mt-2 text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
           {t("banner_slogan")}
         </p>
         <p className=" lg:text-2xl text-[15px]">{t("show_short_description")}</p>

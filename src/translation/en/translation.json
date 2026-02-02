@@ -29,6 +29,7 @@
 "beach_trips": "Beach Trips",
 "mountain_adventures": "Mountain Adventures",
 "relaxing_tours": "Relaxing Tours",
+
 "group_packages": "Group Packages",
 "see_more": "see more",
 "error_loading": "Error loading tour plans. Please try again later.",
@@ -155,6 +156,7 @@
 "no_countries_found": "No countries found",
 "all_countries": "All Countries",
 "travel_type": "Travel Type",
+"reject_offer": "Reject Offer",
 "search_by_travel_type": "Search by travel type",
 "login_to_submit_offer": "Please log in to submit an offer",
 "only_agencies_can_submit": "Only agencies can submit offers",
@@ -169,6 +171,7 @@
 "login_to_send_message": "Please log in to send a message",
 "chat_initiated_success": "Chat initiated successfully",
 "failed_to_initiate_chat": "Failed to initiate chat",
+"conversation_inactive_message": "❌ Your offer has been rejected.",
 "send_offer": "Send Offer",
 "close": "Close",
 "place_your_offer": "Place Your Offer",

@@ -3,7 +3,7 @@ export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-     baseUrl: "https://api.vacanzamycost.com/",
+    baseUrl: "https://api.vacanzamycost.com/",
     // baseUrl: "http://31.97.39.215/",
 
     prepareHeaders: (headers, { endpoint }) => {
@@ -53,7 +53,7 @@ export const sqQuery = createApi({
     "SentMessages",
     "createPlanOne",
     "updatePlan",
-    "final"
+    "final",
   ],
 
   endpoints: (builder) => ({
@@ -232,6 +232,15 @@ export const sqQuery = createApi({
     getChatList: builder.query({
       query: () => "/chat/conversations/",
       providesTags: ["Chat"],
+    }),
+
+    rejectOffer: builder.mutation({
+      query: ({id, data}) => ({
+        url: `initial-reject/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Chat", "Offer"],
     }),
 
     getChatHsitory: builder.query({
@@ -447,6 +456,7 @@ export const {
   // chat
   useInviteToChatMutation,
   useGetChatListQuery,
+  useRejectOfferMutation,
   useGetChatHsitoryQuery,
   // show user information
   useShowUserInpormationQuery,

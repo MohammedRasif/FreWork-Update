@@ -14,12 +14,14 @@ import {
   useGetPlansQuery,
   useInviteToChatMutation,
   useMessageSentMutation,
+  useRejectOfferMutation,
   useShowMessagesQuery,
 } from "@/redux/features/withAuth";
 import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { HiOutlineDotsVertical } from "react-icons/hi";
 
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
@@ -39,6 +41,7 @@ function Messages() {
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
+
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
   const [archivedUser] = useArchivedUserMutation();
@@ -56,6 +59,8 @@ function Messages() {
     isLoading: isChatListLoading,
     refetch: refetchChatList,
   } = useGetChatListQuery();
+
+  const [rejectOffer] = useRejectOfferMutation();
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
@@ -65,6 +70,28 @@ function Messages() {
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [selectedRejectReason, setSelectedRejectReason] = useState("");
+
+  const rejectReasons = [
+    { label: "Prezzo troppo alto", value: "Prezzo troppo alto", tKey: "preza" },
+    {
+      label: "Offerta poco chiara",
+      value: "Offerta poco chiara",
+      tKey: "offerta",
+    },
+    {
+      label: "Destinazione inadatta",
+      value: "Destinazione inadatta",
+      tKey: "destinazioan",
+    },
+    { label: "Solo valutazione", value: "Solo valutazione", tKey: "solo" },
+    {
+      label: "Ho scelto un'altra proposta",
+      value: "Ho scelto un'altra proposta",
+      tKey: "scelto",
+    },
+  ];
 
   useEffect(() => {
     if (!agency && id && chatList && !isChatListLoading) {
@@ -92,12 +119,22 @@ function Messages() {
         });
       }
     }
-  }, [agency, id, chatList, isChatListLoading, navigate,  navigate, location.pathname, t]);
+  }, [
+    agency,
+    id,
+    chatList,
+    isChatListLoading,
+    navigate,
+    navigate,
+    location.pathname,
+    t,
+  ]);
 
   useEffect(() => {
     if (agency?.tour_plan_id && plansData) {
       const selectedPlan = plansData.find(
-        (plan) => plan.id === agency.tour_plan_id && plan.status === "published"
+        (plan) =>
+          plan.id === agency.tour_plan_id && plan.status === "published",
       );
       if (selectedPlan) {
         setSelectedDropdown(agency.tour_plan_id.toString());
@@ -155,25 +192,37 @@ function Messages() {
 
         setMessages((prev) => {
           if (serverMessage.isUser) {
-            const matchingPending = Array.from(pendingMessagesRef.current.values()).find(
+            const matchingPending = Array.from(
+              pendingMessagesRef.current.values(),
+            ).find(
               (pm) =>
                 pm.message_type === serverMessage.message_type &&
-                (pm.text === serverMessage.text || (pm.text === null && serverMessage.text === null)) &&
-                Math.abs(pm.timestamp.getTime() - serverMessage.timestamp.getTime()) < 10000
+                (pm.text === serverMessage.text ||
+                  (pm.text === null && serverMessage.text === null)) &&
+                Math.abs(
+                  pm.timestamp.getTime() - serverMessage.timestamp.getTime(),
+                ) < 10000,
             );
 
             if (matchingPending) {
               return prev.map((msg) =>
                 msg.tempId === matchingPending.tempId
-                  ? { ...msg, id: serverMessage.id, status: "sent", tempId: undefined }
-                  : msg
+                  ? {
+                      ...msg,
+                      id: serverMessage.id,
+                      status: "sent",
+                      tempId: undefined,
+                    }
+                  : msg,
               );
             }
           }
 
           const exists = prev.some((msg) => msg.id === serverMessage.id);
           if (exists) return prev;
-          return [...prev, serverMessage].sort((a, b) => a.timestamp - b.timestamp);
+          return [...prev, serverMessage].sort(
+            (a, b) => a.timestamp - b.timestamp,
+          );
         });
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
@@ -186,10 +235,15 @@ function Messages() {
   }, [id, userId]);
 
   useEffect(() => {
-    if (messagesData?.messages && Array.isArray(messagesData.messages) && userId) {
+    if (
+      messagesData?.messages &&
+      Array.isArray(messagesData.messages) &&
+      userId
+    ) {
       const formattedMessages = messagesData.messages.map((msg) => ({
         id: msg.id,
-        message_type: msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
+        message_type:
+          msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
         text: msg.text || null,
         data: msg.data || null,
         tour_plan_id: msg.tour_plan_id || null,
@@ -211,7 +265,9 @@ function Messages() {
           if (!acc[msg.id]) acc[msg.id] = msg;
           return acc;
         }, {});
-        return Object.values(uniqueMsgs).sort((a, b) => a.timestamp - b.timestamp);
+        return Object.values(uniqueMsgs).sort(
+          (a, b) => a.timestamp - b.timestamp,
+        );
       });
     }
   }, [messagesData, userId, id]);
@@ -235,7 +291,9 @@ function Messages() {
 
       const tempId = uuidv4();
       const messageId = uuidv4();
-      const tourPlan = dropdownOptions.find((opt) => opt.value === selectedDropdown);
+      const tourPlan = dropdownOptions.find(
+        (opt) => opt.value === selectedDropdown,
+      );
 
       const filePreviewUrl = URL.createObjectURL(file);
       const localFileName = file.name;
@@ -286,8 +344,8 @@ function Messages() {
                   tempId: undefined,
                   localFileName: undefined,
                 }
-              : msg
-          )
+              : msg,
+          ),
         );
         pendingMessagesRef.current.delete(tempId);
       } catch (error) {
@@ -298,8 +356,8 @@ function Messages() {
           prev.map((msg) =>
             msg.tempId === tempId
               ? { ...msg, status: "failed", localFileName: undefined }
-              : msg
-          )
+              : msg,
+          ),
         );
         pendingMessagesRef.current.delete(tempId);
       }
@@ -318,7 +376,9 @@ function Messages() {
 
     const tempId = uuidv4();
     const messageId = uuidv4();
-    const tourPlan = dropdownOptions.find((opt) => opt.value === selectedDropdown);
+    const tourPlan = dropdownOptions.find(
+      (opt) => opt.value === selectedDropdown,
+    );
 
     const localMessage = {
       id: messageId,
@@ -349,9 +409,14 @@ function Messages() {
       setMessages((prev) =>
         prev.map((msg) =>
           msg.tempId === tempId
-            ? { ...msg, id: response.id || msg.id, status: "sent", tempId: undefined }
-            : msg
-        )
+            ? {
+                ...msg,
+                id: response.id || msg.id,
+                status: "sent",
+                tempId: undefined,
+              }
+            : msg,
+        ),
       );
       pendingMessagesRef.current.delete(tempId);
     } catch (error) {
@@ -359,8 +424,8 @@ function Messages() {
       toast.error(t("failed_send_text"));
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.tempId === tempId ? { ...msg, status: "failed" } : msg
-        )
+          msg.tempId === tempId ? { ...msg, status: "failed" } : msg,
+        ),
       );
       pendingMessagesRef.current.delete(tempId);
     }
@@ -414,8 +479,8 @@ function Messages() {
 
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.tempId === tempId ? { ...msg, status: "sending" } : msg
-      )
+        msg.tempId === tempId ? { ...msg, status: "sending" } : msg,
+      ),
     );
 
     const formData = new FormData();
@@ -440,8 +505,8 @@ function Messages() {
                 status: "sent",
                 tempId: undefined,
               }
-            : msg
-        )
+            : msg,
+        ),
       );
       pendingMessagesRef.current.delete(tempId);
     } catch (error) {
@@ -449,8 +514,8 @@ function Messages() {
       toast.error(t("failed_retry_message"));
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.tempId === tempId ? { ...msg, status: "failed" } : msg
-        )
+          msg.tempId === tempId ? { ...msg, status: "failed" } : msg,
+        ),
       );
       pendingMessagesRef.current.delete(tempId);
     }
@@ -468,7 +533,9 @@ function Messages() {
         const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
         const messageId = uuidv4();
         const tempId = uuidv4();
-        const messageText = t("conversation_started", { plan: tourPlan?.label || t("unknown") });
+        const messageText = t("conversation_started", {
+          plan: tourPlan?.label || t("unknown"),
+        });
 
         const localMessage = {
           id: messageId,
@@ -495,17 +562,22 @@ function Messages() {
         setMessages((prev) =>
           prev.map((msg) =>
             msg.tempId === tempId
-              ? { ...msg, id: res.id || msg.id, status: "sent", tempId: undefined }
-              : msg
-          )
+              ? {
+                  ...msg,
+                  id: res.id || msg.id,
+                  status: "sent",
+                  tempId: undefined,
+                }
+              : msg,
+          ),
         );
         pendingMessagesRef.current.delete(tempId);
       } catch (err) {
         console.error("Failed to send start conversation:", err);
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.tempId === tempId ? { ...msg, status: "failed" } : msg
-          )
+            msg.tempId === tempId ? { ...msg, status: "failed" } : msg,
+          ),
         );
         pendingMessagesRef.current.delete(tempId);
       }
@@ -542,12 +614,19 @@ function Messages() {
       toast.success(
         isConversationArchived
           ? t("conversation_unarchived")
-          : t("conversation_archived")
+          : t("conversation_archived"),
       );
       await refetchChatList();
     } catch (err) {
-      console.error(`Failed to ${isConversationArchived ? "unarchive" : "archive"} conversation:`, err);
-      toast.error(t("failed_archive_conversation", { action: isConversationArchived ? t("unarchive") : t("archive") }));
+      console.error(
+        `Failed to ${isConversationArchived ? "unarchive" : "archive"} conversation:`,
+        err,
+      );
+      toast.error(
+        t("failed_archive_conversation", {
+          action: isConversationArchived ? t("unarchive") : t("archive"),
+        }),
+      );
     }
   };
 
@@ -642,16 +721,104 @@ function Messages() {
       <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
         <div></div>
         <div className="flex items-center space-x-2">
-          <div className="relative" ref={menuRef}>
+          <div className="relative space-x-2 flex items-center " ref={menuRef}>
+            {currentChat?.is_active === true && (
+              <button
+                className="bg-gray-100 hover:bg-gray-200 dark:bg-[#1E232E] px-3 py-1 rounded"
+                type="button"
+                onClick={() => setIsRejectModalOpen(true)}
+              >
+                {t("reject_offer")}
+              </button>
+            )}
+
+            {isRejectModalOpen && (
+              <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-[#252c3b] w-full max-w-md rounded-xl p-5">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    {t("reject_reason_title")}
+                  </h3>
+
+                  <div className="space-y-3">
+                    {rejectReasons.map((reason) => (
+                      <label
+                        key={reason.label}
+                        className="flex items-center space-x-3 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="reject_reason"
+                          value={reason.label}
+                          checked={selectedRejectReason === reason.label}
+                          onChange={() => setSelectedRejectReason(reason.label)}
+                        />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {i18n.language === "it"
+                            ? reason.label
+                            : t(reason.label)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      onClick={() => setIsRejectModalOpen(false)}
+                      className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-600"
+                    >
+                      {t("cancel")}
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        if (!selectedRejectReason) return;
+
+                        try {
+                          await rejectOffer({
+                            id: currentChat.offer_id,
+                            data: {
+                              reason: selectedRejectReason,
+                            },
+                          }).unwrap();
+                        } catch (err) {
+                          toast.error(t("failed_reject_offer"));
+                          return; 
+                        }
+
+                        try {
+                          await finalOfferResponse({
+                            id: Number(id),
+                            data: {
+                              is_accepted: false,
+                              reason: selectedRejectReason,
+                            },
+                          }).unwrap();
+
+                          toast.success(t("offer_rejected"));
+                          setIsRejectModalOpen(false);
+                        } catch (err) {
+                          toast.error(t("failed_final_offer_response"));
+                        }
+                      }}
+                      disabled={!selectedRejectReason}
+                      className="px-4 py-2 rounded bg-[#2F80A9] text-white disabled:opacity-50"
+                    >
+                      {t("send")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <button
-              className="bg-gray-100 hover:cursor-pointer dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 px-3 text-2xl font-semibold rounded focus:outline-none"
+              className="bg-gray-100 hover:cursor-pointer dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 px-2 text-2xl font-semibold rounded focus:outline-none py-1"
               onClick={() => setMenuOpen((prev) => !prev)}
               type="button"
             >
-              ...
+              <HiOutlineDotsVertical size={22} />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#252c3b] border border-gray-200 dark:border-gray-700 rounded shadow-lg z-10">
+              <div className="absolute right-0 mt-40 w-52 bg-white dark:bg-[#252c3b] border border-gray-200 dark:border-gray-700 rounded shadow-lg z-10">
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
                   onClick={handleViewDetails}
@@ -690,7 +857,10 @@ function Messages() {
 
           if (message.message_type === "start_conversation") {
             return (
-              <div key={message.id || message.tempId} className="flex justify-center w-full">
+              <div
+                key={message.id || message.tempId}
+                className="flex justify-center w-full"
+              >
                 <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full italic max-w-sm text-center">
                   {message.text}
                 </div>
@@ -720,10 +890,13 @@ function Messages() {
                         </button>
                       )}
                       <span className="text-[8px] text-gray-300">
-                        {message.timestamp.toLocaleTimeString(i18n.language === 'it' ? 'it-IT' : 'en-US', {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {message.timestamp.toLocaleTimeString(
+                          i18n.language === "it" ? "it-IT" : "en-US",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
                       </span>
                     </div>
                   </div>
@@ -779,45 +952,58 @@ function Messages() {
           )}
       </div>
 
-      <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
-        <div className="flex items-center bg-gray-100 dark:bg-[#1E232E] rounded-full px-4 py-2">
-          <button
-            type="button"
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <PaperclipIcon className="h-5 w-5 cursor-pointer" />
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept="image/*,.pdf,.doc,.docx"
-            onChange={handleFileChange}
-          />
-          <input
-            type="text"
-            placeholder={t("type_message_or_select_file")}
-            className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm text-gray-800 dark:text-gray-200"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            ref={inputRef}
-            disabled={!!currentChat?.final_offer_response}
-          />
-          <button
-            className={`transition-colors duration-200 ${
-              newMessage.trim() === "" || currentChat?.final_offer_response
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            }`}
-            onClick={handleSendMessage}
-            disabled={newMessage.trim() === "" || !!currentChat?.final_offer_response}
-          >
-            <SendIcon className="h-5 w-5 cursor-pointer" />
-          </button>
+      {currentChat?.is_active === true ? (
+        <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
+          <div className="flex items-center bg-gray-100 dark:bg-[#1E232E] rounded-full px-4 py-2">
+            <button
+              type="button"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <PaperclipIcon className="h-5 w-5 cursor-pointer" />
+            </button>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
+
+            <input
+              type="text"
+              placeholder={t("type_message_or_select_file")}
+              className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm text-gray-800 dark:text-gray-200"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              ref={inputRef}
+              disabled={!!currentChat?.final_offer_response}
+            />
+
+            <button
+              className={`transition-colors duration-200 ${
+                newMessage.trim() === "" || currentChat?.final_offer_response
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              }`}
+              onClick={handleSendMessage}
+              disabled={
+                newMessage.trim() === "" || !!currentChat?.final_offer_response
+              }
+            >
+              <SendIcon className="h-5 w-5 cursor-pointer" />
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="border-t border-gray-200 p-3 bg-gray-50 dark:bg-[#1E232E] dark:border-gray-700 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t("conversation_inactive_message")}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
