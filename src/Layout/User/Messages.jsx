@@ -722,15 +722,16 @@ function Messages() {
         <div></div>
         <div className="flex items-center space-x-2">
           <div className="relative space-x-2 flex items-center " ref={menuRef}>
-            {currentChat?.is_active === true && (
-              <button
-                className="bg-gray-100 hover:bg-gray-200 dark:bg-[#1E232E] px-3 py-1 rounded"
-                type="button"
-                onClick={() => setIsRejectModalOpen(true)}
-              >
-                {t("reject_offer")}
-              </button>
-            )}
+            {currentChat?.is_active === true &&
+              localStorage.getItem("role") !== "agency" && (
+                <button
+                  className="bg-gray-100 hover:bg-gray-200 dark:bg-[#1E232E] px-3 py-1 rounded"
+                  type="button"
+                  onClick={() => setIsRejectModalOpen(true)}
+                >
+                  {t("reject_offer")}
+                </button>
+              )}
 
             {isRejectModalOpen && (
               <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -782,7 +783,7 @@ function Messages() {
                           }).unwrap();
                         } catch (err) {
                           toast.error(t("failed_reject_offer"));
-                          return; 
+                          return;
                         }
 
                         try {
