@@ -1,5 +1,5 @@
 import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
-import { MapPin, ShieldCheck } from "lucide-react";
+import { Baby, MapPin, ShieldCheck, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {
   FaBed,
@@ -207,7 +207,7 @@ function AcceptedOffers() {
                     {tour.total_members}{" "}
                     {tour.total_members > 1 ? t("people") : t("person")}
                   </span>
-                  <div className="flex items-center space-x-4">
+                  {/* <div className="flex items-center space-x-4">
                     <h1 className="text-md text-gray-700">
                       <span className="font-medium">{t("child")} :</span>{" "}
                       {tour.child_count}
@@ -216,10 +216,24 @@ function AcceptedOffers() {
                       <span className="font-medium">{t("adult")} :</span>{" "}
                       {tour.adult_count}
                     </h1>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div>
+                  <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                        <Baby className="w-6 h-5 text-gray-900" />
+                        <span>
+                          <span className="font-bold">{t("child")}:</span>{" "}
+                          {tour.child_count}
+                        </span>
+                      </p>
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                        <User className="w-6 h-5 text-gray-900" />
+                        <span>
+                          <span className="font-bold">{t("adult")}:</span>{" "}
+                          {tour.adult_count}
+                        </span>
+                      </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
