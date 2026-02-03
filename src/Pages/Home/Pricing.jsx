@@ -73,6 +73,7 @@ const Pricing = () => {
 
  const handleSelectPlan = async (plan) => {
   if (plan?.cta?.action === "apply_partner") {
+    localStorage.setItem("pricing_status", "agency");
     navigate("/register", {
       state: {
         pricing_id: plan.price_id, 
@@ -83,6 +84,7 @@ const Pricing = () => {
 
   if (!accessToken) {
     toast.info(t("login_required_for_premium"));
+    
     navigate("/login", { state: { from: "/pricing" } });
     return;
   }
@@ -99,8 +101,6 @@ const Pricing = () => {
     }
   } catch (err) {}
 };
-
-
   const PricingSkeleton = ({ count = 1 }) => (
     <>
       {Array.from({ length: count }).map((_, i) => (

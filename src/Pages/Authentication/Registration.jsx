@@ -34,15 +34,16 @@ const Register = () => {
   const password = watch("password");
   const userType = watch("userType");
 
-  useEffect(() => {
-    return () => {
-      localStorage.removeItem("pricing_status");
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     localStorage.removeItem("pricing_status");
+  //   };
+  // }, []);
 
   useEffect(() => {
     const pricingStatus = localStorage.getItem("pricing_status");
-    if (pricingStatus === "from_pricing") {
+
+    if (pricingStatus === "agency") {
       setSelectedUserType("agency");
       setValue("userType", "agency");
     }
@@ -61,6 +62,23 @@ const Register = () => {
       }
     }
   }, [setValue]);
+
+
+  useEffect(() => {
+  const handleBeforeUnload = () => {
+    localStorage.removeItem("pricing_status");
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+    localStorage.removeItem("pricing_status");  
+  };
+}, []);
+
+
+
 
   const userTypes = ["tourist", "agency"];
 
@@ -85,6 +103,7 @@ const Register = () => {
 
       const res = await createUser(payload).unwrap();
       console.log("User created:", res);
+      localStorage.removeItem("pricing_status");
 
       navigate("/otp_verify", {
         state: { email: data.email, from: "register" },
@@ -159,7 +178,9 @@ const Register = () => {
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -174,7 +195,11 @@ const Register = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500"
                 >
-                  <span className={selectedUserType ? "text-gray-900" : "text-gray-400"}>
+                  <span
+                    className={
+                      selectedUserType ? "text-gray-900" : "text-gray-400"
+                    }
+                  >
                     {selectedUserType
                       ? t(`user_type_${selectedUserType}`)
                       : t("select_one")}
@@ -200,9 +225,14 @@ const Register = () => {
                 )}
               </div>
 
-              <input type="hidden" {...register("userType", { required: t("user_type_required") })} />
+              <input
+                type="hidden"
+                {...register("userType", { required: t("user_type_required") })}
+              />
               {errors.userType && (
-                <p className="text-red-500 text-xs mt-1">{errors.userType.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.userType.message}
+                </p>
               )}
             </div>
 
@@ -221,15 +251,22 @@ const Register = () => {
                     <input
                       {...register("agency_name", {
                         required: isAgency ? t("agency_name_required") : false,
-                        minLength: { value: 2, message: t("agency_name_too_short") },
+                        minLength: {
+                          value: 2,
+                          message: t("agency_name_too_short"),
+                        },
                       })}
                       type="text"
-                      placeholder={t("agency_name_placeholder") || "e.g. Arnob Agency"}
+                      placeholder={
+                        t("agency_name_placeholder") || "e.g. Arnob Agency"
+                      }
                       className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   {errors.agency_name && (
-                    <p className="text-red-500 text-xs mt-1">{errors.agency_name.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.agency_name.message}
+                    </p>
                   )}
                 </div>
 
@@ -241,14 +278,16 @@ const Register = () => {
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                     <input
-                      {...register("telephone_number", )}
+                      {...register("telephone_number")}
                       type="tel"
                       placeholder="01XXXXXXXXX"
                       className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   {errors.telephone_number && (
-                    <p className="text-red-500 text-xs mt-1">{errors.telephone_number.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.telephone_number.message}
+                    </p>
                   )}
                 </div>
 
@@ -270,7 +309,9 @@ const Register = () => {
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
                   />
                   {errors.vatId && (
-                    <p className="text-red-500 text-xs mt-1">{errors.vatId.message}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.vatId.message}
+                    </p>
                   )}
                 </div>
               </>
@@ -294,7 +335,9 @@ const Register = () => {
                 />
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -308,7 +351,8 @@ const Register = () => {
                 <input
                   {...register("confirmPassword", {
                     required: t("confirm_password_required"),
-                    validate: (value) => value === password || t("passwords_do_not_match"),
+                    validate: (value) =>
+                      value === password || t("passwords_do_not_match"),
                   })}
                   type="password"
                   placeholder={t("password_placeholder")}
@@ -316,7 +360,9 @@ const Register = () => {
                 />
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
@@ -338,9 +384,10 @@ const Register = () => {
               type="submit"
               disabled={isLoading || !watch("termsAccepted")}
               className={`w-full mt-6 py-3.5 px-4 rounded-lg font-medium text-white transition-all
-                ${isLoading || !watch("termsAccepted")
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
+                ${
+                  isLoading || !watch("termsAccepted")
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
                 }`}
             >
               {isLoading ? t("registering") + "..." : t("register")}
@@ -352,24 +399,42 @@ const Register = () => {
             <label className="flex items-start gap-4 cursor-pointer select-none">
               <input
                 type="checkbox"
-                {...register("termsAccepted", { required: t("please_accept_terms") })}
+                {...register("termsAccepted", {
+                  required: t("please_accept_terms"),
+                })}
                 className="w-6 h-6 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 leading-relaxed">
                 {t("by_registering_agree")}{" "}
-                <NavLink to="/terms" target="_blank" className="text-blue-600 hover:underline">
+                <NavLink
+                  to="/terms"
+                  target="_blank"
+                  className="text-blue-600 hover:underline"
+                >
                   {t("terms_and_conditions")}
                 </NavLink>{" "}
                 &{" "}
-                <NavLink to="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                <NavLink
+                  to="/privacy"
+                  target="_blank"
+                  className="text-blue-600 hover:underline"
+                >
                   {t("privacy_policy")}
                 </NavLink>
               </span>
             </label>
             {errors.termsAccepted && (
               <p className="text-red-500 text-xs mt-3 flex items-center gap-2 ml-10">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {errors.termsAccepted.message}
               </p>

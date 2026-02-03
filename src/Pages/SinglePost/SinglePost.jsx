@@ -42,12 +42,10 @@ function SinglePost({ prid }) {
   const { id: paramId } = useParams();
   const finalId = paramId || prid?.id;
   const { t } = useTranslation();
-
   const [token, setToken] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [role, setRole] = useState(null);
   const [isLocalStorageLoaded, setIsLocalStorageLoaded] = useState(false);
-
   const [postData, setPostData] = useState({});
   const [offerForm, setOfferForm] = useState({
     budget: "",
@@ -281,9 +279,6 @@ function SinglePost({ prid }) {
       );
       return;
     }
-    // if (userData?.role === "agency" && !userData?.agency_is_verified) {
-    //   navigate("/dashboard");
-    // }
     if (tour.status === "accepted") {
       toast.info(t("offer_accepted"));
       return;
@@ -298,7 +293,6 @@ function SinglePost({ prid }) {
   };
 
   const showSentOfferButton = !token || role === "agency";
-
   return (
     <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
       <Toaster />
