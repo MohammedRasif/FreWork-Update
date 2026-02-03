@@ -13,9 +13,9 @@ const VacanzaMycost = () => {
         {/* <p className="text-gray-700 text-[14px] md:text-lg lg:mb-4 font-medium">
           {t("what_we_offer")}
         </p> */}
-        <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
+        {/* <h1 className="text-2xl md:text-4xl lg:text-5xl font-semibold text-[#3F4C65]">
           {t("lets_use_vacanzamycost")}
-        </h1>
+        </h1> */}
       </div>
       <div className="relative">
         <img

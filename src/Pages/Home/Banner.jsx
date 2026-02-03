@@ -92,7 +92,7 @@ const Banner = () => {
         />
         <div className="absolute inset-0 bg-black/10" />
       </div>
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center lg:mt-12 mt-8">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center lg:mt-0 mt-8">
         {/* <img
           src={img1}
           alt="Logo"
@@ -103,10 +103,10 @@ const Banner = () => {
         </h1> */}
 
         
-        <p className="mt-2 text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm max-w-[90%]">
+        <p className=" text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm lg:max-w-[40%]">
           {t("banner_slogan")}
         </p>
-        <p className=" lg:text-2xl text-[15px]">{t("show_short_description")}</p>
+        <p className=" lg:text-2xl text-[15px] lg:pt-5">{t("show_short_description")}</p>
         <h1 className="lg:text-4xl pb-3 text-[#FF6600] text-[16px] font-semibold lg:pb-5 ">
           {t("banner_tagline")}
         </h1>

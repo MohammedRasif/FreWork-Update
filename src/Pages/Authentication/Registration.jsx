@@ -126,9 +126,9 @@ const Register = () => {
                 <img src={img1} className="h-20" alt={t("logo")} />
               </div>
             </NavLink>
-            <h1 className="text-4xl font-semibold text-gray-700">
+            {/* <h1 className="text-4xl font-semibold text-gray-700">
               {t("welcome_to_frework")}
-            </h1>
+            </h1> */}
           </div>
 
           {errorMessage && (

@@ -73,7 +73,7 @@ const Pricing = () => {
 
  const handleSelectPlan = async (plan) => {
   if (plan?.cta?.action === "apply_partner") {
-    navigate("/apply-partner", {
+    navigate("/register", {
       state: {
         pricing_id: plan.price_id, 
       },
