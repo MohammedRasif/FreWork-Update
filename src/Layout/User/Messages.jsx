@@ -74,24 +74,27 @@ function Messages() {
   const [selectedRejectReason, setSelectedRejectReason] = useState("");
 
   const rejectReasons = [
-    { label: "Prezzo troppo alto", value: "Prezzo troppo alto", tKey: "preza" },
-    {
-      label: "Offerta poco chiara",
-      value: "Offerta poco chiara",
-      tKey: "offerta",
-    },
-    {
-      label: "Destinazione inadatta",
-      value: "Destinazione inadatta",
-      tKey: "destinazioan",
-    },
-    { label: "Solo valutazione", value: "Solo valutazione", tKey: "solo" },
-    {
-      label: "Ho scelto un'altra proposta",
-      value: "Ho scelto un'altra proposta",
-      tKey: "scelto",
-    },
-  ];
+  { 
+    labelKey: "reject_reason_price_too_high",   // translation key
+    value: "Prezzo troppo alto"                 // backend-এ যাবে (italian fixed)
+  },
+  { 
+    labelKey: "reject_reason_offer_unclear",
+    value: "Offerta poco chiara"
+  },
+  { 
+    labelKey: "reject_reason_destination_unsuitable",
+    value: "Destinazione inadatta"
+  },
+  { 
+    labelKey: "reject_reason_only_evaluation",
+    value: "Solo valutazione"
+  },
+  { 
+    labelKey: "reject_reason_chose_another",
+    value: "Ho scelto un'altra proposta"
+  },
+];
 
   useEffect(() => {
     if (!agency && id && chatList && !isChatListLoading) {
@@ -742,24 +745,22 @@ function Messages() {
 
                   <div className="space-y-3">
                     {rejectReasons.map((reason) => (
-                      <label
-                        key={reason.label}
-                        className="flex items-center space-x-3 cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="reject_reason"
-                          value={reason.label}
-                          checked={selectedRejectReason === reason.label}
-                          onChange={() => setSelectedRejectReason(reason.label)}
-                        />
-                        <span className="text-gray-700 dark:text-gray-300">
-                          {i18n.language === "it"
-                            ? reason.label
-                            : t(reason.label)}
-                        </span>
-                      </label>
-                    ))}
+  <label
+    key={reason.value}
+    className="flex items-center space-x-3 cursor-pointer"
+  >
+    <input
+      type="radio"
+      name="reject_reason"
+      value={reason.value}                    
+      checked={selectedRejectReason === reason.value}
+      onChange={() => setSelectedRejectReason(reason.value)}
+    />
+    <span className="text-gray-700 dark:text-gray-300">
+      {t(reason.labelKey)}                    
+    </span>
+  </label>
+))}
                   </div>
 
                   <div className="flex justify-end space-x-3 mt-6">

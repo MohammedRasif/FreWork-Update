@@ -243,10 +243,10 @@ export default function AdminDashboardLayout() {
                 <img
                   src={
                     isLoading
-                      ? "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                      ? ""
                       : agencyData?.profile_handler_image ||
                         agencyData?.agency_logo_url ||
-                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                        ""
                   }
                   alt={agencyData?.agency_name || t("user")}
                   className="w-16 h-16 rounded-full"

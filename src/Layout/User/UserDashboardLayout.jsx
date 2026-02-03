@@ -318,7 +318,7 @@ export default function UserDashboardLayout() {
                   <img
                     src={
                       profileData.profile_picture_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                      ""
                     }
                     alt={t("user_avatar")}
                     className="w-16 h-16 rounded-full"
