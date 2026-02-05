@@ -805,7 +805,7 @@ function Messages() {
                       disabled={!selectedRejectReason}
                       className="px-4 py-2 rounded bg-[#2F80A9] text-white disabled:opacity-50"
                     >
-                      {t("send")}
+                      {t("sent")}
                     </button>
                   </div>
                 </div>

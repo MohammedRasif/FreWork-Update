@@ -67,7 +67,6 @@ const Pricing = () => {
   const isSingleCardView = visiblePlans.length === 1;
   const isLoadingState = isLoading || isFetching;
 
-  // Helper to get color based on plan
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
   const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
 

@@ -66,7 +66,6 @@ const SubscriptionSuccess = () => {
                                             }}
                                         />
                                     </svg>
-
                                     {/* Ripple Effect */}
                                     <div
                                         className={`absolute inset-0 rounded-full transition-all duration-1000 ${showIcon ? "scale-150 opacity-0" : "scale-100 opacity-30"
@@ -136,18 +135,18 @@ const SubscriptionSuccess = () => {
             </div>
 
             <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
+                @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+                }
+                .animate-float {
+                animation: float 3s ease-in-out infinite;
+                }
       `}</style>
         </div>
     )
