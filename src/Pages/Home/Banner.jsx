@@ -103,11 +103,15 @@ const Banner = () => {
         </h1> */}
 
         
-        <p className=" text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold md:leading-[48px] lg:leading-[50px] text-white drop-shadow-sm lg:max-w-[40%]">
-          {t("banner_slogan")}
-        </p>
-        <p className=" lg:text-2xl text-[15px] lg:pt-5">{t("show_short_description")}</p>
-        <h1 className="lg:text-4xl pb-3 text-[#FF6600] text-[16px] font-semibold lg:pb-5 ">
+        <p className="text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold 
+leading-[32px] md:leading-[55px] lg:leading-[65px] 
+whitespace-pre-line
+text-white drop-shadow-sm lg:max-w-[40%]">
+  {t("banner_slogan")}
+</p>
+
+        <p className=" lg:text-2xl text-[15px] lg:pt-14">{t("show_short_description")}</p>
+        <h1 className="lg:text-4xl pb-3 text-[#FF6600] text-[16px] font-semibold lg:pb-10 lg:pt-4 ">
           {t("banner_tagline")}
         </h1>
         {showCreateRequestButton && (
