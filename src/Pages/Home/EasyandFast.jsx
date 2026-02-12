@@ -112,7 +112,7 @@ const EasyandFast = () => {
             <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xl border border-gray-100">
               <div className="relative h-40 sm:h-48 lg:h-64 bg-white overflow-hidden rounded-xl mb-3 sm:mb-4">
                 <img
-                  src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/sheep.jpg"
+                  src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1770626297/WhatsApp_Image_2026-02-09_at_08.39.56_fjzvbm.webp"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   alt="Trip to Greece"
                 />

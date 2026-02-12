@@ -47,7 +47,7 @@ export default function AdminDashboardLayout() {
   const { data: agencyData, isLoading } = useGetAgencyProfileQuery();
   const ws = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { data: userData } = useShowUserInpormationQuery();
+  const { data: userData ,refetch  } = useShowUserInpormationQuery();
   const notificationRef = useRef(null);
 
   const allMenuItems = [
@@ -84,10 +84,24 @@ export default function AdminDashboardLayout() {
       items: userData?.is_profile_complete
         ? allMenuItems[0].items
         : allMenuItems[0].items.filter((item) =>
-            [t("profile"), t("logout")].includes(item.name)
+            [t("profile"), t("logout")].includes(item.name),
           ),
     },
   ];
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  useEffect(() => {
+  const hasReloaded = sessionStorage.getItem("admin_dashboard_reload");
+
+  if (!hasReloaded) {
+    sessionStorage.setItem("admin_dashboard_reload", "true");
+    window.location.reload();
+  }
+}, []);
+
 
   useEffect(() => {
     const normalizedLocation = location.pathname.replace(/\/$/, "");
@@ -230,7 +244,9 @@ export default function AdminDashboardLayout() {
         )}
 
         {/* Desktop Sidebar */}
-        <aside className={`hidden lg:block ${isCollapsed ? "w-20" : "w-80"} transition-all duration-500 ease-in-out`}>
+        <aside
+          className={`hidden lg:block ${isCollapsed ? "w-20" : "w-80"} transition-all duration-500 ease-in-out`}
+        >
           <NavLink to="/">
             <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
               <img src={img} className="h-full" alt={t("logo")} />
@@ -239,7 +255,9 @@ export default function AdminDashboardLayout() {
 
           <div className="h-auto flex items-center px-4">
             <div className="flex flex-col w-full justify-center items-center mt-16">
-              <div className={`transform transition-all duration-500 ${isCollapsed ? "opacity-0 -translate-x-full" : "opacity-100 translate-x-0"}`}>
+              <div
+                className={`transform transition-all duration-500 ${isCollapsed ? "opacity-0 -translate-x-full" : "opacity-100 translate-x-0"}`}
+              >
                 <img
                   src={
                     isLoading
@@ -254,7 +272,9 @@ export default function AdminDashboardLayout() {
               </div>
               <div className="w-full flex flex-col items-center gap-1 pl-3">
                 <h3 className="text-2xl text-justify  font-normal text-[#343E4B]">
-                  {isLoading ? t("loading") : agencyData?.agency_name || t("company_profile")}
+                  {isLoading
+                    ? t("loading")
+                    : agencyData?.agency_name || t("company_profile")}
                 </h3>
               </div>
             </div>
@@ -317,10 +337,17 @@ export default function AdminDashboardLayout() {
         </aside>
 
         {/* Mobile Sidebar */}
-        <aside className={`mobile-sidebar fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <aside
+          className={`mobile-sidebar fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        >
           <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="text-lg font-semibold text-[#343E4B]">{t("menu")}</h1>
-            <button onClick={toggleMobileMenu} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <h1 className="text-lg font-semibold text-[#343E4B]">
+              {t("menu")}
+            </h1>
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <X size={20} />
             </button>
           </div>
@@ -334,17 +361,23 @@ export default function AdminDashboardLayout() {
               </NavLink>
               <div className="w-20 h-20 rounded-full overflow-hidden">
                 <img
-                  src={(!isLoading && agencyData?.agency_logo_url) || UserAvatar}
+                  src={
+                    (!isLoading && agencyData?.agency_logo_url) || UserAvatar
+                  }
                   alt={agencyData?.name || t("user")}
                   className="w-full h-full rounded-full"
                 />
               </div>
               <div className="w-full flex flex-col gap-1 pl-3 mt-4">
                 <h3 className="text-xl text-center font-normal text-[#343E4B]">
-                  {isLoading ? t("loading") : agencyData?.name || t("company_profile")}
+                  {isLoading
+                    ? t("loading")
+                    : agencyData?.name || t("company_profile")}
                 </h3>
                 <span className="text-center text-sm text-[#8C8C8C]">
-                  {isLoading ? t("loading") : agencyData?.position || t("username")}
+                  {isLoading
+                    ? t("loading")
+                    : agencyData?.position || t("username")}
                 </span>
               </div>
             </div>
@@ -449,12 +482,20 @@ export default function AdminDashboardLayout() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
                       <NavLink to="/contact">
-                        <DropdownMenuItem onClick={() => handleItemClick(t("upgrade_package"), "/contact")}>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleItemClick(t("upgrade_package"), "/contact")
+                          }
+                        >
                           <CircleArrowUp size={20} />
                           {t("upgrade_package")}
                         </DropdownMenuItem>
                       </NavLink>
-                      <DropdownMenuItem onClick={() => handleItemClick(t("change_password"), "")}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleItemClick(t("change_password"), "")
+                        }
+                      >
                         <Lock size={20} />
                         {t("change_password")}
                       </DropdownMenuItem>
@@ -470,11 +511,19 @@ export default function AdminDashboardLayout() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
-                      <DropdownMenuItem onClick={() => handleItemClick(t("upgrade_package"), "/contact")}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleItemClick(t("upgrade_package"), "/contact")
+                        }
+                      >
                         <CircleArrowUp size={20} />
                         {t("upgrade_package")}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleItemClick(t("change_password"), "")}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleItemClick(t("change_password"), "")
+                        }
+                      >
                         <Lock size={20} />
                         {t("change_password")}
                       </DropdownMenuItem>
@@ -494,8 +543,13 @@ export default function AdminDashboardLayout() {
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">{t("change_password")}</h2>
-                  <button onClick={handleClosePopup} className="text-gray-500 hover:text-gray-700">
+                  <h2 className="text-lg font-semibold">
+                    {t("change_password")}
+                  </h2>
+                  <button
+                    onClick={handleClosePopup}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
                     <X size={20} />
                   </button>
                 </div>

@@ -70,12 +70,12 @@ flex-shrink: 0;
 padding: 10px 24px;
 font-size: 14px;
 font-weight: 600;
-border-radius: 50px; /* Pill shape matching "Crea Richiesta" */
+border-radius: 50px; 
 cursor: pointer;
 transition: transform 0.2s, box-shadow 0.2s;
 white-space: nowrap;
 }
-/* Accept Button - Brand Orange */
+
 .vmc-btn-primary {
 background-color: #ff6600;
 color: white;
@@ -113,6 +113,10 @@ width: 100%;
 justify-content: flex-end;
 margin-top: 10px;
 }
+.vmc-cookie-banner.show {
+    bottom: 0;
+  }
+
 .vmc-btn {
 flex: 1;
 text-align: center;
