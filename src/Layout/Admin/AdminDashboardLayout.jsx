@@ -210,7 +210,7 @@ export default function AdminDashboardLayout() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
-    const baseUrl = "//api.vacanzamycost.com";
+    const baseUrl = "//api.vacanzamycost.it";
     const socketUrl = `wss:${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
