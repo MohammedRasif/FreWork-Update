@@ -871,7 +871,7 @@ const TourPlanWithPopup = () => {
                   );
                 })
               ) : (
-                <div>No tours found</div>
+                <div className="h-screen">No tours found</div>
               )}
             </div>
           </div>

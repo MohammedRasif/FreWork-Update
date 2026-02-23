@@ -767,7 +767,7 @@ const TourPlanDouble = () => {
                   );
                 })
               ) : (
-                <div className="col-span-full">{t("no_tours_found")}</div>
+                <div className="col-span-full h-[36vh] text-3xl font-semibold text-center pt-40">{t("no_tours_found")}</div>
               )}
             </div>
           </div>
