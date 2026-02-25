@@ -191,11 +191,11 @@ export default function UserDashboardLayout() {
     const myPlansRoutes = [
       "/user",
       "/user/favourite",
-      "/user/accepted",
-      "/user/published",
-      "/user/CreatePlan",
+      "/user/richieste-accettate",
+      "/user/richieste-pubblicate",
+      "/user/crea-richiesta",
     ];
-    const profileRoutes = ["/user/profile", "/user/editProfile"];
+    const profileRoutes = ["/user/profilo", "/user/modifica-profilo"];
 
     if (myPlansRoutes.includes(normalizedLocation)) {
       setSelectedItem(t("my_plans"));
@@ -269,7 +269,7 @@ export default function UserDashboardLayout() {
         {
           name: t("profile"),
           icon: <UserRound size={20} />,
-          path: "/user/profile",
+          path: "/user/profilo",
         },
         {
           name: t("conversations"),

@@ -158,7 +158,7 @@ const Login = () => {
             {/* Forget Password */}
             <div>
               <h1
-                onClick={() => navigate("/verify")}
+                onClick={() => navigate("/verifica-account")}
                 className="text-blue-500 text-end cursor-pointer hover:underline"
               >
                 {t("forget_password")}
@@ -176,7 +176,7 @@ const Login = () => {
 
           {/* Register Link */}
           <div className="text-center mt-6">
-            <NavLink to="/register" className="text-md text-gray-600">
+            <NavLink to="/registrazione" className="text-md text-gray-600">
               {t("no_account")}{" "}
               <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
                 {t("register")}

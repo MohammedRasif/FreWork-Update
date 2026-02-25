@@ -29,13 +29,13 @@ const Navbar = () => {
   const routeMap = {
     "/": "home",
     "/blog": "blog",
-    "/pricing": "agencies",
-    "/tourPlans": "tours",
-    "/acceptedOffers": "acceptedOffers",
-    "/contact": "contact",
-    "/who_it_work": "howitworks",
-    "/user/editProfile": "profile",
-    "/user/profile": "profile",
+    "/prezzi-agenzie": "agencies",
+    "/richieste": "tours",
+    "/offerte-accettate": "acceptedOffers",
+    "/contatti": "contact",
+    "/come-funziona": "howitworks",
+    "/user/modifica-profilo": "profile",
+    "/user/profilo": "profile",
   };
 
   useEffect(() => {
@@ -103,9 +103,9 @@ const Navbar = () => {
       path = "/user";
     } else if (role === "agency") {
       if (!isAgencyVerified) {
-        path = "/pandding";
+        path = "/in-attesa";
       } else if (!isProfileComplete) {
-        path = "/admin/editProfile";
+        path = "/admin/modifica-profilo";
       } else {
         path = "/admin";
       }
@@ -118,14 +118,14 @@ const Navbar = () => {
 
   const navItems = [
     { key: "home", path: "/", label: t("home") },
-    { key: "tours", path: "/tourPlans", label: t("tour_plans") },
+    { key: "tours", path: "/richieste", label: t("tour_plans") },
     {
       key: "acceptedOffers",
-      path: "/acceptedOffers",
+      path: "/offerte-accettate",
       label: t("accepted_offers"),
     },
-    { key: "agencies", path: "/pricing", label: t("for_agencies") },
-    { key: "howitworks", path: "/who_it_work", label: t("who_work") },
+    { key: "agencies", path: "/prezzi-agenzie", label: t("for_agencies") },
+    { key: "howitworks", path: "/come-funziona", label: t("who_work") },
   ];
 
   return (
@@ -225,7 +225,7 @@ const Navbar = () => {
                 {t("login")}
               </button>
             </NavLink>
-            <NavLink to="/register">
+            <NavLink to="/registrazione">
               <button className="px-6 py-2.5 text-[18px] bg-[#3776E2] text-white rounded-lg hover:bg-blue-700 transition shadow-md">
                 {t("register")}
               </button>
@@ -305,7 +305,7 @@ const Navbar = () => {
                       {t("login")}
                     </button>
                   </NavLink>
-                  <NavLink to="/register" className="block">
+                  <NavLink to="/registrazione" className="block">
                     <button className="w-full py-3 text-lg font-medium bg-[#3776E2] text-white rounded-lg hover:bg-blue-700 shadow-md">
                       {t("register")}
                     </button>

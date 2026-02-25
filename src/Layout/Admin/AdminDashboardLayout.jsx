@@ -62,7 +62,7 @@ export default function AdminDashboardLayout() {
         {
           name: t("for_agencies"),
           icon: <UserRound size={20} />,
-          path: "/admin/membership",
+          path: "/admin/gestione-abbonamento",
         },
         {
           name: t("conversations"),
@@ -72,7 +72,7 @@ export default function AdminDashboardLayout() {
         {
           name: t("profile"),
           icon: <UserRound size={20} />,
-          path: "/admin/profile",
+          path: "/admin/profilo",
         },
         { name: t("logout"), icon: <LogOut size={20} />, path: "/" },
       ],
@@ -111,7 +111,7 @@ export default function AdminDashboardLayout() {
       "/admin/accepted",
       "/admin/published",
     ];
-    const profileRoutes = ["/admin/profile", "/admin/editProfile"];
+    const profileRoutes = ["/admin/profilo", "/admin/modifica-profilo"];
 
     if (myPlansRoutes.includes(normalizedLocation)) {
       setSelectedItem(t("my_plans"));
@@ -481,10 +481,10 @@ export default function AdminDashboardLayout() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
-                      <NavLink to="/contact">
+                      <NavLink to="/contatti">
                         <DropdownMenuItem
                           onClick={() =>
-                            handleItemClick(t("upgrade_package"), "/contact")
+                            handleItemClick(t("upgrade_package"), "/contatti")
                           }
                         >
                           <CircleArrowUp size={20} />
@@ -513,7 +513,7 @@ export default function AdminDashboardLayout() {
                     <DropdownMenuContent className="w-56" align="end">
                       <DropdownMenuItem
                         onClick={() =>
-                          handleItemClick(t("upgrade_package"), "/contact")
+                          handleItemClick(t("upgrade_package"), "/contatti")
                         }
                       >
                         <CircleArrowUp size={20} />

@@ -73,7 +73,7 @@ const AdminPricing = () => {
  const handleSelectPlan = async (plan) => {
   if (plan?.cta?.action === "apply_partner") {
     localStorage.setItem("pricing_status", "agency");
-    navigate("/register", {
+    navigate("/registrazione", {
       state: {
         pricing_id: plan.price_id, 
       },
@@ -84,7 +84,7 @@ const AdminPricing = () => {
   if (!accessToken) {
     toast.info(t("login_required_for_premium"));
     
-    navigate("/login", { state: { from: "/pricing" } });
+    navigate("/login", { state: { from: "/prezzi-agenzie" } });
     return;
   }
 
@@ -174,7 +174,7 @@ const AdminPricing = () => {
             </p>
             {!accessToken && (
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/registrazione")}
                 className="px-8 py-3 text-white rounded-md hover:opacity-90 transition"
                 style={{
                   backgroundColor: visiblePlans[0]

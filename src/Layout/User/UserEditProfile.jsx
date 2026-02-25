@@ -146,7 +146,7 @@ function UserEditProfile() {
 
       <div className="mb-3 sm:mb-4 lg:mb-5">
         <NavLink
-          to="/user/profile"
+          to="/user/profilo"
           className="inline-flex items-center px-2 sm:px-3 lg:px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 text-sm sm:text-base lg:text-base"
         >
           <IoArrowBack className="h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 mr-1 sm:mr-2 lg:mr-2 text-gray-700" />

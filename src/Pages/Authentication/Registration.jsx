@@ -105,7 +105,7 @@ const Register = () => {
       console.log("User created:", res);
       localStorage.removeItem("pricing_status");
 
-      navigate("/otp_verify", {
+      navigate("/verifica-otp", {
         state: { email: data.email, from: "register" },
       });
     } catch (err) {
@@ -407,7 +407,7 @@ const Register = () => {
               <span className="text-sm text-gray-700 leading-relaxed">
                 {t("by_registering_agree")}{" "}
                 <NavLink
-                  to="/terms"
+                  to="/termini-e-condizioni"
                   target="_blank"
                   className="text-blue-600 hover:underline"
                 >
@@ -415,7 +415,7 @@ const Register = () => {
                 </NavLink>{" "}
                 &{" "}
                 <NavLink
-                  to="/privacy"
+                  to="/privacy-policy"
                   target="_blank"
                   className="text-blue-600 hover:underline"
                 >

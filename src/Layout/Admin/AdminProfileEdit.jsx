@@ -159,7 +159,7 @@ const AdminProfileEdit = () => {
   return (
     <div className="p-5">
       <div className="flex items-center justify-between">
-        <NavLink to="/admin/profile" className="flex items-center space-x-1 cursor-pointer">
+        <NavLink to="/admin/profilo" className="flex items-center space-x-1 cursor-pointer">
           <GoArrowLeft size={22} />
           <h1 className="text-[19px] -mt-1">{t("back")}</h1>
         </NavLink>

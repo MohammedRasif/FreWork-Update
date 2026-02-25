@@ -740,7 +740,7 @@ const AdminHome = () => {
                   <p className="text-sm text-gray-900 font-semibold mb-2">
                     {t("need_fast_response")}
                   </p>
-                  <NavLink to="/contact">
+                  <NavLink to="/contatti">
                     <Button
                       variant="link"
                       size="sm"

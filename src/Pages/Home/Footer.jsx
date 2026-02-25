@@ -23,7 +23,7 @@ const Footer = () => {
       <div className="space-y-2 pl-10">
         <h3 className="text-2xl font-bold text-gray-100">{t("about_us")}</h3>
         <div className="space-y-1">
-          <NavLink to="/contact" className="block text-gray-400 hover:text-white text-sm">
+          <NavLink to="/contatti" className="block text-gray-400 hover:text-white text-sm">
             {t("contact_us")}
           </NavLink>
           <NavLink to="/membership" className="block text-gray-400 hover:text-white text-sm">
@@ -62,10 +62,10 @@ const Footer = () => {
       <div className="space-y-4 ">
         <h3 className="text-3xl font-bold text-gray-100">{t("about_us")}</h3>
         <div className="space-y-2 pt-4">
-          <NavLink to="/contact" className="block text-gray-400 hover:text-white text-sm">
+          <NavLink to="/contatti" className="block text-gray-400 hover:text-white text-sm">
             {t("contact_us")}
           </NavLink>
-          <NavLink to="/membership" className="block text-gray-400 hover:text-white text-sm">
+          <NavLink to="/abbonamenti-agenzie" className="block text-gray-400 hover:text-white text-sm">
             {t("agencies")}
           </NavLink>
           <NavLink to="/blog" className="block text-gray-400 hover:text-white text-sm">
@@ -90,10 +90,10 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4">
         <p>© 2024 {t("company_name")}. {t("all_rights_reserved")}</p>
         <div className="flex gap-8">
-          <NavLink to="/privacy" className="text-gray-400 hover:text-white font-medium">
+          <NavLink to="/privacy-policy" className="text-gray-400 hover:text-white font-medium">
             {t("privacy_notice")}
           </NavLink>
-          <NavLink to="/terms" className="text-gray-400 hover:text-white font-medium">
+          <NavLink to="/termini-e-condizioni" className="text-gray-400 hover:text-white font-medium">
             {t("terms_of_service")}
           </NavLink>
         </div>

@@ -140,7 +140,7 @@ const AdminNotification = () => {
 
   const handleNotificationClick = (planId) => {
     if (planId) {
-      navigate(`/tour-plans/${planId}`);
+      navigate(`/richieste/${planId}`);
     } else {
       toast.error(t("no_plan_id"));
     }

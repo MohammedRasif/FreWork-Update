@@ -6,7 +6,7 @@ export default function Card({ tourPlan }) {
 
   return (
    <Link
-  to={`/tour-plans/${tourPlan.id}`}
+  to={`/richieste/${tourPlan.id}`}
   className="flex flex-col shadow-md w-full p-1 sm:max-w-sm mx-auto sm:mx-2 overflow-hidden rounded-2xl border transition-shadow duration-300"
 >
   <div className="relative  ">

@@ -278,7 +278,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (!accessToken) {
       localStorage.setItem("pendingPlan", JSON.stringify(data));
       toast.error(t("please_login") || "Please log in to create a plan");
-      navigate("/register", { state: { fromLogin: true } });
+      navigate("/registrazione", { state: { fromLogin: true } });
       return;
     }
     if (data.endingDate < data.startingDate) {

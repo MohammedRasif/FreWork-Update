@@ -49,16 +49,16 @@ export const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },
       { path: "/blog_details/:id", element: <BlogDetails /> },
-      { path: "/membership", element: <Membership /> },
-      { path: "/pricing", element: <Pricing /> },
-      { path: "/tourPlan", element: <TourPlan /> },
-      { path: "/tourPlans", element: <TourPlanDouble /> },
-      { path: "/acceptedOffers", element: <AcceptedOffers /> },
-      { path: "/contact", element: <Contact /> },
-      { path: "/viewall", element: <ViewAllPost /> },
-      { path: "/who_it_work", element: <WhoItWork /> },
-      { path: "/privacy", element: <Privacy /> },
-      { path: "/terms", element: <Terms /> },
+      { path: "/abbonamenti-agenzie", element: <Membership /> },
+      { path: "/prezzi-agenzie", element: <Pricing /> },
+      { path: "/crea-richiesta", element: <TourPlan /> },
+      { path: "/richieste", element: <TourPlanDouble /> },
+      { path: "/offerte-accettate", element: <AcceptedOffers /> },
+      { path: "/contatti", element: <Contact /> },
+      { path: "/tutte-le-richieste", element: <ViewAllPost /> },
+      { path: "/come-funziona", element: <WhoItWork /> },
+      { path: "/privacy-policy", element: <Privacy /> },
+      { path: "/termini-e-condizioni", element: <Terms /> },
     ],
   },
 
@@ -68,10 +68,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminHome /> },
       { path: "dashboard", element: <AdminHome /> },
-      { path: "profile", element: <AdminProfile /> },
-      { path: "editProfile", element: <AdminProfileEdit /> },
-      { path: "membership", element: <AdminPricing /> },
-      { path: "admin_notification", element: <AdminNotification /> },
+      { path: "profilo", element: <AdminProfile /> },
+      { path: "modifica-profilo", element: <AdminProfileEdit /> },
+      { path: "gestione-abbonamento", element: <AdminPricing /> },
+      { path: "notifiche", element: <AdminNotification /> },
       {
         path: "chat", 
         element: <ChatInterface />,
@@ -100,7 +100,7 @@ export const router = createBrowserRouter([
       }, // Default route for /user (maps to /user/)
       {
         index: true,
-        path: "published",
+        path: "richieste-pubblicate",
         element: (
           <HomeLayout>
             <PublishedPlan />
@@ -109,7 +109,7 @@ export const router = createBrowserRouter([
       }, 
       {
         index: true,
-        path: "accepted",
+        path: "richieste-accettate",
         element: (
           <HomeLayout>
             <UserAccepte />
@@ -118,7 +118,7 @@ export const router = createBrowserRouter([
       },
       {
         index: true,
-        path: "favourite",
+        path: "preferiti",
         element: (
           <HomeLayout>
             <Favorite />
@@ -128,14 +128,14 @@ export const router = createBrowserRouter([
     ],
   },
 
-  { path: "/register", element: <Registration /> },
+  { path: "/registrazione", element: <Registration /> },
   { path: "/login", element: <Login /> },
-  { path: "/Successfully", element: <SubscriptionSuccess /> },
-  { path: "/verify", element: <EmailVerification /> },
-  { path: "/otp_verify", element: <OTP_Verification /> },
-  { path: "/reset_password", element: <ResetPassword /> },
-  { path: "/success", element: <SubscriptionSuccess /> },
-  { path: "/pandding", element: <PendingForAdmin /> },
+  { path: "/registrazione-completata", element: <SubscriptionSuccess /> },
+  { path: "/verifica-account", element: <EmailVerification /> },
+  { path: "/verifica-otp", element: <OTP_Verification /> },
+  { path: "/recupero-password", element: <ResetPassword /> },
+  { path: "/successo", element: <SubscriptionSuccess /> },
+  { path: "/in-attesa", element: <PendingForAdmin /> },
   {
     path: "/user",
     element: <UserDashboardLayout />,
@@ -143,7 +143,7 @@ export const router = createBrowserRouter([
       { index: true, element: <HomeLayout /> },
       { path: "dashboard", element: <HomeLayout /> },
       {
-        path: "chat", // Changed from "user" to "chat" to avoid repetition
+        path: "chat", 
         element: <ChatInterface />,
         children: [
           {
@@ -152,19 +152,19 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      { path: "profile", element: <UserProfile /> },
-      { path: "CreatePlan", element: <CreatePlan /> },
-      { path: "editCreatePlan", element: <CreatePlan /> },
+      { path: "profilo", element: <UserProfile /> },
+      { path: "crea-richiesta", element: <CreatePlan /> },
+      { path: "modifica-richiesta", element: <CreatePlan /> },
       { path: "notification", element: <AdminNotification /> },
-      { path: "editProfile", element: <UserEditProfile /> },
+      { path: "modifica-profilo", element: <UserEditProfile /> },
     ],
   },
 
   // make it private
-  { path: `/tour-plans/:id`, element: <SinglePost /> },
-  { path: "/register", element: <Registration /> },
+  { path: `/richieste/:id`, element: <SinglePost /> },
+  { path: "/registrazione", element: <Registration /> },
   { path: "/login", element: <Login /> },
-  { path: "/verify", element: <EmailVerification /> },
-  { path: "/otp_verify", element: <OTP_Verification /> },
-  { path: "/reset_password", element: <ResetPassword /> },
+  { path: "/verifica-account", element: <EmailVerification /> },
+  { path: "/verifica-otp", element: <OTP_Verification /> },
+  { path: "/recupero-password", element: <ResetPassword /> },
 ]);

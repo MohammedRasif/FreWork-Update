@@ -286,7 +286,7 @@ const AdminProfile = () => {
                   {profileData?.agency_name || t("unnamed_agency")}
                 </h2>
                 <NavLink
-                  to="/admin/editProfile"
+                  to="/admin/modifica-profilo"
                   className="flex items-center gap-1 cursor-pointer underline"
                 >
                   <FaEdit className="w-5 h-5" />

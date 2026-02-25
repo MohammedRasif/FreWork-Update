@@ -272,7 +272,7 @@ function SinglePost({ prid }) {
     }
 
     if (userData?.role === "agency" && !userData?.agency_is_verified) {
-      navigate("/pandding");
+      navigate("/in-attesa");
       toast.info(
         t("agency_verification_pending") ||
           "Your agency profile is under verification",

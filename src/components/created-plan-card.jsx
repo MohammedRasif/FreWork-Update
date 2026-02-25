@@ -197,7 +197,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                       : t("publish_plan")}
                   </DropdownMenuItem>
                   <Link
-                    to={"/user/CreatePlan"}
+                    to={"/user/crea-richiesta"}
                     state={{ from: "edit", id: plan.id }}
                   >
                     <DropdownMenuItem>

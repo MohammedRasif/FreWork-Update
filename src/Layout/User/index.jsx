@@ -22,7 +22,7 @@ const HomeLayout = ({ children }) => {
         {/* Main Content Section */}
         <div className="lg:col-span-6 max-lg:order-last">
           <div className="w-full flex items-end justify-end">
-            <NavLink to="/user/CreatePlan">
+            <NavLink to="/user/crea-richiesta">
               <Button
                 variant="transparent"
                 className="font-nunito-sans font-semibold"
@@ -63,10 +63,10 @@ const HomeLayout = ({ children }) => {
                 {t("created_plan")}
               </button>
             </Link>
-            <Link to="/user/published">
+            <Link to="/user/richieste-pubblicate">
               <button
                 className={`w-full text-center px-4 py-3 font-semibold rounded-md transition-colors cursor-pointer ${
-                  pathname === "/user/published"
+                  pathname === "/user/richieste-pubblicate"
                     ? "bg-white shadow-md"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
@@ -74,10 +74,10 @@ const HomeLayout = ({ children }) => {
                 {t("published_plans")}
               </button>
             </Link>
-            <Link to="/user/accepted">
+            <Link to="/user/richieste-accettate">
               <button
                 className={`w-full text-center px-4 py-3 font-semibold rounded-md transition-colors cursor-pointer ${
-                  pathname === "/user/accepted"
+                  pathname === "/user/richieste-accettate"
                     ? "bg-white shadow-md"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
@@ -85,10 +85,10 @@ const HomeLayout = ({ children }) => {
                 {t("accepted_offers")}
               </button>
             </Link>
-            <Link to="/user/favourite">
+            <Link to="/user/preferiti">
               <button
                 className={`w-full text-center px-4 py-3 font-semibold rounded-md transition-colors cursor-pointer ${
-                  pathname === "/user/favourite"
+                  pathname === "/user/preferiti"
                     ? "bg-white shadow-md"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
@@ -101,7 +101,7 @@ const HomeLayout = ({ children }) => {
               <p className="text-sm text-gray-900 font-semibold mb-2">
                 {t("need_fast_response")}
               </p>
-             <NavLink to="/contact">
+             <NavLink to="/contatti">
                <Button
                 variant="link"
                 size="sm"

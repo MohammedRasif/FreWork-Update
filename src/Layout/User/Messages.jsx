@@ -606,7 +606,7 @@ function Messages() {
       alert(t("no_tour_plan_provided"));
       return;
     }
-    navigate(`/tour-plans/${agency.tour_plan_id}`);
+    navigate(`/richieste/${agency.tour_plan_id}`);
     setIsButtonVisible(false);
   };
 

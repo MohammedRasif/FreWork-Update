@@ -28,7 +28,7 @@ function UserProfile() {
           <h1 className="text-base sm:text-lg text-gray-600">
             {t("invitation_code")}: 101020
           </h1>
-          <NavLink to="/user/editProfile">
+          <NavLink to="/user/modifica-profilo">
             <button className="text-blue-500 hover:underline border border-blue-500 rounded-md px-4 sm:px-6 py-2 flex items-center cursor-pointer">
               <FaEdit className="mr-2" /> {t("edit")}
             </button>

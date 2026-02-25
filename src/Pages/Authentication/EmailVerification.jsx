@@ -22,7 +22,7 @@ const EmailVerification = () => {
       const res = await verify({ email }).unwrap();
       console.log("Verify response:", res);
 
-      navigate("/otp_verify", { state: { email, to: "/reset_password" } });
+      navigate("/verifica-otp", { state: { email, to: "/recupero-password" } });
     } catch (error) {
       console.error("Error verifying email:", error);
       alert(

@@ -52,7 +52,7 @@ const OTP_Verification = () => {
         setTimeout(() => {
           setShowPopup(false);
           if (userType === "agency") {
-            navigate("/pandding", {
+            navigate("/in-attesa", {
               state: { email: location.state.email },
             });
           } else {
