@@ -28,7 +28,7 @@ export default function GroupCard({ tourPlan }) {
   }, [tourPlan]);
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.id}`);
+    navigate(`/richieste/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {

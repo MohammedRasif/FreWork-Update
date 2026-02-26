@@ -28,7 +28,7 @@ export default function BeachCard({ tourPlan }) {
   }, [tourPlan]);
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.id}`);
+    navigate(`/richieste/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {

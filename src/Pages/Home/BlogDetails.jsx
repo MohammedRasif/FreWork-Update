@@ -41,7 +41,7 @@ export default function BlogDetails() {
 
   if (isError || !post) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen pt-90">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Post Not Found</h1>
         <p className="text-gray-600">
           {error?.data?.message ||

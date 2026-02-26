@@ -45,7 +45,7 @@ export default function TourCard({ tourPlan }) {
   };
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.id}`);
+    navigate(`/richieste/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {

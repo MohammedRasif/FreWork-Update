@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },
-      { path: "/blog_details/:id", element: <BlogDetails /> },
+      { path: "/blog/:id", element: <BlogDetails /> },
       { path: "/abbonamenti-agenzie", element: <Membership /> },
       { path: "/prezzi-agenzie", element: <Pricing /> },
       { path: "/crea-richiesta", element: <TourPlan /> },

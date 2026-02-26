@@ -40,7 +40,7 @@ function BlogCard({ post }) {
 
   return (
     <div>
-      <NavLink to={`/blog_details/${post.id}`}>
+      <NavLink to={`/blog/${post.slug}`}>
         <article className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100">
           <div className="flex flex-col md:flex-row">
             <div className="md:w-96 flex-shrink-0">
@@ -131,7 +131,7 @@ export default function Blog() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-96">
+      <div className="flex justify-center items-center h-screen">
         <div className="text-2xl text-gray-600">Loading blogs...</div>
       </div>
     );
