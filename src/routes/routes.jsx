@@ -97,7 +97,7 @@ export const router = createBrowserRouter([
             <CreatedPlan />
           </HomeLayout>
         ),
-      }, // Default route for /user (maps to /user/)
+      }, 
       {
         index: true,
         path: "richieste-pubblicate",
@@ -160,7 +160,7 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // make it private
+  
   { path: `/richieste/:id`, element: <SinglePost /> },
   { path: "/registrazione", element: <Registration /> },
   { path: "/login", element: <Login /> },
