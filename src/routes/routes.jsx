@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
-    errorElement: <Navigate to="/" replace />,
+   // errorElement: <Navigate to="/" replace />,
     children: [
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import { format } from "date-fns";
@@ -14,22 +14,24 @@ const formatDate = (dateString) => {
 };
 
 export default function BlogDetails() {
-  const { id } = useParams();
-  const numericId = id ? parseInt(id, 10) : null;
+  const { id } = useParams();          
+  console.log("URL param (slug):", id);
 
   const {
-    data: postsArray = [],
+    data: posts = [],              
     isLoading,
     isError,
     error,
-  } = useShowBlogPostQuery(numericId, {
-    skip: !numericId,
-  });
+  } = useShowBlogPostQuery();      
+
+  const post = posts.find((p) => p.slug === id);
+
+  console.log("Total posts loaded:", posts.length);
+  console.log("Found post:", post ? post.title : "Not found");
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const post = postsArray.find((p) => p.id === numericId);
 
   if (isLoading) {
     return (
@@ -39,21 +41,31 @@ export default function BlogDetails() {
     );
   }
 
-  if (isError || !post) {
+  if (isError) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen pt-90">
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
+        <h1 className="text-4xl font-bold text-red-600 mb-4">Error Loading Post</h1>
+        <p className="text-gray-600">
+          {error?.data?.message || "Something went wrong while fetching the blog post."}
+        </p>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Post Not Found</h1>
         <p className="text-gray-600">
-          {error?.data?.message ||
-            "The blog post you're looking for doesn't exist."}
+          No blog post found with slug: <strong>{id}</strong><br />
+          Please check the URL or try another post.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24">
-      {/* Title & Date */}
+    <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24 h-screen">
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
           {post.title}
@@ -73,7 +85,7 @@ export default function BlogDetails() {
         </div>
       )}
 
-      <article className="blog-content-raw mt-10">
+      <article className="blog-content-raw mt-10 prose prose-lg max-w-none">
         {post.content ? (
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         ) : (
