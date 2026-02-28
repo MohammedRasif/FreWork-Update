@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },
       { path: "/blog/:id", element: <BlogDetails /> },
-      { path: "/abbonamenti-agenzie", element: <Membership /> },
+      { path: "/agenzie-certificate", element: <Membership /> },
       { path: "/prezzi-agenzie", element: <Pricing /> },
       { path: "/crea-richiesta", element: <TourPlan /> },
       { path: "/richieste", element: <TourPlanDouble /> },
