@@ -29,7 +29,7 @@ const Navbar = () => {
   const routeMap = {
     "/": "home",
     "/blog": "blog",
-    "/prezzi-agenzie": "agencies",
+    "/per-agenzie": "agencies",
     "/richieste": "tours",
     "/offerte-accettate": "acceptedOffers",
     "/contatti": "contact",
@@ -124,7 +124,7 @@ const Navbar = () => {
       path: "/offerte-accettate",
       label: t("accepted_offers"),
     },
-    { key: "agencies", path: "/prezzi-agenzie", label: t("for_agencies") },
+    { key: "agencies", path: "/per-agenzie", label: t("for_agencies") },
     { key: "howitworks", path: "/come-funziona", label: t("who_work") },
   ];
 

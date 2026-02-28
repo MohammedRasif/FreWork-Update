@@ -84,7 +84,7 @@ const Pricing = () => {
   if (!accessToken) {
     toast.info(t("login_required_for_premium"));
     
-    navigate("/login", { state: { from: "/prezzi-agenzie" } });
+    navigate("/login", { state: { from: "/per-agenzie" } });
     return;
   }
 

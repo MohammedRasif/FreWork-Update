@@ -50,7 +50,7 @@ export const router = createBrowserRouter([
       { path: "/blog", element: <Blog /> },
       { path: "/blog/:id", element: <BlogDetails /> },
       { path: "/agenzie-certificate", element: <Membership /> },
-      { path: "/prezzi-agenzie", element: <Pricing /> },
+      { path: "/per-agenzie", element: <Pricing /> },
       { path: "/crea-richiesta", element: <TourPlan /> },
       { path: "/richieste", element: <TourPlanDouble /> },
       { path: "/offerte-accettate", element: <AcceptedOffers /> },
