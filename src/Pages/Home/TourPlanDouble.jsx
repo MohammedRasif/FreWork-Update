@@ -93,7 +93,6 @@ const TourPlanDouble = () => {
   ).sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
-    // Search API theke asbe (searchResults). Jodi search thake to searchResults use korbo, na hole tourPlanPublic
     let filteredData = filters.search ? (searchResults || []) : (tourPlanPublic || []);
 
     // Search er local filter remove kora hoyeche karon API already location_to diye search kore dibe

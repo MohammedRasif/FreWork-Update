@@ -13,7 +13,7 @@ const Footer = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-bold text-gray-100">VacanzaMyCost.it</h3>
         <p className="text-sm text-gray-400">
-          Sede legale: <br />
+         {t("contact_us")}: <br />
           Verona, Italia
         </p>
         <p className="text-sm text-gray-400">info@vacanzamycost.it</p>
@@ -88,7 +88,7 @@ const Footer = () => {
   <div className="mt-10 pt-6 border-t border-gray-800">
     <div className="container mx-auto px-4">
       <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4">
-        <p>© 2024 {t("company_name")}. {t("all_rights_reserved")}</p>
+        <p>© 2026 {t("company_name")}. {t("all_rights_reserved")}</p>
         <div className="flex gap-8">
           <NavLink to="/privacy-policy" className="text-gray-400 hover:text-white font-medium">
             {t("privacy_notice")}

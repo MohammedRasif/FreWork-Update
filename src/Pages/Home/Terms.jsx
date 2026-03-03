@@ -101,7 +101,7 @@ function Terms() {
       </div>
 
       <p className="text-center text-gray-600 mt-16 text-sm">
-        © 2025 VacanzaMyCost.it – Tutti i diritti riservati.
+        © 2026 VacanzaMyCost.it – Tutti i diritti riservati.
       </p>
     </div>
   );

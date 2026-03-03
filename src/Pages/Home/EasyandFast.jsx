@@ -92,7 +92,7 @@ const EasyandFast = () => {
               <div className="flex items-start">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
                   <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1764484092/Image20251130122412_qqwgzn.jpg"
+                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1764484092/Image20261130122412_qqwgzn.jpg"
                     alt=""
                   />
                 </div>

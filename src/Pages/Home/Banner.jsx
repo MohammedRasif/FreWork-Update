@@ -102,28 +102,36 @@ const Banner = () => {
           {t("banner_tagline")}
         </h1> */}
 
-        
-        <p className="text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold 
+        <p
+          className="text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold 
 leading-[32px] md:leading-[55px] lg:leading-[65px] 
 whitespace-pre-line
-text-white drop-shadow-sm lg:max-w-[40%]">
-  {t("banner_slogan")}
-</p>
+text-white drop-shadow-sm lg:max-w-[40%]"
+        >
+          {t("banner_slogan")}
+        </p>
 
-        <p className=" lg:text-2xl text-[15px] lg:pt-14">{t("show_short_description")}</p>
+        <p className=" lg:text-2xl text-[15px] lg:pt-14">
+          {t("show_short_description")}
+        </p>
         <h1 className="lg:text-4xl pb-3 text-[#FF6600] text-[16px] font-semibold lg:pb-10 lg:pt-4 ">
           {t("banner_tagline")}
         </h1>
         {showCreateRequestButton && (
           <button
             onClick={handleButtonClick}
-            className="mt-3 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[28px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
+            className="mt-1 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[28px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
           >
             {t("create_request")}
           </button>
         )}
+
+        <div className="block md:hidden text-[13px] text-white font-medium py-1">
+  <p>{t("banner_top_buttom")}</p>
+  <p>{t("banner_buttom")}</p>
+</div>
       </div>
-      
+
       {isPopupOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -139,7 +147,9 @@ text-white drop-shadow-sm lg:max-w-[40%]">
           >
             <BannerSectionPopup
               closeForm={closePopup}
-              initialStep={getInitialStep(JSON.parse(localStorage.getItem("pendingPlan") || "{}"))}
+              initialStep={getInitialStep(
+                JSON.parse(localStorage.getItem("pendingPlan") || "{}"),
+              )}
             />
           </motion.div>
         </motion.div>

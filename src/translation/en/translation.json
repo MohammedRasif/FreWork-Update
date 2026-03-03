@@ -11,6 +11,8 @@
 "logout": "Logout",
 "loading": "Loading...",
 "banner_tagline": "Ideal for trips from €2,000 and up",
+"banner_top_buttom": "Every request will be verified by phone.",
+"banner_buttom": "We thank you and we hope …",
 "banner_slogan": "Publish your request and receive personalized offers from agencies",
 "create_request": "Create Request",
 "what_we_offer": "What we offer to our users...",
@@ -103,9 +105,9 @@
 "benefit_2": "Receive direct client requests instantly",
 "benefit_3": "Manage offers, negotiations, and bookings in one dashboard",
 "benefit_4": "Boost your visibility with highly interested travelers",
-"address_line1": "Sede legale:",
+"address_line1": "location:",
 "address_line2": "Verona, Italia",
-"email": "Email",
+"email": "info@vacanzamycost.com",
 "our_collaborators": "Our collaborators",
 "collaborator_1": "Demo company limited",
 "collaborator_2": "Demo task company",
@@ -751,7 +753,7 @@
 "google_maps_load_failed": "Failed to load Google Maps",
 "google_maps_not_available": "Google Places not available",
 "privacy": {
-"title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Updated Version 2025 – GDPR compliant (EU 2016/679) + ePrivacy Directive",
+"title": "PRIVACY & COOKIE POLICY – VacanzaMyCost.it Updated Version 2026 – GDPR compliant (EU 2016/679) + ePrivacy Directive",
 "1": {
 "title": "Data Controller",
 "type": "Individual Entrepreneur",
@@ -866,7 +868,7 @@
 
 
 "terms": {
-"title": "TERMS AND CONDITIONS OF USE – VACANZAMYCOST.IT Version 2025 – Italy & EU",
+"title": "TERMS AND CONDITIONS OF USE – VACANZAMYCOST.IT Version 2026 – Italy & EU",
 "1": {
 "title": "Website Owner",
 "text": "VacanzaMyCost.it is a web portal managed by:\nIlie Fabian – Individual Entrepreneur\nVAT: [INSERT] – Verona (VR)\nEmail: info@vacanzamycost.it – PEC: [INSERT IF ACTIVE]"
