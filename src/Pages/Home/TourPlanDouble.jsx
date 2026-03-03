@@ -21,6 +21,7 @@ import {
   useGetTourPlanPublicQuery,
   useInviteToChatMutation,
   useOfferBudgetMutation,
+  useSearchPlanQuery,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import toast, { Toaster } from "react-hot-toast";
@@ -82,6 +83,7 @@ const TourPlanDouble = () => {
     useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
+  const { data: searchResults, isLoading: isSearchLoading } = useSearchPlanQuery(filters.search, { skip: !filters.search });
 
   const uniqueCountries = Array.from(
     new Set(
@@ -91,12 +93,10 @@ const TourPlanDouble = () => {
   ).sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
-    let filteredData = tourPlanPublic || [];
-    if (filters.search) {
-      filteredData = filteredData.filter((tour) =>
-        tour.location_to?.toLowerCase().includes(filters.search.toLowerCase()),
-      );
-    }
+    // Search API theke asbe (searchResults). Jodi search thake to searchResults use korbo, na hole tourPlanPublic
+    let filteredData = filters.search ? (searchResults || []) : (tourPlanPublic || []);
+
+    // Search er local filter remove kora hoyeche karon API already location_to diye search kore dibe
     if (filters.min) {
       filteredData = filteredData.filter(
         (tour) => parseFloat(tour.budget) >= parseFloat(filters.min),
@@ -134,12 +134,12 @@ const TourPlanDouble = () => {
       });
       setTourPlanPublicUser(tourUsers);
     }
-  }, [tourPlanPublic, filters, currentUserId]);
+  }, [tourPlanPublic, searchResults, filters, currentUserId]);
 
   const debouncedFilterChange = useCallback(
     debounce((name, value) => {
       setFilters((prev) => ({ ...prev, [name]: value }));
-    }, 500),
+    }, ),
     [],
   );
 
@@ -332,6 +332,8 @@ const TourPlanDouble = () => {
 
   const displayTours = tours;
 
+  const isDataLoading = filters.search ? isSearchLoading : isTourPlanPublicLoading;
+
   return (
     <div className="bg-gray-50 p-3 sm:p-4 md:p-6 lg:pb-20 roboto ">
       <Toaster />
@@ -398,7 +400,7 @@ const TourPlanDouble = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-xl">
-              {isTourPlanPublicLoading ? (
+              {isDataLoading ? (
                 <div className="col-span-full">
                   <FullScreenInfinityLoader />
                 </div>
@@ -609,20 +611,6 @@ const TourPlanDouble = () => {
                             {tour.total_members}{" "}
                             {tour.total_members > 1 ? t("people") : t("person")}
                           </span>
-                          {/* <div className="flex items-center space-x-4">
-                            <h1 className="text-md text-gray-700">
-                              <span className="font-medium">
-                                {t("child")} :
-                              </span>{" "}
-                              {tour.child_count}
-                            </h1>
-                            <h1>
-                              <span className="font-medium">
-                                {t("adult")} :
-                              </span>{" "}
-                              {tour.adult_count}
-                            </h1>
-                          </div> */}
                         </div>
 
                         <div>
@@ -698,25 +686,12 @@ const TourPlanDouble = () => {
                                           : "N/A"}
                               </span>
                             </p>
-                            {/* <p className="text-md text-gray-600 flex items-center gap-2 -space-x-[6px]">
-                                          
-                                          <span>{tour.minimum_star_hotel|| t("na")}</span><FaStar className="w-4 h-4 text-black" />
-                                        </p> */}
                             <p className="text-md text-gray-600 flex items-center gap-2">
                               {tour.minimum_star_hotel
                                 ? "⭐".repeat(Number(tour.minimum_star_hotel))
                                 : t("na")}
                             </p>
                           </div>
-                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaStar className="w-6 h-5 text-black" />
-                            <span>
-                              <span className="font-medium">
-                                {t("minimum_rating")}:
-                              </span>{" "}
-                              {tour.minimum_star_hotel || "N/A"}
-                            </span>
-                          </p> */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
@@ -844,20 +819,6 @@ const TourPlanDouble = () => {
                     </select>
                   )}
                 </div>
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("travel_type")}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={t("search_by_travel_type")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={filters.travel_type}
-                    onChange={(e) =>
-                      handleFilterChange("travel_type", e.target.value)
-                    }
-                  />
-                </div> */}
               </div>
             </div>
           </div>

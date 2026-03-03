@@ -5,10 +5,8 @@ export const sqQuery = createApi({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
     baseUrl: "https://api.vacanzamycost.it/",
     // baseUrl: "http://31.97.39.215/",
-
     prepareHeaders: (headers, { endpoint }) => {
       // headers.set("ngrok-skip-browser-warning", "true");
-
       const token = localStorage.getItem("access_token");
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
@@ -24,7 +22,6 @@ export const sqQuery = createApi({
       ) {
         headers.set("Content-Type", "application/json");
       }
-
       return headers;
     },
   }),
@@ -83,6 +80,12 @@ export const sqQuery = createApi({
       query: () => "/tour-plans/",
       providesTags: ["TourPlan"],
     }),
+
+    // search plan
+    searchPlan: builder.query({
+  query: (searchTerm) => `/tour-plans/?search=${encodeURIComponent(searchTerm)}`,
+  providesTags: ["TourPlan"],
+}),
 
     // showSubscription data
     showSubscriptionData: builder.query({
@@ -475,6 +478,8 @@ export const {
   // decline request
   useDeclineRequestMutation,
   useGetTourPlanPublicQuery,
+  // search plan
+  useSearchPlanQuery,
   // seen notification
   useSeenNotificationMutation,
   // delete notification
