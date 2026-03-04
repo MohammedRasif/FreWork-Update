@@ -83,7 +83,7 @@ export const sqQuery = createApi({
 
     // search plan
     searchPlan: builder.query({
-  query: (searchTerm) => `/tour-plans/?search=${encodeURIComponent(searchTerm)}`,
+  query: (searchTerm) => `public/tour-plans/?search=${encodeURIComponent(searchTerm)}`,
   providesTags: ["TourPlan"],
 }),
 

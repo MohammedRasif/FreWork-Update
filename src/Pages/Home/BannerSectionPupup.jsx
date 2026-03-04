@@ -630,20 +630,21 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                           Budget totale del gruppo
                         </span>
                         <br />
-                        Inserisci il{" "}
+                        Inserisci il budget massimo complessivo per il tuo viaggio.{" "}
                         <span className="font-semibold">
-                          budget massimo complessivo.
+                          
                         </span>
                         <br />
                         <br />
                         <span className="font-semibold">
-                          Minimo per pubblicare: 2.000 €
+                          Minimo per pubblicare: 3.000 €
                         </span>
                         <br />
-                        Con budget inferiori, le agenzie difficilmente inviano{" "}
-                        <span className="font-semibold">
-                          proposte su misura.
+                        {" "}
+                        <span className="font-semibold pr-1">
+                          VacanzaMyCost 
                         </span>
+                          seleziona solo richieste di alto profilo per garantire proposte d'élite dalle migliori agenzie specializzate. <br /> Con budget inferiori, non è possibile garantire un servizio su misura di qualità.
                       </p>
 
                       <button
@@ -1050,13 +1051,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <p className="text-gray-700 text-xs sm:text-sm">
               📞 Verifica qualità richiesta
               <br />
-              Per garantire serietà, alcune richieste vengono verificate
-              telefonicamente
+              Per garantirti la massima serietà e proposte d'élite, ogni richiesta viene verificata telefonicamente da un nostro esperto 
               <br />
               (chiamata breve, max 2 minuti).
               <br />
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte su
-              misura.
+              <p className="py-1">Riceverai fino a 3 preventivi su misura dalle migliori agenzie, senza commissioni e senza impegno.</p>
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte professionali.
             </p>
           </div>
         )}
