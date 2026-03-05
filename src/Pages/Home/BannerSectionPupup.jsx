@@ -1050,17 +1050,15 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
         {currentStep === 6 && (
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-gray-700 text-xs sm:text-sm">
-              📞 Verifica qualità richiesta
+          <div className="space-y-3 sm:space-y-4 text-center">
+            <p className="text-gray-700 text-[13px] sm:text-sm">
+              <p className="text-[15px]">📞 Verifica qualità richiesta</p>
               <br />
-              Per garantirti serietà, alcune richieste vengono verificate
-              telefonicamente
+              <span className="font-bold">Per garantire la massima qualità</span> delle proposte, ogni richiesta viene verificata telefonicamente da un nostro esperto
               <br />
-              (chiamata breve, max 2 minuti).
-              <br />
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte
-              professionali.
+              <p className="py-1">(chiamata breve, max 2 minuti).</p>
+              <p className="py-2">Dopo la verifica riceverai <span className="font-bold">fino a 3 proposte personalizzate da agenzie specializzate</span>, senza commissioni e senza impegno.</p>
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte su misura.
             </p>
           </div>
         )}
