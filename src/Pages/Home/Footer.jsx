@@ -13,7 +13,7 @@ const Footer = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-bold text-gray-100">VacanzaMyCost.it</h3>
         <p className="text-sm text-gray-400">
-         {t("contact_us")}: <br />
+         {t("address_line1")}: <br />
           Verona, Italia
         </p>
         <p className="text-sm text-gray-400">info@vacanzamycost.it</p>

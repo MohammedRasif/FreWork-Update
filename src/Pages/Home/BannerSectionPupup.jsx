@@ -90,13 +90,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         "startingDate",
         state?.start_date
           ? new Date(state?.start_date).toISOString().split("T")[0]
-          : ""
+          : "",
       );
       setValue(
         "endingDate",
         state?.end_date
           ? new Date(state?.end_date).toISOString().split("T")[0]
-          : ""
+          : "",
       );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
@@ -154,7 +154,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         script.onerror = () => {
           console.error("Failed to load Google Maps API");
           toast.error(
-            t("google_maps_load_failed") || "Failed to load Google Maps API"
+            t("google_maps_load_failed") || "Failed to load Google Maps API",
           );
         };
         document.head.appendChild(script);
@@ -170,7 +170,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.error("Google Maps Places API is not available");
         toast.error(
           t("google_maps_not_available") ||
-            "Google Maps Places API is not available"
+            "Google Maps Places API is not available",
         );
         return;
       }
@@ -178,7 +178,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       if (locationFromRef.current) {
         console.log("Setting up autocomplete for locationFrom");
         const fromAutocomplete = new window.google.maps.places.Autocomplete(
-          locationFromRef.current
+          locationFromRef.current,
         );
         fromAutocomplete.addListener("place_changed", () => {
           const place = fromAutocomplete.getPlace();
@@ -193,7 +193,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       if (locationToRef.current) {
         console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
-          locationToRef.current
+          locationToRef.current,
         );
         toAutocomplete.addListener("place_changed", () => {
           const place = toAutocomplete.getPlace();
@@ -252,7 +252,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (!result) {
       toast.error(
         t("fill_all_required") ||
-          "Please fill all required fields before proceeding."
+          "Please fill all required fields before proceeding.",
       );
     }
     return result;
@@ -283,13 +283,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     if (data.endingDate < data.startingDate) {
       toast.error(
-        t("end_date_after_start") || "End date must be after start date"
+        t("end_date_after_start") || "End date must be after start date",
       );
       return;
     }
     if (!data.adults && !data.children) {
       toast.error(
-        t("at_least_one_person") || "At least one adult or child is required"
+        t("at_least_one_person") || "At least one adult or child is required",
       );
       return;
     }
@@ -309,7 +309,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formDataToSend.append("destination_type", data.destinationType || "");
     formDataToSend.append(
       "type_of_accommodation",
-      data.typeOfAccommodation || ""
+      data.typeOfAccommodation || "",
     );
     formDataToSend.append("minimum_star_hotel", data.minimumHotelStars || "");
     formDataToSend.append("meal_plan", data.mealPlan || "");
@@ -317,7 +317,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formDataToSend.append("tourist_spots", data.touristSpots || "");
     formDataToSend.append(
       "is_confirmed_request",
-      data.confirmation ? "true" : "false"
+      data.confirmation ? "true" : "false",
     );
     if (selectedFile) {
       formDataToSend.append("spot_picture", selectedFile);
@@ -363,7 +363,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             primary: "#ffffff",
             secondary: "#FF6600",
           },
-        }
+        },
       );
 
       reset();
@@ -376,7 +376,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       console.error("API Error:", error);
       toast.error(
         t("error_submitting") ||
-          `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`
+          `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`,
       );
     } finally {
       if (status === "draft") {
@@ -626,27 +626,30 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 shadow-2xl lg:w-96 w-72">
                       <p className="lg:text-[15px] text-[13px] text-gray-800 leading-relaxed">
                         💰{" "}
-                        <span className="font-semibold">
+                        <span className="font-bold">
                           Budget totale del gruppo
                         </span>
                         <br />
-                        Inserisci il budget massimo complessivo per il tuo viaggio.{" "}
-                        <span className="font-semibold">
-                          
+                        Inserisci il{" "}
+                        <span className="font-bold">
+                          budget massimo complessivo per
                         </span>
+                        il tuo viaggio.
                         <br />
                         <br />
-                        <span className="font-semibold">
+                        <span className="font-bold">
                           Minimo per pubblicare: 3.000 €
                         </span>
-                        <br />
-                        {" "}
-                        <span className="font-semibold pr-1">
-                          VacanzaMyCost 
+                        <br />{" "}
+                        <span className="font-bold pr-1">VacanzaMyCost</span>
+                        seleziona solo richieste di alto profilo per garantire
+                        proposte d'élite dalle migliori agenzie specializzate.{" "}
+                        <br /> Con budget inferiori,{" "}
+                        <span className="font-bold">
+                          non è possibile garantire un servizio su misura di
+                          qualità.
                         </span>
-                          seleziona solo richieste di alto profilo per garantire proposte d'élite dalle migliori agenzie specializzate. <br /> Con budget inferiori, non è possibile garantire un servizio su misura di qualità.
                       </p>
-
                       <button
                         onClick={handleOkClick}
                         className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
@@ -1051,12 +1054,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <p className="text-gray-700 text-xs sm:text-sm">
               📞 Verifica qualità richiesta
               <br />
-              Per garantirti la massima serietà e proposte d'élite, ogni richiesta viene verificata telefonicamente da un nostro esperto 
+              Per garantirti serietà, alcune richieste vengono verificate
+              telefonicamente
               <br />
               (chiamata breve, max 2 minuti).
               <br />
-              <p className="py-1">Riceverai fino a 3 preventivi su misura dalle migliori agenzie, senza commissioni e senza impegno.</p>
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte professionali.
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte
+              professionali.
             </p>
           </div>
         )}
