@@ -114,13 +114,13 @@ text-white drop-shadow-sm lg:max-w-[40%]"
         <p className=" lg:text-2xl text-[15px] lg:pt-14">
           {t("show_short_description")}
         </p>
-        <h1 className="lg:text-4xl pb-3 text-[#FF6600] text-[16px] font-semibold lg:pb-10 lg:pt-4 ">
+        <h1 className="lg:text-4xl pb-3 text-white text-[16px] font-semibold lg:pb-10 lg:pt-4 pt-3 ">
           {t("banner_tagline")}
         </h1>
         {showCreateRequestButton && (
           <button
             onClick={handleButtonClick}
-            className="mt-1 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[28px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
+            className=" md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[28px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
           >
             {t("create_request")}
           </button>
