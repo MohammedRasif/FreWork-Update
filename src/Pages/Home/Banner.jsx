@@ -126,7 +126,7 @@ text-white drop-shadow-sm lg:max-w-[40%]"
           </button>
         )}
 
-        <div className="block md:hidden text-[13px] text-white font-medium py-1 px-10">
+        <div className="text-[13px] text-white font-medium py-1 px-10">
           <p className="">{t("banner_top_buttom")}</p>
         </div>
       </div>

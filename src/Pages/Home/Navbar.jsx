@@ -13,6 +13,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const userRole = localStorage.getItem("role");
 
   const {
     data: userData,
@@ -21,9 +22,10 @@ const Navbar = () => {
   } = useShowUserInpormationQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-
-  localStorage.setItem("agency_is_verified", userData?.agency_is_verified || "");
-
+  localStorage.setItem(
+    "agency_is_verified",
+    userData?.agency_is_verified || "",
+  );
   const isAuthenticated = !!localStorage.getItem("access_token");
 
   const routeMap = {
@@ -97,7 +99,7 @@ const Navbar = () => {
     const isAgencyVerified = userData?.agency_is_verified;
     const isProfileComplete = userData?.is_profile_complete;
 
-    let path = "/"; // default fallback
+    let path = "/";
 
     if (role === "tourist") {
       path = "/user";
@@ -124,7 +126,9 @@ const Navbar = () => {
       path: "/offerte-accettate",
       label: t("accepted_offers"),
     },
-    { key: "agencies", path: "/per-agenzie", label: t("for_agencies") },
+    ...(userRole !== "tourist"
+      ? [{ key: "agencies", path: "/per-agenzie", label: t("for_agencies") }]
+      : []),
     { key: "howitworks", path: "/come-funziona", label: t("who_work") },
   ];
 

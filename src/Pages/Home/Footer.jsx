@@ -26,7 +26,7 @@ const Footer = () => {
           <NavLink to="/contatti" className="block text-gray-400 hover:text-white text-sm">
             {t("contact_us")}
           </NavLink>
-          <NavLink to="/membership" className="block text-gray-400 hover:text-white text-sm">
+          <NavLink to="/agenzie-certificate" className="block text-gray-400 hover:text-white text-sm">
             {t("agencies")}
           </NavLink>
           <NavLink to="/blog" className="block text-gray-400 hover:text-white text-sm">
