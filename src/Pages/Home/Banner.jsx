@@ -104,9 +104,9 @@ const Banner = () => {
 
         <p
           className="text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold 
-leading-[32px] md:leading-[55px] lg:leading-[65px] 
-whitespace-pre-line
-text-white drop-shadow-sm lg:max-w-[40%]"
+          leading-[32px] md:leading-[55px] lg:leading-[65px] 
+          whitespace-pre-line
+          text-white drop-shadow-sm lg:max-w-[40%]"
         >
           {t("banner_slogan")}
         </p>
@@ -126,7 +126,7 @@ text-white drop-shadow-sm lg:max-w-[40%]"
           </button>
         )}
 
-        <div className="text-[13px] text-white font-medium py-1 px-10">
+        <div className="text-[13px] lg:text-xl text-white font-medium py-1 px-10 lg:pt-10">
           <p className="">{t("banner_top_buttom")}</p>
         </div>
       </div>
