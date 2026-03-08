@@ -6,16 +6,15 @@ const CookieBanner = () => {
   const storageKey = "vmc_cookie_consent";
   const { t } = useTranslation();
 
-
   useEffect(() => {
     const consent = localStorage.getItem(storageKey);
 
-    if (!consent) {
-      setTimeout(() => {
-        setShowBanner(true);
-      }, 1000);
-    } else if (consent === "accepted") {
+    if (consent === "accepted") {
+      // আগে accept করেছে → banner দেখাবে না, tracking চালু
       initTrackingScripts();
+    } else {
+      // "rejected" হোক বা null হোক → banner দেখাবে
+      setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);
 
@@ -26,7 +25,8 @@ const CookieBanner = () => {
   };
 
   const handleReject = () => {
-    localStorage.setItem(storageKey, "rejected");
+    // ✅ reject করলে localStorage clear করো — পরের বার আবার দেখাবে
+    localStorage.removeItem(storageKey);
     setShowBanner(false);
   };
 
@@ -38,26 +38,22 @@ const CookieBanner = () => {
 
   return (
     <div className="vmc-cookie-banner show">
-  <div className="vmc-cookie-content">
-    <h4>{t("cookie_title")}</h4>
-
-    <p>
-      {t("cookie_desc")}{" "}
-      <a href="/privacy-policy">{t("privacy_policy")}</a>
-    </p>
-  </div>
-
-  <div className="vmc-cookie-actions">
-    <button className="vmc-btn vmc-btn-outline" onClick={handleReject}>
-      {t("decline")}
-    </button>
-
-    <button className="vmc-btn vmc-btn-primary" onClick={handleAccept}>
-      {t("accept_all")}
-    </button>
-  </div>
-</div>
-
+      <div className="vmc-cookie-content">
+        <h4>{t("cookie_title")}</h4>
+        <p>
+          {t("cookie_desc")}{" "}
+          <a href="/privacy-policy">{t("privacy_policy")}</a>
+        </p>
+      </div>
+      <div className="vmc-cookie-actions">
+        <button className="vmc-btn vmc-btn-outline" onClick={handleReject}>
+          {t("decline")}
+        </button>
+        <button className="vmc-btn vmc-btn-primary" onClick={handleAccept}>
+          {t("accept_all")}
+        </button>
+      </div>
+    </div>
   );
 };
 
