@@ -93,7 +93,11 @@ const AdminHome = () => {
         (offer) => offer.agency?.contact_email === currentUserEmail
       );
     const isOwnPlan = plan.user === currentUserEmail;
-    return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan;
+
+    // ✅ Condition 2: plan_status === "accepted" হলে hide করো
+    const isAccepted = plan.plan_status === "accepted";
+
+    return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan && !isAccepted;
   });
 
   const handleOfferChange = (e) => {
@@ -231,101 +235,112 @@ const AdminHome = () => {
             </div>
           );
         }
-        return filteredPlans.map((plan) => (
-          <div
-            key={plan.id}
-            className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
-          >
-            <div className="flex flex-col lg:flex-row">
-              <div className="lg:flex relative">
-                <img
-                  src={
-                    plan.spot_picture_url ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                  }
-                  alt={t("tourist_spot")}
-                  className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
-                />
-              </div>
-              <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
-                <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
-                    {plan.location_to}
-                  </h2>
-                  <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
-                    <p>
-                      {t("dates")}:{" "}
-                      <span className="font-medium">
-                        {plan.start_date} — {plan.end_date || plan.start_date}
-                      </span>
-                    </p>
-                    {/* <p>
-                      {t("total_members")}:{" "}
-                      <span className="font-medium">{plan.total_members}</span>
-                    </p> */}
+        return filteredPlans.map((plan) => {
+          // ✅ Condition 1: offer_count > 3 বা offered_status true হলে button hide
+          const offerLimitReached = plan.offer_count > 3;
+          const alreadyOffered = plan.offered_status === true;
+          const hideOfferButton = offerLimitReached || alreadyOffered;
 
-                    <p>
-                      <span className="">{t("category")}:</span>{" "}
-                      <span className="font-medium">
-                        {plan.destination_type === "beach"
-                          ? "Mare"
-                          : plan.destination_type === "mountain"
-                          ? "Montagna"
-                          : plan.destination_type === "relax"
-                          ? "Relax"
-                          : plan.destination_type === "group"
-                          ? "Gruppi"
-                          : t("na")}
-                      </span>
-                    </p>
-                  </div>
+          return (
+            <div
+              key={plan.id}
+              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
+            >
+              <div className="flex flex-col lg:flex-row">
+                <div className="lg:flex relative">
+                  <img
+                    src={
+                      plan.spot_picture_url ||
+                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
+                    }
+                    alt={t("tourist_spot")}
+                    className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
+                  />
                 </div>
-                <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
-                  <div className="lg:flex lg:items-end lg:justify-between lg:flex-col lg:space-x-0">
-                    <div className="text-center lg:text-right">
-                      
-                      
-                      <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
-                        {t("budget")} <FaEuroSign /> {plan.budget}
+                <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
+                  <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
+                      {plan.location_to}
+                    </h2>
+                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                      <p>
+                        {t("dates")}:{" "}
+                        <span className="font-medium">
+                          {plan.start_date} — {plan.end_date || plan.start_date}
+                        </span>
                       </p>
-                      <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                        {t("total")} {plan.total_members}{" "}
-                        {plan.total_members === 1 ? t("person") : t("persons")}
+                      <p>
+                        <span className="">{t("category")}:</span>{" "}
+                        <span className="font-medium">
+                          {plan.destination_type === "beach"
+                            ? "Mare"
+                            : plan.destination_type === "mountain"
+                            ? "Montagna"
+                            : plan.destination_type === "relax"
+                            ? "Relax"
+                            : plan.destination_type === "group"
+                            ? "Gruppi"
+                            : t("na")}
+                        </span>
                       </p>
                     </div>
-                    <div className="flex flex-row justify-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
-                      <button
-                        onClick={() => openPopup(plan, "view")}
-                        className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        {t("view")}
-                      </button>
-                      <button
-                        onClick={() => openPopup(plan, "offer")}
-                        className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                      >
-                        {t("send_offer")}
-                      </button>
-                      <button
-                        onClick={() => handleDeclineRequest(plan.id)}
-                        disabled={isDeclineRequestLoading}
-                        className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
-                          isDeclineRequestLoading
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        {isDeclineRequestLoading
-                          ? t("declining")
-                          : t("decline_request")}
-                      </button>
+                  </div>
+                  <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
+                    <div className="lg:flex lg:items-end lg:justify-between lg:flex-col lg:space-x-0">
+                      <div className="text-center lg:text-right">
+                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
+                          {t("budget")} <FaEuroSign /> {plan.budget}
+                        </p>
+                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                          {t("total")} {plan.total_members}{" "}
+                          {plan.total_members === 1 ? t("person") : t("persons")}
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-center items-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
+                        <button
+                          onClick={() => openPopup(plan, "view")}
+                          className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                          {t("view")}
+                        </button>
+
+                        {/* ✅ Send Offer button — condition চেক করে দেখাচ্ছি */}
+                        {hideOfferButton ? (
+                          <span className="text-xs text-gray-500 italic">
+                            {alreadyOffered
+                              ? t("already_offered") // "তুমি already offer পাঠিয়েছ"
+                              : "Max 3 offers reached"} {/* offer_count > 3 */}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => openPopup(plan, "offer")}
+                            className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                          >
+                            {t("send_offer")}
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => handleDeclineRequest(plan.id)}
+                          disabled={isDeclineRequestLoading}
+                          className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                            isDeclineRequestLoading
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                        >
+                          {isDeclineRequestLoading
+                            ? t("declining")
+                            : t("decline_request")}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ));
+          );
+        });
       case t("decline_plans_tab"):
         return <AdminDecline />;
       case t("offered_plans_tab"):
@@ -350,17 +365,14 @@ const AdminHome = () => {
                   </h2>
                   <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                     <div>
-                      
-                     
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <BsFillCalendarDateFill  className="w-6 h-5 text-gray-900 size-4" />
+                        <BsFillCalendarDateFill className="w-6 h-5 text-gray-900 size-4" />
                         <span>
-                          <span className="font-bold">
-                            {t("dates")}:
-                          </span>{" "}
+                          <span className="font-bold">{t("dates")}:</span>{" "}
                           <span className="font-medium">
-                        {selectedPlan.start_date} — {selectedPlan.end_date || selectedPlan.start_date}
-                      </span>
+                            {selectedPlan.start_date} —{" "}
+                            {selectedPlan.end_date || selectedPlan.start_date}
+                          </span>
                         </span>
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
@@ -381,18 +393,8 @@ const AdminHome = () => {
                           {selectedPlan.location_from || t("na")}
                         </span>
                       </p>
-                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaStar className="w-6 h-5 text-gray-900" />
-                        <span>
-                          <span className="font-bold">
-                            {t("minimum_rating")}:
-                          </span>{" "}
-                          {selectedPlan.minimum_star_hotel || t("na")}
-                        </span>
-                      </p> */}
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
-
                         <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan === "breakfast"
@@ -446,7 +448,6 @@ const AdminHome = () => {
                       </p>
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaClock className="w-6 h-5 text-gray-900" />
-
                         <span>
                           <span className="font-medium">{t("duration")}:</span>{" "}
                           {selectedPlan.duration
@@ -475,9 +476,6 @@ const AdminHome = () => {
                       {t("budget")} <FaEuroSign /> {selectedPlan.budget}
                     </p>
                     <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                      {/* {t("total_persons", {
-                        count: selectedPlan.total_members,
-                      })} */}
                       {t("total")} {selectedPlan.total_members}{" "}
                       {selectedPlan.total_members === 1
                         ? t("person")
