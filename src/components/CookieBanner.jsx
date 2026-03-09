@@ -10,10 +10,8 @@ const CookieBanner = () => {
     const consent = localStorage.getItem(storageKey);
 
     if (consent === "accepted") {
-      // আগে accept করেছে → banner দেখাবে না, tracking চালু
       initTrackingScripts();
     } else {
-      // "rejected" হোক বা null হোক → banner দেখাবে
       setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);
