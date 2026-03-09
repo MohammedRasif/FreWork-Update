@@ -23,7 +23,6 @@ const CookieBanner = () => {
   };
 
   const handleReject = () => {
-    // ✅ reject করলে localStorage clear করো — পরের বার আবার দেখাবে
     localStorage.removeItem(storageKey);
     setShowBanner(false);
   };
