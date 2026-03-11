@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, X } from "lucide-react"; // ← added X icon
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import img from "../../assets/img/Mask group (3).png";
 import {
@@ -11,12 +11,28 @@ import { useTranslation } from "react-i18next";
 const OTP_Verification = () => {
   const { t } = useTranslation();
   const [otp, setOtp] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showTouristPopup, setShowTouristPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [regVerify, { isLoading }] = useOtpVerifyMutation();
   const [reSend, { isLoading: ResendLoading }] = useReSendOtpMutation();
+  const openTouristPopup = () => {
+    const userType = localStorage.getItem("userType");
 
+    if (userType === "tourist") {
+      setShowSuccessPopup(false);
+      setShowTouristPopup(true);
+
+      setTimeout(() => {
+        setShowTouristPopup(false);
+
+        navigate("/user/modifica-profilo", {
+          state: { email: location.state?.email },
+        });
+      }, 5000);
+    }
+  };
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
   };
@@ -43,24 +59,24 @@ const OTP_Verification = () => {
         localStorage.setItem("refresh_token", res.refresh);
 
         const userType = localStorage.getItem("userType");
-        console.log("Retrieved userType from localStorage:", userType);
 
-        if (userType === "agency") {
-          setShowPopup(true);
-        }
+        setShowSuccessPopup(true);
 
-        setTimeout(() => {
-          setShowPopup(false);
-          if (userType === "agency") {
+        if (userType === "tourist") {
+          setShowSuccessPopup(true);
+
+          setTimeout(() => {
+            openTouristPopup();
+          }, 300000);
+        } else if (userType === "agency") {
+          setTimeout(() => {
+            setShowSuccessPopup(false);
+
             navigate("/in-attesa", {
-              state: { email: location.state.email },
+              state: { email: location.state?.email },
             });
-          } else {
-            navigate("/", {
-              state: { email: location.state.email },
-            });
-          }
-        }, 7000);
+          }, 4000);
+        }
       } else {
         alert(t("otp_verification_failed"));
       }
@@ -69,6 +85,10 @@ const OTP_Verification = () => {
       alert(error.data?.message || t("otp_verification_failed"));
     }
   };
+
+  const closeSuccessPopup = () => {
+  openTouristPopup();
+};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -138,19 +158,56 @@ const OTP_Verification = () => {
         </div>
       </div>
 
-      {/* Popup */}
-      {showPopup && (
-        <div className="backdrop-blur-[5px] absolute inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-16 text-center max-w-xl">
+      {/* Thank You Success Popup – appears for all on OTP success */}
+      {showSuccessPopup && (
+        <div className="backdrop-blur-[5px] fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 text-center max-w-lg w-[90%] relative">
+            {/* Close button */}
+            <button
+              onClick={closeSuccessPopup}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+            >
+              <X size={28} />
+            </button>
+
+            <h3 className="text-2xl md:text-3xl font-bold text-green-600 mb-4">
+              {t("thank_you_for_registering") || "Thank you for registering!"}
+            </h3>
+            <p className="text-gray-700 text-lg mb-6">
+              {t("registration_success_message") ||
+                "Your account has been successfully created."}
+            </p>
+
+            {/* You can add Google ad, link, button etc. here */}
+            <div className="mt-6">
+              {/* Example placeholder for future ad/link */}
+              <div className="bg-gray-100 h-32 flex items-center justify-center text-gray-500">
+                Google Ad / Banner space
+              </div>
+
+              <a
+                href="https://example.com"
+                target="_blank"
+                className="btn btn-outline btn-primary mt-4"
+              >
+                Visit our website
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Old tourist-specific popup (7-second auto close) */}
+      {showTouristPopup && (
+        <div className="backdrop-blur-[5px] fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-12 md:p-16 text-center max-w-xl">
             <p className="text-blue-600 font-semibold text-2xl">
               {t("complete_profile_now")}
             </p>
             <p className="text-gray-600 mt-2 text-xl pb-1">
               {t("access_full_dashboard")}
             </p>
-            <p className="text-gray-600 mt-2 text-xl">
-              {t("please_wait")}
-            </p>
+            <p className="text-gray-600 mt-2 text-xl">{t("please_wait")}</p>
           </div>
         </div>
       )}

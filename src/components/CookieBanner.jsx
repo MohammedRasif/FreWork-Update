@@ -9,10 +9,11 @@ const CookieBanner = () => {
   useEffect(() => {
     const consent = localStorage.getItem(storageKey);
 
-    if (consent === "accepted") {
+    // Only show if user never accepted
+    if (!consent) {
+      setShowBanner(true);
+    } else if (consent === "accepted") {
       initTrackingScripts();
-    } else {
-      setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);
 
@@ -42,10 +43,12 @@ const CookieBanner = () => {
           <a href="/privacy-policy">{t("privacy_policy")}</a>
         </p>
       </div>
+
       <div className="vmc-cookie-actions">
         <button className="vmc-btn vmc-btn-outline" onClick={handleReject}>
           {t("decline")}
         </button>
+
         <button className="vmc-btn vmc-btn-primary" onClick={handleAccept}>
           {t("accept_all")}
         </button>
