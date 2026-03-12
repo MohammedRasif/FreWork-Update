@@ -9,7 +9,6 @@ const CookieBanner = () => {
   useEffect(() => {
     const consent = localStorage.getItem(storageKey);
 
-    // Only show if user never accepted
     if (!consent) {
       setShowBanner(true);
     } else if (consent === "accepted") {
