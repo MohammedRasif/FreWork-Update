@@ -221,7 +221,6 @@ export default function UserDashboardLayout() {
     }
   }, [location.pathname, t]);
 
-  // Close mobile menu and notification dropdown when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsNotificationOpen(false);
