@@ -286,6 +286,7 @@ const Navbar = () => {
                 <LanguageToggleButton />
               </div>
 
+              {/* Auth Buttons */}
               {isAuthenticated && userData ? (
                 <>
                   <button
