@@ -126,7 +126,7 @@ const Navbar = () => {
       path: "/offerte-accettate",
       label: t("accepted_offers"),
     },
-    ...(userRole !== "agency"
+    ...(userRole !== "tourist"
       ? [{ key: "agencies", path: "/per-agenzie", label: t("for_agencies") }]
       : []),
     { key: "howitworks", path: "/come-funziona", label: t("who_work") },

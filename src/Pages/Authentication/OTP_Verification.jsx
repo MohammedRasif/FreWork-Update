@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Lock, X } from "lucide-react"; // ← added X icon
+import { Lock } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import img from "../../assets/img/Mask group (3).png";
 import {
@@ -11,28 +11,12 @@ import { useTranslation } from "react-i18next";
 const OTP_Verification = () => {
   const { t } = useTranslation();
   const [otp, setOtp] = useState("");
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showTouristPopup, setShowTouristPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [regVerify, { isLoading }] = useOtpVerifyMutation();
   const [reSend, { isLoading: ResendLoading }] = useReSendOtpMutation();
-  const openTouristPopup = () => {
-    const userType = localStorage.getItem("userType");
 
-    if (userType === "tourist") {
-      setShowSuccessPopup(false);
-      setShowTouristPopup(true);
-
-      setTimeout(() => {
-        setShowTouristPopup(false);
-
-        navigate("/user/modifica-profilo", {
-          state: { email: location.state?.email },
-        });
-      }, 5000);
-    }
-  };
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
   };
@@ -59,20 +43,24 @@ const OTP_Verification = () => {
         localStorage.setItem("refresh_token", res.refresh);
 
         const userType = localStorage.getItem("userType");
+        console.log("Retrieved userType from localStorage:", userType);
 
-        setShowSuccessPopup(true);
-
-        if (userType === "tourist") {
-          setShowSuccessPopup(true);
-
-          setTimeout(() => {
-            openTouristPopup();
-          }, 300000);
-        } else if (userType === "agency") {
-            navigate("/in-attesa", {
-              state: { email: location.state?.email },
-            });
+        if (userType === "agency") {
+          setShowPopup(true);
         }
+
+        setTimeout(() => {
+          setShowPopup(false);
+          if (userType === "agency") {
+            navigate("/in-attesa", {
+              state: { email: location.state.email },
+            });
+          } else {
+            navigate("/", {
+              state: { email: location.state.email },
+            });
+          }
+        }, 7000);
       } else {
         alert(t("otp_verification_failed"));
       }
@@ -80,10 +68,6 @@ const OTP_Verification = () => {
       console.error("Error verifying OTP:", error);
       alert(error.data?.message || t("otp_verification_failed"));
     }
-  };
-
-  const closeSuccessPopup = () => {
-    openTouristPopup();
   };
 
   return (
@@ -154,127 +138,19 @@ const OTP_Verification = () => {
         </div>
       </div>
 
-      {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[6px] z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative">
-            {/* Background image */}
-            <div className="absolute inset-0">
-              <img
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="beach background"
-                className="w-full h-full object-cover opacity-40"
-              />
-            </div>
-            {/* Content */}
-            <div className="relative px-8 py-10 md:px-12 md:py-12 text-center">
-              {/* Close button */}
-              <button
-                onClick={closeSuccessPopup}
-                className="absolute top-4 right-5 text-gray-600 hover:text-gray-900 transition-colors"
-                aria-label="Close"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-
-              {/* Green checkmark */}
-              <div className="mx-auto mb-6 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
-                  <svg
-                    className="w-12 h-12 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="4"
-                      d="M5 13l4 4L19 7"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Main title */}
-              <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-3">
-                {t("request_received_successfully")}
-                {/* fallback: "Richiesta ricevuta con successo!" */}
-              </h2>
-
-              {/* Thank you text */}
-              <p className="text-gray-700 text-lg mb-8 font-medium">
-                {t("thank_you_for_choosing_vacanzamycost")}
-              </p>
-
-              <hr className="my-6 border-gray-200" />
-
-              {/* What's next section */}
-              <div className="text-left space-y-4 text-gray-700">
-                <h3 className="text-xl font-semibold text-center text-gray-800 mb-4">
-                  {t("what_happens_next")}
-                  {/* fallback: "Cosa succede ora?" */}
-                </h3>
-
-                <p>
-                  {t("expert_will_verify_details")}
-                  {/* fallback: "Un nostro esperto verificherà personalmente i dettagli della tua richiesta." */}
-                </p>
-
-                <p>
-                  {t("you_will_receive_verification_call")}
-                  {/* fallback: "Riceverai una breve chiamata di verifica a breve per confermare i dati." */}
-                </p>
-
-                <p>
-                  {t("request_sent_to_agencies")}
-                  {/* fallback: "Una volta verificata, la tua richiesta verrà inviata alle 3 migliori agenzie di viaggio specializzate, che prepareranno le tue offerte personalizzate." */}
-                </p>
-              </div>
-
-              {/* Closing text */}
-              <p className="mt-8 text-gray-800 font-medium text-lg">
-                {t("see_you_soon")}
-                {/* fallback: "A presto!" */}
-              </p>
-
-              {/* Close button */}
-              <button
-                onClick={closeSuccessPopup}
-                className="mt-8 w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {t("close")}
-                {/* fallback: "Chiudi" */}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Old tourist-specific popup (7-second auto close) */}
-      {showTouristPopup && (
-        <div className="backdrop-blur-[5px] fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-12 md:p-16 text-center max-w-xl">
+      {/* Popup */}
+      {showPopup && (
+        <div className="backdrop-blur-[5px] absolute inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-16 text-center max-w-xl">
             <p className="text-blue-600 font-semibold text-2xl">
               {t("complete_profile_now")}
             </p>
             <p className="text-gray-600 mt-2 text-xl pb-1">
               {t("access_full_dashboard")}
             </p>
-            <p className="text-gray-600 mt-2 text-xl">{t("please_wait")}</p>
+            <p className="text-gray-600 mt-2 text-xl">
+              {t("please_wait")}
+            </p>
           </div>
         </div>
       )}

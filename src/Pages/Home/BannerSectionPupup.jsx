@@ -344,6 +344,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.log("Create Plan Response:", response);
       }
 
+//       if (typeof window !== "undefined") {
+//   window.dataLayer = window.dataLayer || [];
+//   window.dataLayer.push({
+//     event: "apertura_popup",
+//   });
+
+//   console.log("Google Analytics event 'apertura_popup' pushed to dataLayer");
+//   console.log("Current dataLayer:", window.dataLayer);
+// }
+if (typeof window !== "undefined" && window.gtag) {
+  window.gtag("event", "apertura_popup");
+
+  console.log("Google Analytics event 'apertura_popup' sent using gtag");
+}
       toast.success(
         t("plan_submitted_success") ||
           "Your data successfully submitted! When approved by admin, this tour plan will be published.",
@@ -1054,11 +1068,22 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <p className="text-gray-700 text-[13px] sm:text-sm">
               <p className="text-[15px]">📞 Verifica qualità richiesta</p>
               <br />
-              <span className="font-bold">Per garantire la massima qualità</span> delle proposte, ogni richiesta viene verificata telefonicamente da un nostro esperto
+              <span className="font-bold">
+                Per garantire la massima qualità
+              </span>{" "}
+              delle proposte, ogni richiesta viene verificata telefonicamente da
+              un nostro esperto
               <br />
               <p className="py-1">(chiamata breve, max 2 minuti).</p>
-              <p className="py-2">Dopo la verifica riceverai <span className="font-bold">fino a 3 proposte personalizzate da agenzie specializzate</span>, senza commissioni e senza impegno.</p>
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte su misura.
+              <p className="py-2">
+                Dopo la verifica riceverai{" "}
+                <span className="font-bold">
+                  fino a 3 proposte personalizzate da agenzie specializzate
+                </span>
+                , senza commissioni e senza impegno.
+              </p>
+              ⚠️ Procedi solo se realmente interessato a ricevere proposte su
+              misura.
             </p>
           </div>
         )}
