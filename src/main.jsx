@@ -1,21 +1,21 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
 
-
-import {
-  RouterProvider,
-} from "react-router-dom";
-import { router } from './routes/routes.jsx';
-import { store } from './redux/sotre.js';
-import { Provider } from 'react-redux';
-import '../i18n.js';
-import CookieBanner from './components/CookieBanner';
-createRoot(document.getElementById('root')).render(
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes/routes.jsx";
+import { store } from "./redux/sotre.js";
+import { Provider } from "react-redux";
+import "../i18n.js";
+import CookieBanner from "./components/CookieBanner";
+import { HelmetProvider } from "react-helmet-async";
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Provider store = {store}>
-       <RouterProvider router={router} />  
-       <CookieBanner />
-    </Provider>
-    </StrictMode>,
-)
+    <HelmetProvider>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+        <CookieBanner />
+      </Provider>
+    </HelmetProvider>
+  </StrictMode>,
+);

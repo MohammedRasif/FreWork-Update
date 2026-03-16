@@ -210,7 +210,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setTimeout(initAutocomplete, 100);
     }
   }, [setValue, currentStep]);
-
+  
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
       ...prev,
