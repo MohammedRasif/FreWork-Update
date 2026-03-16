@@ -19,6 +19,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { FaAward } from "react-icons/fa6";
 import { RiAwardLine } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const Membership = () => {
   const { t } = useTranslation();
@@ -201,6 +202,9 @@ const Membership = () => {
 
   return (
     <div className="flex flex-col sm:flex-row bg-gray-50 px-4 sm:px-10 pb-16 font-roboto pt-16">
+       <Helmet>
+        <title>vacanzamycost.it | agenzie-certificate</title>
+      </Helmet>
       <div className="w-full sm:w-4/5 p-4 sm:p-6">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold sm:font-medium text-gray-600 mb-3 sm:mb-5">

@@ -16,6 +16,7 @@ import { LuNavigation2 as Navigation } from "react-icons/lu";
 import { MdOutlineNoMeals } from "react-icons/md";
 import img from "../../assets/img/badge.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 function AcceptedOffers() {
   const { t } = useTranslation();
@@ -86,6 +87,9 @@ function AcceptedOffers() {
 
   return (
     <div className="pt-24 container mx-auto lg:px-3 px-5">
+      <Helmet>
+        <title>vacanzamycost.it | offerte-accettate</title>
+      </Helmet>
       <h1 className="lg:text-4xl text-[28px] font-semibold pb-3">
         {t("all_accepted_offers")}
       </h1>
@@ -186,12 +190,12 @@ function AcceptedOffers() {
                     {tour.destination_type === "beach"
                       ? "Mare"
                       : tour.destination_type === "mountain"
-                      ? "Montagna"
-                      : tour.destination_type === "relax"
-                      ? "Relax"
-                      : tour.destination_type === "group"
-                      ? "Gruppi"
-                      : t("na")}
+                        ? "Montagna"
+                        : tour.destination_type === "relax"
+                          ? "Relax"
+                          : tour.destination_type === "group"
+                            ? "Gruppi"
+                            : t("na")}
                   </p>
                 </div>
 
@@ -221,19 +225,19 @@ function AcceptedOffers() {
 
                 <div>
                   <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <Baby className="w-6 h-5 text-gray-900" />
-                        <span>
-                          <span className="font-bold">{t("child")}:</span>{" "}
-                          {tour.child_count}
-                        </span>
-                      </p>
-                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <User className="w-6 h-5 text-gray-900" />
-                        <span>
-                          <span className="font-bold">{t("adult")}:</span>{" "}
-                          {tour.adult_count}
-                        </span>
-                      </p>
+                    <Baby className="w-6 h-5 text-gray-900" />
+                    <span>
+                      <span className="font-bold">{t("child")}:</span>{" "}
+                      {tour.child_count}
+                    </span>
+                  </p>
+                  <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                    <User className="w-6 h-5 text-gray-900" />
+                    <span>
+                      <span className="font-bold">{t("adult")}:</span>{" "}
+                      {tour.adult_count}
+                    </span>
+                  </p>
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
@@ -261,10 +265,10 @@ function AcceptedOffers() {
                       {tour.meal_plan === "breakfast"
                         ? "Colazione"
                         : tour.meal_plan === "half-board"
-                        ? "Mezza Pensione (Colazione & Cena)"
-                        : tour.meal_plan === "full-board"
-                        ? "Pensione Completa (Tutti i Pasti)"
-                        : "N/A"}
+                          ? "Mezza Pensione (Colazione & Cena)"
+                          : tour.meal_plan === "full-board"
+                            ? "Pensione Completa (Tutti i Pasti)"
+                            : "N/A"}
                     </span>
                   </p>
                   <div className="flex items-center  space-x-2">
@@ -277,14 +281,14 @@ function AcceptedOffers() {
                         {tour.type_of_accommodation === "hotel"
                           ? "Hotel"
                           : tour.type_of_accommodation === "resort"
-                          ? "Resort"
-                          : tour.type_of_accommodation === "homestay"
-                          ? "Famiglia"
-                          : tour.type_of_accommodation === "apartment"
-                          ? "Appartamento"
-                          : tour.type_of_accommodation === "hostel"
-                          ? "Ostello"
-                          : "N/A"}
+                            ? "Resort"
+                            : tour.type_of_accommodation === "homestay"
+                              ? "Famiglia"
+                              : tour.type_of_accommodation === "apartment"
+                                ? "Appartamento"
+                                : tour.type_of_accommodation === "hostel"
+                                  ? "Ostello"
+                                  : "N/A"}
                       </span>
                     </p>
                     <p className="text-md text-gray-600 flex items-center gap-2">

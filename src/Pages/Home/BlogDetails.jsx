@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import { format } from "date-fns";
+import { Helmet } from "react-helmet-async";
 
 const formatDate = (dateString) => {
   try {
@@ -14,15 +15,15 @@ const formatDate = (dateString) => {
 };
 
 export default function BlogDetails() {
-  const { id } = useParams();          
+  const { id } = useParams();
   console.log("URL param (slug):", id);
-
+  const slug = id;
   const {
-    data: posts = [],              
+    data: posts = [],
     isLoading,
     isError,
     error,
-  } = useShowBlogPostQuery();      
+  } = useShowBlogPostQuery();
 
   const post = posts.find((p) => p.slug === id);
 
@@ -44,9 +45,12 @@ export default function BlogDetails() {
   if (isError) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Error Loading Post</h1>
+        <h1 className="text-4xl font-bold text-red-600 mb-4">
+          Error Loading Post
+        </h1>
         <p className="text-gray-600">
-          {error?.data?.message || "Something went wrong while fetching the blog post."}
+          {error?.data?.message ||
+            "Something went wrong while fetching the blog post."}
         </p>
       </div>
     );
@@ -57,7 +61,8 @@ export default function BlogDetails() {
       <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Post Not Found</h1>
         <p className="text-gray-600">
-          No blog post found with slug: <strong>{id}</strong><br />
+          No blog post found with slug: <strong>{id}</strong>
+          <br />
           Please check the URL or try another post.
         </p>
       </div>
@@ -66,6 +71,9 @@ export default function BlogDetails() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24 ">
+      <Helmet>
+        <title>{`vacanzamycost.it | blog | ${post?.slug || ""}`}</title>
+      </Helmet>
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
           {post.title}

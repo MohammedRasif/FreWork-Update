@@ -2,6 +2,7 @@
 
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
@@ -32,7 +33,7 @@ function BlogCard({ post }) {
   }, []);
   const fullText = stripHtmlAndTruncate(
     post.content || post.introductory_description,
-    200
+    200,
   );
   const words = fullText.split(/\s+/).filter((w) => w.length > 0);
   const isLong = words.length > 80;
@@ -40,6 +41,9 @@ function BlogCard({ post }) {
 
   return (
     <div>
+      <Helmet>
+        <title>vacanzamycost.it | blog</title>
+      </Helmet>
       <NavLink to={`/blog/${post.slug}`}>
         <article className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100">
           <div className="flex flex-col md:flex-row">

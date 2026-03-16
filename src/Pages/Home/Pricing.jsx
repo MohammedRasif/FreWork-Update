@@ -11,6 +11,7 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const Pricing = () => {
   const { t } = useTranslation();
@@ -70,36 +71,36 @@ const Pricing = () => {
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
   const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
 
- const handleSelectPlan = async (plan) => {
-  if (plan?.cta?.action === "apply_partner") {
-    localStorage.setItem("pricing_status", "agency");
-    navigate("/registrazione", {
-      state: {
-        pricing_id: plan.price_id, 
-      },
-    });
-    return;
-  }
-
-  if (!accessToken) {
-    toast.info(t("login_required_for_premium"));
-    
-    navigate("/login", { state: { from: "/per-agenzie" } });
-    return;
-  }
-
-  try {
-    const response = await subscription({
-      price_id: plan.price_id, 
-    }).unwrap();
-
-    if (response?.checkout_url) {
-      window.location.href = response.checkout_url;
-    } else {
-      toast.success(t("subscription_success"));
+  const handleSelectPlan = async (plan) => {
+    if (plan?.cta?.action === "apply_partner") {
+      localStorage.setItem("pricing_status", "agency");
+      navigate("/registrazione", {
+        state: {
+          pricing_id: plan.price_id,
+        },
+      });
+      return;
     }
-  } catch (err) {}
-};
+
+    if (!accessToken) {
+      toast.info(t("login_required_for_premium"));
+
+      navigate("/login", { state: { from: "/per-agenzie" } });
+      return;
+    }
+
+    try {
+      const response = await subscription({
+        price_id: plan.price_id,
+      }).unwrap();
+
+      if (response?.checkout_url) {
+        window.location.href = response.checkout_url;
+      } else {
+        toast.success(t("subscription_success"));
+      }
+    } catch (err) {}
+  };
   const PricingSkeleton = ({ count = 1 }) => (
     <>
       {Array.from({ length: count }).map((_, i) => (
@@ -125,6 +126,9 @@ const Pricing = () => {
 
   return (
     <section className="pt-24 roboto bg-gray-50 min-h-screen pb-14">
+      <Helmet>
+        <title>vacanzamycost.it | offerte-accettate</title>
+      </Helmet>
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
           {t("pricing")}
@@ -362,7 +366,6 @@ const Pricing = () => {
         )}
       </div>
       <ToastContainer position="top-right" autoClose={5000} />
-      
     </section>
   );
 };

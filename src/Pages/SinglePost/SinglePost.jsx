@@ -35,6 +35,7 @@ import { ToastContainer } from "react-toastify";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { IoBed, IoCheckmarkCircleSharp, IoPersonSharp } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
@@ -56,7 +57,9 @@ function SinglePost({ prid }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [expandedOffers, setExpandedOffers] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const { id } = useParams();
+  const slug = id 
+  console.log(id)
   const {
     data: post,
     isLoading: isPostLoading,
@@ -295,6 +298,9 @@ function SinglePost({ prid }) {
   const showSentOfferButton = !token || role === "agency";
   return (
     <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
+      <Helmet>
+      <title>{`vacanzamycost.it | richieste | ${slug}`}</title>
+    </Helmet>
       <Toaster />
       <button
         onClick={() => navigate(-1)}

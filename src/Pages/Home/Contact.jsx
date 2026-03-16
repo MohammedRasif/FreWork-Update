@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import img from "../../assets/img/contact.jpg";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -25,6 +26,9 @@ const Contact = () => {
 
   return (
     <div className="relative min-h-screen w-full roboto">
+      <Helmet>
+        <title>vacanzamycost.it | contatti</title>
+      </Helmet>
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -50,7 +54,10 @@ const Contact = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5 sm:space-y-6"
+          >
             {/* First Name and Last Name Row */}
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -58,7 +65,9 @@ const Contact = () => {
                   {t("first_name")}
                 </label>
                 <input
-                  {...register("firstName", { required: t("first_name_required") })}
+                  {...register("firstName", {
+                    required: t("first_name_required"),
+                  })}
                   type="text"
                   placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
@@ -75,7 +84,9 @@ const Contact = () => {
                   {t("last_name")}
                 </label>
                 <input
-                  {...register("lastName", { required: t("last_name_required") })}
+                  {...register("lastName", {
+                    required: t("last_name_required"),
+                  })}
                   type="text"
                   placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
@@ -118,7 +129,9 @@ const Contact = () => {
                   {t("phone_number")}
                 </label>
                 <input
-                  {...register("phoneNumber", { required: t("phone_required") })}
+                  {...register("phoneNumber", {
+                    required: t("phone_required"),
+                  })}
                   type="tel"
                   placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
@@ -155,7 +168,9 @@ const Contact = () => {
                   {t("location")}
                 </label>
                 <input
-                  {...register("location", { required: t("location_required") })}
+                  {...register("location", {
+                    required: t("location_required"),
+                  })}
                   type="text"
                   placeholder={t("enter_here")}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-md text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"

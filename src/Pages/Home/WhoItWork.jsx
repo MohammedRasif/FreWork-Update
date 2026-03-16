@@ -10,6 +10,7 @@ import {
   Gift,
   Users,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const WhoItWork = () => {
   const { t } = useTranslation();
@@ -63,6 +64,9 @@ const WhoItWork = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-16 pt-24">
+      <Helmet>
+        <title>vacanzamycost.it | come-funziona</title>
+      </Helmet>
       <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">
         {t("howItWorks.pageTitle")}
       </h1>

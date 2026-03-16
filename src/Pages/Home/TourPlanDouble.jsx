@@ -36,6 +36,7 @@ import {
 } from "react-icons/fa6";
 import img from "../../assets/img/badge.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const FullScreenInfinityLoader = () => (
   <div className="flex justify-center items-center min-h-screen">
@@ -83,7 +84,8 @@ const TourPlanDouble = () => {
     useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
   const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
-  const { data: searchResults, isLoading: isSearchLoading } = useSearchPlanQuery(filters.search, { skip: !filters.search });
+  const { data: searchResults, isLoading: isSearchLoading } =
+    useSearchPlanQuery(filters.search, { skip: !filters.search });
 
   const uniqueCountries = Array.from(
     new Set(
@@ -93,7 +95,9 @@ const TourPlanDouble = () => {
   ).sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
-    let filteredData = filters.search ? (searchResults || []) : (tourPlanPublic || []);
+    let filteredData = filters.search
+      ? searchResults || []
+      : tourPlanPublic || [];
 
     // Search er local filter remove kora hoyeche karon API already location_to diye search kore dibe
     if (filters.min) {
@@ -138,7 +142,7 @@ const TourPlanDouble = () => {
   const debouncedFilterChange = useCallback(
     debounce((name, value) => {
       setFilters((prev) => ({ ...prev, [name]: value }));
-    }, ),
+    }),
     [],
   );
 
@@ -331,10 +335,15 @@ const TourPlanDouble = () => {
 
   const displayTours = tours;
 
-  const isDataLoading = filters.search ? isSearchLoading : isTourPlanPublicLoading;
+  const isDataLoading = filters.search
+    ? isSearchLoading
+    : isTourPlanPublicLoading;
 
   return (
     <div className="bg-gray-50 p-3 sm:p-4 md:p-6 lg:pb-20 roboto ">
+      <Helmet>
+        <title>vacanzamycost.it | richieste</title>
+      </Helmet>
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -621,7 +630,6 @@ const TourPlanDouble = () => {
                             </span>
                           </p>
                           <p className="text-md text-gray-600 flex items-center gap-2 ">
-                            
                             <Baby className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">{t("child")}:</span>{" "}
@@ -741,7 +749,9 @@ const TourPlanDouble = () => {
                   );
                 })
               ) : (
-                <div className="col-span-full h-[36vh] text-3xl font-semibold text-center pt-40">{t("no_tours_found")}</div>
+                <div className="col-span-full h-[36vh] text-3xl font-semibold text-center pt-40">
+                  {t("no_tours_found")}
+                </div>
               )}
             </div>
           </div>
