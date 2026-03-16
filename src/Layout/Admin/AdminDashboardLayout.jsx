@@ -31,6 +31,7 @@ import {
 } from "@/redux/features/withAuth";
 import AdminNotification from "./AdminNotification";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const UnreadCountContext = createContext();
 export const useUnreadCount = () => useContext(UnreadCountContext);
@@ -47,7 +48,7 @@ export default function AdminDashboardLayout() {
   const { data: agencyData, isLoading } = useGetAgencyProfileQuery();
   const ws = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { data: userData ,refetch  } = useShowUserInpormationQuery();
+  const { data: userData, refetch } = useShowUserInpormationQuery();
   const notificationRef = useRef(null);
 
   const allMenuItems = [
@@ -94,14 +95,13 @@ export default function AdminDashboardLayout() {
   }, []);
 
   useEffect(() => {
-  const hasReloaded = sessionStorage.getItem("admin_dashboard_reload");
+    const hasReloaded = sessionStorage.getItem("admin_dashboard_reload");
 
-  if (!hasReloaded) {
-    sessionStorage.setItem("admin_dashboard_reload", "true");
-    window.location.reload();
-  }
-}, []);
-
+    if (!hasReloaded) {
+      sessionStorage.setItem("admin_dashboard_reload", "true");
+      window.location.reload();
+    }
+  }, []);
 
   useEffect(() => {
     const normalizedLocation = location.pathname.replace(/\/$/, "");
@@ -239,6 +239,9 @@ export default function AdminDashboardLayout() {
   return (
     <UnreadCountContext.Provider value={{ unreadCount, setUnreadCount }}>
       <div className="flex h-screen bg-[#F8F9FA]">
+        <Helmet>
+          <title>vacanzamycost.it | admin</title>
+        </Helmet>
         {isMobileMenuOpen && (
           <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"></div>
         )}

@@ -6,6 +6,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useLogInMutation } from "@/redux/features/baseApi";
 import img1 from "../../assets/img/1000062305-removebg-preview.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ const Login = () => {
 
       localStorage.setItem(
         "name",
-        res?.profile_data.name || res?.profile_data.agency
+        res?.profile_data.name || res?.profile_data.agency,
       );
 
       localStorage.setItem("userEmail", data.email);
@@ -60,6 +61,9 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex">
+      <Helmet>
+        <title>vacanzamycost.it | login</title>
+      </Helmet>
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <img

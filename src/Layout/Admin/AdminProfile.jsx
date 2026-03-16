@@ -19,6 +19,7 @@ import {
 import { IoMdSend } from "react-icons/io";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const AdminProfile = () => {
   const { t } = useTranslation();
@@ -95,10 +96,10 @@ const AdminProfile = () => {
     try {
       const payload = {
         start_unavailable: new Date(
-          parsedFromDate.setHours(14, 36, 34, 327)
+          parsedFromDate.setHours(14, 36, 34, 327),
         ).toISOString(),
         end_unavailable: new Date(
-          parsedToDate.setHours(14, 36, 34, 327)
+          parsedToDate.setHours(14, 36, 34, 327),
         ).toISOString(),
       };
 
@@ -155,11 +156,10 @@ const AdminProfile = () => {
   } catch (err) {
     console.error("Failed to parse facilities:", err);
   }
-
   try {
     if (profileData?.service_categories?.[0]) {
       serviceCategoriesDetails = JSON.parse(
-        profileData.service_categories[0]
+        profileData.service_categories[0],
       ).map((name) => ({ name }));
     }
   } catch (err) {
@@ -179,6 +179,9 @@ const AdminProfile = () => {
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-screen">
+      <Helmet>
+        <title>vacanzamycost.it | admin | profilo</title>
+      </Helmet>
       {isPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4 sm:p-6 relative">
@@ -316,7 +319,7 @@ const AdminProfile = () => {
                   {JSON.parse(profileData.service_categories[0])
                     .map(
                       (category) =>
-                        category.charAt(0).toUpperCase() + category.slice(1)
+                        category.charAt(0).toUpperCase() + category.slice(1),
                     )
                     .join(", ")}
                 </span>

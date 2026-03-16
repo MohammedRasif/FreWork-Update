@@ -35,6 +35,7 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import AdminNotification from "../Admin/AdminNotification";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 export default function UserDashboardLayout() {
   const { t } = useTranslation();
@@ -145,7 +146,7 @@ export default function UserDashboardLayout() {
       console.error("No token found, WebSocket connection aborted");
       return;
     }
-   
+
     const baseUrl = "api.vacanzamycost.it";
     const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
@@ -287,7 +288,9 @@ export default function UserDashboardLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8F9FA]">
-      {/* Mobile Menu Overlay */}
+      <Helmet>
+        <title>vacanzamycost.it | user</title>
+      </Helmet>
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"></div>
       )}
@@ -315,10 +318,7 @@ export default function UserDashboardLayout() {
                   }`}
                 >
                   <img
-                    src={
-                      profileData.profile_picture_url ||
-                      ""
-                    }
+                    src={profileData.profile_picture_url || ""}
                     alt={t("user_avatar")}
                     className="w-16 h-16 rounded-full"
                   />
@@ -549,7 +549,10 @@ export default function UserDashboardLayout() {
                 <h4 className="text-xl font-medium">{t("settings")}</h4>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="cursor-pointer" title={t("more_options")}>
+                    <button
+                      className="cursor-pointer"
+                      title={t("more_options")}
+                    >
                       <ChevronDown size={20} />
                     </button>
                   </DropdownMenuTrigger>
@@ -574,7 +577,10 @@ export default function UserDashboardLayout() {
               <div className="sm:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="cursor-pointer p-2" title={t("more_options")}>
+                    <button
+                      className="cursor-pointer p-2"
+                      title={t("more_options")}
+                    >
                       <ChevronDown size={16} />
                     </button>
                   </DropdownMenuTrigger>
@@ -616,7 +622,9 @@ export default function UserDashboardLayout() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">{t("change_password")}</h2>
+                <h2 className="text-lg font-semibold">
+                  {t("change_password")}
+                </h2>
                 <button
                   onClick={handleClosePopup}
                   className="text-gray-500 hover:text-gray-700"
@@ -644,7 +652,11 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("current_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={showPasswords.current_password ? t("hide_password") : t("show_password")}
+                    title={
+                      showPasswords.current_password
+                        ? t("hide_password")
+                        : t("show_password")
+                    }
                   >
                     {showPasswords.current_password ? (
                       <EyeOff size={20} className="text-gray-500" />
@@ -670,7 +682,11 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("new_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={showPasswords.new_password ? t("hide_password") : t("show_password")}
+                    title={
+                      showPasswords.new_password
+                        ? t("hide_password")
+                        : t("show_password")
+                    }
                   >
                     {showPasswords.new_password ? (
                       <EyeOff size={20} className="text-gray-500" />
@@ -696,7 +712,11 @@ export default function UserDashboardLayout() {
                     type="button"
                     onClick={() => togglePasswordVisibility("confirm_password")}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={showPasswords.confirm_password ? t("hide_password") : t("show_password")}
+                    title={
+                      showPasswords.confirm_password
+                        ? t("hide_password")
+                        : t("show_password")
+                    }
                   >
                     {showPasswords.confirm_password ? (
                       <EyeOff size={20} className="text-gray-500" />

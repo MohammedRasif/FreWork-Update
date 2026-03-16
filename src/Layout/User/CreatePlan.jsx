@@ -10,6 +10,7 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 // Global flag to ensure Google Maps script loads only once
 let isGoogleScriptLoaded = false;
@@ -254,6 +255,9 @@ const CreatePlan = () => {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>vacanzamycost.it | user | crea-richiesta</title>
+      </Helmet>
       <div className="mx-auto">
         <Toaster />
         <div className="flex items-center mb-8">

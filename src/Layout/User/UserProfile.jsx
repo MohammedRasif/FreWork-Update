@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 function UserProfile() {
   const { t } = useTranslation();
@@ -19,6 +20,9 @@ function UserProfile() {
 
   return (
     <div className="mx-auto p-4">
+      <Helmet>
+        <title>vacanzamycost.it | user | profilo</title>
+      </Helmet>
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 space-y-2 sm:space-y-0">
         <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">

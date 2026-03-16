@@ -11,6 +11,7 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const AdminPricing = () => {
   const { t } = useTranslation();
@@ -125,6 +126,9 @@ const AdminPricing = () => {
 
   return (
     <section className="pt-24 roboto bg-gray-50 min-h-screen pb-14">
+      <Helmet>
+        <title>vacanzamycost.it | admin |gestione-abbonamento</title>
+      </Helmet>
       <div className="container mx-auto px-4">
         <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
           {t("pricing")}

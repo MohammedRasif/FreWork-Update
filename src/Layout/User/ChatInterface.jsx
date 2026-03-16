@@ -6,6 +6,7 @@ import { IoMdSearch } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
 import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 export default function ChatInterface() {
   const { t } = useTranslation();
@@ -135,6 +136,9 @@ export default function ChatInterface() {
   if (isMobile) {
     return (
       <div className="h-screen flex flex-col">
+        <Helmet>
+        <title>vacanzamycost.it | admin | chat</title>
+      </Helmet>
         <div className="p-4 border-b border-gray-300">
           <h1 className="text-xl font-semibold mb-3">{t("messages")}</h1>
           <div className="relative">

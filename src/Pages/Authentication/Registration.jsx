@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "@/redux/features/baseApi";
 import img1 from "../../assets/img/1000062305-removebg-preview.png";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const Register = () => {
   const { t } = useTranslation();
@@ -126,6 +127,9 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex">
+      <Helmet>
+        <title>vacanzamycost.it | registrazione</title>
+      </Helmet>
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <img
