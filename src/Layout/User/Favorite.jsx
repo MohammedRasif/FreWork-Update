@@ -4,6 +4,7 @@ import { useState } from "react";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const Favorite = () => {
   const { t } = useTranslation();
@@ -12,11 +13,14 @@ const Favorite = () => {
 
   // Filter agencies based on search term
   const filteredAgencies = favoriteAgency?.filter((agency) =>
-    agency.agency_name.toLowerCase().includes(searchTerm.toLowerCase())
+    agency.agency_name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
     <div className="p-4">
+      <Helmet>
+        <title>vacanzamycost.it | user | preferiti</title>
+      </Helmet>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-6">

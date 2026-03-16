@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { FiSearch, FiStar, FiMapPin, FiUsers } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const UserAccepte = () => {
   const { t, i18n } = useTranslation();
@@ -108,6 +109,9 @@ const UserAccepte = () => {
 
   return (
     <div className="">
+      <Helmet>
+        <title>vacanzamycost.it | user | richieste-accettate</title>
+      </Helmet>
       <Toaster />
       <div className="flex flex-col sm:flex-row justify-between mt-6 mb-6 border-b border-gray-300">
         <div className="flex space-x-4 sm:space-x-8 mb-4 sm:mb-0">

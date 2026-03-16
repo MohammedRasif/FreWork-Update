@@ -29,6 +29,7 @@ import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { FaClock } from "react-icons/fa6";
+import { Helmet } from "react-helmet-async";
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -308,6 +309,9 @@ function PublishedPlan() {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>vacanzamycost.it | user | richieste-pubblicate</title>
+      </Helmet>
       <Toaster />
       <div className="flex flex-col">
         <div className="flex-1 flex flex-col gap-3">
