@@ -226,6 +226,7 @@ export default function AdminDashboardLayout() {
     ws.current.onerror = () => {};
     ws.current.onclose = () => {};
 
+  
     return () => {
       if (ws.current) ws.current.close();
     };
