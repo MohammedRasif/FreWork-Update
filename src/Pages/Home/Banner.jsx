@@ -119,16 +119,14 @@ const Banner = () => {
         </h1> */}
         {showCreateRequestButton && (
           <button
-            onClick={handleButtonClick}
-            className=" mt-2 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[48px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
-          >
-            {t("create_request")}
-          </button>
+  onClick={handleButtonClick}
+  className="mt-2 md:mt-5 bg-gradient-to-r from-[#F2C879] via-[#DFA13A] via-[#C9871E] to-[#A66E12] hover:opacity-90 text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[48px] md:px-[36px] rounded-full max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
+>
+  {t("create_request")}
+</button>
         )}
 
-        <div className="text-[13px] lg:text-xl text-white font-medium py-1 px-10 lg:pt-10">
-          <p className="">{t("banner_top_buttom")}</p>
-        </div>
+       
       </div>
 
       {isPopupOpen && (

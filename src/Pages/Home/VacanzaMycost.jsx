@@ -42,7 +42,7 @@ const VacanzaMycost = () => {
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
                 {t("enter_travel_request")}
                 <br />
-                {t("in_just_a_few_clicks")}
+                {/* {t("in_just_a_few_clicks")} */}
               </p>
             </div>
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[300px] lg:bg-white">
