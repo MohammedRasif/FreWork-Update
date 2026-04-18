@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "daisyui";
@@ -10,7 +12,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     brightness(102%) contrast(104%);
   cursor: pointer;
 }
-
+.dm_serif {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 /* Banner Container */
 .vmc-cookie-banner {

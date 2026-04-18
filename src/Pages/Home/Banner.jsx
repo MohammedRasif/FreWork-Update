@@ -72,7 +72,7 @@ const Banner = () => {
         <div className="absolute inset-0 bg-black/30 lg:bg-transparent lg:bg-gradient-to-r lg:from-black/60 lg:to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 lg:py-0">
+      <div className="relative z-10 w-full container mx-auto px-6 py-20 lg:py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           {/* Left Side: Content */}
@@ -80,57 +80,57 @@ const Banner = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-sm">
               <FaClock className="text-blue-300" />
-              <span>{t("response_time_text", "Response within 24 to 48 hours")}</span>
+              <span>{t("show_short_description")}</span>
             </div>
 
             {/* Slogan */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-[50px] font-bold leading-tight dm_serif">
               {t("banner_slogan")}
             </h1>
 
             {/* Description */}
             <p className="text-lg md:text-xl opacity-90 max-w-lg">
-              {t("show_short_description")}
+              {t("show_short_descriptionn" , "Compare verified agencies and choose without wasting time.")}
             </p>
 
             {/* Features Checklist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
               <div className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-400" />
+                <FaCheckCircle size={22} className="text-gray-100" />
                 <span>{t("feature_drivers", "Professional drivers")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-400" />
+                <FaCheckCircle size={22} className="text-gray-100" />
                 <span>{t("feature_booking", "Flexible booking")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-400" />
+                <FaCheckCircle size={22} className="text-gray-100" />
                 <span>{t("feature_pricing", "Transparent pricing")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-400" />
+                <FaCheckCircle size={22} className="text-gray-100" />
                 <span>{t("feature_vehicles", "Comfortable vehicles")}</span>
               </div>
             </div>
           </div>
 
           {/* Right Side: Form Action */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl w-full max-w-md shadow-2xl">
+          <div className="flex justify-center lg:justify-end lg:mt-32">
+            <div className="bg-white/10 backdrop-blur-[5px] border border-white/20 p-5 rounded-[14px] w-full max-w-xl shadow-2xl">
               <div className="space-y-4">
                 <div className="relative">
                   <input
                     disabled
                     type="text"
                     placeholder={t("input_placeholder", "Where do you want to go?")}
-                    className="w-full py-4 px-6 rounded-xl bg-white text-gray-800 placeholder-gray-500 focus:outline-none"
+                    className="w-full py-2.5 px-6 rounded-[10px] bg-white text-gray-800 placeholder-gray-500 focus:outline-none"
                   />
                 </div>
 
                 {showCreateRequestButton && (
                   <button
                     onClick={handleButtonClick}
-                    className="w-full bg-[#D4952B] hover:bg-[#b88124] transition-colors text-white text-xl font-semibold py-4 rounded-xl shadow-lg"
+                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer transition-colors text-white text-[17px] font-semibold py-2.5 rounded-[10px] shadow-lg"
                   >
                     {t("create_request")}
                   </button>
