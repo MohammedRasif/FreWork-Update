@@ -36,13 +36,13 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-[13px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[13px] md:text-2xl font-semibold text-[#DD9E2C] mb-1 md:mb-4">
                 {t("publish_requests")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
                 {t("enter_travel_request")}
                 <br />
-                {t("in_just_a_few_clicks")}
+                {/* {t("in_just_a_few_clicks")} */}
               </p>
             </div>
             <div className="flex flex-col items-center text-center md:rounded-full lg:shadow-xl p-3 md:p-8 w-[80px] md:w-[300px] lg:bg-white">
@@ -55,7 +55,7 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-[13px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[13px] md:text-2xl font-semibold text-[#DD9E2C] mb-1 md:mb-4">
                 {t("receive_personalized_offers")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">
@@ -74,7 +74,7 @@ const VacanzaMycost = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-[13px] md:text-2xl font-semibold text-cyan-600 mb-1 md:mb-4">
+              <h3 className="text-[13px] md:text-2xl font-semibold text-[#DD9E2C] mb-1 md:mb-4">
                 {t("choose_and_go")}
               </h3>
               <p className="text-gray-600 text-[10px] md:text-base leading-relaxed font-medium hidden md:block">

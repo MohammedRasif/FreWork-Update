@@ -333,7 +333,7 @@ const Pricing = () => {
                         className={`
                           w-full mt-5 text-white py-3 rounded-md mb-2
                           transition-colors cursor-pointer text-lg font-semibold
-                          ${plan.isSpecial ? "bg-[#3776E2] hover:bg-[#2a5bb5]" : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                          ${plan.isSpecial ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C]" : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#e65f05]"}
                         `}
                         onClick={() => handleSelectPlan(plan)}
                         disabled={isSubscribing}
@@ -351,7 +351,7 @@ const Pricing = () => {
                       className={`
                         w-full mt-5 text-white py-3 rounded-md mb-4
                         transition-colors cursor-pointer text-lg font-semibold
-                        ${plan.isSpecial ? "bg-[#3776E2] hover:bg-[#2a5bb5]" : "bg-[#FF6600] hover:bg-[#e65f05]"}
+                        ${plan.isSpecial ? "bg-[#DD9E2C] hover:bg-[#C2851C]" : "bg-[#FF6600] hover:bg-[#e65f05]"}
                       `}
                       onClick={() => handleSelectPlan(plan)}
                       disabled={isSubscribing}

@@ -211,7 +211,7 @@ const AdminProfile = () => {
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] appearance-none"
                     min={new Date().toISOString().split("T")[0]}
                   />
                   <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
@@ -226,7 +226,7 @@ const AdminProfile = () => {
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] appearance-none"
                     min={fromDate || new Date().toISOString().split("T")[0]}
                   />
                   <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
@@ -239,7 +239,7 @@ const AdminProfile = () => {
               className={`w-full py-2 sm:py-3 rounded-md font-medium text-white ${
                 isLoading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer"
               }`}
             >
               {isLoading ? t("submitting") : t("confirm")}
@@ -259,7 +259,7 @@ const AdminProfile = () => {
           </h1>
           <button
             onClick={handleOpenPopup}
-            className="flex items-center gap-1 mt-2 text-blue-500 underline cursor-pointer self-center sm:self-end"
+            className="flex items-center gap-1 mt-2 text-[#DD9E2C] underline cursor-pointer self-center sm:self-end"
           >
             <FaEdit className="w-5 h-5" />
             <span className="text-sm">{t("set_unavailability")}</span>
@@ -303,7 +303,7 @@ const AdminProfile = () => {
                     {profileData?.rating || 0}
                   </span>
                 </div>
-                <span className="text-sm sm:text-[15px] text-blue-600">
+                <span className="text-sm sm:text-[15px] text-[#DD9E2C]">
                   ({profileData?.review_count || 0} {t("reviews")})
                 </span>
               </div>

@@ -92,7 +92,7 @@ const EasyandFast = () => {
               <div className="flex items-start">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
                   <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1764484092/Image20261130122412_qqwgzn.jpg"
+                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/q_auto/f_auto/v1764484092/Image20251130122412_qqwgzn.jpg"
                     alt=""
                   />
                 </div>
@@ -171,7 +171,7 @@ const EasyandFast = () => {
                   </p>
                   <div className="w-20 sm:w-24 h-1.5 bg-gray-200 rounded-full mt-1 sm:mt-1.5 mb-1">
                     <div
-                      className="h-1.5 bg-purple-500 rounded-full"
+                      className="h-1.5 bg-[#DD9E2C] rounded-full"
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -226,19 +226,19 @@ const EasyandFast = () => {
 
             <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6 px-2 sm:px-4">
               <p className="group flex items-center text-sm sm:text-md font-medium">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
+                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
                 {t("benefit_1")}
               </p>
               <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
+                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
                 {t("benefit_2")}
               </p>
               <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
+                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
                 {t("benefit_3")}
               </p>
               <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-600 transition-transform group-hover:translate-x-1 font-bold" />
+                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
                 {t("benefit_4")}
               </p>
             </div>

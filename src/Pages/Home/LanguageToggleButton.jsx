@@ -28,7 +28,7 @@ const LanguageToggleButton = () => {
     >
       {/* Sliding Ball - Without framer-motion, using only Tailwind */}
       <div
-        className={`w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-[#8280FF] transition-all duration-300 ease-in-out ${
+        className={`w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all duration-300 ease-in-out ${
           isItalian ? "left-[40px]" : "left-[8px]"
         }`}
       />

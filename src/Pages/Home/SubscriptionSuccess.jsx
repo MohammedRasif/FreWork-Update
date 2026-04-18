@@ -70,16 +70,15 @@ const SubscriptionSuccess = () => {
                                     <div
                                         className={`absolute inset-0 rounded-full transition-all duration-1000 ${showIcon ? "scale-150 opacity-0" : "scale-100 opacity-30"
                                             }`}
-                                        style={{ backgroundColor: "#3776E2" }}
+                                        style={{ backgroundColor: "#DD9E2C" }}
                                     ></div>
                                 </div>
                             </div>
-
                             {/* Outer Glow Effect */}
                             <div
                                 className={`absolute inset-0 rounded-full blur-xl transition-all duration-[2500ms] ${showIcon ? "scale-150 opacity-20" : "scale-100 opacity-0"
                                     }`}
-                                style={{ backgroundColor: "#3776E2" }}
+                                style={{ backgroundColor: "#DD9E2C" }}
                             ></div>
                         </div>
                     </div>
@@ -100,14 +99,14 @@ const SubscriptionSuccess = () => {
                             <button
                                 className="px-8 py-3 text-white font-semibold rounded-full transition-all duration-200 transform hover:scale-105 cursor-pointer"
                                 style={{
-                                    backgroundColor: "#3776E2",
+                                    backgroundColor: "#DD9E2C",
                                     boxShadow: "0 4px 15px rgba(235, 90, 142, 0.3)",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "#3776E2"
+                                    e.target.style.backgroundColor = "#DD9E2C"
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#3776E2"
+                                    e.target.style.backgroundColor = "#DD9E2C"
                                 }}
                             >
                                 Continue to Home

@@ -40,7 +40,7 @@ import { Helmet } from "react-helmet-async";
 
 const FullScreenInfinityLoader = () => (
   <div className="flex justify-center items-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#DD9E2C]"></div>
   </div>
 );
 
@@ -363,7 +363,7 @@ const TourPlanDouble = () => {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                   <div className="w-full sm:w-auto">
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent hover:border-[#DD9E2C] transition-colors"
                       value={filters.destination_type || ""}
                       onChange={(e) => handleCategoryChange(e.target.value)}
                     >
@@ -731,7 +731,7 @@ const TourPlanDouble = () => {
                               className={`block w-full text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md relative group ${
                                 token && isDisabled
                                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                                  : "bg-[#DD9E2C] hover:bg-[#DD9E2C] text-white"
                               }`}
                             >
                               {t("sent_offer")}

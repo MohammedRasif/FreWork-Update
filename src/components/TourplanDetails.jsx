@@ -65,7 +65,7 @@ export default function TourPlanDetails({ id, closeModal }) {
             alt={`${tourData.location_to} tour`}
             className="w-full h-48 sm:h-64 object-cover rounded-t-2xl"
           />
-          <div className="absolute top-4 left-4 bg-blue-500 text-white text-xs sm:text-sm font-semibold px-2 py-1 rounded-full">
+          <div className="absolute top-4 left-4 bg-[#DD9E2C] text-white text-xs sm:text-sm font-semibold px-2 py-1 rounded-full">
             {tourData.category}
           </div>
         </div>

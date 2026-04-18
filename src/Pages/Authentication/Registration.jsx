@@ -77,10 +77,6 @@ const Register = () => {
     localStorage.removeItem("pricing_status");  
   };
 }, []);
-
-
-
-
   const userTypes = ["tourist", "agency"];
 
   const onSubmit = async (data) => {
@@ -178,7 +174,7 @@ const Register = () => {
                   })}
                   type="email"
                   placeholder={t("email_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C] focus:border-transparent"
                 />
               </div>
               {errors.email && (
@@ -197,7 +193,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white text-left flex items-center justify-between focus:ring-2 focus:ring-[#C2851C]"
                 >
                   <span
                     className={
@@ -261,7 +257,7 @@ const Register = () => {
                       placeholder={
                         t("agency_name_placeholder") || "e.g. Arnob Agency"
                       }
-                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C]"
                     />
                   </div>
                   {errors.agency_name && (
@@ -282,7 +278,7 @@ const Register = () => {
                       {...register("telephone_number")}
                       type="tel"
                       placeholder="01XXXXXXXXX"
-                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C]"
                     />
                   </div>
                   {errors.telephone_number && (
@@ -307,7 +303,7 @@ const Register = () => {
                     })}
                     type="text"
                     placeholder={t("vat_id_placeholder")}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
                   />
                   {errors.vatId && (
                     <p className="text-red-500 text-xs mt-1">
@@ -332,7 +328,7 @@ const Register = () => {
                   })}
                   type="password"
                   placeholder={t("password_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
                 />
               </div>
               {errors.password && (
@@ -357,7 +353,7 @@ const Register = () => {
                   })}
                   type="password"
                   placeholder={t("password_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
                 />
               </div>
               {errors.confirmPassword && (
@@ -376,7 +372,7 @@ const Register = () => {
                 {...register("invitationCode")}
                 type="text"
                 placeholder={t("enter_here")}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
               />
             </div>
 
@@ -388,7 +384,7 @@ const Register = () => {
                 ${
                   isLoading || !watch("termsAccepted")
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
+                    : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] hover:shadow-lg transform hover:-translate-y-0.5"
                 }`}
             >
               {isLoading ? t("registering") + "..." : t("register")}
@@ -398,19 +394,19 @@ const Register = () => {
           {/* Terms Checkbox */}
           <div className="mt-8 pb-6 border-b border-gray-200">
             <label className="flex items-start gap-4 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                {...register("termsAccepted", {
-                  required: t("please_accept_terms"),
-                })}
-                className="w-6 h-6 text-blue-600 border-2 border-gray-300 rounded-md focus:ring-blue-500"
-              />
+             <input
+          type="checkbox"
+          {...register("termsAccepted", {
+            required: t("please_accept_terms"),
+          })}
+          className="w-6 h-6 accent-[#C2851C] border-2 border-gray-300 rounded-md focus:ring-0"
+        />
               <span className="text-sm text-gray-700 leading-relaxed">
                 {t("by_registering_agree")}{" "}
                 <NavLink
                   to="/termini-e-condizioni"
                   target="_blank"
-                  className="text-blue-600 hover:underline"
+                  className="text-[#DD9E2C] hover:underline"
                 >
                   {t("terms_and_conditions")}
                 </NavLink>{" "}
@@ -418,7 +414,7 @@ const Register = () => {
                 <NavLink
                   to="/privacy-policy"
                   target="_blank"
-                  className="text-blue-600 hover:underline"
+                  className="text-[#DD9E2C] hover:underline"
                 >
                   {t("privacy_policy")}
                 </NavLink>
@@ -446,7 +442,7 @@ const Register = () => {
           <div className="text-center mt-6">
             <NavLink to="/login" className="text-gray-600">
               {t("already_have_account")}{" "}
-              <span className="text-blue-600 font-medium">{t("login")}</span>
+              <span className="text-[#DD9E2C] font-medium">{t("login")}</span>
             </NavLink>
           </div>
         </div>

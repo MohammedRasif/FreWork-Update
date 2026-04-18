@@ -147,7 +147,7 @@ export default function ChatInterface() {
               placeholder={t("search_chats_or_tour_plans")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gray-200 rounded-lg pl-10 pr-4 py-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-200 rounded-lg pl-10 pr-4 py-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
             />
             <IoMdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
@@ -156,7 +156,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("inbox")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "inbox"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-[#DD9E2C] text-white"
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
@@ -166,7 +166,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("archived")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "archived"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-[#DD9E2C] text-white"
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
@@ -207,11 +207,11 @@ export default function ChatInterface() {
                     <div className="flex items-center">
                       <h3 className="font-semibold truncate">{agency.name}</h3>
                       {agency.tourist_is_verified && (
-                        <MdVerified className="ml-1 w-4 h-4 text-blue-600" />
+                        <MdVerified className="ml-1 w-4 h-4 text-[#C2851C]" />
                       )}
                     </div>
                     {agency.unreadCount > 0 && (
-                      <span className="text-[12px] bg-blue-500 text-white px-2 py-1 rounded-full ml-2">
+                      <span className="text-[12px] bg-[#DD9E2C] text-white px-2 py-1 rounded-full ml-2">
                         {agency.unreadCount}
                       </span>
                     )}
@@ -259,7 +259,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("inbox")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "inbox"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-[#DD9E2C] text-white"
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
@@ -269,7 +269,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("archived")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "archived"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-[#DD9E2C] text-white"
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
@@ -313,14 +313,14 @@ export default function ChatInterface() {
                           {agency.name}
                         </span>
                         {agency.tourist_is_verified && (
-                          <MdVerified className="ml-1 w-4 h-4 text-blue-600" />
+                          <MdVerified className="ml-1 w-4 h-4 text-[#C2851C]" />
                         )}
                         <span className="pl-1 font-semibold">
                           ({agency.tour_plan_title})
                         </span>
                       </div>
                       {agency.unreadCount > 0 && (
-                        <span className="text-[12px] bg-blue-500 text-white px-2 py-1 rounded-full ml-2">
+                        <span className="text-[12px] bg-[#DD9E2C] text-white px-2 py-1 rounded-full ml-2">
                           {agency.unreadCount}
                         </span>
                       )}

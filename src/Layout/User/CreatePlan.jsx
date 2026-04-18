@@ -282,7 +282,7 @@ const CreatePlan = () => {
               <input
                 type="text"
                 placeholder={t("enter_full_name")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("name", { required: t("name_required") })}
               />
               {errors.name && (
@@ -298,7 +298,7 @@ const CreatePlan = () => {
               <input
                 type="email"
                 placeholder={t("enter_email")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("email", {
                   required: t("email_required"),
                   pattern: {
@@ -323,7 +323,7 @@ const CreatePlan = () => {
               <input
                 type="tel"
                 placeholder={t("enter_phone_number")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("phoneNumber", {
                   required: t("phone_required"),
                   pattern: {
@@ -344,7 +344,7 @@ const CreatePlan = () => {
                   {t("accommodation_type")}
                 </label>
                 <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("typeOfAccommodation", {
                     required: t("accommodation_required"),
                   })}
@@ -369,7 +369,7 @@ const CreatePlan = () => {
                   {t("destination_type")}
                 </label>
                 <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("destinationType", {
                     required: t("destination_required"),
                   })}
@@ -393,7 +393,7 @@ const CreatePlan = () => {
                   {t("minimum_hotel_stars")}
                 </label>
                 <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("minimumHotelStars")}
                 >
                   <option value="" disabled selected>
@@ -417,7 +417,7 @@ const CreatePlan = () => {
               <input
                 type="text"
                 placeholder={t("enter_here")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...fromRest}
                 ref={(e) => {
                   fromFormRef(e);
@@ -437,7 +437,7 @@ const CreatePlan = () => {
               <input
                 type="text"
                 placeholder={t("enter_here")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...toRest}
                 ref={(e) => {
                   toFormRef(e);
@@ -460,7 +460,7 @@ const CreatePlan = () => {
               <div className="relative">
                 <input
                   type="date"
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] pr-10"
                   {...register("startingDate", {
                     required: t("starting_date_required"),
                   })}
@@ -480,7 +480,7 @@ const CreatePlan = () => {
               <div className="relative">
                 <input
                   type="date"
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] pr-10"
                   {...register("endingDate", {
                     required: t("ending_date_required"),
                   })}
@@ -504,7 +504,7 @@ const CreatePlan = () => {
                 <input
                   type="number"
                   placeholder={t("enter_adults")}
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("adult", {
                     min: {
                       value: 0,
@@ -525,7 +525,7 @@ const CreatePlan = () => {
                 <input
                   type="number"
                   placeholder={t("enter_children")}
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("child", {
                     min: {
                       value: 0,
@@ -552,7 +552,7 @@ const CreatePlan = () => {
               <input
                 type="number"
                 placeholder="EUR"
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("budget", {
                   required: t("budget_required"),
                   min: { value: 0, message: t("budget_cannot_be_negative") },
@@ -584,7 +584,7 @@ const CreatePlan = () => {
               <input
                 type="text"
                 placeholder={t("search_tourist_spot")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 ref={(e) => {
                   touristSpotsRef.current = e;
                 }}
@@ -595,7 +595,7 @@ const CreatePlan = () => {
                 {t("meal_plan")}
               </label>
               <select
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("mealPlan", { required: t("meal_plan_required") })}
               >
                 <option value="" disabled selected>
@@ -622,7 +622,7 @@ const CreatePlan = () => {
               <textarea
                 placeholder={t("description_placeholder")}
                 rows={4}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] resize-none"
                 {...register("description")}
               />
             </div>
@@ -632,7 +632,7 @@ const CreatePlan = () => {
             <input
               type="checkbox"
               id="confirmation"
-              className="mt-1 w-4 h-4 text-blue-600 border border-blue-600 rounded focus:ring-blue-500 hover:cursor-pointer checkbox checkbox-xs checked:text-blue-600"
+              className="mt-1 w-4 h-4 text-[#DD9E2C] border border-[#DD9E2C] rounded focus:ring-[#DD9E2C] hover:cursor-pointer checkbox checkbox-xs checked:text-[#DD9E2C]"
               {...register("confirmation", {
                 required: t("confirm_information"),
               })}
@@ -662,7 +662,7 @@ const CreatePlan = () => {
             <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "published"))}
-              className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+              className="px-8 py-3 bg-[#DD9E2C] text-white rounded-md hover:bg-[#C2851C] transition-colors font-medium"
               disabled={isSavingDraft || isPublishing}
             >
               {isPublishing ? t("publishing") : t("publish_now")}
