@@ -156,7 +156,7 @@ export default function GroupCard({ tourPlan }) {
         >
           <button
             onClick={handleViewDetails}
-            className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
+            className="block w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
           >
             {t("view_details")}
           </button>

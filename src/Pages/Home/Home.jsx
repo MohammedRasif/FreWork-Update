@@ -12,7 +12,6 @@ const Home = () => {
       <Helmet>
         <title> vacanzamycost.it | Home</title>
       </Helmet>
-
       <Banner />
       <VacanzaMycost />
       <Published />

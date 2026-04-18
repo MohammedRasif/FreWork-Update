@@ -70,7 +70,7 @@ const Agencies = () => {
       <div className="max-w-7xl mx-auto">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#DD9E2C] border-t-transparent"></div>
           </div>
         ) : isError ? (
           <div className="text-center text-red-500 py-8">
@@ -89,14 +89,14 @@ const Agencies = () => {
                 className="absolute top-1/2 -left-4 lg:-left-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
                 style={{ transform: "translateY(-50%)" }}
               >
-                <ArrowLeft className="text-blue-500" />
+                <ArrowLeft className="text-[#DD9E2C]" />
               </button>
               <button
                 ref={mountainNextRef}
                 className="absolute top-1/2 -right-4 lg:-right-10 z-10 hidden lg:flex w-10 h-10 items-center bg-white text-black justify-center border rounded-full shadow"
                 style={{ transform: "translateY(-50%)" }}
               >
-                <ArrowRight className="text-blue-500" />
+                <ArrowRight className="text-[#DD9E2C]" />
               </button>
               <Swiper
                 modules={[Pagination, Navigation]}
@@ -131,7 +131,7 @@ const Agencies = () => {
 
       {topAgency.length === 0 ? null : (
         <NavLink to="/membership" className="flex justify-center">
-          <h1 className="w-full md:w-auto h-[48px] bg-gray-300 md:bg-transparent rounded-2xl py-2 mt-6 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
+          <h1 className="w-full md:w-auto h-[48px] bg-gray-300 md:bg-transparent rounded-2xl py-2 mt-6 font-medium text-base sm:text-lg lg:text-[19px] text-[#DD9E2C] underline text-center cursor-pointer">
             {t("see_more")}
           </h1>
         </NavLink>

@@ -118,7 +118,7 @@ const Published = () => {
       <div className="max-w-7xl mx-auto">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#DD9E2C] border-t-transparent"></div>
           </div>
         ) : isError ? (
           <div className="text-center text-red-500 py-8">
@@ -340,7 +340,7 @@ const Published = () => {
       </div>
 
       <NavLink to="/richieste" className="flex justify-center mt-2">
-        <h1 className="w-5/6 md:w-auto h-[48px] rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-blue-500 underline text-center cursor-pointer">
+        <h1 className="w-5/6 md:w-auto h-[48px] rounded-2xl py-2 font-medium text-base sm:text-lg lg:text-[19px] text-[#DD9E2C] underline text-center cursor-pointer">
           {t("see_more")}
         </h1>
       </NavLink>
