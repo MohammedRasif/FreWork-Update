@@ -236,7 +236,6 @@ const AdminHome = () => {
           );
         }
         return filteredPlans.map((plan) => {
-          // ✅ Condition 1: offer_count > 3 বা offered_status true হলে button hide
           const offerLimitReached = plan.offer_count > 3;
           const alreadyOffered = plan.offered_status === true;
           const hideOfferButton = offerLimitReached || alreadyOffered;
@@ -299,7 +298,7 @@ const AdminHome = () => {
                       <div className="flex flex-row justify-center items-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
                         <button
                           onClick={() => openPopup(plan, "view")}
-                          className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                          className="px-4 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md transition-colors"
                         >
                           {t("view")}
                         </button>
@@ -500,7 +499,7 @@ const AdminHome = () => {
                       .map((location, index) => (
                         <span
                           key={index}
-                          className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                          className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                         >
                           {location.trim()}
                           {index <
@@ -542,13 +541,13 @@ const AdminHome = () => {
                 placeholder={t("enter_your_budget")}
                 value={offerBudget}
                 onChange={(e) => setOfferBudget(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
               />
               <textarea
                 placeholder={t("enter_your_comment")}
                 value={offerComment}
                 onChange={(e) => setOfferComment(e.target.value)}
-                className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                 rows="4"
               />
               <div className="mt-4">
@@ -558,7 +557,7 @@ const AdminHome = () => {
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                 />
                 {selectedFile && (
                   <p className="text-xs text-gray-600 mt-1">
@@ -573,7 +572,7 @@ const AdminHome = () => {
                     name="applyDiscount"
                     checked={offerForm.applyDiscount}
                     onChange={handleOfferChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-[#DD9E2C] focus:ring-[#DD9E2C] border-gray-300 rounded"
                   />
                   <span className="ml-2 lg:text-md text-gray-700">
                     {t("apply_additional_discount")}
@@ -596,7 +595,7 @@ const AdminHome = () => {
                   value={offerForm.discount}
                   onChange={handleOfferChange}
                   placeholder={t("enter_discount_percentage")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] transition"
                   disabled={!offerForm.applyDiscount}
                 />
               </div>
@@ -607,7 +606,7 @@ const AdminHome = () => {
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                 }`}
                 disabled={
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
@@ -676,7 +675,7 @@ const AdminHome = () => {
                     placeholder={t("search_by_tour_location")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
+                    className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
                   />
                   <svg
                     className="absolute right-2 sm:right-3 lg:right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 text-gray-400"
@@ -696,7 +695,7 @@ const AdminHome = () => {
                 <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm lg:text-base text-gray-700"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] text-xs sm:text-sm lg:text-base text-gray-700"
                 >
                   <option value="All">{t("all")}</option>
                   <option value="Offered">{t("offered")}</option>

@@ -101,7 +101,7 @@ export default function AdminAcceptPlan() {
                         [tour.id]: !isExpanded,
                       }))
                     }
-                    className="text-blue-500 text-sm mb-3 hover:underline"
+                    className="text-[#DD9E2C] text-sm mb-3 hover:underline"
                   >
                     {isExpanded ? t("see_less") : t("see_more")}
                   </button>
@@ -110,7 +110,7 @@ export default function AdminAcceptPlan() {
                 <div className="mt-auto">
                   <button
                     onClick={() => openModal(tour.tour_plan.id)}
-                    className="py-[5px] px-5 border-2 border-gray-400 text-blue-500 font-medium rounded-md hover:bg-blue-50 transition-colors text-[14px]"
+                    className="py-[5px] px-5 border-2 border-gray-400 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-medium rounded-md hover:bg-blue-50 transition-colors text-[14px]"
                   >
                     {t("view")}
                   </button>

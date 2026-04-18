@@ -188,7 +188,7 @@ function AdminDecline() {
                     .map((location, index) => (
                       <span
                         key={index}
-                        className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                        className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                       >
                         {location.trim()}
                         {index <

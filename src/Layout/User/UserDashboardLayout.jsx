@@ -325,7 +325,7 @@ export default function UserDashboardLayout() {
                 </div>
                 {profileData?.is_verified && (
                   <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                    <MdVerified className="w-5 h-5 z-20 text-blue-600" />
+                    <MdVerified className="w-5 h-5 z-20 text-[#C2851C]" />
                   </div>
                 )}
               </div>
@@ -434,7 +434,7 @@ export default function UserDashboardLayout() {
               </div>
               {profileData?.is_verified && (
                 <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                  <MdVerified className="w-5 h-5 z-20 text-blue-600" />
+                  <MdVerified className="w-5 h-5 z-20 text-[#C2851C]" />
                 </div>
               )}
             </div>
@@ -727,7 +727,7 @@ export default function UserDashboardLayout() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-2 rounded-md disabled:bg-blue-400"
+                  className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white py-2 rounded-md disabled:bg-blue-400"
                   disabled={isChangePasswordLoading}
                 >
                   {isChangePasswordLoading ? t("processing") : t("confirm")}

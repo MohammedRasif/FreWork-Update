@@ -90,7 +90,7 @@ const AdminMessages = () => {
                 <div className="relative">
                   <span className="font-medium text-[15px]">{user.name}</span>
                   {user.number && (
-                    <h1 className="absolute top-1 left-[28vh] text-[12px] bg-[#0B7EBB] text-white px-[5px] rounded-full">
+                    <h1 className="absolute top-1 left-[28vh] text-[12px] bg-[#C2851C] text-white px-[5px] rounded-full">
                       {user.number}
                     </h1>
                   )}

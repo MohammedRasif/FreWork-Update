@@ -180,7 +180,7 @@ const AdminProfileEdit = () => {
               {...register("agencyName", { required: t("agency_name_required") })}
               type="text"
               placeholder={t("enter_here")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.agencyName && (
               <span className="text-red-500 text-sm">
@@ -202,7 +202,7 @@ const AdminProfileEdit = () => {
               })}
               type="text"
               placeholder={t("enter_11_digit_vat")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.vatNumber && (
               <span className="text-red-500 text-sm">{errors.vatNumber.message}</span>
@@ -222,7 +222,7 @@ const AdminProfileEdit = () => {
               })}
               type="email"
               placeholder="user@mail.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.email && (
               <span className="text-red-500 text-sm">{errors.email.message}</span>
@@ -242,7 +242,7 @@ const AdminProfileEdit = () => {
               })}
               type="tel"
               placeholder={t("phone_example")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.phoneNumber && (
               <span className="text-red-500 text-sm">{errors.phoneNumber.message}</span>
@@ -316,7 +316,7 @@ const AdminProfileEdit = () => {
             })}
             placeholder={t("enter_short_description")}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C] resize-none"
           />
           {errors.description && (
             <span className="text-red-500 text-sm">{errors.description.message}</span>
@@ -337,7 +337,7 @@ const AdminProfileEdit = () => {
                   validate: (value) =>
                     value.length > 0 || t("select_at_least_one_category"),
                 })}
-                className="h-4 w-4 text-blue-600"
+                className="h-4 w-4 text-[#DD9E2C]"
               />
               {category}
             </label>
@@ -353,7 +353,7 @@ const AdminProfileEdit = () => {
             {...register("terms", {
               required: t("accept_terms_required"),
             })}
-            className="h-4 w-4 text-blue-600"
+            className="h-4 w-4 text-[#DD9E2C]"
           />
           <span className="ml-2 text-base text-gray-700">
             {t("accept_terms_privacy")}
@@ -373,7 +373,7 @@ const AdminProfileEdit = () => {
           <button
             type="submit"
             disabled={isLoading || !!logoSizeError || !!coverSizeError}
-            className={`px-6 py-2 bg-[#3776E2] font-medium text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 ${
+            className={`px-6 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer font-medium text-white rounded-md  focus:ring-2 focus:ring-[#DD9E2C] ${
               isLoading || logoSizeError || coverSizeError
                 ? "opacity-50 cursor-not-allowed"
                 : ""

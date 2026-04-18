@@ -413,7 +413,7 @@ function PublishedPlan() {
                           plan.tourist_spots.split(",").map((spot, index) => (
                             <span
                               key={index}
-                              className="text-xs sm:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                              className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                             >
                               {spot.trim()}
                               {index <
@@ -493,7 +493,7 @@ function PublishedPlan() {
                                           onClick={() =>
                                             toggleOfferMessage(offer.id)
                                           }
-                                          className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
+                                          className="text-[#DD9E2C] hover:underline text-xs sm:text-sm ml-1"
                                         >
                                           {t("see_more")}
                                         </button>
@@ -504,7 +504,7 @@ function PublishedPlan() {
                                           onClick={() =>
                                             toggleOfferMessage(offer.id)
                                           }
-                                          className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
+                                          className="text-[#DD9E2C] hover:underline text-xs sm:text-sm ml-1"
                                         >
                                           {t("show_less")}
                                         </button>
@@ -512,7 +512,7 @@ function PublishedPlan() {
                                   </span>
                                   {offer.verified && (
                                     <div className="flex space-x-1">
-                                      <span className="text-blue-500">
+                                      <span className="text-[#DD9E2C]">
                                         <MdVerified size={20} />
                                       </span>
                                       <span className="text-green-500">
@@ -540,7 +540,7 @@ function PublishedPlan() {
                               <Link to={`/user/chat/${offer.room_id}`}>
                               <button
                                 
-                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white text-xs sm:text-md rounded-md  transition-colors cursor-pointer"
                               >
                                 {t("response")}
                               </button>
@@ -644,7 +644,7 @@ function PublishedPlan() {
                             .map((location, index) => (
                               <span
                                 key={index}
-                                className="text-xs sm:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                               >
                                 {location.trim()}
                                 {index <
@@ -672,7 +672,7 @@ function PublishedPlan() {
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-[#DD9E2C] rounded-full flex items-center justify-center mr-1">
                             <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 text-white fill-current" />
                           </div>
                           <div className="w-4 h-4 sm:w-5 sm:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
@@ -697,9 +697,9 @@ function PublishedPlan() {
                           disabled={isInteractLoading}
                           className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isLiked[selectedTour.id]
-                              ? "text-blue-600"
+                              ? "text-[#DD9E2C]"
                               : "text-gray-600"
-                          } hover:text-blue-600 transition-colors`}
+                          } hover:text-[#DD9E2C] cursor-pointer transition-colors`}
                         >
                           <ThumbsUp
                             className={`w-3 h-3 sm:w-4 sm:h-4 ${
@@ -712,7 +712,7 @@ function PublishedPlan() {
                         </button>
                         <button
                           onClick={() => openPopup(selectedTour)}
-                          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-[#C2851C] transition-colors"
                         >
                           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>{t("comments")}</span>
@@ -722,9 +722,9 @@ function PublishedPlan() {
                           disabled={isInteractLoading}
                           className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
                             isShared[selectedTour.id]
-                              ? "text-blue-600"
+                              ? "text-[#DD9E2C]"
                               : "text-gray-600"
-                          } hover:text-blue-600 transition-colors`}
+                          } hover:text-[#C2851C] cursor-pointer transition-colors`}
                         >
                           <Share2
                             className={`w-3 h-3 sm:w-4 sm:h-4 ${
@@ -758,13 +758,13 @@ function PublishedPlan() {
                             placeholder={t("enter_your_budget")}
                             value={offerBudget}
                             onChange={(e) => setOfferBudget(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                           />
                           <textarea
                             placeholder={t("enter_your_comment")}
                             value={offerComment}
                             onChange={(e) => setOfferComment(e.target.value)}
-                            className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                             rows="4"
                           />
                           <button
@@ -777,7 +777,7 @@ function PublishedPlan() {
                             }
                             className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-2 sm:gap-3 justify-center ${
                               offerBudget && offerComment.trim()
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                ? "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                             }`}
                             disabled={!offerBudget || !offerComment.trim()}
@@ -821,7 +821,7 @@ function PublishedPlan() {
                                             onClick={() =>
                                               toggleOfferMessage(offer.id)
                                             }
-                                            className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
+                                            className="text-[#DD9E2C] hover:underline text-xs sm:text-sm ml-1"
                                           >
                                             {t("see_more")}
                                           </button>
@@ -832,7 +832,7 @@ function PublishedPlan() {
                                             onClick={() =>
                                               toggleOfferMessage(offer.id)
                                             }
-                                            className="text-blue-600 hover:underline text-xs sm:text-sm ml-1"
+                                            className="text-[#DD9E2C] hover:underline text-xs sm:text-sm ml-1"
                                           >
                                             {t("show_less")}
                                           </button>
@@ -840,7 +840,7 @@ function PublishedPlan() {
                                     </span>
                                     {offer.verified && (
                                       <div className="flex space-x-1">
-                                        <span className="text-blue-500">
+                                        <span className="text-[#DD9E2C]">
                                           <MdVerified size={20} />
                                         </span>
                                         <span className="text-green-500">
@@ -864,7 +864,7 @@ function PublishedPlan() {
                                       selectedTour.user
                                     )
                                   }
-                                  className="px-3 sm:px-5 py-1.5 sm:py-2 bg-[#3776E2] text-white text-xs sm:text-md rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                                  className="px-3 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white text-xs sm:text-md rounded-md  transition-colors cursor-pointer"
                                 >
                                   {t("response")}
                                 </button>
@@ -938,7 +938,7 @@ function PublishedPlan() {
                           </span>
                           <button
                             onClick={handleReviewsClick}
-                            className="text-xs sm:text-sm text-blue-600 hover:underline cursor-pointer"
+                            className="text-xs sm:text-sm text-[#DD9E2C] hover:underline cursor-pointer"
                           >
                             {t("reviews")}
                           </button>
@@ -960,7 +960,7 @@ function PublishedPlan() {
 
                 <div className="mb-2">
                   <h1 className="flex items-center">
-                    <Mail className="w-4 h-4 text-blue-600 mr-1" />{" "}
+                    <Mail className="w-4 h-4 text-[#DD9E2C] mr-1" />{" "}
                     {showResponseData?.contact_email}
                   </h1>
                   <h1 className="flex items-center">
@@ -985,9 +985,9 @@ function PublishedPlan() {
                         ).map((item, i) => (
                           <span
                             key={i}
-                            className="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
+                            className="bg-blue-100 text-[#DD9E2C] px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
                           >
-                            <FaCheckCircle className="w-3 h-3 text-blue-500" />
+                            <FaCheckCircle className="w-3 h-3 text-[#DD9E2C]" />
                             {item}
                           </span>
                         ))}

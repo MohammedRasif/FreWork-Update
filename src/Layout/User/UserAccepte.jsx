@@ -119,7 +119,7 @@ const UserAccepte = () => {
             onClick={() => setActiveTab("upcoming")}
             className={`text-base sm:text-lg font-medium pb-2 transition-colors cursor-pointer ${
               activeTab === "upcoming"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-[#C2851C] border-b-2 border-[#C2851C]"
                 : "text-gray-500 border-transparent hover:text-gray-700"
             }`}
           >
@@ -129,7 +129,7 @@ const UserAccepte = () => {
             onClick={() => setActiveTab("completed")}
             className={`text-base sm:text-lg font-medium pb-2 transition-colors cursor-pointer ${
               activeTab === "completed"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-[#C2851C] border-b-2 border-[#C2851C]"
                 : "text-gray-500 border-transparent hover:text-gray-700"
             }`}
           >
@@ -144,7 +144,7 @@ const UserAccepte = () => {
               placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64 text-sm text-gray-700 bg-white"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent w-full sm:w-64 text-sm text-gray-700 bg-white"
             />
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
@@ -153,7 +153,7 @@ const UserAccepte = () => {
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-44 text-sm text-gray-700 bg-white"
+              className="pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent w-full sm:w-44 text-sm text-gray-700 bg-white"
             />
           </div>
         </div>
@@ -200,7 +200,7 @@ const UserAccepte = () => {
                             })}
                           </h2>
                           {offer.tour_plan.is_completed === false && (
-                            <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                            <span className="bg-blue-100 text-[#C2851C] px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
                               <FaCheckCircle className="w-4 h-4 rounded-full" />
                               {t("offer_accepted")}
                             </span>
@@ -229,7 +229,7 @@ const UserAccepte = () => {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-8 mt-auto">
                         <div>
                           <div className="flex items-center gap-2">
-                            <FaCheckCircle className="w-4 h-4 text-blue-600 rounded-full" />
+                            <FaCheckCircle className="w-4 h-4 text-[#C2851C] rounded-full" />
                             <span className="text-xs sm:text-sm font-medium">
                               {t("starting_date")}:
                             </span>
@@ -238,7 +238,7 @@ const UserAccepte = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <FaCheckCircle className="w-4 h-4 text-blue-600 rounded-full" />
+                            <FaCheckCircle className="w-4 h-4 text-[#C2851C] rounded-full" />
                             <span className="text-xs sm:text-sm font-medium">
                               {t("ending_date")}:
                             </span>
@@ -334,7 +334,7 @@ const UserAccepte = () => {
                         setSelectedOffer(offer);
                         setIsReviewModalOpen(true);
                       }}
-                      className="px-4 border border-blue-600 text-blue-600 py-2 rounded-md font-medium hover:bg-blue-50 transition-colors w-full sm:w-auto"
+                      className="px-4 border border-[#C2851C] text-[#C2851C] py-2 rounded-md font-medium hover:bg-blue-50 transition-colors w-full sm:w-auto"
                     >
                       {t("give_review")}
                     </button>
@@ -400,14 +400,14 @@ const UserAccepte = () => {
                 placeholder={t("enter_here")}
                 value={reviewMessage}
                 onChange={(e) => setReviewMessage(e.target.value)}
-                className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full h-24 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] resize-none"
               />
             </div>
 
             <button
               onClick={handleReviewSubmit}
               disabled={isReviewLoading}
-              className={`w-full bg-[#3776E2] text-white py-2 rounded-md font-medium hover:bg-blue-700 transition-colors hover:cursor-pointer ${
+              className={`w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white py-2 rounded-md font-medium transition-colors hover:cursor-pointer ${
                 isReviewLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

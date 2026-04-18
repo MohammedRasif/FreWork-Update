@@ -189,7 +189,7 @@ const AdminNotification = () => {
                       e.stopPropagation();
                       handleViewClick(item);
                     }}
-                    className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
+                    className="text-[#DD9E2C] hover:text-[#C2851C] p-1 rounded-full hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
                     title={t("view_notification")}
                   >
                     <IoEyeOutline size={20} />

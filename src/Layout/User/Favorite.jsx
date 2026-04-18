@@ -35,7 +35,7 @@ const Favorite = () => {
             <input
               type="text"
               placeholder={t("search_by_agency_name")}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 text-sm bg-white"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent w-64 text-sm bg-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -77,7 +77,7 @@ const Favorite = () => {
                           {agency.agency_name}
                         </h2>
                         {agency.is_verified && (
-                          <VscVerifiedFilled className="text-blue-600 text-2xl" />
+                          <VscVerifiedFilled className="text-[#DD9E2C] text-2xl" />
                         )}
                       </div>
                     </div>

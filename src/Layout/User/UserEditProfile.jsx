@@ -171,7 +171,7 @@ function UserEditProfile() {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
               placeholder={t("enter_here")}
             />
           </div>
@@ -186,7 +186,7 @@ function UserEditProfile() {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
               placeholder={t("enter_here")}
             />
           </div>
@@ -201,7 +201,7 @@ function UserEditProfile() {
               name="phonePersonal"
               value={formData.phonePersonal}
               onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
               placeholder={t("enter_here")}
             />
           </div>
@@ -216,7 +216,7 @@ function UserEditProfile() {
               name="describeYourself"
               value={formData.describeYourself}
               onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
               placeholder={t("enter_here")}
             />
           </div>
@@ -233,7 +233,7 @@ function UserEditProfile() {
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   placeholder={t("enter_here")}
                 />
               </div>
@@ -246,7 +246,7 @@ function UserEditProfile() {
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   placeholder={t("enter_here")}
                 />
               </div>
@@ -263,7 +263,7 @@ function UserEditProfile() {
               name="language"
               value={formData.language}
               onChange={handleChange}
-              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
               placeholder={t("enter_here")}
             />
           </div>
@@ -309,7 +309,7 @@ function UserEditProfile() {
                 name="houseNo"
                 value={formData.houseNo}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -322,7 +322,7 @@ function UserEditProfile() {
                 name="roadNo"
                 value={formData.roadNo}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -335,7 +335,7 @@ function UserEditProfile() {
                 name="townCity"
                 value={formData.townCity}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -348,7 +348,7 @@ function UserEditProfile() {
                 name="postalCode"
                 value={formData.postalCode}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -361,7 +361,7 @@ function UserEditProfile() {
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -374,7 +374,7 @@ function UserEditProfile() {
                 name="phoneHome"
                 value={formData.phoneHome}
                 onChange={handleChange}
-                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded bg-white text-sm sm:text-base lg:text-base focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 placeholder={t("enter_here")}
               />
             </div>
@@ -389,7 +389,7 @@ function UserEditProfile() {
             className={`w-full sm:w-auto lg:w-auto font-medium py-2 px-6 sm:px-8 lg:px-8 rounded-md transition-colors text-sm sm:text-base lg:text-base ${
               updateLoading || pictureError
                 ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white"
             }`}
           >
             {updateLoading ? t("saving") : t("save_changes")}

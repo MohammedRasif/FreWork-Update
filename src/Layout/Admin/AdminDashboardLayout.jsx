@@ -297,7 +297,7 @@ export default function AdminDashboardLayout() {
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
                             isActive || selectedItem === item.name
-                              ? "bg-[#3776E2] text-white font-semibold"
+                              ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
                               : ""
                           }`
                         }
@@ -400,7 +400,7 @@ export default function AdminDashboardLayout() {
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
                             isActive || selectedItem === item.name
-                              ? "bg-[#3776E2] text-white font-semibold"
+                              ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
                               : ""
                           }`
                         }
@@ -588,7 +588,7 @@ export default function AdminDashboardLayout() {
                       className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
                     />
                   </div>
-                  <button className="w-full bg-blue-600 text-white py-2 rounded-md">
+                  <button className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white py-2 rounded-md">
                     {t("confirm")}
                   </button>
                 </div>

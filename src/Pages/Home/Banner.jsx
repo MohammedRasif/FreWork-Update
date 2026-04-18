@@ -100,40 +100,40 @@ const Banner = () => {
           </div>
 
           {/* Right Side: Floating Form Card */}
-          <div className="flex justify-center lg:justify-end lg:mt-40">
-            <div className="bg-black/10 backdrop-blur-[10px] border border-white/20 p-6 rounded-[14px] w-full max-w-[460px] shadow-2xl">
-              <div className="space-y-4">
-                <div className="relative">
-                  <input
-                    disabled
-                    type="text"
-                    placeholder={t("input_placeholder", "Where do you want to go?")}
-                    className="w-full py-2.5 px-6 rounded-[7px] bg-white/95 text-gray-800 placeholder-gray-500 focus:outline-none text-[15px]"
-                  />
-                </div>
+          {showCreateRequestButton && (
+  <div className="flex justify-center lg:justify-end lg:mt-40">
+    <div className="bg-black/10 backdrop-blur-[10px] border border-white/20 p-6 rounded-[14px] w-full max-w-[460px] shadow-2xl">
+      <div className="space-y-4">
+        <div className="relative">
+          <input
+            disabled
+            type="text"
+            placeholder={t("input_placeholder", "Where do you want to go?")}
+            className="w-full py-2.5 px-6 rounded-[7px] bg-white/95 text-gray-800 placeholder-gray-500 focus:outline-none text-[15px]"
+          />
+        </div>
 
-                {showCreateRequestButton && (
-                  <button
-                    onClick={handleButtonClick}
-                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all cursor-pointer text-white lg:text-[18px] text-[16px] font-bold py-2.5 rounded-[7px] shadow-lg active:scale-[0.98]"
-                  >
-                    {t("create_request")}
-                  </button>
-                )}
+        <button
+          onClick={handleButtonClick}
+          className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all cursor-pointer text-white lg:text-[18px] text-[16px] font-bold py-2.5 rounded-[7px] shadow-lg active:scale-[0.98]"
+        >
+          {t("create_request")}
+        </button>
 
-                <div className="flex justify-between items-center text-[10px] md:text-[12px] text-white/90 px-1 font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full shadow-sm"></div>
-                    <span>{t("time_info", "Takes less than 2 minutes")}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <FaLock size={10} />
-                    <span>{t("privacy_info", "No calls without your consent")}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="flex justify-between items-center text-[10px] md:text-[12px] text-white/90 px-1 font-medium">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 bg-white rounded-full shadow-sm"></div>
+            <span>{t("time_info", "Takes less than 2 minutes")}</span>
           </div>
+          <div className="flex items-center gap-1.5">
+            <FaLock size={10} />
+            <span>{t("privacy_info", "No calls without your consent")}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
         </div>
       </div>
 

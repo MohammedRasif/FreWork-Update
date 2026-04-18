@@ -230,7 +230,7 @@ function AdminOfferPlan() {
                                 {offer.agency.agency_name}
                               </span>
                               {offer.agency.is_verified && (
-                                <span className="text-blue-500">
+                                <span className="text-[#DD9E2C]">
                                   <MdVerified
                                     size={16}
                                     className="sm:w-5 sm:h-5 lg:w-6 lg:h-6"
@@ -246,7 +246,7 @@ function AdminOfferPlan() {
                           </span>
                           <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                             <NavLink to={`/admin/chat/${offer?.room_id}`}>
-                              <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-blue-500 text-white text-sm sm:text-[17px] rounded-md hover:bg-blue-600 hover:cursor-pointer transition-colors w-full sm:w-auto">
+                              <button className="px-3 sm:px-5 py-2 sm:py-[5px] font-semibold bg-[#DD9E2C] text-white text-sm sm:text-[17px] rounded-md hover:bg-[#C2851C] hover:cursor-pointer transition-colors w-full sm:w-auto">
                                 {t("start_conversation")}
                               </button>
                             </NavLink>
