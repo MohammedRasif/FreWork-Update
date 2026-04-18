@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import img from "../../assets/img/background.png";
-import img1 from "../../assets/img/removebg1.png";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BannerSectionPopup from "./BannerSectionPupup";
 import { useTranslation } from "react-i18next";
+import { FaCheckCircle, FaClock, FaLock } from "react-icons/fa"; // Using react-icons for the UI
 
 const Banner = () => {
   const { t } = useTranslation();
@@ -20,12 +20,8 @@ const Banner = () => {
     if (fromLogin && accessToken && pendingPlan) {
       return 5;
     }
-
     if (!pendingPlan) return 1;
     const {
-      name,
-      email,
-      phoneNumber,
       locationFrom,
       locationTo,
       startingDate,
@@ -34,36 +30,22 @@ const Banner = () => {
       children,
       budget,
       touristSpots,
-      description,
       typeOfAccommodation,
       minimumHotelStars,
       mealPlan,
       travelType,
       destinationType,
+      name,
+      email,
+      phoneNumber,
       confirmation,
     } = pendingPlan;
 
-    if (
-      !locationFrom ||
-      !locationTo ||
-      !startingDate ||
-      !endingDate ||
-      (!adults && !children)
-    ) {
-      return 1;
-    }
-    if (!budget || !touristSpots) {
-      return 2;
-    }
-    if (!typeOfAccommodation || !minimumHotelStars || !mealPlan) {
-      return 3;
-    }
-    if (!travelType || !destinationType) {
-      return 4;
-    }
-    if (!name || !email || !phoneNumber || !confirmation) {
-      return 5;
-    }
+    if (!locationFrom || !locationTo || !startingDate || !endingDate || (!adults && !children)) return 1;
+    if (!budget || !touristSpots) return 2;
+    if (!typeOfAccommodation || !minimumHotelStars || !mealPlan) return 3;
+    if (!travelType || !destinationType) return 4;
+    if (!name || !email || !phoneNumber || !confirmation) return 5;
     return 5;
   };
 
@@ -83,69 +65,112 @@ const Banner = () => {
   };
 
   return (
-    <div className="relative w-full h-auto pb-3 md:h-[120vh] lg:h-screen overflow-hidden">
+    <div className="relative w-full min-h-screen lg:h-screen overflow-hidden flex items-center">
+      {/* Background Image & Overlay */}
       <div className="absolute inset-0">
-  <img
-    src={img}
-    alt="Background"
-    className="object-cover w-full h-full"
-  />
-  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-</div>
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center lg:mt-0 mt-8">
-        {/* <img
-          src={img1}
-          alt="Logo"
-          className="w-[220px] md:w-[500px] lg:w-[600px] lg:mt-3 mt-1 md:mt-16"
-        />
-        <h1 className="lg:text-4xl text-[16px] font-semibold text-blue-950 lg:pb-5 pb-2">
-          {t("banner_tagline")}
-        </h1> */}
-
-        <p
-          className="text-[24px] md:text-[40px] lg:text-[48px] pb-2 font-bold 
-          leading-[32px] md:leading-[55px] lg:leading-[65px] 
-          whitespace-pre-line
-          text-white drop-shadow-sm lg:max-w-[40%]"
-        >
-          {t("banner_slogan")}
-        </p>
-
-        <p className=" lg:text-2xl text-[15px] lg:pt-14">
-          {t("show_short_description")}
-        </p>
-        {/* <h1 className="lg:text-4xl pb-3 text-white text-[16px] font-semibold lg:pb-10 lg:pt-4 pt-3 ">
-          {t("banner_tagline")}
-        </h1> */}
-        {showCreateRequestButton && (
-         <button
-            onClick={handleButtonClick}
-            className=" mt-2 md:mt-5 bg-[#FF6600] hover:bg-[#e55600] text-white text-[18px] md:text-[24px] font-medium py-[10px] md:py-[12px] px-[48px] md:px-[36px] rounded-full  max-w-[80%] md:w-[300px] lg:w-[300px] mx-auto"
-          >
-            {t("create_request")}
-          </button>
-        )}
-
-       
+        <img src={img} alt="Background" className="object-cover w-full h-full" />
+        <div className="absolute inset-0 bg-black/30 lg:bg-transparent lg:bg-gradient-to-r lg:from-black/60 lg:to-transparent" />
       </div>
 
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 lg:py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Side: Content */}
+          <div className="text-white space-y-6">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-sm">
+              <FaClock className="text-blue-300" />
+              <span>{t("response_time_text", "Response within 24 to 48 hours")}</span>
+            </div>
+
+            {/* Slogan */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+              {t("banner_slogan")}
+            </h1>
+
+            {/* Description */}
+            <p className="text-lg md:text-xl opacity-90 max-w-lg">
+              {t("show_short_description")}
+            </p>
+
+            {/* Features Checklist */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <div className="flex items-center gap-2">
+                <FaCheckCircle className="text-green-400" />
+                <span>{t("feature_drivers", "Professional drivers")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaCheckCircle className="text-green-400" />
+                <span>{t("feature_booking", "Flexible booking")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaCheckCircle className="text-green-400" />
+                <span>{t("feature_pricing", "Transparent pricing")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaCheckCircle className="text-green-400" />
+                <span>{t("feature_vehicles", "Comfortable vehicles")}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side: Form Action */}
+          <div className="flex justify-center lg:justify-end">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl w-full max-w-md shadow-2xl">
+              <div className="space-y-4">
+                <div className="relative">
+                  <input
+                    disabled
+                    type="text"
+                    placeholder={t("input_placeholder", "Where do you want to go?")}
+                    className="w-full py-4 px-6 rounded-xl bg-white text-gray-800 placeholder-gray-500 focus:outline-none"
+                  />
+                </div>
+
+                {showCreateRequestButton && (
+                  <button
+                    onClick={handleButtonClick}
+                    className="w-full bg-[#D4952B] hover:bg-[#b88124] transition-colors text-white text-xl font-semibold py-4 rounded-xl shadow-lg"
+                  >
+                    {t("create_request")}
+                  </button>
+                )}
+
+                <div className="flex justify-between items-center text-xs text-white/80 px-2">
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    <span>{t("time_info", "Takes less than 2 minutes")}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <FaLock size={10} />
+                    <span>{t("privacy_info", "No calls without your consent")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Popup Logic - Same as before */}
       {isPopupOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
         >
           <motion.div
-            initial={{ scale: 0.7 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.7 }}
-            className="p-6 rounded-lg  max-w-xl w-full mx-4"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="p-4 sm:p-6 rounded-2xl max-w-xl w-full mx-4"
           >
             <BannerSectionPopup
               closeForm={closePopup}
               initialStep={getInitialStep(
-                JSON.parse(localStorage.getItem("pendingPlan") || "{}"),
+                JSON.parse(localStorage.getItem("pendingPlan") || "{}")
               )}
             />
           </motion.div>
