@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import img from "../../assets/img/background.png";
-import img2 from "../../assets/img/mobileDeviceBackground.png"; // মোবাইল ব্যাকগ্রাউন্ড
+import img2 from "../../assets/img/mobileDeviceBackground.png"; 
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BannerSectionPopup from "./BannerSectionPupup";
 import { useTranslation } from "react-i18next";
 import { FaCheckCircle, FaLock } from "react-icons/fa";
-import { LuClock3 } from "react-icons/lu"; // ছবির মতো আইকনের জন্য
+import { LuClock3 } from "react-icons/lu"; 
 
 const Banner = () => {
   const { t } = useTranslation();
@@ -51,7 +51,7 @@ const Banner = () => {
       {/* Background Handler: Mobile and Desktop */}
       <div className="absolute inset-0">
         <picture>
-          <source media="(max-width: 768px)" srcSet={img2} />
+          <source media="(max-width: 700px)" srcSet={img2} />
           <img 
             src={img} 
             alt="Background" 
@@ -62,7 +62,7 @@ const Banner = () => {
         <div className="absolute inset-0 bg-black/20 lg:bg-gradient-to-r lg:from-black/50 lg:via-transparent lg:to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full container mx-auto px-6 pt-16 pb-10 lg:py-0">
+      <div className="relative z-10 w-full container mx-auto px-6 pt-7 pb-10 lg:py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           
           {/* Left Side: Text Content */}
@@ -74,12 +74,12 @@ const Banner = () => {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-[34px] md:text-5xl lg:text-[56px] font-bold leading-[1.1] dm_serif">
+            <h1 className="text-[28px] md:text-5xl lg:text-[56px] font-bold leading-[1.1] dm_serif">
               {t("banner_slogan")}
             </h1>
 
             {/* Sub-description */}
-            <p className="text-lg md:text-xl font-medium opacity-95 max-w-md">
+            <p className="text-[17px] md:text-xl font-medium opacity-95 max-w-md">
               {t("show_short_descriptionn", "Compare verified agencies and choose without wasting time.")}
             </p>
 
@@ -92,8 +92,8 @@ const Banner = () => {
                 { key: "feature_vehicles", label: "Comfortable vehicles" }
               ].map((item) => (
                 <div key={item.key} className="flex items-center gap-3">
-                  <FaCheckCircle size={22} className="text-white bg-green-600 rounded-full border-2 border-white" />
-                  <span className="text-[16px] md:text-[18px] font-medium">{t(item.key, item.label)}</span>
+                  <FaCheckCircle size={18} className="text-white bg-green-600 rounded-full border-2 border-white" />
+                  <span className="text-[15px] md:text-[18px] font-medium">{t(item.key, item.label)}</span>
                 </div>
               ))}
             </div>
@@ -115,7 +115,7 @@ const Banner = () => {
                 {showCreateRequestButton && (
                   <button
                     onClick={handleButtonClick}
-                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all cursor-pointer text-white text-[18px] font-bold py-2.5 rounded-[7px] shadow-lg active:scale-[0.98]"
+                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all cursor-pointer text-white lg:text-[18px] text-[16px] font-bold py-2.5 rounded-[7px] shadow-lg active:scale-[0.98]"
                   >
                     {t("create_request")}
                   </button>
@@ -134,7 +134,6 @@ const Banner = () => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
