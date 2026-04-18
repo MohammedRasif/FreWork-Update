@@ -205,7 +205,7 @@ const Contact = () => {
             <div className="flex justify-center pt-3 sm:pt-4">
               <button
                 type="submit"
-                className="px-8 sm:px-12 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent text-sm sm:text-base"
+                className="px-8 sm:px-12 py-2 sm:py-3 bg-[#DD9E2C] hover:bg-[#C2851C] cursor-pointer text-white font-semibold rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent text-sm sm:text-base"
               >
                 {t("submit")}
               </button>

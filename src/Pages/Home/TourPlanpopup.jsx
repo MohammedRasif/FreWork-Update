@@ -116,7 +116,7 @@ const TourPlanPopup = ({
                   onChange={handleOfferChange}
                   placeholder={t("enter_budget_placeholder")}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]  focus:border-b[#DD9E2C] transition"
                 />
               </div>
 
@@ -135,7 +135,7 @@ const TourPlanPopup = ({
                   rows="4"
                   placeholder={t("enter_message_placeholder")}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-b[#DD9E2C] focus:border-b[#DD9E2C] transition resize-none"
                 />
               </div>
 
@@ -150,7 +150,7 @@ const TourPlanPopup = ({
                   type="file"
                   id="file"
                   onChange={handleFileChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-b[#DD9E2C] focus:border-b[#DD9E2C] transition"
                   accept="image/*,.pdf,.doc,.docx"
                 />
                 {selectedFile && (
@@ -168,7 +168,7 @@ const TourPlanPopup = ({
                     id="applyDiscount"
                     checked={offerForm.applyDiscount}
                     onChange={handleOfferChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-[#DD9E2C] focus:ring-b[#DD9E2C] border-gray-300 rounded"
                   />
                   <span className="ml-2 text-md text-gray-700">
                     {t("apply_additional_discount")}
@@ -193,7 +193,7 @@ const TourPlanPopup = ({
                   value={offerForm.discount}
                   onChange={handleOfferChange}
                   placeholder={t("discount_placeholder")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-b[#DD9E2C] focus:border-b[#DD9E2C] transition"
                   disabled={!offerForm.applyDiscount}
                 />
               </div>
@@ -212,7 +212,7 @@ const TourPlanPopup = ({
                   !offerForm.budget ||
                   !offerForm.comment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    : "bg-[#DD9E2C] hover:bg-[#C2851C]"
                 }`}
               >
                 <IoIosSend size={20} />
@@ -269,7 +269,7 @@ const TourPlanPopup = ({
                           className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
                             isAcceptLoading
                               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-[#3776E2] text-white hover:bg-blue-700"
+                              : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                           }`}
                         >
                           {t("accept")}

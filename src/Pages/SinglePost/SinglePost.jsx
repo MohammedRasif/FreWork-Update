@@ -577,7 +577,7 @@ function SinglePost({ prid }) {
                         ${
                           tour.status === "accepted" || hasMaxOffers
                             ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
+                            : "bg-[#DD9E2C] hover:bg-[#C2851C] text-white hover:cursor-pointer"
                         }
                       `}
                     >
@@ -624,7 +624,7 @@ function SinglePost({ prid }) {
                       onChange={handleOfferChange}
                       placeholder={t("enter_budget_placeholder")}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-#DD9E2C focus:border-#DD9E2C transition"
                     />
                   </div>
 
@@ -643,7 +643,7 @@ function SinglePost({ prid }) {
                       rows="4"
                       placeholder={t("enter_message_placeholder")}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-#DD9E2C focus:border-#DD9E2C transition resize-none"
                     />
                   </div>
 
@@ -658,7 +658,7 @@ function SinglePost({ prid }) {
                       type="file"
                       id="file"
                       onChange={handleFileChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-#DD9E2C focus:border-#DD9E2C transition"
                       accept="image/*,.pdf,.doc,.docx"
                     />
                     {selectedFile && (
@@ -676,7 +676,7 @@ function SinglePost({ prid }) {
                         id="applyDiscount"
                         checked={offerForm.applyDiscount}
                         onChange={handleOfferChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-[#DD9E2C] focus:ring-#DD9E2C border-gray-300 rounded"
                       />
                       <span className="ml-2 text-md text-gray-700">
                         {t("apply_additional_discount")}
@@ -701,7 +701,7 @@ function SinglePost({ prid }) {
                       value={offerForm.discount}
                       onChange={handleOfferChange}
                       placeholder={t("discount_placeholder")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-#DD9E2C focus:border-#DD9E2C transition"
                       disabled={!offerForm.applyDiscount}
                     />
                   </div>
@@ -718,7 +718,7 @@ function SinglePost({ prid }) {
                       !offerForm.budget ||
                       !offerForm.comment.trim()
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
+                        : "bg-[#DD9E2C] hover:bg-[#C2851C] hover:cursor-pointer"
                     }`}
                   >
                     <IoIosSend size={20} />
@@ -798,7 +798,7 @@ function SinglePost({ prid }) {
                                     isAcceptLoading ||
                                     !offer.agency?.user
                                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                      : "bg-[#3776E2] text-white hover:bg-blue-700 hover:cursor-pointer"
+                                      : "bg-[#DD9E2C] text-white hover:bg-[#C2851C] hover:cursor-pointer"
                                   }`}
                                 >
                                   {isInviteLoading
@@ -813,7 +813,7 @@ function SinglePost({ prid }) {
                                     className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
                                       isAcceptLoading
                                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                        : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                        : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                                     }`}
                                   >
                                     {t("accept")}
@@ -832,7 +832,7 @@ function SinglePost({ prid }) {
                   {tour.offers?.length > 3 && (
                     <button
                       onClick={() => setExpandedOffers(!expandedOffers)}
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-[#DD9E2C] hover:underline text-sm"
                     >
                       {expandedOffers ? t("see_less") : t("see_more")}
                     </button>

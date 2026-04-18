@@ -375,7 +375,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                 {offer?.agency?.is_verified && (
                                   <MdVerified
                                     size={20}
-                                    className="sm:w-5 sm:h-5 text-blue-700"
+                                    className="sm:w-5 sm:h-5 text-[#DD9E2C]"
                                   />
                                 )}
                               </div>
@@ -390,7 +390,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
                             <button
                               onClick={() => handleMessage(offer)}
-                              className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                              className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white rounded-full hover:bg-[#C2851C] transition"
                               disabled={isInviteLoading}
                             >
                               <MessageSquare size={16} /> {t("message")}

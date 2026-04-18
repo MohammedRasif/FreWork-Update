@@ -12,7 +12,7 @@ function PendingForAdmin() {
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
 
         
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3 text-center">
+        <div className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer px-8 py-3 text-center">
          <NavLink to="/">
            <div className='flex items-center justify-center pb-5'>
           <img src={image} className='h-16' alt="" />

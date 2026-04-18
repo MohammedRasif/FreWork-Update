@@ -44,11 +44,11 @@ const CookieBanner = () => {
       </div>
 
       <div className="vmc-cookie-actions">
-        <button className="vmc-btn vmc-btn-outline" onClick={handleReject}>
+        <button className="vmc-btn vmc-btn-outline cursor-pointer" onClick={handleReject}>
           {t("decline")}
         </button>
 
-        <button className="vmc-btn vmc-btn-primary" onClick={handleAccept}>
+        <button className="vmc-btn vmc-btn-primary bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer" onClick={handleAccept}>
           {t("accept_all")}
         </button>
       </div>

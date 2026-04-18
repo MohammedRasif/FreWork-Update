@@ -38,12 +38,12 @@ const SubscriptionSuccess = () => {
                             <div
                                 className={`w-44 h-44 rounded-full border-4 flex items-center justify-center transition-all duration-[2500ms] ${showIcon ? "animate-pulse" : ""
                                     }`}
-                                style={{ borderColor: "#EB5A8E" }}
+                                style={{ borderColor: "#DD9E2C" }}
                             >
                                 {/* Inner Circle */}
                                 <div
                                     className="w-36 h-36 rounded-full flex items-center justify-center relative overflow-hidden"
-                                    style={{ backgroundColor: "#EB5A8E" }}
+                                    style={{ backgroundColor: "#DD9E2C" }}
                                 >
                                     {/* Checkmark Icon */}
                                     <svg
@@ -70,7 +70,7 @@ const SubscriptionSuccess = () => {
                                     <div
                                         className={`absolute inset-0 rounded-full transition-all duration-1000 ${showIcon ? "scale-150 opacity-0" : "scale-100 opacity-30"
                                             }`}
-                                        style={{ backgroundColor: "#EB5A8E" }}
+                                        style={{ backgroundColor: "#DD9E2C" }}
                                     ></div>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@ const SubscriptionSuccess = () => {
                             <div
                                 className={`absolute inset-0 rounded-full blur-xl transition-all duration-[2500ms] ${showIcon ? "scale-150 opacity-20" : "scale-100 opacity-0"
                                     }`}
-                                style={{ backgroundColor: "#EB5A8E" }}
+                                style={{ backgroundColor: "#DD9E2C" }}
                             ></div>
                         </div>
                     </div>
@@ -100,14 +100,14 @@ const SubscriptionSuccess = () => {
                             <button
                                 className="px-8 py-3 text-white font-semibold rounded-full transition-all duration-200 transform hover:scale-105 cursor-pointer"
                                 style={{
-                                    backgroundColor: "#EB5A8E",
+                                    backgroundColor: "#DD9E2C",
                                     boxShadow: "0 4px 15px rgba(235, 90, 142, 0.3)",
                                 }}
                                 onMouseEnter={(e) => {
                                     e.target.style.backgroundColor = "#D14A7C"
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#EB5A8E"
+                                    e.target.style.backgroundColor = "#DD9E2C"
                                 }}
                             >
                                 Continue to Dashboard
@@ -124,7 +124,7 @@ const SubscriptionSuccess = () => {
                             className={`absolute w-2 h-2 rounded-full transition-all duration-[3000ms] ${showIcon ? "animate-float" : "opacity-0"
                                 }`}
                             style={{
-                                backgroundColor: "#EB5A8E",
+                                backgroundColor: "#DD9E2C",
                                 left: `${20 + i * 15}%`,
                                 top: `${30 + (i % 2) * 40}%`,
                                 animationDelay: `${i * 0.5}s`,

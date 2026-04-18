@@ -488,7 +488,7 @@ const TourPlanWithPopup = () => {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                   <div className="w-full sm:w-auto">
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent hover:border-[#DD9E2C] transition-colors"
                       value={filters.category}
                       onChange={(e) =>
                         handleFilterChange("category", e.target.value)
@@ -599,7 +599,7 @@ const TourPlanWithPopup = () => {
                             {isTruncated && !expandedDescriptions[tour.id] && (
                               <button
                                 onClick={() => toggleDescription(tour.id)}
-                                className="text-blue-600 hover:underline text-sm ml-1"
+                                className="text-[#DD9E2C] hover:underline text-sm ml-1"
                               >
                                 See More
                               </button>
@@ -607,7 +607,7 @@ const TourPlanWithPopup = () => {
                             {isTruncated && expandedDescriptions[tour.id] && (
                               <button
                                 onClick={() => toggleDescription(tour.id)}
-                                className="text-blue-600 hover:underline text-sm ml-1"
+                                className="text-[#DD9E2C] hover:underline text-sm ml-1"
                               >
                                 Show Less
                               </button>
@@ -626,7 +626,7 @@ const TourPlanWithPopup = () => {
                                 .map((location, index) => (
                                   <span
                                     key={index}
-                                    className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                    className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                                   >
                                     {location.trim()}
                                     {index <
@@ -656,7 +656,7 @@ const TourPlanWithPopup = () => {
                         <div className="flex items-center justify-between py-3">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center">
-                              <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-[#DD9E2C] rounded-full flex items-center justify-center mr-1">
                                 <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
                               </div>
                               <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
@@ -680,9 +680,9 @@ const TourPlanWithPopup = () => {
                               disabled={isInteractLoading}
                               className={`flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm ${
                                 isLiked[tour.id]
-                                  ? "text-blue-600"
+                                  ? "text-[#DD9E2C]"
                                   : "text-gray-600"
-                              } hover:text-blue-600 transition-colors hover:cursor-pointer`}
+                              } hover:text-[#C2851C] transition-colors hover:cursor-pointer`}
                             >
                               <ThumbsUp
                                 className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
@@ -695,7 +695,7 @@ const TourPlanWithPopup = () => {
                             </button>
                             <button
                               onClick={() => openPopup(tour)}
-                              className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                              className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-[#C2851C] transition-colors"
                             >
                               <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
                               <span>Comments</span>
@@ -707,7 +707,7 @@ const TourPlanWithPopup = () => {
                                 isShared[tour.id]
                                   ? "text-gray-600"
                                   : "text-gray-600"
-                              } hover:text-blue-600 transition-colors`}
+                              } hover:text-[#C2851C] transition-colors`}
                             >
                               <Share2
                                 className={`w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4 ${
@@ -759,7 +759,7 @@ const TourPlanWithPopup = () => {
                                         </span>
                                         {offer.agency.is_verified && (
                                           <div className="flex space-x-1">
-                                            <span className="text-blue-500">
+                                            <span className="text-[#DD9E2C]">
                                               <MdVerified
                                                 size={20}
                                                 className="sm:w-6 sm:h-6"
@@ -778,7 +778,7 @@ const TourPlanWithPopup = () => {
                                               onClick={() =>
                                                 toggleOfferMessage(offer.id)
                                               }
-                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                              className="text-[#DD9E2C] hover:underline text-sm ml-1"
                                             >
                                               See More
                                             </button>
@@ -789,7 +789,7 @@ const TourPlanWithPopup = () => {
                                               onClick={() =>
                                                 toggleOfferMessage(offer.id)
                                               }
-                                              className="text-blue-600 hover:underline text-sm ml-1"
+                                              className="text-[#DD9E2C] hover:underline text-sm ml-1"
                                             >
                                               Show Less
                                             </button>
@@ -821,7 +821,7 @@ const TourPlanWithPopup = () => {
                                             }
                                           }
                                         }}
-                                        className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
+                                        className="flex items-center space-x-2 bg-[#DD9E2C] text-white px-4 py-2 rounded-full hover:bg-[#C2851C] transition-colors w-full sm:w-auto hover:cursor-pointer"
                                         aria-label={`Message ${
                                           offer.agency.agency_name || "Agency"
                                         }`}
@@ -844,7 +844,7 @@ const TourPlanWithPopup = () => {
                                           className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
                                             isAcceptLoading
                                               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                              : "bg-[#3776E2] text-white hover:bg-blue-700"
+                                              : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                                           }`}
                                         >
                                           Accept
@@ -895,7 +895,7 @@ const TourPlanWithPopup = () => {
                   <input
                     type="text"
                     placeholder="search to available plan"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
                       handleFilterChange("search", e.target.value)
@@ -910,7 +910,7 @@ const TourPlanWithPopup = () => {
                     <input
                       type="text"
                       placeholder="Min"
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                       value={filters.min}
                       onChange={(e) =>
                         handleFilterChange("min", e.target.value)
@@ -919,7 +919,7 @@ const TourPlanWithPopup = () => {
                     <input
                       type="text"
                       placeholder="Max"
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                       value={filters.max}
                       onChange={(e) =>
                         handleFilterChange("max", e.target.value)
@@ -932,7 +932,7 @@ const TourPlanWithPopup = () => {
                     Select Country
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-400 transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent hover:border-blue-400 transition-colors"
                     value={filters.country}
                     onChange={(e) =>
                       handleFilterChange("country", e.target.value)
@@ -956,7 +956,7 @@ const TourPlanWithPopup = () => {
                   <input
                     type="text"
                     placeholder="search destination"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
                       handleFilterChange("search", e.target.value)
@@ -1063,7 +1063,7 @@ const TourPlanWithPopup = () => {
                             .map((location, index) => (
                               <span
                                 key={index}
-                                className="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
                               >
                                 {location.trim()}
                                 {index <
@@ -1091,7 +1091,7 @@ const TourPlanWithPopup = () => {
                     <div className="flex items-center justify-between py-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
-                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-blue-500 rounded-full flex items-center justify-center mr-1">
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-[#DD9E2C] rounded-full flex items-center justify-center mr-1">
                             <ThumbsUp className="w-2 h-2 sm:w-3 sm:h-3 lg:w-3 lg:h-3 text-white fill-current" />
                           </div>
                           <div className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 bg-red-500 rounded-full flex items-center justify-center -ml-2">
@@ -1196,7 +1196,7 @@ const TourPlanWithPopup = () => {
                                       </span>
                                       {offer.agency.is_verified && (
                                         <div className="flex space-x-1">
-                                          <span className="text-blue-500">
+                                          <span className="text-[#DD9E2C]">
                                             <MdVerified
                                               size={20}
                                               className="sm:w-6 sm:h-6"
@@ -1326,13 +1326,13 @@ const TourPlanWithPopup = () => {
                             placeholder="Enter your budget"
                             value={offerBudget}
                             onChange={(e) => setOfferBudget(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                           />
                           <textarea
                             placeholder="Enter your comment"
                             value={offerComment}
                             onChange={(e) => setOfferComment(e.target.value)}
-                            className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                             rows="4"
                           />
                           <div className="mt-4">
@@ -1343,7 +1343,7 @@ const TourPlanWithPopup = () => {
                                 id="applyDiscount"
                                 checked={offerForm.applyDiscount}
                                 onChange={handleOfferChange}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                className="h-4 w-4 text-blue-600 focus:ring-[#DD9E2C] border-gray-300 rounded"
                               />
                               <span className="ml-2 lg:text-md text-gray-700">
                                 Apply an additional discount
@@ -1371,7 +1371,7 @@ const TourPlanWithPopup = () => {
                               value={offerForm.discount}
                               onChange={handleOfferChange}
                               placeholder="Enter discount percentage"
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] transition"
                               disabled={!offerForm.applyDiscount}
                             />
                           </div>

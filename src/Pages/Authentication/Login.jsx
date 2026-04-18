@@ -120,7 +120,7 @@ const Login = () => {
                   })}
                   type="email"
                   placeholder={t("email_placeholder")}
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent"
                 />
               </div>
               {errors.email && (
@@ -149,7 +149,7 @@ const Login = () => {
                   })}
                   type="password"
                   placeholder={t("password_placeholder")}
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent"
                 />
               </div>
               {errors.password && (
@@ -163,7 +163,7 @@ const Login = () => {
             <div>
               <h1
                 onClick={() => navigate("/verifica-account")}
-                className="text-blue-500 text-end cursor-pointer hover:underline"
+                className="text-#DD9E2C text-end cursor-pointer hover:underline"
               >
                 {t("forget_password")}
               </h1>
@@ -172,7 +172,7 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mt-6"
+              className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white font-medium py-2.5 px-4 rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-#DD9E2C focus:ring-offset-2 mt-6"
             >
               {t("login")}
             </button>
@@ -182,7 +182,7 @@ const Login = () => {
           <div className="text-center mt-6">
             <NavLink to="/registrazione" className="text-md text-gray-600">
               {t("no_account")}{" "}
-              <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
+              <button className="text-[#DD9E2C] hover:text-[#C2851C] font-medium cursor-pointer">
                 {t("register")}
               </button>
             </NavLink>

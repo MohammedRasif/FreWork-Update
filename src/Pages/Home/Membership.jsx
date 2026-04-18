@@ -221,11 +221,11 @@ const Membership = () => {
               type="text"
               placeholder={t("search_placeholder")}
               onChange={handleSearch}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent text-sm sm:text-base"
               aria-label={t("search_tour_plans")}
             />
             <button
-              className="px-4 sm:px-5 py-2 sm:py-3 bg-[#3776E2] text-white rounded-r-lg transition-colors hover:bg-blue-600"
+              className="px-4 sm:px-5 py-2 sm:py-3 bg-[#DD9E2C] hover:bg-[#C2851C] cursor-pointer text-white rounded-r-lg transition-colors"
               aria-label={t("search")}
             >
               <Search className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -310,7 +310,7 @@ const Membership = () => {
                           </span>
                           <span
                             onClick={() => handleOpenReviews(plan)}
-                            className="text-xs text-blue-500 underline font-medium cursor-pointer"
+                            className="text-xs text-[#DD9E2C] underline font-medium cursor-pointer"
                           >
                             ({plan.reviews} {t("reviews")})
                           </span>
@@ -319,7 +319,7 @@ const Membership = () => {
                     </div>
                     {plan.badge_count > 0 && (
                       <div className="relative">
-                        <RiAwardLine size={40} className="text-yellow-500" />
+                        <RiAwardLine size={40} className="text-[#DD9E2C]" />
                         <h1 className="absolute top-[3px] left-[15px] font-bold">
                           {plan.badge_count}
                         </h1>
@@ -402,7 +402,7 @@ const Membership = () => {
                     </span>
                     <span
                       onClick={() => handleOpenReviews(agency)}
-                      className="text-xs text-blue-500 underline font-medium cursor-pointer"
+                      className="text-xs text-[#DD9E2C] underline font-medium cursor-pointer"
                     >
                       ({agency.reviews} {t("reviews")})
                     </span>

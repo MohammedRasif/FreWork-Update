@@ -44,7 +44,7 @@ export default function FinalOfferForm({
                     type="date"
                     value={startingDate}
                     onChange={(e) => onStartingDateChange(e.target.value)}
-                    className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] text-gray-500"
                     placeholder="Select date"
                   />
                  
@@ -59,7 +59,7 @@ export default function FinalOfferForm({
                     type="date"
                     value={endingDate}
                     onChange={(e) => onEndingDateChange(e.target.value)}
-                    className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] text-gray-500"
                     placeholder="Select date"
                   />
                   
@@ -77,7 +77,7 @@ export default function FinalOfferForm({
                   placeholder="Enter here"
                   value={totalMembers}
                   onChange={(e) => onTotalMembersChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C]"
                 />
               </div>
 
@@ -89,7 +89,7 @@ export default function FinalOfferForm({
                   placeholder="Enter amount"
                   value={amount}
                   onChange={(e) => onAmountChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C]"
                 />
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function FinalOfferForm({
           <div className="mt-8">
             <button
               onClick={onConfirm}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:ring-offset-2"
             >
               Confirm
             </button>

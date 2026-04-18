@@ -80,11 +80,11 @@ const WhoItWork = () => {
             key={index}
             className="relative bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-shadow duration-300 border border-gray-100"
           >
-            <div className="absolute -top-6 left-8 bg-[#8280FF] text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold shadow-xl">
+            <div className="absolute -top-6 left-8 bg-[#DD9E2C] text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold shadow-xl">
               {step.number}
             </div>
 
-            <div className="flex justify-center mb-6 text-[#8280FF] mt-4">
+            <div className="flex justify-center mb-6 text-[#DD9E2C] mt-4">
               {step.icon}
             </div>
 

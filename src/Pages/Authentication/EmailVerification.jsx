@@ -49,7 +49,7 @@ const EmailVerification = () => {
             onSubmit={handleSubmit}
             className="backdrop-blur-sm bg-white/60 p-10 mb-10 rounded-lg border border-blue-200 shadow-xl"
           >
-            <h2 className="text-3xl font-bold text-blue-600 mb-10 text-center">
+            <h2 className="text-3xl font-bold text-[#DD9E2C] mb-10 text-center">
               {t("enter_your_email")}
             </h2>
             <div className="form-control w-full mb-6">
@@ -59,11 +59,11 @@ const EmailVerification = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t("enter_your_email_placeholder")}
-                  className="input input-bordered border-blue-200 w-full pl-10 bg-white/70 text-blue-900 placeholder-blue-300 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="input input-bordered border-blue-200 w-full pl-10 bg-white/70 text-[#DD9E2C]  focus:outline-none focus:ring-2 focus:ring-yellow-200 rounded-full"
                   required
                 />
                 <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#DD9E2C]"
                   size={18}
                 />
               </div>
@@ -73,14 +73,14 @@ const EmailVerification = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full w-full text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white rounded-full w-full text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? t("please_wait") : t("next")}
               </button>
               <div className="flex mx-auto justify-center">
                 <Link
                   to="/login"
-                  className="font-semibold mt-4 text-sm text-blue-500 hover:text-blue-600 hover:underline"
+                  className="font-semibold mt-4 text-sm text-[#DD9E2C] hover:text-[#C2851C] hover:underline"
                 >
                   {t("back_to_login")}
                 </Link>

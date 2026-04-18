@@ -62,7 +62,7 @@ function BlogCard({ post }) {
             <div className="flex-1 px-8 md:px-10 lg:px-12 py-6 lg:py-8">
               <div className="space-y-5">
                 {/* Title */}
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight group-hover:text-[#C2851C] transition-colors">
                   {post.title}
                 </h2>
 
@@ -93,7 +93,7 @@ function BlogCard({ post }) {
                         e.stopPropagation();
                         setExpanded(!expanded);
                       }}
-                      className="ml-2 font-semibold text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors"
+                      className="ml-2 font-semibold text-[#DD9E2C] hover:text-[#C2851C] underline underline-offset-2 transition-colors"
                     >
                       {expanded ? t("show_less") : t("read_more")}
                     </button>
@@ -101,7 +101,7 @@ function BlogCard({ post }) {
                 </p>
 
                 <div>
-                  <button className="inline-flex items-center gap-2 text-blue-600 font-medium hover:gap-4 transition-all">
+                  <button className="inline-flex items-center gap-2 text-[#DD9E2C] font-medium hover:gap-4 transition-all">
                     <span>{t("continue_reading")}</span>
                     <svg
                       className="w-5 h-5"
