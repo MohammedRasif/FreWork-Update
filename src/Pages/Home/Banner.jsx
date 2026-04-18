@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import img from "../../assets/img/background.jpg";
+import img from "../../assets/img/background.png";
 import img1 from "../../assets/img/removebg1.png";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -85,13 +85,13 @@ const Banner = () => {
   return (
     <div className="relative w-full h-auto pb-3 md:h-[120vh] lg:h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <img
-          src={img}
-          alt="Background"
-          className="object-cover w-full h-full "
-        />
-        <div className="absolute inset-0 bg-black/10" />
-      </div>
+  <img
+    src={img}
+    alt="Background"
+    className="object-cover w-full h-full"
+  />
+  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+</div>
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4 text-center lg:mt-0 mt-8">
         {/* <img
           src={img1}
