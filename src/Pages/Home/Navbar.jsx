@@ -168,8 +168,8 @@ const Navbar = () => {
             to={item.path}
             className={`text-[18px] font-medium transition-colors ${
               activeLink === item.key
-                ? "text-[#2464EC] border-b-2 border-[#2464EC] pb-1"
-                : "text-gray-700 hover:text-[#2464EC]"
+                ? "text-[#DD9E2C] border-b-2 border-[#DD9E2C] pb-1"
+                : "text-gray-700 hover:text-[#DD9E2C]"
             }`}
             onClick={() => handleLinkClick(item.key, item.path)}
           >
@@ -230,7 +230,7 @@ const Navbar = () => {
               </button>
             </NavLink>
             <NavLink to="/registrazione">
-              <button className="px-6 py-2.5 text-[18px] bg-[#3776E2] text-white rounded-lg hover:bg-blue-700 transition shadow-md">
+              <button className="px-6 py-2.5 text-[18px] bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white rounded-lg cursor-pointer transition shadow-md">
                 {t("register")}
               </button>
             </NavLink>
@@ -272,7 +272,7 @@ const Navbar = () => {
                   to={item.path}
                   className={`text-lg font-medium py-2 text-center rounded-lg transition ${
                     activeLink === item.key
-                      ? "text-[#2464EC] bg-blue-50"
+                      ? "text-[#DD9E2C] bg-blue-50"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                   onClick={() => handleLinkClick(item.key, item.path)}
@@ -291,7 +291,7 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={handleDashboardClick}
-                    className="w-full py-3 text-lg font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md"
+                    className="w-full py-3 text-lg font-medium bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white rounded-lg shadow-md"
                   >
                     {t("dashboard")}
                   </button>
@@ -310,7 +310,7 @@ const Navbar = () => {
                     </button>
                   </NavLink>
                   <NavLink to="/registrazione" className="block">
-                    <button className="w-full py-3 text-lg font-medium bg-[#3776E2] text-white rounded-lg hover:bg-blue-700 shadow-md">
+                    <button className="w-full py-3 text-lg font-medium bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white rounded-lg shadow-md">
                       {t("register")}
                     </button>
                   </NavLink>

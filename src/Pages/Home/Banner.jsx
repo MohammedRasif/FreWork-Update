@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import img from "../../assets/img/background.png";
+import img2 from "../../assets/img/mobileDeviceBackground.png"; // মোবাইল ব্যাকগ্রাউন্ড
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BannerSectionPopup from "./BannerSectionPupup";
 import { useTranslation } from "react-i18next";
-import { FaCheckCircle, FaClock, FaLock } from "react-icons/fa"; // Using react-icons for the UI
+import { FaCheckCircle, FaLock } from "react-icons/fa";
+import { LuClock3 } from "react-icons/lu"; // ছবির মতো আইকনের জন্য
 
 const Banner = () => {
   const { t } = useTranslation();
@@ -17,28 +19,12 @@ const Banner = () => {
 
   const getInitialStep = (pendingPlan) => {
     const fromLogin = location.state?.fromLogin || false;
-    if (fromLogin && accessToken && pendingPlan) {
-      return 5;
-    }
+    if (fromLogin && accessToken && pendingPlan) return 5;
     if (!pendingPlan) return 1;
     const {
-      locationFrom,
-      locationTo,
-      startingDate,
-      endingDate,
-      adults,
-      children,
-      budget,
-      touristSpots,
-      typeOfAccommodation,
-      minimumHotelStars,
-      mealPlan,
-      travelType,
-      destinationType,
-      name,
-      email,
-      phoneNumber,
-      confirmation,
+      locationFrom, locationTo, startingDate, endingDate, adults, children,
+      budget, touristSpots, typeOfAccommodation, minimumHotelStars,
+      mealPlan, travelType, destinationType, name, email, phoneNumber, confirmation,
     } = pendingPlan;
 
     if (!locationFrom || !locationTo || !startingDate || !endingDate || (!adults && !children)) return 1;
@@ -56,92 +42,91 @@ const Banner = () => {
     }
   }, [accessToken]);
 
-  const handleButtonClick = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-  };
+  const handleButtonClick = () => setIsPopupOpen(true);
+  const closePopup = () => setIsPopupOpen(false);
 
   return (
-    <div className="relative w-full min-h-screen lg:h-screen overflow-hidden flex items-center">
-      {/* Background Image & Overlay */}
+    <div className="relative w-full min-h-screen flex items-center overflow-hidden">
+      
+      {/* Background Handler: Mobile and Desktop */}
       <div className="absolute inset-0">
-        <img src={img} alt="Background" className="object-cover w-full h-full" />
-        <div className="absolute inset-0 bg-black/30 lg:bg-transparent lg:bg-gradient-to-r lg:from-black/60 lg:to-transparent" />
+        <picture>
+          <source media="(max-width: 768px)" srcSet={img2} />
+          <img 
+            src={img} 
+            alt="Background" 
+            className="object-cover w-full h-full object-center" 
+          />
+        </picture>
+        {/* Gradient Overlay to match the image style */}
+        <div className="absolute inset-0 bg-black/20 lg:bg-gradient-to-r lg:from-black/50 lg:via-transparent lg:to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full container mx-auto px-6 py-20 lg:py-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 w-full container mx-auto px-6 pt-16 pb-10 lg:py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           
-          {/* Left Side: Content */}
-          <div className="text-white space-y-6">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-sm">
-              <FaClock className="text-blue-300" />
-              <span>{t("show_short_description")}</span>
+          {/* Left Side: Text Content */}
+          <div className="text-white space-y-6 lg:text-left">
+            {/* Top Badge */}
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-4 py-1.5 rounded-full text-[13px] md:text-sm">
+              <LuClock3 className="text-white/90" />
+              <span>{t("response_time", "Response within 24 to 48 hours")}</span>
             </div>
 
-            {/* Slogan */}
-            <h1 className="text-4xl md:text-5xl lg:text-[50px] font-bold leading-tight dm_serif">
+            {/* Main Heading */}
+            <h1 className="text-[34px] md:text-5xl lg:text-[56px] font-bold leading-[1.1] dm_serif">
               {t("banner_slogan")}
             </h1>
 
-            {/* Description */}
-            <p className="text-lg md:text-xl opacity-90 max-w-lg">
-              {t("show_short_descriptionn" , "Compare verified agencies and choose without wasting time.")}
+            {/* Sub-description */}
+            <p className="text-lg md:text-xl font-medium opacity-95 max-w-md">
+              {t("show_short_descriptionn", "Compare verified agencies and choose without wasting time.")}
             </p>
 
             {/* Features Checklist */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-              <div className="flex items-center gap-2">
-                <FaCheckCircle size={22} className="text-gray-100" />
-                <span>{t("feature_drivers", "Professional drivers")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaCheckCircle size={22} className="text-gray-100" />
-                <span>{t("feature_booking", "Flexible booking")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaCheckCircle size={22} className="text-gray-100" />
-                <span>{t("feature_pricing", "Transparent pricing")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaCheckCircle size={22} className="text-gray-100" />
-                <span>{t("feature_vehicles", "Comfortable vehicles")}</span>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 max-w-lg">
+              {[
+                { key: "feature_drivers", label: "Professional drivers" },
+                { key: "feature_booking", label: "Flexible booking" },
+                { key: "feature_pricing", label: "Transparent pricing" },
+                { key: "feature_vehicles", label: "Comfortable vehicles" }
+              ].map((item) => (
+                <div key={item.key} className="flex items-center gap-3">
+                  <FaCheckCircle size={22} className="text-white bg-green-600 rounded-full border-2 border-white" />
+                  <span className="text-[16px] md:text-[18px] font-medium">{t(item.key, item.label)}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Side: Form Action */}
-          <div className="flex justify-center lg:justify-end lg:mt-32">
-            <div className="bg-white/10 backdrop-blur-[5px] border border-white/20 p-5 rounded-[14px] w-full max-w-md shadow-2xl">
+          {/* Right Side: Floating Form Card */}
+          <div className="flex justify-center lg:justify-end lg:mt-40">
+            <div className="bg-black/10 backdrop-blur-[10px] border border-white/20 p-6 rounded-[14px] w-full max-w-[460px] shadow-2xl">
               <div className="space-y-4">
                 <div className="relative">
                   <input
                     disabled
                     type="text"
                     placeholder={t("input_placeholder", "Where do you want to go?")}
-                    className="w-full py-2.5 px-6 rounded-[10px] bg-white text-gray-800 placeholder-gray-500 focus:outline-none"
+                    className="w-full py-2.5 px-6 rounded-[7px] bg-white/95 text-gray-800 placeholder-gray-500 focus:outline-none text-[15px]"
                   />
                 </div>
 
                 {showCreateRequestButton && (
                   <button
                     onClick={handleButtonClick}
-                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer transition-colors text-white text-[17px] font-semibold py-2.5 rounded-[10px] shadow-lg"
+                    className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all cursor-pointer text-white text-[18px] font-bold py-2.5 rounded-[7px] shadow-lg active:scale-[0.98]"
                   >
                     {t("create_request")}
                   </button>
                 )}
 
-                <div className="flex justify-between items-center text-xs text-white/80 px-2">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                <div className="flex justify-between items-center text-[10px] md:text-[12px] text-white/90 px-1 font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full shadow-sm"></div>
                     <span>{t("time_info", "Takes less than 2 minutes")}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <FaLock size={10} />
                     <span>{t("privacy_info", "No calls without your consent")}</span>
                   </div>
@@ -153,19 +138,19 @@ const Banner = () => {
         </div>
       </div>
 
-      {/* Popup Logic - Same as before */}
+      {/* Popup Modal */}
       {isPopupOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         >
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="p-4 sm:p-6 rounded-2xl max-w-xl w-full mx-4"
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="w-full max-w-xl"
           >
             <BannerSectionPopup
               closeForm={closePopup}
