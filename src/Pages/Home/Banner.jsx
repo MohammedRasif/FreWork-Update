@@ -116,7 +116,7 @@ const Banner = () => {
 
           {/* Right Side: Form Action */}
           <div className="flex justify-center lg:justify-end lg:mt-32">
-            <div className="bg-white/10 backdrop-blur-[5px] border border-white/20 p-5 rounded-[14px] w-full max-w-xl shadow-2xl">
+            <div className="bg-white/10 backdrop-blur-[5px] border border-white/20 p-5 rounded-[14px] w-full max-w-md shadow-2xl">
               <div className="space-y-4">
                 <div className="relative">
                   <input

@@ -424,7 +424,7 @@ if (typeof window !== "undefined" && window.gtag) {
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
-      <div className="bg-gradient-to-r from-[#FF6600] to-[#e55600] p-3 sm:p-4">
+      <div className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] p-3 sm:p-4">
         <div className="flex justify-between items-center mb-2 sm:mb-3">
           <span className="text-xs sm:text-sm font-semibold text-white">
             {t("step_of", { current: Math.min(currentStep, 5), total: 5 })}
@@ -666,7 +666,7 @@ if (typeof window !== "undefined" && window.gtag) {
                       </p>
                       <button
                         onClick={handleOkClick}
-                        className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
+                        className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer transition-colors text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
                       >
                         {t("ok")}
                       </button>
@@ -1108,7 +1108,7 @@ if (typeof window !== "undefined" && window.gtag) {
             {currentStep < totalSteps ? (
               <button
                 onClick={nextStep}
-                className="bg-[#FF6600] hover:bg-[#e55600] text-white font-semibold py-1.5 sm:py-2 px-4 sm:px-6 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
+                className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer  text-white font-semibold py-1.5 sm:py-2 px-4 sm:px-6 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
                 {t("next") || "Next"}
               </button>
@@ -1118,7 +1118,7 @@ if (typeof window !== "undefined" && window.gtag) {
                 disabled={
                   isSavingDraft || isPublishing || !formData.confirmation
                 }
-                className="bg-[#FF6600] hover:bg-[#e55600] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
+                className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer  disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
               >
                 {isPublishing
                   ? t("publishing") || "Publishing..."
