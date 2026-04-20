@@ -7,6 +7,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { FaLocationDot } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa";
+import { GoChevronDown } from "react-icons/go";
 
 let isGoogleScriptLoaded = false;
 
@@ -23,7 +26,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     endingDate: "",
     adults: 0,
     children: 0,
-    budget: "",
+    budget: "5000",
     touristSpots: "",
     description: "",
     uploadedFile: null,
@@ -54,10 +57,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     setValue,
     reset,
     trigger,
-  } = useForm();
+  } = useForm({
+    defaultValues: { budget: "5000" },
+  });
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
+
+  // UI-only display step (1-3) mapped from internal step
+  // Navigation: currentStep 1 → UI 1, currentStep 5 → UI 2, currentStep 6 → UI 3
+  const uiStep = currentStep <= 4 ? 1 : currentStep === 5 ? 2 : 3;
+  const totalUiSteps = 3;
+  const progressPercentage = (uiStep / totalUiSteps) * 100;
 
   // Define the event handlers
   const handleBudgetClick = () => {
@@ -100,7 +111,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
-      setValue("budget", state?.budget || "");
+      setValue("budget", state?.budget || "5000");
       setValue("touristSpots", state?.tourist_spots || "");
       setValue("description", state?.description || "");
       setValue("destinationType", state?.destination_type || "");
@@ -168,28 +179,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
         console.error("Google Maps Places API is not available");
-        toast.error(
-          t("google_maps_not_available") ||
-            "Google Maps Places API is not available",
-        );
         return;
       }
-      console.log("Initializing autocomplete for all fields...");
-      if (locationFromRef.current) {
-        console.log("Setting up autocomplete for locationFrom");
-        const fromAutocomplete = new window.google.maps.places.Autocomplete(
-          locationFromRef.current,
-        );
-        fromAutocomplete.addListener("place_changed", () => {
-          const place = fromAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          console.log("locationFrom selected:", locationValue);
-          setValue("locationFrom", locationValue);
-          updateFormData("locationFrom", locationValue);
-        });
-      } else {
-        console.warn("locationFromRef is null");
-      }
+      console.log("Initializing autocomplete for locationTo (Where To)...");
+
+      // locationFromRef is a hidden input — skip it (Google can't attach to hidden inputs).
+      // We auto-mirror locationFrom = locationTo on place selection below.
+
       if (locationToRef.current) {
         console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
@@ -201,16 +197,30 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           console.log("locationTo selected:", locationValue);
           setValue("locationTo", locationValue);
           updateFormData("locationTo", locationValue);
+          // Also set locationFrom to the same value so the backend field is filled
+          setValue("locationFrom", locationValue);
+          updateFormData("locationFrom", locationValue);
         });
       } else {
         console.warn("locationToRef is null");
       }
     };
+
+    // If Google is already loaded, init immediately (with small delay for DOM)
     if (window.google) {
       setTimeout(initAutocomplete, 100);
+    } else {
+      // Wait for the script's onload then retry
+      const interval = setInterval(() => {
+        if (window.google) {
+          clearInterval(interval);
+          setTimeout(initAutocomplete, 100);
+        }
+      }, 300);
+      return () => clearInterval(interval);
     }
   }, [setValue, currentStep]);
-  
+
   const updateFormData = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -344,20 +354,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.log("Create Plan Response:", response);
       }
 
-//       if (typeof window !== "undefined") {
-//   window.dataLayer = window.dataLayer || [];
-//   window.dataLayer.push({
-//     event: "apertura_popup",
-//   });
-
-//   console.log("Google Analytics event 'apertura_popup' pushed to dataLayer");
-//   console.log("Current dataLayer:", window.dataLayer);
-// }
-if (typeof window !== "undefined" && window.gtag) {
-  window.gtag("event", "apertura_popup");
-
-  console.log("Google Analytics event 'apertura_popup' sent using gtag");
-}
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "apertura_popup");
+        console.log("Google Analytics event 'apertura_popup' sent using gtag");
+      }
       toast.success(
         t("plan_submitted_success") ||
           "Your data successfully submitted! When approved by admin, this tour plan will be published.",
@@ -412,175 +412,152 @@ if (typeof window !== "undefined" && window.gtag) {
     closeForm();
   };
 
-  const progressPercentage = (Math.min(currentStep, 5) / 5) * 100;
-
-  const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
-    required: t("location_from_required") || "Location (From) is required",
-  });
+  // locationFrom is a hidden field — no required validation (auto-filled from locationTo)
+  const { ref: fromFormRef, ...fromRest } = register("locationFrom");
 
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: t("location_to_required") || "Location (To) is required",
   });
 
+  // ─── UI STEP 1: Plan Your Trip (internal steps 1 & 2) ───────────────────────
+  const handleUiStep1Next = async () => {
+    // Pre-fill hidden fields with safe defaults before validation
+    if (!formData.children) {
+      setValue("children", 0);
+      updateFormData("children", 0);
+    }
+    // If locationFrom is empty, mirror locationTo into it
+    if (!formData.locationFrom && formData.locationTo) {
+      setValue("locationFrom", formData.locationTo);
+      updateFormData("locationFrom", formData.locationTo);
+    }
+    // touristSpots is hidden — set a placeholder so validation passes
+    if (!formData.touristSpots) {
+      setValue("touristSpots", "N/A");
+      updateFormData("touristSpots", "N/A");
+    }
+
+    // Only validate the VISIBLE fields on this screen
+    const visibleFields = ["startingDate", "endingDate", "adults", "locationTo", "budget"];
+    const result = await trigger(visibleFields);
+    if (!result) {
+      toast.error(
+        t("fill_all_required") || "Please fill all required fields before proceeding."
+      );
+      return;
+    }
+    // Advance to UI step 2 (internal step 5 — name/email/phone)
+    setCurrentStep(5);
+  };
+
+  // ─── UI STEP 2: Almost Done (internal step 5 — name/email/phone/confirmation) ─
+  const handleUiStep2Next = async () => {
+    const valid = await validateStep(5);
+    if (!valid) return;
+    setCurrentStep(6); // go to optional step UI
+  };
+
+  // ─── UI STEP 3: Improve Your Offers (optional — internal steps 3 & 4) ────────
+  // "Add details" — validate & submit with optional data
+  const handleAddDetails = async () => {
+    // validate accommodation / stars / meal plan
+    const step3Valid = await validateStep(3);
+    if (!step3Valid) return;
+    // validate travel type / destination type
+    const step4Valid = await validateStep(4);
+    if (!step4Valid) return;
+    handleSubmit((data) => onSubmit(data, "published"))();
+  };
+
+  // "Skip for now" — auto-confirm and submit without optional data
+  const handleSkipDetails = () => {
+    // clear optional fields so they are empty in submission
+    setValue("typeOfAccommodation", "");
+    setValue("minimumHotelStars", "");
+    setValue("mealPlan", "");
+    setValue("travelType", "");
+    setValue("destinationType", "");
+    setValue("description", "");
+    handleSubmit((data) => onSubmit(data, "published"))();
+  };
+
+  // Star rating helper
+  const StarRating = ({ value, onChange }) => (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => onChange(star)}
+          className="text-xl focus:outline-none transition-transform hover:scale-110"
+        >
+          <span style={{ color: star <= value ? "#DD9E2C" : "#d1d5db" }}>★</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  // Pill button helper
+  const PillButton = ({ label, active, onClick }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
+        active
+          ? "bg-[#DD9E2C] text-white border-[#DD9E2C]"
+          : "bg-white text-gray-600 border-gray-300 hover:border-[#DD9E2C]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden sm:max-w-lg xs:max-w-xs transition-all duration-300">
-      <div className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] p-3 sm:p-4">
-        <div className="flex justify-between items-center mb-2 sm:mb-3">
-          <span className="text-xs sm:text-sm font-semibold text-white">
-            {t("step_of", { current: Math.min(currentStep, 5), total: 5 })}
+    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+      {/* ── Progress Header ─────────────────────────────────────────────── */}
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-bold text-gray-800 uppercase tracking-wider">
+            STEP {uiStep} OF {totalUiSteps}
           </span>
-          <span className="text-xs sm:text-sm font-semibold text-white">
-            {Math.round(progressPercentage)}% {t("complete")}
-          </span>
+          <button
+            onClick={handlepupupClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors text-lg leading-none"
+            aria-label="Close"
+          >
+            ✕
+          </button>
         </div>
-        <div className="w-full bg-white/30 rounded-full h-2 sm:h-3">
+        {/* <div className="w-full bg-gray-100 rounded-full h-1.5">
           <div
-            className="bg-white h-2 sm:h-3 rounded-full transition-all duration-500 ease-in-out"
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
-        </div>
+            className="h-1.5 rounded-full transition-all duration-500 ease-in-out"
+            style={{
+              width: `${progressPercentage}%`,
+              background: "linear-gradient(90deg, #DD9E2C, #C2851C)",
+            }}
+          />
+        </div> */}
       </div>
 
-      <div className="p-3 sm:p-4 xs:p-2 relative" style={{ zIndex: 1000 }}>
-        <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 mb-3 sm:mb-4 text-center">
-          {t("create_your_tour_plan")}
-        </h2>
-        {currentStep === 1 && (
-          <div className="space-y-3 sm:space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("starting_date")}
-                </label>
-                <input
-                  {...register("startingDate", {
-                    required:
-                      t("starting_date_required") ||
-                      "Starting Date is required",
-                  })}
-                  type="date"
-                  defaultValue={formData.startingDate}
-                  onChange={(e) =>
-                    updateFormData("startingDate", e.target.value)
-                  }
-                  className="date-input w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.startingDate && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.startingDate.message}
-                  </span>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("ending_date")}
-                </label>
-                <input
-                  {...register("endingDate", {
-                    required:
-                      t("ending_date_required") || "Ending Date is required",
-                  })}
-                  type="date"
-                  defaultValue={formData.endingDate}
-                  onChange={(e) => updateFormData("endingDate", e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.endingDate && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.endingDate.message}
-                  </span>
-                )}
-              </div>
+      {/* ── BODY ─────────────────────────────────────────────────────────── */}
+      <div className="px-5 pb-5 relative" style={{ zIndex: 1000 }}>
+        {uiStep === 1 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                Plan Your Trip ✈️
+              </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("adults")}
-                </label>
-                <input
-                  {...register("adults", {
-                    required:
-                      t("adults_required") ||
-                      "At least one adult or child is required",
-                    min: {
-                      value: 0,
-                      message:
-                        t("adults_negative") || "Adults cannot be negative",
-                    },
-                  })}
-                  type="number"
-                  placeholder={t("adults_placeholder") || "Adults"}
-                  defaultValue={formData.adults}
-                  onChange={(e) => updateFormData("adults", e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.adults && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.adults.message}
-                  </span>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("children")}
-                </label>
-                <input
-                  {...register("children", {
-                    min: {
-                      value: 0,
-                      message:
-                        t("children_negative") || "Children cannot be negative",
-                    },
-                  })}
-                  type="number"
-                  placeholder={t("children_placeholder") || "Children"}
-                  defaultValue={formData.children}
-                  onChange={(e) => updateFormData("children", e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.children && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.children.message}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-        {currentStep === 2 && (
-          <div className="space-y-3 sm:space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("location_from")}
-                </label>
-                <input
-                  {...fromRest}
-                  type="text"
-                  placeholder={
-                    t("starting_location_placeholder") || "Starting location"
-                  }
-                  defaultValue={formData.locationFrom}
-                  onChange={(e) => {
-                    updateFormData("locationFrom", e.target.value);
-                    setValue("locationFrom", e.target.value);
-                  }}
-                  ref={(e) => {
-                    fromFormRef(e);
-                    locationFromRef.current = e;
-                  }}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.locationFrom && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.locationFrom.message}
-                  </span>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("location_to")}
-                </label>
+
+            <div className="grid grid-cols-1 lg:flex items-center gap-4">
+              {/* Where To (locationTo) */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                WHERE TO?
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black"><FaLocationDot />
+</span>
                 <input
                   {...toRest}
                   type="text"
@@ -594,380 +571,235 @@ if (typeof window !== "undefined" && window.gtag) {
                     toFormRef(e);
                     locationToRef.current = e;
                   }}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                  className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
                 />
-                {errors.locationTo && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.locationTo.message}
-                  </span>
-                )}
               </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("budget")}
-                </label>
-                <input
-                  {...register("budget", {
-                    required: t("budget_required") || "Budget is required",
-                    validate: (value) =>
-                      value.trim() !== "" ||
-                      t("budget_empty") ||
-                      "Budget cannot be empty",
-                  })}
-                  type="text"
-                  placeholder={t("budget_placeholder") || "Budget (EUR)"}
-                  defaultValue={formData.budget}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    updateFormData("budget", value);
-                    setValue("budget", value, { shouldValidate: true });
-                  }}
-                  onClick={handleBudgetClick}
-                  ref={budgetRef}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                />
-                {errors.budget && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.budget.message}
-                  </span>
-                )}
-
-                {/* budget_warning_message */}
-                {showBudgetMessage && (
-                  <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4 ">
-                    <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 shadow-2xl lg:w-96 w-72">
-                      <p className="lg:text-[15px] text-[13px] text-gray-800 leading-relaxed">
-                        💰{" "}
-                        <span className="font-bold">
-                          Budget totale del gruppo
-                        </span>
-                        <br />
-                        Inserisci il{" "}
-                        <span className="font-bold">
-                          budget massimo complessivo per
-                        </span>
-                        il tuo viaggio.
-                        <br />
-                        <br />
-                        <span className="font-bold">
-                          Minimo per pubblicare: 3.000 €
-                        </span>
-                        <br />{" "}
-                        <span className="font-bold pr-1">VacanzaMyCost</span>
-                        seleziona solo richieste di alto profilo per garantire
-                        proposte d'élite dalle migliori agenzie specializzate.{" "}
-                        <br /> Con budget inferiori,{" "}
-                        <span className="font-bold">
-                          non è possibile garantire un servizio su misura di
-                          qualità.
-                        </span>
-                      </p>
-                      <button
-                        onClick={handleOkClick}
-                        className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer transition-colors text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
-                      >
-                        {t("ok")}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("tourist_spots")}
-                </label>
-                <input
-                  {...register("touristSpots", {
-                    required:
-                      t("tourist_spots_required") ||
-                      "Tourist Spots is required",
-                  })}
-                  type="text"
-                  placeholder={
-                    t("tourist_spots_placeholder") ||
-                    "Mare, Monumenti, Ristorante..."
-                  }
-                  defaultValue={formData.touristSpots}
-                  onChange={(e) => {
-                    updateFormData("touristSpots", e.target.value);
-                    setValue("touristSpots", e.target.value);
-                    console.log("touristSpots input changed:", e.target.value);
-                  }}
-                  ref={(e) => {
-                    touristSpotsRef.current = e;
-                  }}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                  style={{ zIndex: 1001 }}
-                />
-                {errors.touristSpots && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.touristSpots.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                {t("description_optional") || "Description (Optional)"}
-              </label>
-              <textarea
-                {...register("description")}
-                placeholder={
-                  t("description_placeholder") ||
-                  "Vorremmo una settimana di relax al mare con due bambini, in hotel con piscina."
-                }
-                rows="4"
-                defaultValue={formData.description}
-                onChange={(e) => updateFormData("description", e.target.value)}
-                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent resize-none text-xs sm:text-sm transition-all duration-200"
-              ></textarea>
-            </div>
-          </div>
-        )}
-        {currentStep === 3 && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("type_of_accommodation")}
-                </label>
-                <select
-                  className="border-2 border-slate-300 rounded-sm"
-                  {...register("typeOfAccommodation", {
-                    required:
-                      t("accommodation_required") ||
-                      "Accommodation is required",
-                  })}
-                >
-                  <option value="">
-                    {t("select_accommodation") || "Select Accommodation"}
-                  </option>
-                  <option value="hotel">{t("hotel")}</option>
-                  <option value="resort">{t("resort")}</option>
-                  <option value="homestay">{t("homestay")}</option>
-                  <option value="apartment">{t("apartment")}</option>
-                  <option value="hostel">{t("hostel")}</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("minimum_hotel_stars")}
-                </label>
-                <select
-                  className="border-2 border-slate-300 rounded-sm"
-                  {...register("minimumHotelStars")}
-                >
-                  <option value="">
-                    {t("select_stars") || "Select Stars"}
-                  </option>
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <option key={s} value={s}>
-                      {s} {t("star", { count: s })}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {errors.locationTo && (
+                <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>
+              )}
             </div>
 
+            {/* Hidden locationFrom — set same as locationTo or leave blank */}
+            <input
+              {...fromRest}
+              type="hidden"
+              ref={(e) => {
+                fromFormRef(e);
+                locationFromRef.current = e;
+              }}
+            />
+
+            {/* Dates row */}
+            <div className="grid grid-cols-1 gap-3">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                  WHEN WILL YOU TRAVEL?
+                </label>
+                <div className="relative">
+                  <input
+                    {...register("startingDate", {
+                      required: t("starting_date_required") || "Starting Date is required",
+                    })}
+                    type="date"
+                    defaultValue={formData.startingDate}
+                    onChange={(e) => updateFormData("startingDate", e.target.value)}
+                    className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"                  />
+                </div>
+                {errors.startingDate && (
+                  <span className="text-red-500 text-xs mt-1">{errors.startingDate.message}</span>
+                )}
+              </div>
+              {/* <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  ENDING DATE
+                </label>
+                <input
+                  {...register("endingDate", {
+                    required: t("ending_date_required") || "Ending Date is required",
+                  })}
+                  type="date"
+                  defaultValue={formData.endingDate}
+                  onChange={(e) => updateFormData("endingDate", e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+                />
+                {errors.endingDate && (
+                  <span className="text-red-500 text-xs mt-1">{errors.endingDate.message}</span>
+                )}
+              </div> */}
+            </div>
+
+            {/* Travelers row */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 mt-4">
-                {t("meal_plan")}
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                HOW MANY TRAVELERS?
               </label>
-              <select
-                className="border-2 border-slate-300 rounded-sm"
-                {...register("mealPlan", {
-                  required: t("meal_plan_required") || "Meal plan is required",
+              <div className="flex items-center gap-4">
+                {/* Adults counter */}
+                <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-[6px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = Math.max(0, (parseInt(formData.adults) || 0) - 1);
+                      updateFormData("adults", val);
+                      setValue("adults", val);
+                    }}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer  transition-colors font-bold text-lg leading-none"
+                  >
+                    −
+                  </button>
+                  <input
+                    {...register("adults", {
+                      required: t("adults_required") || "At least one adult or child is required",
+                      min: { value: 0, message: t("adults_negative") || "Adults cannot be negative" },
+                    })}
+                    type="number"
+                    value={formData.adults}
+                    onChange={(e) => {
+                      updateFormData("adults", e.target.value);
+                      setValue("adults", e.target.value);
+                    }}
+                    className="w-8 text-center bg-transparent text-base font-semibold focus:outline-none border-none"
+                    style={{ MozAppearance: "textfield" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = (parseInt(formData.adults) || 0) + 1;
+                      updateFormData("adults", val);
+                      setValue("adults", val);
+                    }}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer  transition-colors font-bold text-lg leading-none"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Children (hidden but preserved) */}
+                <input
+                  {...register("children", {
+                    min: { value: 0, message: t("children_negative") || "Children cannot be negative" },
+                  })}
+                  type="hidden"
+                  value={formData.children}
+                />
+              </div>
+              {errors.adults && (
+                <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>
+              )}
+            </div>
+            </div>
+
+            {/* Budget Slider */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider">
+                  WHAT'S YOUR BUDGET?
+                </label>
+                <span className="text-base font-bold text-gray-800">
+                  ${parseInt(formData.budget || 5000).toLocaleString()}
+                </span>
+              </div>
+              <input
+                {...register("budget", {
+                  required: t("budget_required") || "Budget is required",
                 })}
-              >
-                <option value="">
-                  {t("select_meal_plan") || "Select Meal Plan"}
-                </option>
-                <option value="none">{t("no_meals")}</option>
-                <option value="breakfast">{t("breakfast")}</option>
-                <option value="half-board">{t("half_board")}</option>
-                <option value="full-board">{t("full_board")}</option>
-              </select>
+                type="range"
+                min={0}
+                max={50000}
+                step={500}
+                value={formData.budget || 5000}
+                onClick={handleBudgetClick}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFormData("budget", value);
+                  setValue("budget", value, { shouldValidate: true });
+                }}
+                ref={budgetRef}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #DD9E2C ${((parseInt(formData.budget || 5000)) / 50000) * 100}%, #e5e7eb ${((parseInt(formData.budget || 5000)) / 50000) * 100}%)`,
+                }}
+              />
+              {errors.budget && (
+                <span className="text-red-500 text-xs mt-1">{errors.budget.message}</span>
+              )}
             </div>
-          </>
-        )}
-        {currentStep === 4 && (
-          <div className="space-y-3 sm:space-y-4 ">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("travel_type")}
-                </label>
-                <select
-                  {...register("travelType", {
-                    required:
-                      t("travel_type_required") || "Travel Type is required",
-                  })}
-                  defaultValue={formData.travelType}
-                  onChange={(e) => updateFormData("travelType", e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                >
-                  <option value="">
-                    {t("select_travel_type") || "Select Travel Type"}
-                  </option>
-                  <option value="family">
-                    {t("family_trip") || "Family Trip"}
-                  </option>
-                  <option value="solo">
-                    {t("solo_travel") || "Solo Travel"}
-                  </option>
-                  <option value="couple">{t("couple") || "Couple"}</option>
-                  <option value="group">
-                    {t("group_travel") || "Group Travel"}
-                  </option>
-                  <option value="business">
-                    {t("business_travel") || "Business Travel"}
-                  </option>
-                </select>
-                {errors.travelType && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.travelType.message}
-                  </span>
-                )}
+
+            {/* Hidden touristSpots — no required validation, pre-filled in handleUiStep1Next */}
+            <input
+              {...register("touristSpots")}
+              type="hidden"
+              ref={(e) => { touristSpotsRef.current = e; }}
+            />
+
+            {/* Budget warning popup */}
+            {showBudgetMessage && (
+              <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
+                <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 shadow-2xl lg:w-96 w-72">
+                  <p className="lg:text-[15px] text-[13px] text-gray-800 leading-relaxed">
+                    💰{" "}
+                    <span className="font-bold">Budget totale del gruppo</span>
+                    <br />
+                    Inserisci il{" "}
+                    <span className="font-bold">budget massimo complessivo per</span>{" "}
+                    il tuo viaggio.
+                    <br />
+                    <br />
+                    <span className="font-bold">Minimo per pubblicare: 3.000 €</span>
+                    <br />{" "}
+                    <span className="font-bold pr-1">VacanzaMyCost</span>
+                    seleziona solo richieste di alto profilo per garantire proposte
+                    d'élite dalle migliori agenzie specializzate.{" "}
+                    <br /> Con budget inferiori,{" "}
+                    <span className="font-bold">
+                      non è possibile garantire un servizio su misura di qualità.
+                    </span>
+                  </p>
+                  <button
+                    onClick={handleOkClick}
+                    className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer transition-colors text-white font-semibold py-1 px-4 rounded-lg text-[14px]"
+                  >
+                    {t("ok")}
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  {t("destination_type")}
-                </label>
-                <select
-                  {...register("destinationType", {
-                    required:
-                      t("destination_type_required") ||
-                      "Destination Type is required",
-                  })}
-                  defaultValue={formData.destinationType}
-                  onChange={(e) =>
-                    updateFormData("destinationType", e.target.value)
-                  }
-                  className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-                >
-                  <option value="">
-                    {t("select_destination_type") || "Select Destination Type"}
-                  </option>
-                  <option value="beach">
-                    {t("beach_trips") || "Beach trips"}
-                  </option>
-                  <option value="mountain">
-                    {t("mountain_adventures") || "Mountain adventures"}
-                  </option>
-                  <option value="relax">
-                    {t("relaxing_tours") || "Relaxing tours"}
-                  </option>
-                  <option value="group">
-                    {t("group_packages") || "Group packages"}
-                  </option>
-                </select>
-                {errors.destinationType && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {errors.destinationType.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm">
-              <h3 className="font-semibold text-gray-800 mb-2 sm:mb-3 text-sm sm:text-base">
-                {t("review_your_information") || "Review Your Information"}
-              </h3>
-              <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
-                <p>
-                  <span className="font-medium">{t("from") || "From:"}</span>{" "}
-                  {formData.locationFrom ||
-                    t("not_specified") ||
-                    "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">{t("to") || "To:"}</span>{" "}
-                  {formData.locationTo || t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">{t("dates") || "Dates:"}</span>{" "}
-                  {formData.startingDate && formData.endingDate
-                    ? `${formData.startingDate} to ${formData.endingDate}`
-                    : t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("travelers") || "Travelers:"}
-                  </span>{" "}
-                  {formData.adults || formData.children
-                    ? `${formData.adults || 0} ${t("adults")}, ${
-                        formData.children || 0
-                      } ${t("children")}`
-                    : t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("budget") || "Budget:"}
-                  </span>{" "}
-                  {formData.budget || t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("tourist_spots") || "Tourist Spots:"}
-                  </span>{" "}
-                  {formData.touristSpots ||
-                    t("not_specified") ||
-                    "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("accommodation") || "Accommodation:"}
-                  </span>{" "}
-                  {formData.typeOfAccommodation ||
-                    t("not_specified") ||
-                    "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("hotel_stars") || "Hotel Stars:"}
-                  </span>{" "}
-                  {formData.minimumHotelStars ||
-                    t("not_specified") ||
-                    "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("meal_plan") || "Meal Plan:"}
-                  </span>{" "}
-                  {formData.mealPlan || t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("travel_type") || "Travel Type:"}
-                  </span>{" "}
-                  {formData.travelType || t("not_specified") || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("destination_type") || "Destination Type:"}
-                  </span>{" "}
-                  {formData.destinationType ||
-                    t("not_specified") ||
-                    "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium">
-                    {t("flight") || "Flight:"}
-                  </span>{" "}
-                  {formData.includeRoundTripFlight
-                    ? t("included") || "Included"
-                    : t("not_included") || "Not included"}
-                </p>
-              </div>
-            </div>
+            )}
+
+            {/* Next button */}
+            <button
+              type="button"
+              onClick={handleUiStep1Next}
+              className="w-full py-2.5 cursor-pointer rounded-lg text-white font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+              style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
+            >
+              Next Step
+            </button>
           </div>
         )}
-        {currentStep === 5 && (
-          <div className="space-y-3 sm:space-y-4">
+
+
+        {uiStep === 2 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                className="w-8 h-8 rounded-full border cursor-pointer border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
+              >
+                <FaArrowLeft />
+              </button>
+            </div>
+
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                {t("name")}
+              <h2 className="text-3xl font-bold text-gray-900">
+                Almost Done !
+              </h2>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                FULL NAME
               </label>
               <input
                 {...register("name", {
@@ -977,157 +809,270 @@ if (typeof window !== "undefined" && window.gtag) {
                 placeholder={t("full_name") || "Full name"}
                 defaultValue={formData.name}
                 onChange={(e) => updateFormData("name", e.target.value)}
-                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
+                className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
               />
               {errors.name && (
-                <span className="text-red-500 text-xs mt-1">
-                  {errors.name.message}
-                </span>
+                <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>
               )}
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                {t("email")}
-              </label>
-              <input
-                {...register("email", {
-                  required: t("email_required") || "Email is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: t("invalid_email") || "Invalid email address",
-                  },
-                })}
-                type="email"
-                placeholder={t("email") || "Email"}
-                defaultValue={formData.email}
-                onChange={(e) => updateFormData("email", e.target.value)}
-                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-              />
-              {errors.email && (
-                <span className="text-red-500 text-xs mt-1">
-                  {errors.email.message}
-                </span>
-              )}
+
+            {/* Email + Phone row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                  EMAIL ADDRESS
+                </label>
+                <input
+                  {...register("email", {
+                    required: t("email_required") || "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: t("invalid_email") || "Invalid email address",
+                    },
+                  })}
+                  type="email"
+                  placeholder={t("email") || "Email"}
+                  defaultValue={formData.email}
+                  onChange={(e) => updateFormData("email", e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+                />
+                {errors.email && (
+                  <span className="text-red-500 text-xs mt-1">{errors.email.message}</span>
+                )}
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                  PHONE NUMBER
+                </label>
+                <input
+                  {...register("phoneNumber", {
+                    required: t("phone_required") || "Phone Number is required",
+                    pattern: {
+                      value: /^[0-9]{10,15}$/,
+                      message: t("invalid_phone") || "Invalid phone number",
+                    },
+                  })}
+                  type="tel"
+                  placeholder={t("phone_number") || "Phone number"}
+                  defaultValue={formData.phoneNumber}
+                  onChange={(e) => updateFormData("phoneNumber", e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+                />
+                {errors.phoneNumber && (
+                  <span className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</span>
+                )}
+              </div>
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                {t("phone_number")}
-              </label>
-              <input
-                {...register("phoneNumber", {
-                  required: t("phone_required") || "Phone Number is required",
-                  pattern: {
-                    value: /^[0-9]{10,15}$/,
-                    message: t("invalid_phone") || "Invalid phone number",
-                  },
-                })}
-                type="tel"
-                placeholder={t("phone_number") || "Phone number"}
-                defaultValue={formData.phoneNumber}
-                onChange={(e) => updateFormData("phoneNumber", e.target.value)}
-                className="w-full px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:border-transparent text-xs sm:text-sm transition-all duration-200"
-              />
-              {errors.phoneNumber && (
-                <span className="text-red-500 text-xs mt-1">
-                  {errors.phoneNumber.message}
-                </span>
-              )}
-            </div>
-            <div className="flex items-start">
-              <input
-                {...register("confirmation", {
-                  required:
-                    t("confirmation_required") ||
-                    "You must confirm the request",
-                })}
-                type="checkbox"
-                id="confirmation"
-                checked={formData.confirmation}
-                onChange={(e) =>
-                  updateFormData("confirmation", e.target.checked)
-                }
-                className="h-4 w-4 text-[#FF6600] focus:ring-[#FF6600] border-gray-300 rounded mt-1"
-              />
-              <label
-                htmlFor="confirmation"
-                className="ml-2 text-xs sm:text-sm text-gray-700"
-              >
-                {t("confirmation_text") ||
-                  "I confirm this is a travel request, and all provided information is valid and does not include any third party."}
-              </label>
-              {errors.confirmation && (
-                <span className="text-red-500 text-xs mt-1">
-                  {errors.confirmation.message}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-        {currentStep === 6 && (
-          <div className="space-y-3 sm:space-y-4 text-center">
-            <p className="text-gray-700 text-[13px] sm:text-sm">
-              <p className="text-[15px]">📞 Verifica qualità richiesta</p>
-              <br />
-              <span className="font-bold">
-                Per garantire la massima qualità
-              </span>{" "}
-              delle proposte, ogni richiesta viene verificata telefonicamente da
-              un nostro esperto
-              <br />
-              <p className="py-1">(chiamata breve, max 2 minuti).</p>
-              <p className="py-2">
-                Dopo la verifica riceverai{" "}
-                <span className="font-bold">
-                  fino a 3 proposte personalizzate da agenzie specializzate
-                </span>
-                , senza commissioni e senza impegno.
-              </p>
-              ⚠️ Procedi solo se realmente interessato a ricevere proposte su
-              misura.
-            </p>
-          </div>
-        )}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2 sm:mb-0 w-full sm:w-auto">
-            {currentStep > 1 && currentStep !== 6 && (
-              <button
-                onClick={prevStep}
-                className="px-2 py-1 sm:px-2 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
-              >
-                {t("previous") || "Previous"}
-              </button>
-            )}
+
+            {/* Hidden confirmation — auto-checked when user taps Send Request */}
+            <input
+              {...register("confirmation", {
+                required: t("confirmation_required") || "You must confirm the request",
+              })}
+              type="hidden"
+              value={formData.confirmation ? "true" : "false"}
+            />
+
+            {/* Send Request button */}
             <button
-              onClick={handlepupupClose}
-              className="px-2 py-1 sm:px-2.1 sm:py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium text-xs sm:text-sm transition-all duration-200 w-full sm:w-auto"
+              type="button"
+              onClick={async () => {
+                // auto-set confirmation to true
+                updateFormData("confirmation", true);
+                setValue("confirmation", true);
+                await handleUiStep2Next();
+              }}
+              className="w-full py-2.5 rounded-[7px] text-white cursor-pointer font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+              style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              {t("cancel") || "Cancel"}
+              Send Request
             </button>
           </div>
-          <div className="w-full sm:w-auto">
-            {currentStep < totalSteps ? (
+        )}
+        {uiStep === 3 && (
+          <div className="space-y-4 ">
+            <div className="flex items-center justify-between">
               <button
-                onClick={nextStep}
-                className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer  text-white font-semibold py-1.5 sm:py-2 px-4 sm:px-6 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
+                type="button"
+                onClick={() => setCurrentStep(5)}
+                className="w-8 h-8 rounded-full border cursor-pointer border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
               >
-                {t("next") || "Next"}
+                <FaArrowLeft />
               </button>
-            ) : (
-              <button
-                onClick={handleSubmit((data) => onSubmit(data, "published"))}
-                disabled={
-                  isSavingDraft || isPublishing || !formData.confirmation
-                }
-                className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer  disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-1.5 sm:py-1.01 px-1 sm:px-2 rounded-lg text-xs sm:text-sm w-full sm:w-auto transition-all duration-200"
-              >
-                {isPublishing
-                  ? t("publishing") || "Publishing..."
-                  : t("ok") || "OK"}
-              </button>
-            )}
+            </div>
+
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                Improve Your Offers{" "}
+                <span style={{ color: "#DD9E2C" }}>✨</span>
+              </h2>
+            </div>
+
+            {/* Trip Type */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                TRIP TYPE
+              </label>
+              <div className="relative">
+                <select
+                  {...register("travelType")}
+                  defaultValue={formData.travelType}
+                  onChange={(e) => {
+                    updateFormData("travelType", e.target.value);
+                    setValue("travelType", e.target.value);
+                  }}
+                  className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm appearance-none transition-all duration-200"
+                >
+                  <option value="">{t("select_travel_type") || "Select Travel Type"}</option>
+                  <option value="family">{t("family_trip") || "Family Trip"}</option>
+                  <option value="solo">{t("solo_travel") || "Solo Travel"}</option>
+                  <option value="couple">{t("couple") || "Couple"}</option>
+                  <option value="group">{t("group_travel") || "Group Travel"}</option>
+                  <option value="business">{t("business_travel") || "Business Travel"}</option>
+                </select>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-800"><GoChevronDown />
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+                    ACCOMMODATION PREFERENCES
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["hotel", "resort", "homestay", "apartment", "hostel"].map((opt) => (
+                      <PillButton
+                        key={opt}
+                        label={opt.charAt(0).toUpperCase() + opt.slice(1)}
+                        active={formData.typeOfAccommodation === opt}
+                        onClick={() => {
+                          updateFormData("typeOfAccommodation", opt);
+                          setValue("typeOfAccommodation", opt);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* hidden register field */}
+                  <input {...register("typeOfAccommodation")} type="hidden" value={formData.typeOfAccommodation} />
+                </div>
+                <div className="flex-shrink-0">
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+                    MINIMUM STAR
+                  </label>
+                  <StarRating
+                    value={parseInt(formData.minimumHotelStars) || 0}
+                    onChange={(s) => {
+                      updateFormData("minimumHotelStars", s);
+                      setValue("minimumHotelStars", s);
+                    }}
+                  />
+                  <input {...register("minimumHotelStars")} type="hidden" value={formData.minimumHotelStars} />
+                </div>
+              </div>
+            </div>
+
+            {/* Meal Plan */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+                MEAL PLAN
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "none", label: "No meal" },
+                  { value: "breakfast", label: "Breakfast" },
+                  { value: "half-board", label: "Breakfast & Dinner" },
+                  { value: "full-board", label: "All meal" },
+                ].map((opt) => (
+                  <PillButton
+                    key={opt.value}
+                    label={opt.label}
+                    active={formData.mealPlan === opt.value}
+                    onClick={() => {
+                      updateFormData("mealPlan", opt.value);
+                      setValue("mealPlan", opt.value);
+                    }}
+                  />
+                ))}
+              </div>
+              <input {...register("mealPlan")} type="hidden" value={formData.mealPlan} />
+            </div>
+
+            {/* Destination Type (hidden — still preserved) */}
+            <input
+              {...register("destinationType")}
+              type="hidden"
+              value={formData.destinationType}
+            />
+
+            {/* Description (optional) */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                DESCRIPTION <span className="normal-case font-normal">(OPTIONAL)</span>
+              </label>
+              <textarea
+                {...register("description")}
+                placeholder={t("description_placeholder") || "Write something..."}
+                rows={3}
+                defaultValue={formData.description}
+                onChange={(e) => updateFormData("description", e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent resize-none text-sm transition-all duration-200"
+              />
+            </div>
+
+            {/* Add Details button */}
+            <button
+              type="button"
+              onClick={handleAddDetails}
+              disabled={isSavingDraft || isPublishing}
+              className="w-full py-2.5 rounded-md text-white font-bold text-[16px] cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
+            >
+              {isPublishing ? t("publishing") || "Publishing..." : "Add details"}
+            </button>
+
+            {/* Skip for now button */}
+            <button
+              type="button"
+              onClick={handleSkipDetails}
+              disabled={isSavingDraft || isPublishing}
+              className="w-full py-2.5 rounded-md bg-white border border-gray-200 cursor-pointer text-gray-700 font-bold text-[16px] transition-all duration-200 hover:bg-gray-50 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Skip for now
+            </button>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Slider thumb styling */}
+      <style>{`
+        input[type='range']::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #DD9E2C;
+          cursor: pointer;
+          border: 3px solid #fff;
+          box-shadow: 0 0 0 2px #DD9E2C;
+        }
+        input[type='range']::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #DD9E2C;
+          cursor: pointer;
+          border: 3px solid #fff;
+          box-shadow: 0 0 0 2px #DD9E2C;
+        }
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      `}</style>
     </div>
   );
 }
