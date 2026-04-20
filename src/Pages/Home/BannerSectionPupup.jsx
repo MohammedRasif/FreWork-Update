@@ -890,7 +890,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
         {uiStep === 3 && (
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             <div className="flex items-center justify-between">
               <button
                 type="button"
