@@ -13,6 +13,61 @@
 "loading": "Caricamento...",
 "banner_tagline": "Ideale per viaggi da 3.000€ in su",
 "banner_slogan": "Pubblica la tua richiesta e ricevi offerte personalizzate dalle agenzie. ",
+
+
+
+
+ "response_time": "Risposta entro 24-48 ore",
+  "show_short_descriptionn": "Confronta agenzie verificate e scegli senza perdere tempo.",
+  "feature_drivers": "Autisti professionisti",
+  "feature_booking": "Prenotazione flessibile",
+  "feature_pricing": "Prezzi trasparenti",
+  "feature_vehicles": "Veicoli confortevoli",
+  "input_placeholder": "Dove vuoi andare?",
+  "time_info": "Richiede meno di 2 minuti",
+  "privacy_info": "Nessuna chiamata senza il tuo consenso",
+
+  "plan_trip_title": "Pianifica il tuo viaggio ✈️",
+  "where_to": "Dove vuoi andare?",
+  "when_travel": "Quando viaggi?",
+  "how_many_travelers": "Quanti viaggiatori?",
+  "budget_label": "Qual è il tuo budget?",
+  "next_step": "Prossimo step",
+  "almost_done": "Quasi finito!",
+  "email_label": "Indirizzo email",
+  "phone_label": "Numero di telefono",
+  "send_request": "Invia richiesta",
+  "improve_offers": "Migliora le tue offerte",
+  "trip_type": "Tipo di viaggio",
+  "select_trip_type": "Seleziona tipo di viaggio",
+  "accommodation_preferences": "Preferenze alloggio",
+  "minimum_star": "Stelle minime",
+  "meal_none": "Nessun pasto",
+  "meal_breakfast": "Colazione",
+  "meal_half_board": "Colazione e cena",
+  "meal_full_board": "Pensione completa",
+  "description_label": "Descrizione",
+  "add_details": "Aggiungi dettagli",
+  "skip_now": "Salta per ora",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "create_request": "Crea Richiesta",
 "what_we_offer": "Cosa offriamo ai nostri utenti...",
 "lets_use_vacanzamycost": "Come funziona VacanzaMyCost.it",

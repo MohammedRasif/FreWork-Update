@@ -127,7 +127,7 @@ const handleButtonClick = () => {
             {/* Top Badge */}
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-4 py-1.5 rounded-full text-[13px] md:text-sm">
               <LuClock3 className="text-white/90" />
-              <span>{t("response_time", "Response within 24 to 48 hours")}</span>
+              <span>{t("response_time")}</span>
             </div>
 
             {/* Main Heading */}
@@ -137,7 +137,7 @@ const handleButtonClick = () => {
 
             {/* Sub-description */}
             <p className="text-[17px] md:text-xl font-medium opacity-95 max-w-md">
-              {t("show_short_descriptionn", "Compare verified agencies and choose without wasting time.")}
+              {t("show_short_descriptionn")}
             </p>
 
             {/* Features Checklist */}
