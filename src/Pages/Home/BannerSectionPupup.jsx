@@ -952,7 +952,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             active={formData.typeOfAccommodation === opt}
             onClick={() => {
               const current = formData.typeOfAccommodation;
-              const newValue = current === opt ? "" : opt;   // ← Toggle Logic
+              const newValue = current === opt ? "" : opt;   
 
               updateFormData("typeOfAccommodation", newValue);
               setValue("typeOfAccommodation", newValue);
