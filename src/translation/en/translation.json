@@ -14,6 +14,70 @@
 "banner_top_buttom": "Each request will be verified by phone by one of our experts.",
 "banner_buttom": "We thank you and we hope …",
 "banner_slogan": "Post your request and receive personalized offers from agencies. ",
+
+
+"response_time":"Response within 24 to 48 hours",
+"show_short_descriptionn":"Compare verified agencies and choose without wasting time.",
+"feature_drivers":"Professional drivers",
+"feature_booking":"Flexible booking",
+"feature_pricing":"Transparent pricing",
+"eature_vehicles":"Comfortable vehicles",
+"input_placeholder":"Where do you want to go?",
+"time_info":"Takes less than 2 minutes",
+"privacy_info":"No calls without your consent",
+
+"plan_trip_title": "Plan Your Trip ✈️",
+  "where_to": "Where to?",
+  "when_travel": "When will you travel?",
+  "how_many_travelers": "How many travelers?",
+  "budget_label": "What's your budget?",
+  "next_step": "Next Step",
+  "almost_done": "Almost Done !",
+  "email_label": "Email Address",
+  "phone_label": "Phone Number",
+  "send_request": "Send Request",
+  "improve_offers": "Improve Your Offers",
+  "trip_type": "Trip Type",
+  "select_trip_type": "Select Trip Type",
+  "accommodation_preferences": "Accommodation Preferences",
+  "minimum_star": "Minimum Star",
+  "meal_none": "No meal",
+  "meal_breakfast": "Breakfast",
+  "meal_half_board": "Breakfast & Dinner",
+  "meal_full_board": "All meal",
+  "description_label": "Description",
+  "add_details": "Add details",
+  "skip_now": "Skip for now",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "create_request": "Create Request",
 "what_we_offer": "What we offer to our users...",
 "lets_use_vacanzamycost": "Let's Use VacanzaMycost.It",
