@@ -87,8 +87,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     setIsPopupOpened(true);
     setShowBudgetMessage(false);
     setHasWarningBeenShown(false);
-
-    // Load existing plan or pending plan data
     const pendingPlan = localStorage.getItem("pendingPlan");
     if (state?.id) {
       // Load data from state (existing plan)
@@ -141,14 +139,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         updateFormData(mappedKey, value);
       });
     } else if (pendingPlan) {
-      // Load data from pendingPlan
-      const parsed = JSON.parse(pendingPlan);
-      Object.entries(parsed).forEach(([key, value]) => {
-        setValue(key, value);
-        updateFormData(key, value);
-      });
-    }
-  }, [state?.id, setValue]);
+    const parsed = JSON.parse(pendingPlan);
+    Object.entries(parsed).forEach(([key, value]) => {
+      setValue(key, value);
+      updateFormData(key, value);
+    });
+  }
+}, [state?.id, setValue]);
 
   useEffect(() => {
     const loadGoogleMaps = () => {
