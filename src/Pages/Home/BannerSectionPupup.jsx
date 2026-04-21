@@ -95,7 +95,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
-      setValue("locationFrom", state?.location_from || "");
+      // setValue("locationFrom", state?.location_from || "");
       setValue("locationTo", state?.location_to || "");
       setValue(
         "startingDate",
@@ -103,12 +103,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           ? new Date(state?.start_date).toISOString().split("T")[0]
           : "",
       );
-      setValue(
-        "endingDate",
-        state?.end_date
-          ? new Date(state?.end_date).toISOString().split("T")[0]
-          : "",
-      );
+      // setValue(
+      //   "endingDate",
+      //   state?.end_date
+      //     ? new Date(state?.end_date).toISOString().split("T")[0]
+      //     : "",
+      // );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
       setValue("budget", state?.budget || "5000");
@@ -124,10 +124,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         const mappedKey =
           {
             phone_number: "phoneNumber",
-            location_from: "locationFrom",
+            // location_from: "locationFrom",
             location_to: "locationTo",
             start_date: "startingDate",
-            end_date: "endingDate",
+            // end_date: "endingDate",
             adult_count: "adults",
             child_count: "children",
             tourist_spots: "touristSpots",
@@ -291,12 +291,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       navigate("/registrazione", { state: { fromLogin: true } });
       return;
     }
-    if (data.endingDate < data.startingDate) {
-      toast.error(
-        t("end_date_after_start") || "End date must be after start date",
-      );
-      return;
-    }
+    // if (data.endingDate < data.startingDate) {
+    //   toast.error(
+    //     t("end_date_after_start") || "End date must be after start date",
+    //   );
+    //   return;
+    // }
     if (!data.adults && !data.children) {
       toast.error(
         t("at_least_one_person") || "At least one adult or child is required",
@@ -307,10 +307,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formDataToSend.append("name", data.name);
     formDataToSend.append("email", data.email);
     formDataToSend.append("phone_number", data.phoneNumber);
-    formDataToSend.append("location_from", data.locationFrom);
+    // formDataToSend.append("location_from", data.locationFrom);
     formDataToSend.append("location_to", data.locationTo);
     formDataToSend.append("start_date", data.startingDate);
-    formDataToSend.append("end_date", data.endingDate);
+    // formDataToSend.append("end_date", data.endingDate);
     formDataToSend.append("adult_count", data.adults || 0);
     formDataToSend.append("child_count", data.children || 0);
     formDataToSend.append("budget", data.budget || "");
@@ -909,69 +909,85 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
 
             {/* Trip Type */}
-            <div>
-              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                TRIP TYPE
-              </label>
-              <div className="relative">
-                <select
-                  {...register("travelType")}
-                  defaultValue={formData.travelType}
-                  onChange={(e) => {
-                    updateFormData("travelType", e.target.value);
-                    setValue("travelType", e.target.value);
-                  }}
-                  className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm appearance-none transition-all duration-200"
-                >
-                  <option value="">{t("select_travel_type") || "Select Travel Type"}</option>
-                  <option value="family">{t("family_trip") || "Family Trip"}</option>
-                  <option value="solo">{t("solo_travel") || "Solo Travel"}</option>
-                  <option value="couple">{t("couple") || "Couple"}</option>
-                  <option value="group">{t("group_travel") || "Group Travel"}</option>
-                  <option value="business">{t("business_travel") || "Business Travel"}</option>
-                </select>
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-800"><GoChevronDown />
-                </span>
-              </div>
-            </div>
+            {/* Trip Type */}
+<div>
+  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+    TRIP TYPE
+  </label>
+  <div className="relative">
+    <select
+      {...register("travelType")}
+      defaultValue={formData.travelType}
+      onChange={(e) => {
+        const value = e.target.value;
+        updateFormData("travelType", value);
+        setValue("travelType", value);
+      }}
+      className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm appearance-none transition-all duration-200"
+    >
+      <option value="">Select Trip Type</option>
+      <option value="beach">Beach</option>
+      <option value="mountain">Mountain</option>
+      <option value="relax">Relaxing tour</option>
+      <option value="group">Group</option>
+      <option value="">Not sure</option>   
+    </select>
+    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-800">
+      <GoChevronDown />
+    </span>
+  </div>
+</div>
 
             <div>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
-                    ACCOMMODATION PREFERENCES
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {["hotel", "resort", "homestay", "apartment", "hostel"].map((opt) => (
-                      <PillButton
-                        key={opt}
-                        label={opt.charAt(0).toUpperCase() + opt.slice(1)}
-                        active={formData.typeOfAccommodation === opt}
-                        onClick={() => {
-                          updateFormData("typeOfAccommodation", opt);
-                          setValue("typeOfAccommodation", opt);
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* hidden register field */}
-                  <input {...register("typeOfAccommodation")} type="hidden" value={formData.typeOfAccommodation} />
-                </div>
-                <div className="flex-shrink-0">
-                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
-                    MINIMUM STAR
-                  </label>
-                  <StarRating
-                    value={parseInt(formData.minimumHotelStars) || 0}
-                    onChange={(s) => {
-                      updateFormData("minimumHotelStars", s);
-                      setValue("minimumHotelStars", s);
-                    }}
-                  />
-                  <input {...register("minimumHotelStars")} type="hidden" value={formData.minimumHotelStars} />
-                </div>
-              </div>
-            </div>
+  <div className="flex items-start justify-between gap-4">
+    <div className="flex-1">
+      <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+        ACCOMMODATION PREFERENCES
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {["hotel", "resort", "homestay", "apartment", "hostel"].map((opt) => (
+          <PillButton
+            key={opt}
+            label={opt.charAt(0).toUpperCase() + opt.slice(1)}
+            active={formData.typeOfAccommodation === opt}
+            onClick={() => {
+              const current = formData.typeOfAccommodation;
+              const newValue = current === opt ? "" : opt;   // ← Toggle Logic
+
+              updateFormData("typeOfAccommodation", newValue);
+              setValue("typeOfAccommodation", newValue);
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Hidden register field */}
+      <input 
+        {...register("typeOfAccommodation")} 
+        type="hidden" 
+        value={formData.typeOfAccommodation} 
+      />
+    </div>
+
+    <div className="flex-shrink-0">
+      <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+        MINIMUM STAR
+      </label>
+      <StarRating
+        value={parseInt(formData.minimumHotelStars) || 0}
+        onChange={(s) => {
+          updateFormData("minimumHotelStars", s);
+          setValue("minimumHotelStars", s);
+        }}
+      />
+      <input 
+        {...register("minimumHotelStars")} 
+        type="hidden" 
+        value={formData.minimumHotelStars} 
+      />
+    </div>
+  </div>
+</div>
 
             {/* Meal Plan */}
             <div>
