@@ -451,7 +451,7 @@ function SinglePost({ prid }) {
           </div>
 
           <div>
-            <p className="text-md text-gray-600 flex items-center gap-2 ">
+            {/* <p className="text-md text-gray-600 flex items-center gap-2 ">
               <User className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">{t("adult")}:</span>{" "}
@@ -464,7 +464,7 @@ function SinglePost({ prid }) {
                 <span className="font-medium">{t("child")}:</span>{" "}
                 {tour.child_count}
               </span>
-            </p>
+            </p> */}
             <p className="text-md text-gray-600 flex items-center gap-2">
               <FaLocationDot className="w-6 h-5 text-black size-4" />
               <span>
@@ -473,13 +473,13 @@ function SinglePost({ prid }) {
               </span>
             </p>
 
-            <p className="text-md text-gray-600 flex items-center gap-2">
+            {/* <p className="text-md text-gray-600 flex items-center gap-2">
               <FaLocationArrow className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">{t("departure_from")}:</span>{" "}
                 {tour.location_from || t("na")}
               </span>
-            </p>
+            </p> */}
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdOutlineNoMeals className="w-6 h-5 text-black" />
@@ -527,7 +527,7 @@ function SinglePost({ prid }) {
               <span>{tour.minimum_star_hotel || t("na")}</span>
             </p> */}
 
-            <p className="text-md text-gray-600 flex items-center gap-2">
+            {/* <p className="text-md text-gray-600 flex items-center gap-2">
               <FaClock className="w-6 h-5 text-black" />
               <span>
                 <span className="font-medium">{t("duration")}:</span>{" "}
@@ -537,7 +537,7 @@ function SinglePost({ prid }) {
                     }`
                   : "N/A"}
               </span>
-            </p>
+            </p> */}
 
             <p className="text-md text-gray-600 flex items-center gap-2">
               <MdVerifiedUser className="w-7 h-6 text-green-500" />
