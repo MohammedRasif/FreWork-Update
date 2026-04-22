@@ -224,7 +224,7 @@ function AcceptedOffers() {
                 </div>
 
                 <div>
-                  <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                  {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                     <Baby className="w-6 h-5 text-gray-900" />
                     <span>
                       <span className="font-bold">{t("child")}:</span>{" "}
@@ -237,7 +237,7 @@ function AcceptedOffers() {
                       <span className="font-bold">{t("adult")}:</span>{" "}
                       {tour.adult_count}
                     </span>
-                  </p>
+                  </p> */}
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationDot className="w-6 h-5 text-black size-4" />
                     <span>
@@ -249,7 +249,7 @@ function AcceptedOffers() {
                         : tour.tourist_spots}
                     </span>
                   </p>
-                  <p className="text-md text-gray-600 flex items-center gap-2">
+                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaLocationArrow className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">
@@ -257,7 +257,7 @@ function AcceptedOffers() {
                       </span>{" "}
                       {tour.location_from || "N/A"}
                     </span>
-                  </p>
+                  </p> */}
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <MdOutlineNoMeals className="w-6 h-5 text-black" />
                     <span>
@@ -306,7 +306,7 @@ function AcceptedOffers() {
                       {tour.minimum_star_hotel || "N/A"}
                     </span>
                   </p> */}
-                  <p className="text-md text-gray-600 flex items-center gap-2">
+                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
                     <FaClock className="w-6 h-5 text-black" />
                     <span>
                       <span className="font-medium">{t("duration")}:</span>{" "}
@@ -316,7 +316,7 @@ function AcceptedOffers() {
                           }`
                         : "N/A"}
                     </span>
-                  </p>
+                  </p> */}
                   <p className="text-md text-gray-600 flex items-center gap-2">
                     <ShieldCheck className="w-6 h-5 text-green-500" />
                     <span>

@@ -155,16 +155,16 @@ function AdminOfferPlan() {
                             {t("willing_to_go_on")}{" "}
                             <span className="font-medium">{formattedDate}</span>
                           </p>
-                          <p>
-  <span>
-    <span className="font-medium">{t("duration")}:</span>{" "}
-    {duration
-      ? `${parseInt(duration)} ${
-          parseInt(duration) === 1 ? t("day") : t("days")
-        }`
-      : "N/A"}
-  </span>
-</p>
+                              {/* <p>
+                                <span>
+                                  <span className="font-medium">{t("duration")}:</span>{" "}
+                                  {duration
+                                    ? `${parseInt(duration)} ${
+                                        parseInt(duration) === 1 ? t("day") : t("days")
+                                      }`
+                                    : "N/A"}
+                                </span>
+                              </p> */}
 
                           {/* <p>
                             {t("category")}:{" "}
