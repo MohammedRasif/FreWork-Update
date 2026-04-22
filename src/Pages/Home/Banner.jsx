@@ -113,11 +113,18 @@ const handleButtonClick = () => {
     <div className="relative w-full min-h-screen flex items-center overflow-hidden">
       {/* Background Handler */}
       <div className="absolute inset-0">
-        <picture>
-          <source media="(max-width: 700px)" srcSet={img2} />
-          <img src={img} alt="Background" className="object-cover w-full h-full object-center" />
-        </picture>
-        <div className="absolute inset-0 bg-black/20 lg:bg-gradient-to-r lg:from-black/50 lg:via-transparent lg:to-transparent" />
+       <div className="relative w-full h-full">
+  <picture>
+    <source media="(max-width: 700px)" srcSet={img2} />
+    <img
+      src={img}
+      alt="Background"
+      className="object-cover w-full h-full object-center"
+    />
+  </picture>
+
+  {/* Bottom white fade overlay */}
+<div className="" /></div>
       </div>
 
       <div className="relative z-10 w-full container mx-auto px-6 pt-7 pb-10 lg:py-0">
