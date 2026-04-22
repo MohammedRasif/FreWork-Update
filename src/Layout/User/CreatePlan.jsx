@@ -33,8 +33,6 @@ const CreatePlan = () => {
   } = useForm();
 
   const locationFromRef = useRef(null);
-  const locationToRef = useRef(null);
-  const touristSpotsRef = useRef(null);
   const budgetRef = useRef(null);
   const [showBudgetMessage, setShowBudgetMessage] = useState(false);
   const [isPopupOpened, setIsPopupOpened] = useState(false);
@@ -50,26 +48,15 @@ const CreatePlan = () => {
       setValue("email", oldData.email || "");
       setValue("phoneNumber", oldData.phone_number || "");
       setValue("locationFrom", oldData.location_from || "");
-      setValue("locationTo", oldData.location_to || "");
       setValue(
         "startingDate",
         oldData.start_date
           ? new Date(oldData.start_date).toISOString().split("T")[0]
           : ""
       );
-      setValue(
-        "endingDate",
-        oldData.end_date
-          ? new Date(oldData.end_date).toISOString().split("T")[0]
-          : ""
-      );
-      setValue("adult", oldData.adult_count || 0);
-      setValue("child", oldData.child_count || 0);
       setValue("budget", oldData.budget || "");
-      setValue("touristSpots", oldData.tourist_spots || "");
       setValue("description", oldData.description || "");
       setValue("travelType", oldData.travel_type || "");
-      setValue("destinationType", oldData.destination_type || "");
       setValue("typeOfAccommodation", oldData.type_of_accommodation || "");
       setValue("minimum_star_hotel", oldData.minimum_star_hotel || "");
       setValue("mealPlan", oldData.meal_plan || "");
@@ -94,17 +81,6 @@ const CreatePlan = () => {
           const place = fromAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
           setValue("locationFrom", locationValue);
-        });
-      }
-
-      if (locationToRef.current) {
-        const toAutocomplete = new window.google.maps.places.Autocomplete(
-          locationToRef.current
-        );
-        toAutocomplete.addListener("place_changed", () => {
-          const place = toAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          setValue("locationTo", locationValue);
         });
       }
     };
@@ -140,35 +116,19 @@ const CreatePlan = () => {
   }, []);
 
   const onSubmit = async (data, status) => {
-    if (data.endingDate < data.startingDate) {
-      toast.error(t("end_date_after_start"));
-      return;
-    }
-
-    if (!data.adult && !data.child) {
-      toast.error(t("at_least_one_person"));
-      return;
-    }
-
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("phone_number", data.phoneNumber);
     formData.append("location_from", data.locationFrom);
-    formData.append("location_to", data.locationTo);
     formData.append("start_date", data.startingDate);
-    formData.append("end_date", data.endingDate);
-    formData.append("adult_count", data.adult || 0);
-    formData.append("child_count", data.child || 0);
     formData.append("budget", data.budget);
     formData.append("description", data.description);
     formData.append("travel_type", data.travelType);
-    formData.append("destination_type", data.destinationType);
     formData.append("type_of_accommodation", data.typeOfAccommodation);
     formData.append("minimum_star_hotel", data.minimumHotelStars);
     formData.append("meal_plan", data.mealPlan);
     formData.append("status", status);
-    formData.append("tourist_spots", data.touristSpots);
     formData.append(
       "is_confirmed_request",
       data.confirmation ? "true" : "false"
@@ -248,9 +208,6 @@ const CreatePlan = () => {
 
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: t("location_from_required"),
-  });
-  const { ref: toFormRef, ...toRest } = register("locationTo", {
-    required: t("location_to_required"),
   });
 
   return (
@@ -366,30 +323,6 @@ const CreatePlan = () => {
               </div>
               <div>
                 <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  {t("destination_type")}
-                </label>
-                <select
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                  {...register("destinationType", {
-                    required: t("destination_required"),
-                  })}
-                >
-                  <option value="" disabled selected>
-                    {t("select_destination")}
-                  </option>
-                  <option value="beach">{t("beach_trips")}</option>
-                  <option value="mountain">{t("mountain_adventures")}</option>
-                  <option value="relax">{t("relaxing_tours")}</option>
-                  <option value="group">{t("group_packages")}</option>
-                </select>
-                {errors.destinationType && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.destinationType.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-[16px] font-medium text-gray-700 mb-2">
                   {t("minimum_hotel_stars")}
                 </label>
                 <select
@@ -432,29 +365,6 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                {t("location_to")}
-              </label>
-              <input
-                type="text"
-                placeholder={t("enter_here")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                {...toRest}
-                ref={(e) => {
-                  toFormRef(e);
-                  locationToRef.current = e;
-                }}
-              />
-              {errors.locationTo && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.locationTo.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 {t("starting_date")}
               </label>
               <div className="relative">
@@ -465,7 +375,6 @@ const CreatePlan = () => {
                     required: t("starting_date_required"),
                   })}
                 />
-                {/* <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" /> */}
               </div>
               {errors.startingDate && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -473,73 +382,9 @@ const CreatePlan = () => {
                 </p>
               )}
             </div>
-            <div>
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                {t("ending_date")}
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] pr-10"
-                  {...register("endingDate", {
-                    required: t("ending_date_required"),
-                  })}
-                />
-                {/* <FiCalendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" /> */}
-              </div>
-              {errors.endingDate && (
-                <p className="text-red-500 text-[14px] mt-1">
-                  {errors.endingDate.message}
-                </p>
-              )}
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex w-full gap-4">
-              <div className="flex-1">
-                <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  {t("adult")}
-                </label>
-                <input
-                  type="number"
-                  placeholder={t("enter_adults")}
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                  {...register("adult", {
-                    min: {
-                      value: 0,
-                      message: t("adults_cannot_be_negative"),
-                    },
-                  })}
-                />
-                {errors.adult && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.adult.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex-1">
-                <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                  {t("child")}
-                </label>
-                <input
-                  type="number"
-                  placeholder={t("enter_children")}
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                  {...register("child", {
-                    min: {
-                      value: 0,
-                      message: t("children_cannot_be_negative"),
-                    },
-                  })}
-                />
-                {errors.child && (
-                  <p className="text-red-500 text-[14px] mt-1">
-                    {errors.child.message}
-                  </p>
-                )}
-              </div>
-            </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 {t("budget")}
@@ -573,22 +418,6 @@ const CreatePlan = () => {
                   {errors.budget.message}
                 </p>
               )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                {t("tourist_spots")}
-              </label>
-              <input
-                type="text"
-                placeholder={t("search_tourist_spot")}
-                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                ref={(e) => {
-                  touristSpotsRef.current = e;
-                }}
-              />
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -651,14 +480,6 @@ const CreatePlan = () => {
           )}
 
           <div className="flex items-center justify-center gap-4 mt-8 pt-6">
-            {/* <button
-              type="button"
-              onClick={handleSubmit((data) => onSubmit(data, "draft"))}
-              className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
-              disabled={isSavingDraft || isPublishing}
-            >
-              {isSavingDraft ? t("saving") : t("save_for_future")}
-            </button> */}
             <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "published"))}

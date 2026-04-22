@@ -339,7 +339,7 @@ function PublishedPlan() {
                               )}
                             </span>
                           </p>
-                          <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
@@ -353,7 +353,7 @@ function PublishedPlan() {
                                   }`
                                 : "N/A"}
                             </span>
-                          </p>
+                          </p> */}
                           
                         </div>
                       </div>
