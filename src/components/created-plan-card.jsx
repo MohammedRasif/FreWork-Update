@@ -332,7 +332,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         <p className="text-sm text-[#70798F]">
                           {t("interested_tourist_points")}:{" "}
                           <span className="text-[#343E4B] font-medium">
-                            {plan.tourist_spots || tող}
+                            {plan.tourist_spots || t("na")}
                           </span>
                         </p>
                       </div>

@@ -33,6 +33,7 @@ const CreatePlan = () => {
   } = useForm();
 
   const locationFromRef = useRef(null);
+  const locationToRef = useRef(null);
   const budgetRef = useRef(null);
   const [showBudgetMessage, setShowBudgetMessage] = useState(false);
   const [isPopupOpened, setIsPopupOpened] = useState(false);
@@ -48,6 +49,7 @@ const CreatePlan = () => {
       setValue("email", oldData.email || "");
       setValue("phoneNumber", oldData.phone_number || "");
       setValue("locationFrom", oldData.location_from || "");
+      setValue("locationTo", oldData.location_to || "");
       setValue(
         "startingDate",
         oldData.start_date
@@ -81,6 +83,17 @@ const CreatePlan = () => {
           const place = fromAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
           setValue("locationFrom", locationValue);
+        });
+      }
+
+      if (locationToRef.current) {
+        const toAutocomplete = new window.google.maps.places.Autocomplete(
+          locationToRef.current
+        );
+        toAutocomplete.addListener("place_changed", () => {
+          const place = toAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          setValue("locationTo", locationValue);
         });
       }
     };
@@ -121,6 +134,7 @@ const CreatePlan = () => {
     formData.append("email", data.email);
     formData.append("phone_number", data.phoneNumber);
     formData.append("location_from", data.locationFrom);
+    formData.append("location_to", data.locationTo);
     formData.append("start_date", data.startingDate);
     formData.append("budget", data.budget);
     formData.append("description", data.description);
@@ -208,6 +222,9 @@ const CreatePlan = () => {
 
   const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
     required: t("location_from_required"),
+  });
+  const { ref: toFormRef, ...toRest } = register("locationTo", {
+    required: t("location_to_required"),
   });
 
   return (
@@ -363,6 +380,29 @@ const CreatePlan = () => {
                 </p>
               )}
             </div>
+            <div>
+              <label className="block text-[16px] font-medium text-gray-700 mb-2">
+                {t("location_to")}
+              </label>
+              <input
+                type="text"
+                placeholder={t("enter_here")}
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
+                {...toRest}
+                ref={(e) => {
+                  toFormRef(e);
+                  locationToRef.current = e;
+                }}
+              />
+              {errors.locationTo && (
+                <p className="text-red-500 text-[14px] mt-1">
+                  {errors.locationTo.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
                 {t("starting_date")}
