@@ -226,7 +226,7 @@ const AdminPricing = () => {
                       className="w-full h-auto"
                     />
                     <h3
-                      className={`absolute top-5 left-2 z-10 font-bold ${
+                      className={`absolute top-6 left-2 z-10 font-bold ${
                         plan.name === "Founder Partner" ||
                         plan.name === "Partner Fondatore"
                           ? "text-white"
