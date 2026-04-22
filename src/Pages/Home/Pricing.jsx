@@ -67,7 +67,6 @@ const Pricing = () => {
 
   const isSingleCardView = visiblePlans.length === 1;
   const isLoadingState = isLoading || isFetching;
-
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
   const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
 
@@ -226,7 +225,7 @@ const Pricing = () => {
                       className="w-full h-auto"
                     />
                     <h3
-                      className={`absolute top-5 left-2 z-10 font-bold ${
+                      className={`absolute top-6 left-2 z-10 font-bold ${
                         plan.name === "Founder Partner" ||
                         plan.name === "Partner Fondatore"
                           ? "text-white"

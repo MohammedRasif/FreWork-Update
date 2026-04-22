@@ -622,7 +622,7 @@ const TourPlanDouble = () => {
                         </div>
 
                         <div>
-                          <p className="text-md text-gray-600 flex items-center gap-2 ">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2 ">
                             <User className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">{t("adult")}:</span>{" "}
@@ -635,7 +635,7 @@ const TourPlanDouble = () => {
                               <span className="font-medium">{t("child")}:</span>{" "}
                               {tour.child_count}
                             </span>
-                          </p>
+                          </p> */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaLocationDot className="w-6 h-5 text-black size-4" />
                             <span>
@@ -647,7 +647,7 @@ const TourPlanDouble = () => {
                                 : tour.tourist_spots}
                             </span>
                           </p>
-                          <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaLocationArrow className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
@@ -655,7 +655,7 @@ const TourPlanDouble = () => {
                               </span>{" "}
                               {tour.location_from || "N/A"}
                             </span>
-                          </p>
+                          </p> */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-black" />
                             <span>
@@ -699,7 +699,7 @@ const TourPlanDouble = () => {
                                 : t("na")}
                             </p>
                           </div>
-                          <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
@@ -713,7 +713,7 @@ const TourPlanDouble = () => {
                                   }`
                                 : "N/A"}
                             </span>
-                          </p>
+                          </p> */}
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <ShieldCheck className="w-6 h-5 text-green-500" />
                             <span>

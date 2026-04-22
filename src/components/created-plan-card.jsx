@@ -247,7 +247,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                             </span>
                           </p>
 
-                          <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaLocationArrow className="w-6 h-5 text-gray-900" />
                             <span>
                               <span className="font-medium">
@@ -255,7 +255,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                               </span>{" "}
                               {plan.location_from || t("na")}
                             </span>
-                          </p>
+                          </p> */}
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
@@ -300,7 +300,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                             </p>
                           </div>
 
-                          <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
                             <FaClock className="w-6 h-5 text-black" />
                             <span>
                               <span className="font-medium">
@@ -314,7 +314,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                   }`
                                 : "N/A"}
                             </span>
-                          </p>
+                          </p> */}
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdVerifiedUser className="w-7 h-6 text-green-500" />
@@ -332,7 +332,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         <p className="text-sm text-[#70798F]">
                           {t("interested_tourist_points")}:{" "}
                           <span className="text-[#343E4B] font-medium">
-                            {plan.tourist_spots || tող}
+                            {plan.tourist_spots || t("na")}
                           </span>
                         </p>
                       </div>

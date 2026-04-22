@@ -369,12 +369,12 @@ const AdminHome = () => {
                         <span>
                           <span className="font-bold">{t("dates")}:</span>{" "}
                           <span className="font-medium">
-                            {selectedPlan.start_date} —{" "}
-                            {selectedPlan.end_date || selectedPlan.start_date}
+                            {selectedPlan.start_date} 
+                            {/* {selectedPlan.end_date || selectedPlan.start_date} */}
                           </span>
                         </span>
                       </p>
-                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
                         <span>
                           <span className="font-bold">
@@ -382,8 +382,8 @@ const AdminHome = () => {
                           </span>{" "}
                           {selectedPlan.tourist_spots || t("none")}
                         </span>
-                      </p>
-                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                      </p> */}
+                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">
@@ -391,7 +391,7 @@ const AdminHome = () => {
                           </span>{" "}
                           {selectedPlan.location_from || t("na")}
                         </span>
-                      </p>
+                      </p> */}
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                         <span>
@@ -431,7 +431,7 @@ const AdminHome = () => {
                             : t("na")}
                         </p>
                       </p>
-                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <Baby className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">{t("child")}:</span>{" "}
@@ -457,7 +457,7 @@ const AdminHome = () => {
                               }`
                             : "N/A"}
                         </span>
-                      </p>
+                      </p> */}
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdVerifiedUser className="w-7 h-6 text-green-500" />
                         <span>
