@@ -416,25 +416,20 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     required: t("location_to_required") || "Location (To) is required",
   });
 
-  // ─── UI STEP 1: Plan Your Trip (internal steps 1 & 2) ───────────────────────
   const handleUiStep1Next = async () => {
-    // Pre-fill hidden fields with safe defaults before validation
     if (!formData.children) {
       setValue("children", 0);
       updateFormData("children", 0);
     }
-    // If locationFrom is empty, mirror locationTo into it
     if (!formData.locationFrom && formData.locationTo) {
       setValue("locationFrom", formData.locationTo);
       updateFormData("locationFrom", formData.locationTo);
     }
-    // touristSpots is hidden — set a placeholder so validation passes
     if (!formData.touristSpots) {
       setValue("touristSpots", "N/A");
       updateFormData("touristSpots", "N/A");
     }
 
-    // Only validate the VISIBLE fields on this screen
     const visibleFields = ["startingDate", "endingDate", "adults", "locationTo", "budget"];
     const result = await trigger(visibleFields);
     if (!result) {
@@ -443,24 +438,17 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       );
       return;
     }
-    // Advance to UI step 2 (internal step 5 — name/email/phone)
     setCurrentStep(5);
   };
-
-  // ─── UI STEP 2: Almost Done (internal step 5 — name/email/phone/confirmation) ─
   const handleUiStep2Next = async () => {
     const valid = await validateStep(5);
     if (!valid) return;
-    setCurrentStep(6); // go to optional step UI
+    setCurrentStep(6);
   };
 
-  // ─── UI STEP 3: Improve Your Offers (optional — internal steps 3 & 4) ────────
-  // "Add details" — validate & submit with optional data
   const handleAddDetails = async () => {
-    // validate accommodation / stars / meal plan
     const step3Valid = await validateStep(3);
     if (!step3Valid) return;
-    // validate travel type / destination type
     const step4Valid = await validateStep(4);
     if (!step4Valid) return;
     handleSubmit((data) => onSubmit(data, "published"))();
@@ -705,7 +693,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 max={50000}
                 step={500}
                 value={formData.budget || 5000}
-                onClick={handleBudgetClick}
+                // onClick={handleBudgetClick}
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFormData("budget", value);

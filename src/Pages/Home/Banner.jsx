@@ -113,11 +113,18 @@ const handleButtonClick = () => {
     <div className="relative w-full min-h-screen flex items-center overflow-hidden">
       {/* Background Handler */}
       <div className="absolute inset-0">
-        <picture>
-          <source media="(max-width: 700px)" srcSet={img2} />
-          <img src={img} alt="Background" className="object-cover w-full h-full object-center" />
-        </picture>
-        <div className="absolute inset-0 bg-black/20 lg:bg-gradient-to-r lg:from-black/50 lg:via-transparent lg:to-transparent" />
+       <div className="relative w-full h-full">
+  <picture>
+    <source media="(max-width: 700px)" srcSet={img2} />
+    <img
+      src={img}
+      alt="Background"
+      className="object-cover w-full h-full object-center"
+    />
+  </picture>
+
+  {/* Bottom white fade overlay */}
+<div className="" /></div>
       </div>
 
       <div className="relative z-10 w-full container mx-auto px-6 pt-7 pb-10 lg:py-0">
@@ -141,19 +148,25 @@ const handleButtonClick = () => {
             </p>
 
             {/* Features Checklist */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 max-w-lg">
-              {[
-                { key: "feature_drivers", label: "Professional drivers" },
-                { key: "feature_booking", label: "Flexible booking" },
-                { key: "feature_pricing", label: "Transparent pricing" },
-                { key: "feature_vehicles", label: "Comfortable vehicles" }
-              ].map((item) => (
-                <div key={item.key} className="flex items-center gap-3">
-                  <FaCheckCircle size={18} className="text-white bg-green-600 rounded-full border-2 border-white" />
-                  <span className="text-[15px] md:text-[18px] font-medium">{t(item.key, item.label)}</span>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4">
+            {[
+              { key: "feature_drivers", label: "Professional drivers" },
+              { key: "feature_booking", label: "Flexible booking" },
+              { key: "feature_pricing", label: "Transparent pricing" },
+              { key: "feature_vehicles", label: "Comfortable vehicles" }
+            ].map((item) => (
+              <div key={item.key} className="flex items-start gap-3">
+                
+                <div className="w-[18px] h-[18px] flex-shrink-0 mt-[7px]">
+                  <FaCheckCircle className="w-full h-full text-white" />
                 </div>
-              ))}
-            </div>
+
+                <span className="text-[15px] md:text-[18px] font-medium leading-relaxed">
+                  {t(item.key, item.label)}
+                </span>
+              </div>
+            ))}
+          </div>
           </div>
           {/* Right Side: Floating Form Card */}
           {showCreateRequestButton && (
