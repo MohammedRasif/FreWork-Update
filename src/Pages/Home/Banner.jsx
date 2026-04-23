@@ -126,7 +126,6 @@ const handleButtonClick = () => {
   {/* Bottom white fade overlay */}
 <div className="" /></div>
       </div>
-
       <div className="relative z-10 w-full container mx-auto px-6 pt-7 pb-10 lg:py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left Side - unchanged */}
