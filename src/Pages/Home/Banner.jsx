@@ -164,7 +164,6 @@ const handleButtonClick = () => {
                 <span className="text-[15px] md:text-[18px] font-medium leading-relaxed">
                   {t(item.key, item.label)}
                 </span>
-
               </div>
             ))}
           </div>
