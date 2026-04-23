@@ -126,6 +126,7 @@ const handleButtonClick = () => {
   {/* Bottom white fade overlay */}
 <div className="" /></div>
       </div>
+
       <div className="relative z-10 w-full container mx-auto px-6 pt-7 pb-10 lg:py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left Side - unchanged */}
@@ -147,19 +148,26 @@ const handleButtonClick = () => {
             </p>
 
             {/* Features Checklist */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 max-w-lg">
-              {[
-                { key: "feature_drivers", label: "Professional drivers" },
-                { key: "feature_booking", label: "Flexible booking" },
-                { key: "feature_pricing", label: "Transparent pricing" },
-                { key: "feature_vehicles", label: "Comfortable vehicles" }
-              ].map((item) => (
-                <div key={item.key} className="flex items-center gap-3">
-                  <FaCheckCircle size={18} className="text-white bg-green-600 rounded-full border-2 border-white" />
-                  <span className="text-[15px] md:text-[18px] font-medium">{t(item.key, item.label)}</span>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4">
+            {[
+              { key: "feature_drivers", label: "Professional drivers" },
+              { key: "feature_booking", label: "Flexible booking" },
+              { key: "feature_pricing", label: "Transparent pricing" },
+              { key: "feature_vehicles", label: "Comfortable vehicles" }
+            ].map((item) => (
+              <div key={item.key} className="flex items-start gap-3">
+                
+                <div className="w-[18px] h-[18px] flex-shrink-0 mt-[7px]">
+                  <FaCheckCircle className="w-full h-full text-white" />
                 </div>
-              ))}
-            </div>
+
+                <span className="text-[15px] md:text-[18px] font-medium leading-relaxed">
+                  {t(item.key, item.label)}
+                </span>
+
+              </div>
+            ))}
+          </div>
           </div>
           {/* Right Side: Floating Form Card */}
           {showCreateRequestButton && (
