@@ -67,8 +67,8 @@ const Pricing = () => {
 
   const isSingleCardView = visiblePlans.length === 1;
   const isLoadingState = isLoading || isFetching;
-  const getPrimaryColor = (plan) => (plan?.isSpecial ? "#3776E2" : "#FF6600");
-  const getHoverColor = (plan) => (plan?.isSpecial ? "#2a5bb5" : "#e65f05");
+  const getPrimaryColor = (plan) => (plan?.isSpecial ? "#DD9E2C" : "#C2851C");
+  const getHoverColor = (plan) => (plan?.isSpecial ? "#C2851C" : "#2a5bb5");
 
   const handleSelectPlan = async (plan) => {
     if (plan?.cta?.action === "apply_partner") {
@@ -299,7 +299,7 @@ const Pricing = () => {
                           <li key={i} className="flex items-start">
                             <IoCheckmarkDoneSharp
                               style={{ color: getPrimaryColor(plan) }}
-                              className="mt-1 mr-2 flex-shrink-0"
+                              className="mt-1 mr-2 flex-shrink-0 "
                               size={20}
                             />
                             <span>{feature}</span>
