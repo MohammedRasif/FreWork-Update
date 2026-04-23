@@ -64,13 +64,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
 
-  // UI-only display step (1-3) mapped from internal step
-  // Navigation: currentStep 1 → UI 1, currentStep 5 → UI 2, currentStep 6 → UI 3
   const uiStep = currentStep <= 4 ? 1 : currentStep === 5 ? 2 : 3;
   const totalUiSteps = 3;
   const progressPercentage = (uiStep / totalUiSteps) * 100;
 
-  // Define the event handlers
   const handleBudgetClick = () => {
     if (isPopupOpened && !showBudgetMessage && !hasWarningBeenShown) {
       setShowBudgetMessage(true);
@@ -83,17 +80,14 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   };
 
   useEffect(() => {
-    // Reset states when popup is opened
     setIsPopupOpened(true);
     setShowBudgetMessage(false);
     setHasWarningBeenShown(false);
     const pendingPlan = localStorage.getItem("pendingPlan");
     if (state?.id) {
-      // Load data from state (existing plan)
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "");
-      // setValue("locationFrom", state?.location_from || "");
       setValue("locationTo", state?.location_to || "");
       setValue(
         "startingDate",
@@ -101,12 +95,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           ? new Date(state?.start_date).toISOString().split("T")[0]
           : "",
       );
-      // setValue(
-      //   "endingDate",
-      //   state?.end_date
-      //     ? new Date(state?.end_date).toISOString().split("T")[0]
-      //     : "",
-      // );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
       setValue("budget", state?.budget || "5000");
@@ -122,10 +110,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         const mappedKey =
           {
             phone_number: "phoneNumber",
-            // location_from: "locationFrom",
             location_to: "locationTo",
             start_date: "startingDate",
-            // end_date: "endingDate",
             adult_count: "adults",
             child_count: "children",
             tourist_spots: "touristSpots",
@@ -139,19 +125,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         updateFormData(mappedKey, value);
       });
     } else if (pendingPlan) {
-    const parsed = JSON.parse(pendingPlan);
-    Object.entries(parsed).forEach(([key, value]) => {
-      setValue(key, value);
-      updateFormData(key, value);
-    });
-  }
-}, [state?.id, setValue]);
+      const parsed = JSON.parse(pendingPlan);
+      Object.entries(parsed).forEach(([key, value]) => {
+        setValue(key, value);
+        updateFormData(key, value);
+      });
+    }
+  }, [state?.id, setValue]);
 
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (!isGoogleScriptLoaded && !window.google) {
         isGoogleScriptLoaded = true;
-        console.log("Loading Google Maps script...");
         const script = document.createElement("script");
         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
         script.async = true;
@@ -161,9 +146,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         };
         script.onerror = () => {
           console.error("Failed to load Google Maps API");
-          toast.error(
-            t("google_maps_load_failed") || "Failed to load Google Maps API",
-          );
+          toast.error(t("google_maps_load_failed"));
         };
         document.head.appendChild(script);
       }
@@ -178,36 +161,25 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         console.error("Google Maps Places API is not available");
         return;
       }
-      console.log("Initializing autocomplete for locationTo (Where To)...");
-
-      // locationFromRef is a hidden input — skip it (Google can't attach to hidden inputs).
-      // We auto-mirror locationFrom = locationTo on place selection below.
 
       if (locationToRef.current) {
-        console.log("Setting up autocomplete for locationTo");
         const toAutocomplete = new window.google.maps.places.Autocomplete(
           locationToRef.current,
         );
         toAutocomplete.addListener("place_changed", () => {
           const place = toAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
-          console.log("locationTo selected:", locationValue);
           setValue("locationTo", locationValue);
           updateFormData("locationTo", locationValue);
-          // Also set locationFrom to the same value so the backend field is filled
           setValue("locationFrom", locationValue);
           updateFormData("locationFrom", locationValue);
         });
-      } else {
-        console.warn("locationToRef is null");
       }
     };
 
-    // If Google is already loaded, init immediately (with small delay for DOM)
     if (window.google) {
       setTimeout(initAutocomplete, 100);
     } else {
-      // Wait for the script's onload then retry
       const interval = setInterval(() => {
         if (window.google) {
           clearInterval(interval);
@@ -257,10 +229,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     const result = await trigger(fieldsToValidate);
     if (!result) {
-      toast.error(
-        t("fill_all_required") ||
-          "Please fill all required fields before proceeding.",
-      );
+      toast.error(t("fill_all_required"));
     }
     return result;
   };
@@ -279,35 +248,23 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   };
 
   const onSubmit = async (data, status) => {
-    console.log("onSubmit called with data:", data, "status:", status);
     const accessToken = localStorage.getItem("access_token");
-    console.log("Access Token:", accessToken);
     if (!accessToken) {
       localStorage.setItem("pendingPlan", JSON.stringify(data));
-      toast.error(t("please_login") || "Please log in to create a plan");
+      toast.error(t("please_login"));
       navigate("/registrazione", { state: { fromLogin: true } });
       return;
     }
-    // if (data.endingDate < data.startingDate) {
-    //   toast.error(
-    //     t("end_date_after_start") || "End date must be after start date",
-    //   );
-    //   return;
-    // }
     if (!data.adults && !data.children) {
-      toast.error(
-        t("at_least_one_person") || "At least one adult or child is required",
-      );
+      toast.error(t("at_least_one_person"));
       return;
     }
     const formDataToSend = new FormData();
     formDataToSend.append("name", data.name);
     formDataToSend.append("email", data.email);
     formDataToSend.append("phone_number", data.phoneNumber);
-    // formDataToSend.append("location_from", data.locationFrom);
     formDataToSend.append("location_to", data.locationTo);
     formDataToSend.append("start_date", data.startingDate);
-    // formDataToSend.append("end_date", data.endingDate);
     formDataToSend.append("adult_count", data.adults || 0);
     formDataToSend.append("child_count", data.children || 0);
     formDataToSend.append("budget", data.budget || "");
@@ -329,10 +286,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (selectedFile) {
       formDataToSend.append("spot_picture", selectedFile);
     }
-    console.log("FormData to send:");
-    for (let [key, value] of formDataToSend.entries()) {
-      console.log(`${key}: ${value}`);
-    }
     try {
       if (status === "draft") {
         setIsSavingDraft(true);
@@ -345,50 +298,39 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           id: state.id,
           updates: formDataToSend,
         }).unwrap();
-        console.log("Update Plan Response:", response);
       } else {
         response = await createPlan(formDataToSend).unwrap();
-        console.log("Create Plan Response:", response);
       }
 
       if (typeof window !== "undefined" && window.gtag) {
         window.gtag("event", "apertura_popup");
-        console.log("Google Analytics event 'apertura_popup' sent using gtag");
       }
-      toast.success(
-        t("plan_submitted_success") ||
-          "Your data successfully submitted! When approved by admin, this tour plan will be published.",
-        {
-          autoClose: 4000,
-          style: {
-            background: "linear-gradient(135deg, #FF6600, #e55600)",
-            color: "#ffffff",
-            borderRadius: "8px",
-            padding: "16px",
-            fontSize: "16px",
-            fontWeight: "500",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            maxWidth: "400px",
-          },
-          iconTheme: {
-            primary: "#ffffff",
-            secondary: "#FF6600",
-          },
+      toast.success(t("plan_submitted_success"), {
+        autoClose: 4000,
+        style: {
+          background: "linear-gradient(135deg, #FF6600, #e55600)",
+          color: "#ffffff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "16px",
+          fontWeight: "500",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          maxWidth: "400px",
         },
-      );
+        iconTheme: {
+          primary: "#ffffff",
+          secondary: "#FF6600",
+        },
+      });
 
       reset();
       setSelectedFile(null);
-      console.log("Navigating to /user and closing form");
       localStorage.removeItem("pendingPlan");
       navigate("/user");
       closeForm();
     } catch (error) {
       console.error("API Error:", error);
-      toast.error(
-        t("error_submitting") ||
-          `Error ${state?.id ? "updating" : "creating"} plan: ${error.message}`,
-      );
+      toast.error(t("error_submitting"));
     } finally {
       if (status === "draft") {
         setIsSavingDraft(false);
@@ -409,11 +351,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     closeForm();
   };
 
-  // locationFrom is a hidden field — no required validation (auto-filled from locationTo)
   const { ref: fromFormRef, ...fromRest } = register("locationFrom");
 
   const { ref: toFormRef, ...toRest } = register("locationTo", {
-    required: t("location_to_required") || "Location (To) is required",
+    required: t("location_to_required"),
   });
 
   const handleUiStep1Next = async () => {
@@ -433,13 +374,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     const visibleFields = ["startingDate", "endingDate", "adults", "locationTo", "budget"];
     const result = await trigger(visibleFields);
     if (!result) {
-      toast.error(
-        t("fill_all_required") || "Please fill all required fields before proceeding."
-      );
+      toast.error(t("fill_all_required"));
       return;
     }
     setCurrentStep(5);
   };
+
   const handleUiStep2Next = async () => {
     const valid = await validateStep(5);
     if (!valid) return;
@@ -454,9 +394,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     handleSubmit((data) => onSubmit(data, "published"))();
   };
 
-  // "Skip for now" — auto-confirm and submit without optional data
   const handleSkipDetails = () => {
-    // clear optional fields so they are empty in submission
     setValue("typeOfAccommodation", "");
     setValue("minimumHotelStars", "");
     setValue("mealPlan", "");
@@ -466,7 +404,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     handleSubmit((data) => onSubmit(data, "published"))();
   };
 
-  // Star rating helper
   const StarRating = ({ value, onChange }) => (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -482,7 +419,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     </div>
   );
 
-  // Pill button helper
   const PillButton = ({ label, active, onClick }) => (
     <button
       type="button"
@@ -503,197 +439,171 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       <div className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[11px] font-bold text-gray-800 uppercase tracking-wider">
-            STEP {uiStep} OF {totalUiSteps}
+            {t("step_of", { current: uiStep, total: totalUiSteps })}
           </span>
           <button
             onClick={handlepupupClose}
             className="text-gray-400 hover:text-gray-600 transition-colors text-lg leading-none"
-            aria-label="Close"
+            aria-label={t("close")}
           >
             ✕
           </button>
         </div>
-        {/* <div className="w-full bg-gray-100 rounded-full h-1.5">
-          <div
-            className="h-1.5 rounded-full transition-all duration-500 ease-in-out"
-            style={{
-              width: `${progressPercentage}%`,
-              background: "linear-gradient(90deg, #DD9E2C, #C2851C)",
-            }}
-          />
-        </div> */}
       </div>
 
-      {/* ── BODY ─────────────────────────────────────────────────────────── */}
       <div className="px-5 pb-5 relative" style={{ zIndex: 1000 }}>
         {uiStep === 1 && (
           <div className="space-y-4">
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                Plan Your Trip ✈️
+                {t("plan_trip_title")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 lg:flex items-center gap-4">
               {/* Where To (locationTo) */}
-            <div>
-              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                WHERE TO?
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black"><FaLocationDot />
-</span>
-                <input
-                  {...toRest}
-                  type="text"
-                  placeholder={t("destination_placeholder") || "Destination"}
-                  defaultValue={formData.locationTo}
-                  onChange={(e) => {
-                    updateFormData("locationTo", e.target.value);
-                    setValue("locationTo", e.target.value);
-                  }}
-                  ref={(e) => {
-                    toFormRef(e);
-                    locationToRef.current = e;
-                  }}
-                  className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
-                />
-              </div>
-              {errors.locationTo && (
-                <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>
-              )}
-            </div>
-
-            {/* Hidden locationFrom — set same as locationTo or leave blank */}
-            <input
-              {...fromRest}
-              type="hidden"
-              ref={(e) => {
-                fromFormRef(e);
-                locationFromRef.current = e;
-              }}
-            />
-
-            {/* Dates row */}
-            <div className="grid grid-cols-1 gap-3">
               <div>
                 <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                  WHEN WILL YOU TRAVEL?
+                  {t("where_to")}
                 </label>
                 <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                    <FaLocationDot />
+                  </span>
                   <input
-                    {...register("startingDate", {
-                      required: t("starting_date_required") || "Starting Date is required",
-                    })}
-                    type="date"
-                    defaultValue={formData.startingDate}
-                    onChange={(e) => updateFormData("startingDate", e.target.value)}
-                    className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"                  />
-                </div>
-                {errors.startingDate && (
-                  <span className="text-red-500 text-xs mt-1">{errors.startingDate.message}</span>
-                )}
-              </div>
-              {/* <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
-                  ENDING DATE
-                </label>
-                <input
-                  {...register("endingDate", {
-                    required: t("ending_date_required") || "Ending Date is required",
-                  })}
-                  type="date"
-                  defaultValue={formData.endingDate}
-                  onChange={(e) => updateFormData("endingDate", e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
-                />
-                {errors.endingDate && (
-                  <span className="text-red-500 text-xs mt-1">{errors.endingDate.message}</span>
-                )}
-              </div> */}
-            </div>
-
-            {/* Travelers row */}
-            <div>
-              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                HOW MANY TRAVELERS?
-              </label>
-              <div className="flex items-center gap-4">
-                {/* Adults counter */}
-                <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-[6px]">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = Math.max(0, (parseInt(formData.adults) || 0) - 1);
-                      updateFormData("adults", val);
-                      setValue("adults", val);
-                    }}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer  transition-colors font-bold text-lg leading-none"
-                  >
-                    −
-                  </button>
-                  <input
-                    {...register("adults", {
-                      required: t("adults_required") || "At least one adult or child is required",
-                      min: { value: 0, message: t("adults_negative") || "Adults cannot be negative" },
-                    })}
-                    type="number"
-                    value={formData.adults}
+                    {...toRest}
+                    type="text"
+                    placeholder={t("destination_placeholder")}
+                    defaultValue={formData.locationTo}
                     onChange={(e) => {
-                      updateFormData("adults", e.target.value);
-                      setValue("adults", e.target.value);
+                      updateFormData("locationTo", e.target.value);
+                      setValue("locationTo", e.target.value);
                     }}
-                    className="w-8 text-center bg-transparent text-base font-semibold focus:outline-none border-none"
-                    style={{ MozAppearance: "textfield" }}
+                    ref={(e) => {
+                      toFormRef(e);
+                      locationToRef.current = e;
+                    }}
+                    className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = (parseInt(formData.adults) || 0) + 1;
-                      updateFormData("adults", val);
-                      setValue("adults", val);
-                    }}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer  transition-colors font-bold text-lg leading-none"
-                  >
-                    +
-                  </button>
                 </div>
-
-                {/* Children (hidden but preserved) */}
-                <input
-                  {...register("children", {
-                    min: { value: 0, message: t("children_negative") || "Children cannot be negative" },
-                  })}
-                  type="hidden"
-                  value={formData.children}
-                />
+                {errors.locationTo && (
+                  <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>
+                )}
               </div>
-              {errors.adults && (
-                <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>
-              )}
-            </div>
+
+              {/* Hidden locationFrom */}
+              <input
+                {...fromRest}
+                type="hidden"
+                ref={(e) => {
+                  fromFormRef(e);
+                  locationFromRef.current = e;
+                }}
+              />
+
+              {/* Dates row */}
+              <div className="grid grid-cols-1 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                    {t("when_travel")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      {...register("startingDate", {
+                        required: t("starting_date_required"),
+                      })}
+                      type="date"
+                      defaultValue={formData.startingDate}
+                      onChange={(e) => updateFormData("startingDate", e.target.value)}
+                      className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"
+                    />
+                  </div>
+                  {errors.startingDate && (
+                    <span className="text-red-500 text-xs mt-1">{errors.startingDate.message}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Travelers row */}
+              <div>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                  {t("how_many_travelers")}
+                </label>
+                <div className="flex items-center gap-4">
+                  {/* Adults counter */}
+                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-[6px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = Math.max(0, (parseInt(formData.adults) || 0) - 1);
+                        updateFormData("adults", val);
+                        setValue("adults", val);
+                      }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
+                    >
+                      −
+                    </button>
+                    <input
+                      {...register("adults", {
+                        required: t("adults_required"),
+                        min: { value: 0, message: t("adults_negative") },
+                      })}
+                      type="number"
+                      value={formData.adults}
+                      onChange={(e) => {
+                        updateFormData("adults", e.target.value);
+                        setValue("adults", e.target.value);
+                      }}
+                      className="w-8 text-center bg-transparent text-base font-semibold focus:outline-none border-none"
+                      style={{ MozAppearance: "textfield" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = (parseInt(formData.adults) || 0) + 1;
+                        updateFormData("adults", val);
+                        setValue("adults", val);
+                      }}
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Children hidden */}
+                  <input
+                    {...register("children", {
+                      min: { value: 0, message: t("children_negative") },
+                    })}
+                    type="hidden"
+                    value={formData.children}
+                  />
+                </div>
+                {errors.adults && (
+                  <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>
+                )}
+              </div>
             </div>
 
             {/* Budget Slider */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider">
-                  WHAT'S YOUR BUDGET?
+                  {t("budget_label")}
                 </label>
                 <span className="text-base font-bold text-gray-800">
-                  ${parseInt(formData.budget || 5000).toLocaleString()}
+                  €{parseInt(formData.budget || 5000).toLocaleString()}
                 </span>
               </div>
               <input
                 {...register("budget", {
-                  required: t("budget_required") || "Budget is required",
+                  required: t("budget_required"),
                 })}
                 type="range"
                 min={0}
                 max={50000}
                 step={500}
                 value={formData.budget || 5000}
-                // onClick={handleBudgetClick}
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFormData("budget", value);
@@ -710,7 +620,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               )}
             </div>
 
-            {/* Hidden touristSpots — no required validation, pre-filled in handleUiStep1Next */}
+            {/* Hidden touristSpots */}
             <input
               {...register("touristSpots")}
               type="hidden"
@@ -722,23 +632,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               <div className="fixed inset-x-0 top-0 flex items-center justify-center z-50 pt-4">
                 <div className="bg-white rounded-lg p-4 flex flex-col items-end space-y-4 shadow-2xl lg:w-96 w-72">
                   <p className="lg:text-[15px] text-[13px] text-gray-800 leading-relaxed">
-                    💰{" "}
-                    <span className="font-bold">Budget totale del gruppo</span>
-                    <br />
-                    Inserisci il{" "}
-                    <span className="font-bold">budget massimo complessivo per</span>{" "}
-                    il tuo viaggio.
-                    <br />
-                    <br />
-                    <span className="font-bold">Minimo per pubblicare: 3.000 €</span>
-                    <br />{" "}
-                    <span className="font-bold pr-1">VacanzaMyCost</span>
-                    seleziona solo richieste di alto profilo per garantire proposte
-                    d'élite dalle migliori agenzie specializzate.{" "}
-                    <br /> Con budget inferiori,{" "}
-                    <span className="font-bold">
-                      non è possibile garantire un servizio su misura di qualità.
-                    </span>
+                    {t("budget_message")}
                   </p>
                   <button
                     onClick={handleOkClick}
@@ -757,11 +651,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               className="w-full py-2.5 cursor-pointer rounded-lg text-white font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
               style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              Next Step
+              {t("next_step")}
             </button>
           </div>
         )}
-
 
         {uiStep === 2 && (
           <div className="space-y-4">
@@ -777,21 +670,21 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
             <div>
               <h2 className="text-3xl font-bold text-gray-900">
-                Almost Done !
+                {t("almost_done")}
               </h2>
             </div>
 
             {/* Full Name */}
             <div>
               <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                FULL NAME
+                {t("name")}
               </label>
               <input
                 {...register("name", {
-                  required: t("name_required") || "Name is required",
+                  required: t("name_required"),
                 })}
                 type="text"
-                placeholder={t("full_name") || "Full name"}
+                placeholder={t("full_name")}
                 defaultValue={formData.name}
                 onChange={(e) => updateFormData("name", e.target.value)}
                 className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
@@ -805,18 +698,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                  EMAIL ADDRESS
+                  {t("email_label")}
                 </label>
                 <input
                   {...register("email", {
-                    required: t("email_required") || "Email is required",
+                    required: t("email_required"),
                     pattern: {
                       value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: t("invalid_email") || "Invalid email address",
+                      message: t("invalid_email"),
                     },
                   })}
                   type="email"
-                  placeholder={t("email") || "Email"}
+                  placeholder={t("email")}
                   defaultValue={formData.email}
                   onChange={(e) => updateFormData("email", e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
@@ -827,18 +720,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                  PHONE NUMBER
+                  {t("phone_label")}
                 </label>
                 <input
                   {...register("phoneNumber", {
-                    required: t("phone_required") || "Phone Number is required",
+                    required: t("phone_required"),
                     pattern: {
                       value: /^[0-9]{10,15}$/,
-                      message: t("invalid_phone") || "Invalid phone number",
+                      message: t("invalid_phone"),
                     },
                   })}
                   type="tel"
-                  placeholder={t("phone_number") || "Phone number"}
+                  placeholder={t("phone_number")}
                   defaultValue={formData.phoneNumber}
                   onChange={(e) => updateFormData("phoneNumber", e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
@@ -849,10 +742,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </div>
             </div>
 
-            {/* Hidden confirmation — auto-checked when user taps Send Request */}
+            {/* Hidden confirmation */}
             <input
               {...register("confirmation", {
-                required: t("confirmation_required") || "You must confirm the request",
+                required: t("confirmation_required"),
               })}
               type="hidden"
               value={formData.confirmation ? "true" : "false"}
@@ -862,7 +755,6 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             <button
               type="button"
               onClick={async () => {
-                // auto-set confirmation to true
                 updateFormData("confirmation", true);
                 setValue("confirmation", true);
                 await handleUiStep2Next();
@@ -870,12 +762,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               className="w-full py-2.5 rounded-[7px] text-white cursor-pointer font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
               style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              Send Request
+              {t("send_request")}
             </button>
           </div>
         )}
+
         {uiStep === 3 && (
-          <div className="space-y-4 ">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <button
                 type="button"
@@ -888,103 +781,104 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                Improve Your Offers{" "}
-                <span style={{ color: "#DD9E2C" }}>✨</span>
+                {t("improve_offers")} <span style={{ color: "#DD9E2C" }}>✨</span>
               </h2>
             </div>
 
             {/* Trip Type */}
-            {/* Trip Type */}
-<div>
-  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-    TRIP TYPE
-  </label>
-  <div className="relative">
-    <select
-      {...register("travelType")}
-      defaultValue={formData.travelType}
-      onChange={(e) => {
-        const value = e.target.value;
-        updateFormData("travelType", value);
-        setValue("travelType", value);
-      }}
-      className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm appearance-none transition-all duration-200"
-    >
-      <option value="">Select Trip Type</option>
-      <option value="beach">Beach</option>
-      <option value="mountain">Mountain</option>
-      <option value="relax">Relaxing tour</option>
-      <option value="group">Group</option>
-      <option value="">Not sure</option>   
-    </select>
-    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-800">
-      <GoChevronDown />
-    </span>
-  </div>
-</div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                {t("trip_type")}
+              </label>
+              <div className="relative">
+                <select
+                  {...register("travelType")}
+                  defaultValue={formData.travelType}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateFormData("travelType", value);
+                    setValue("travelType", value);
+                  }}
+                  className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm appearance-none transition-all duration-200"
+                >
+                  <option value="">{t("select_trip_type")}</option>
+                  <option value="beach">{t("beach_trips")}</option>
+                  <option value="mountain">{t("mountain_adventures")}</option>
+                  <option value="relax">{t("relaxing_tours")}</option>
+                  <option value="group">{t("group_packages")}</option>
+                  <option value="">{t("not_specified")}</option>
+                </select>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-800">
+                  <GoChevronDown />
+                </span>
+              </div>
+            </div>
 
             <div>
-  <div className="flex items-start justify-between gap-4">
-    <div className="flex-1">
-      <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
-        ACCOMMODATION PREFERENCES
-      </label>
-      <div className="flex flex-wrap gap-2">
-        {["hotel", "resort", "homestay", "apartment", "hostel"].map((opt) => (
-          <PillButton
-            key={opt}
-            label={opt.charAt(0).toUpperCase() + opt.slice(1)}
-            active={formData.typeOfAccommodation === opt}
-            onClick={() => {
-              const current = formData.typeOfAccommodation;
-              const newValue = current === opt ? "" : opt;   
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+                    {t("accommodation_preferences")}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: "hotel", label: t("hotel") },
+                      { value: "resort", label: t("resort") },
+                      { value: "homestay", label: t("homestay") },
+                      { value: "apartment", label: t("apartment") },
+                      { value: "hostel", label: t("hostel") },
+                    ].map((opt) => (
+                      <PillButton
+                        key={opt.value}
+                        label={opt.label}
+                        active={formData.typeOfAccommodation === opt.value}
+                        onClick={() => {
+                          const current = formData.typeOfAccommodation;
+                          const newValue = current === opt.value ? "" : opt.value;
+                          updateFormData("typeOfAccommodation", newValue);
+                          setValue("typeOfAccommodation", newValue);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <input
+                    {...register("typeOfAccommodation")}
+                    type="hidden"
+                    value={formData.typeOfAccommodation}
+                  />
+                </div>
 
-              updateFormData("typeOfAccommodation", newValue);
-              setValue("typeOfAccommodation", newValue);
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Hidden register field */}
-      <input 
-        {...register("typeOfAccommodation")} 
-        type="hidden" 
-        value={formData.typeOfAccommodation} 
-      />
-    </div>
-
-    <div className="flex-shrink-0">
-      <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
-        MINIMUM STAR
-      </label>
-      <StarRating
-        value={parseInt(formData.minimumHotelStars) || 0}
-        onChange={(s) => {
-          updateFormData("minimumHotelStars", s);
-          setValue("minimumHotelStars", s);
-        }}
-      />
-      <input 
-        {...register("minimumHotelStars")} 
-        type="hidden" 
-        value={formData.minimumHotelStars} 
-      />
-    </div>
-  </div>
-</div>
+                <div className="flex-shrink-0">
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
+                    {t("minimum_star")}
+                  </label>
+                  <StarRating
+                    value={parseInt(formData.minimumHotelStars) || 0}
+                    onChange={(s) => {
+                      updateFormData("minimumHotelStars", s);
+                      setValue("minimumHotelStars", s);
+                    }}
+                  />
+                  <input
+                    {...register("minimumHotelStars")}
+                    type="hidden"
+                    value={formData.minimumHotelStars}
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Meal Plan */}
             <div>
               <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-2">
-                MEAL PLAN
+                {t("meal_plan")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { value: "none", label: "No meal" },
-                  { value: "breakfast", label: "Breakfast" },
-                  { value: "half-board", label: "Breakfast & Dinner" },
-                  { value: "full-board", label: "All meal" },
+                  { value: "none", label: t("meal_none") },
+                  { value: "breakfast", label: t("meal_breakfast") },
+                  { value: "half-board", label: t("meal_half_board") },
+                  { value: "full-board", label: t("meal_full_board") },
                 ].map((opt) => (
                   <PillButton
                     key={opt.value}
@@ -1000,21 +894,21 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               <input {...register("mealPlan")} type="hidden" value={formData.mealPlan} />
             </div>
 
-            {/* Destination Type (hidden — still preserved) */}
+            {/* Destination Type hidden */}
             <input
               {...register("destinationType")}
               type="hidden"
               value={formData.destinationType}
             />
 
-            {/* Description (optional) */}
+            {/* Description optional */}
             <div>
               <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                DESCRIPTION <span className="normal-case font-normal">(OPTIONAL)</span>
+                {t("description_label")} <span className="normal-case font-normal">({t("optional")})</span>
               </label>
               <textarea
                 {...register("description")}
-                placeholder={t("description_placeholder") || "Write something..."}
+                placeholder={t("description_placeholder")}
                 rows={3}
                 defaultValue={formData.description}
                 onChange={(e) => updateFormData("description", e.target.value)}
@@ -1030,7 +924,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               className="w-full py-2.5 rounded-md text-white font-bold text-[16px] cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              {isPublishing ? t("publishing") || "Publishing..." : "Add details"}
+              {isPublishing ? t("publishing") : t("add_details")}
             </button>
 
             {/* Skip for now button */}
@@ -1040,7 +934,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               disabled={isSavingDraft || isPublishing}
               className="w-full py-2.5 rounded-md bg-white border border-gray-200 cursor-pointer text-gray-700 font-bold text-[16px] transition-all duration-200 hover:bg-gray-50 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Skip for now
+              {t("skip_now")}
             </button>
           </div>
         )}

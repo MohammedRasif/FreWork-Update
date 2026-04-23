@@ -17,7 +17,7 @@
 
 
 
- "response_time": "Riscontro entro 24–48 ore",
+"response_time": "Riscontro entro 24–48 ore",
 "show_short_descriptionn": "Ottieni fino a 3 proposte su misura da agenzie selezionate.",
 "feature_drivers": "Professionisti affidabili e verificati",
 "feature_booking": "Proposte costruite sulle tue esigenze",
@@ -754,7 +754,7 @@
 "show_short_description": "Gratis, senza impegno. Risposta in 24–48 ore.",
 "description_required" : "La descrizione è obbligatoria",
 "create_your_tour_plan": "Crea il tuo Piano di Viaggio",
-"step_of": "Passo {{current}} di {{total}}",
+"step_of": "step {{current}} di {{total}}",
 "complete": "Completato",
 "adults": "Adulti",
 "children": "Bambini",
