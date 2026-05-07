@@ -95,6 +95,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           ? new Date(state?.start_date).toISOString().split("T")[0]
           : "",
       );
+      setValue(
+        "endingDate",
+        state?.end_date
+          ? new Date(state?.end_date).toISOString().split("T")[0]
+          : "",
+      );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
       setValue("budget", state?.budget || "5000");
@@ -112,6 +118,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             phone_number: "phoneNumber",
             location_to: "locationTo",
             start_date: "startingDate",
+            end_date: "endingDate",
             adult_count: "adults",
             child_count: "children",
             tourist_spots: "touristSpots",
@@ -265,6 +272,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formDataToSend.append("phone_number", data.phoneNumber);
     formDataToSend.append("location_to", data.locationTo);
     formDataToSend.append("start_date", data.startingDate);
+    formDataToSend.append("end_date", data.endingDate);
     formDataToSend.append("adult_count", data.adults || 0);
     formDataToSend.append("child_count", data.children || 0);
     formDataToSend.append("budget", data.budget || "");
@@ -460,7 +468,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 lg:flex items-center gap-4">
+            <div className="space-y-4">
               {/* Where To (locationTo) */}
               <div>
                 <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
@@ -501,11 +509,11 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 }}
               />
 
-              {/* Dates row */}
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Start Date */}
                 <div>
                   <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                    {t("when_travel")}
+                    {t("start_date") || "Start Date"}
                   </label>
                   <div className="relative">
                     <input
@@ -522,66 +530,87 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     <span className="text-red-500 text-xs mt-1">{errors.startingDate.message}</span>
                   )}
                 </div>
-              </div>
 
-              {/* Travelers row */}
-              <div>
-                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                  {t("how_many_travelers")}
-                </label>
-                <div className="flex items-center gap-4">
-                  {/* Adults counter */}
-                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-[6px]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const val = Math.max(0, (parseInt(formData.adults) || 0) - 1);
-                        updateFormData("adults", val);
-                        setValue("adults", val);
-                      }}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
-                    >
-                      −
-                    </button>
+                {/* End Date */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                    {t("end_date") || "End Date"}
+                  </label>
+                  <div className="relative">
                     <input
-                      {...register("adults", {
-                        required: t("adults_required"),
-                        min: { value: 0, message: t("adults_negative") },
+                      {...register("endingDate", {
+                        required: t("ending_date_required") || "End date required",
                       })}
-                      type="number"
-                      value={formData.adults}
-                      onChange={(e) => {
-                        updateFormData("adults", e.target.value);
-                        setValue("adults", e.target.value);
-                      }}
-                      className="w-8 text-center bg-transparent text-base font-semibold focus:outline-none border-none"
-                      style={{ MozAppearance: "textfield" }}
+                      type="date"
+                      defaultValue={formData.endingDate}
+                      onChange={(e) => updateFormData("endingDate", e.target.value)}
+                      className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const val = (parseInt(formData.adults) || 0) + 1;
-                        updateFormData("adults", val);
-                        setValue("adults", val);
-                      }}
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
-                    >
-                      +
-                    </button>
                   </div>
-
-                  {/* Children hidden */}
-                  <input
-                    {...register("children", {
-                      min: { value: 0, message: t("children_negative") },
-                    })}
-                    type="hidden"
-                    value={formData.children}
-                  />
+                  {errors.endingDate && (
+                    <span className="text-red-500 text-xs mt-1">{errors.endingDate.message}</span>
+                  )}
                 </div>
-                {errors.adults && (
-                  <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>
-                )}
+
+                {/* Travelers row */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                    {t("how_many_travelers")}
+                  </label>
+                  <div className="flex items-center gap-4">
+                    {/* Adults counter */}
+                    <div className="flex items-center w-full justify-between bg-gray-50 border border-gray-100 rounded-xl px-3 py-[6px]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const val = Math.max(0, (parseInt(formData.adults) || 0) - 1);
+                          updateFormData("adults", val);
+                          setValue("adults", val);
+                        }}
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
+                      >
+                        −
+                      </button>
+                      <input
+                        {...register("adults", {
+                          required: t("adults_required"),
+                          min: { value: 0, message: t("adults_negative") },
+                        })}
+                        type="number"
+                        value={formData.adults}
+                        onChange={(e) => {
+                          updateFormData("adults", e.target.value);
+                          setValue("adults", e.target.value);
+                        }}
+                        className="w-8 text-center bg-transparent text-base font-semibold focus:outline-none border-none"
+                        style={{ MozAppearance: "textfield" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const val = (parseInt(formData.adults) || 0) + 1;
+                          updateFormData("adults", val);
+                          setValue("adults", val);
+                        }}
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-gray-600 cursor-pointer transition-colors font-bold text-lg leading-none"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Children hidden */}
+                    <input
+                      {...register("children", {
+                        min: { value: 0, message: t("children_negative") },
+                      })}
+                      type="hidden"
+                      value={formData.children}
+                    />
+                  </div>
+                  {errors.adults && (
+                    <span className="text-red-500 text-xs mt-1">{errors.adults.message}</span>
+                  )}
+                </div>
               </div>
             </div>
 
