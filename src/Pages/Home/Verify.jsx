@@ -8,7 +8,6 @@ const SubscriptionSuccess = () => {
     const [showText, setShowText] = useState(false)
 
     useEffect(() => {
-        // Start icon animation after component mounts
         const iconTimer = setTimeout(() => {
             setShowIcon(true)
         }, 300)
