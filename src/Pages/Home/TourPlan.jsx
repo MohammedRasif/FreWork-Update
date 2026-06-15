@@ -71,7 +71,6 @@ const TourPlanWithPopup = () => {
     };
   };
 
-  // Toggle description expansion
   const toggleDescription = (tourId) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -79,7 +78,6 @@ const TourPlanWithPopup = () => {
     }));
   };
 
-  // Toggle offer message expansion
   const toggleOfferMessage = (offerId) => {
     setExpandedOfferMessages((prev) => ({
       ...prev,
@@ -87,7 +85,6 @@ const TourPlanWithPopup = () => {
     }));
   };
 
-  // RTK Queries
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
   console.log(tourPlanPublic, "tourPlanPublic");
@@ -108,7 +105,6 @@ const TourPlanWithPopup = () => {
     useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
 
-  // Initialize tours and like/share status
   useEffect(() => {
     const data = filteredTourPlan || tourPlanPublic || [];
     setTours(data);
