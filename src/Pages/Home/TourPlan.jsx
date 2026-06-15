@@ -46,13 +46,11 @@ const TourPlanWithPopup = () => {
   const [offerComment, setOfferComment] = useState("");
   const [tourPlanPublicUser, setTourPlanPublicUser] = useState({});
 
-  // Add this to the state declarations at the top of the component (if not already present)
   const [offerForm, setOfferForm] = useState({
     applyDiscount: false,
     discount: "",
   });
 
-  // Add this handler function to manage offer form changes (if not already present)
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
     setOfferForm((prev) => ({
@@ -61,7 +59,6 @@ const TourPlanWithPopup = () => {
     }));
   };
 
-  // Utility function to truncate text to a specified word limit
   const truncateText = (text, wordLimit = 100) => {
     if (!text) return { truncated: "", isTruncated: false };
     const words = text.split(/\s+/);
