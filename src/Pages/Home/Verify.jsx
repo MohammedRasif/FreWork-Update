@@ -12,7 +12,6 @@ const SubscriptionSuccess = () => {
             setShowIcon(true)
         }, 300)
 
-        // Show text after icon animation
         const textTimer = setTimeout(() => {
             setShowText(true)
         }, 1800)
