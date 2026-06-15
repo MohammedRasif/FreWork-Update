@@ -123,11 +123,11 @@ const TourPlanWithPopup = () => {
             String(interaction.user) === String(currentUserId) &&
             interaction.interaction_type === "share"
         );
-        tourUsers[tour.id] = tour.user; // Store user ID for each tour
+        tourUsers[tour.id] = tour.user; 
       });
       setIsLiked(initialLikes);
       setIsShared(initialShares);
-      setTourPlanPublicUser(tourUsers); // Set user IDs in state
+      setTourPlanPublicUser(tourUsers); 
     }
   }, [tourPlanPublic, filteredTourPlan, currentUserId]);
 
