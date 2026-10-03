@@ -1,251 +1,58 @@
-import React from "react";
-import img1 from "../../assets/img/Rectangle 14305.png";
-import img2 from "../../assets/img/Rectangle 14306.png";
-import img3 from "../../assets/img/Rectangle 14307.png";
-import img4 from "../../assets/img/Rectangle 14327.svg";
-import img5 from "../../assets/img/Plane vector.svg";
-import { CiHeart } from "react-icons/ci";
-import { IoMdSend } from "react-icons/io";
-import { MapPin, Send, Leaf, Users } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { ArrowUpRight, BadgeCheck, Clock3, LockKeyhole, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import agencyImage from "../../assets/img/contact.jpg";
 
 const EasyandFast = () => {
   const { t } = useTranslation();
+  const benefits = [
+    { icon: Wallet, title: "no_commission", description: "no_commission_desc" },
+    { icon: Clock3, title: "fast_replies", description: "fast_replies_desc" },
+    { icon: BadgeCheck, title: "verified_agencies", description: "verified_agencies_desc" },
+    { icon: LockKeyhole, title: "verified_agencies_contact", description: "verified_agencies_desc_decide" },
+  ];
 
   return (
-    <div className="mb-10 sm:mb-16 lg:mb-20">
-      <img
-        src={img4}
-        alt=""
-        className="absolute right-0 h-[25vh] sm:h-[35vh] lg:h-[50vh] -mt-16 sm:-mt-20 lg:-mt-32"
-      />
-      <img
-        src={img4}
-        alt=""
-        className="absolute left-0 h-[25vh] sm:h-[35vh] lg:h-[50vh] rotate-180 mt-[60vh] sm:mt-[80vh] lg:mt-[110vh]"
-      />
-      <div className="font-sans relative flex flex-col items-center justify-center max-w-7xl mx-auto py-8 sm:py-10 lg:py-12">
-        {/* Benefits and Trip Card Section */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 sm:mb-12 lg:mb-20 gap-6 sm:gap-8 lg:gap-[100px]">
-          {/* Benefits List */}
-          <div className="w-full lg:w-1/2 px-4 sm:px-6">
-            <div className="mb-8 sm:mb-10 lg:mb-10">
-              {/* <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium">
-                {t("easy_and_fast")}
-              </span> */}
-              <h1 className="text-[20px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight lg:px-2 sm:px-4">
-                {t("why_use_vacanza")} <br />
-              </h1>
-            </div>
-
-            <div className="space-y-8 sm:space-y-10">
-              <div className="flex items-start">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
-                  <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1748100792/Group_12_ziiomp.svg"
-                    alt=""
-                  />
-                </div>
-                <div className="px-2 sm:px-4">
-                  <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    {t("no_commission")}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    {t("no_commission_desc")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
-                  <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1748100792/Group_7_the57s.svg"
-                    alt=""
-                  />
-                </div>
-                <div className="px-2 sm:px-4">
-                  <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    {t("fast_replies")}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    {t("fast_replies_desc")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
-                  <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1748100792/Group_11_n4edkj.svg"
-                    alt=""
-                  />
-                </div>
-                <div className="px-2 sm:px-4">
-                  <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    {t("verified_agencies")}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    {t("verified_agencies_desc")}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 shrink-0">
-                  <img
-                    src="https://res.cloudinary.com/dfsu0cuvb/image/upload/q_auto/f_auto/v1764484092/Image20251130122412_qqwgzn.jpg"
-                    alt=""
-                  />
-                </div>
-                <div className="px-2 sm:px-4">
-                  <p className="text-lg sm:text-xl font-bold text-gray-800 mb-1 -mt-1">
-                    {t("verified_agencies_contact")}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    {t("verified_agencies_desc_decide")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative w-full lg:w-auto min-w-[280px] sm:min-w-[320px] lg:min-w-[430px] px-4 sm:px-6">
-            <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xl border border-gray-100">
-              <div className="relative h-40 sm:h-48 lg:h-64 bg-white overflow-hidden rounded-xl mb-3 sm:mb-4">
-                <img
-                  src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1770626297/WhatsApp_Image_2026-02-09_at_08.39.56_fjzvbm.webp"
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  alt="Trip to Greece"
-                />
-                <button className="absolute right-3 sm:right-4 w-7 h-7 sm:w-8 sm:h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors hover:bg-white">
-                  <CiHeart size={18} className="text-gray-700" />
-                </button>
-              </div>
-
-              <div className="p-3 sm:p-4">
-                <div className="mb-3 sm:mb-4">
-                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
-                    {t("trip_to_greece")}
-                  </h3>
-                  <p className="text-gray-500 text-xs sm:text-sm">
-                    {t("greece_date_by")}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 mb-4 sm:mb-5 mt-3 sm:mt-4">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Leaf className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                  </div>
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                  </div>
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Send className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 mr-2" />
-                  <span className="text-gray-600 text-xs sm:text-sm font-medium">
-                    {t("people_going")}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute top-[249px] sm:top-[300px] lg:top-[381px] right-4 sm:-right-6 lg:-right-8 bg-white rounded-xl pl-0 p-3 sm:p-4 shadow-lg border border-gray-200 max-w-[180px] sm:max-w-[200px]">
-              <div className="flex items-center">
-                <img
-                  src="https://res.cloudinary.com/dfsu0cuvb/image/upload/v1737529169/samples/landscapes/architecture-signs.jpg"
-                  alt="Profile"
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 sm:mr-3 object-cover border-2 border-white"
-                />
-                <div>
-                  <div className="flex items-center">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 mr-1 sm:mr-1.5"></div>
-                    <p className="text-xs font-medium text-green-600">
-                      {t("ongoing")}
-                    </p>
-                  </div>
-                  <p className="text-sm sm:text-md font-semibold text-gray-800">
-                    {t("trip_to_rome")}
-                  </p>
-                  <div className="w-20 sm:w-24 h-1.5 bg-gray-200 rounded-full mt-1 sm:mt-1.5 mb-1">
-                    <div
-                      className="h-1.5 bg-[#DD9E2C] rounded-full"
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-gray-500">{t("progress_40")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10 max-w-3xl sm:mb-12">
+          <div className="mb-4 h-1 w-12 rounded-full bg-[#d6a044]" />
+          <h2 className="text-3xl font-bold leading-tight tracking-tight text-[#172b43] sm:text-4xl lg:text-[44px]">
+            {t("why_use_vacanza")}
+          </h2>
         </div>
 
-        {/* Add Your Agency Section */}
-        <div className="flex flex-col lg:flex-row items-center pt-0 sm:pt-24 lg:pt-52 gap-8 sm:gap-10 lg:gap-12">
-          <div className="relative mr-0 lg:mr-8 w-full lg:w-1/2 h-[40vh] sm:h-[50vh] lg:h-[50vh]">
-            <img
-              src={img1}
-              alt="Destination 1"
-              className="w-[70vw] sm:w-72 lg:w-96 h-[50vh] sm:h-[40vh] lg:h-[60vh] rounded-3xl"
-            />
-            <img
-              src={img3}
-              alt="Destination 3"
-              className="w-28 sm:w-36 lg:w-44 h-32 sm:h-40 lg:h-52 object-cover rounded-3xl absolute top-20 sm:top-32 lg:top-44 left-[60vw] sm:left-[22vw] lg:left-[32vh] z-20"
-            />
-            <img
-              src={img2}
-              alt="Destination 2"
-              className="w-28 sm:w-36 lg:w-44 h-32 sm:h-40 lg:h-52 object-cover rounded-3xl absolute -bottom-5 sm:-bottom-10 lg:-bottom-14 left-[60vw] sm:left-[22vw] lg:left-[32vh] z-10"
-            />
-            <img
-              src={img5}
-              alt="Plane vector"
-              className="absolute left-48 sm:left-56 lg:left-80 w-[40vw] sm:w-[50vw] lg:w-[70vh] -ml-4 -mt-4 -top-[30vh] sm:-top-[40vh] lg:-top-[55vh] hidden md:block"
-            />
+        <div className="grid gap-4 sm:grid-cols-2 lg:gap-6">
+          {benefits.map(({ icon: Icon, title, description }) => (
+            <div key={title} className="flex min-w-0 gap-5 rounded-[22px] border border-[#e9edf0] bg-[#f8fafb] p-6 sm:p-8">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e8f0f2] text-[#243e51]">
+                <Icon size={24} strokeWidth={1.8} aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="break-words text-lg font-bold leading-snug text-[#1d334a] sm:text-xl">{t(title)}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#5b6978] sm:text-base">{t(description)}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-20 overflow-hidden rounded-[28px] bg-[#172b43] text-white shadow-[0_24px_65px_rgba(23,43,67,0.13)] lg:mt-24 lg:grid lg:grid-cols-2">
+          <div className="relative min-h-[250px] sm:min-h-[360px] lg:min-h-full">
+            <img src={agencyImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#172b43]/35 to-transparent" />
           </div>
-
-          <div className="w-full lg:w-1/2 px-4 sm:px-6 lg:pt-0 pt-10">
-            <span className="inline-block mb-3 sm:mb-4 text-[15px] sm:text-lg lg:text-xl text-gray-700 font-medium lg:pl-0 pl-2">
-              {t("start_earning")}
-            </span>
-            <h1 className="text-[22px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight pb-4 sm:pb-5 px-2 sm:px-4">
-              {t("add_your_agency")} <br className="hidden md:block" />
-              {/* <span className="">VacanzaMyCost.it</span> */}
-            </h1>
-            <div className="space-y-3 sm:space-y-4 text-gray-600 px-2 sm:px-4">
-              <p className="text-sm sm:text-md leading-relaxed">
-                {t("agency_desc_1")}
-              </p>
-              <p className="text-sm sm:text-md leading-relaxed">
-                {t("agency_desc_2")}
-              </p>
-            </div>
-
-            <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6 px-2 sm:px-4">
-              <p className="group flex items-center text-sm sm:text-md font-medium">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
-                {t("benefit_1")}
-              </p>
-              <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
-                {t("benefit_2")}
-              </p>
-              <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
-                {t("benefit_3")}
-              </p>
-              <p className="group flex items-center text-sm sm:text-md font-medium transition-colors">
-                <IoMdSend className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#DD9E2C] transition-transform group-hover:translate-x-1 font-bold" />
-                {t("benefit_4")}
-              </p>
-            </div>
+          <div className="px-6 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.13em] text-[#e4b154]">{t("start_earning")}</p>
+            <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{t("add_your_agency")}</h2>
+            <p className="mt-6 text-base leading-7 text-white/80">{t("agency_desc_1")}</p>
+            <p className="mt-3 text-base leading-7 text-white/80">{t("agency_desc_2")}</p>
+            <NavLink to="/pentru-agentii" className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#d49a36] px-6 py-3 font-bold text-[#172b43] transition-colors hover:bg-[#ebae47] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+              {t("for_agencies")} <ArrowUpRight size={18} aria-hidden="true" />
+            </NavLink>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

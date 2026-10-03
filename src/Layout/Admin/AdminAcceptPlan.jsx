@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useGetAllacceptedOfferQuery } from "@/redux/features/withAuth";
 import TourPlanDetails from "@/components/TourplanDetails";
 import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n.js";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
+
 
 export default function AdminAcceptPlan() {
   const { t } = useTranslation();
@@ -11,21 +14,18 @@ export default function AdminAcceptPlan() {
   const [expanded, setExpanded] = useState({});
 
   const formatDateRange = (startDate, endDate) => {
-    const start = new Date(startDate).toLocaleDateString("en-US", {
+    const start = new Date(startDate).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-    const end = new Date(endDate).toLocaleDateString("en-US", {
+    const end = new Date(endDate || startDate).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
     return `${start} - ${end}`;
   };
-
-  const placeholderImage =
-    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
 
   const openModal = (tourId) => {
     setSelectedTourId(tourId);
@@ -38,20 +38,20 @@ export default function AdminAcceptPlan() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-10">{t("loading")}</div>;
+    return <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-sm font-medium text-[#617082]" role="status">{t("loading")}</div>;
   }
 
   if (isError || !toursData || toursData.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-56 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center text-base font-semibold text-[#172b43] shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
         {t("no_plans_available")}
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 lg-pt-0 pt-12">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="min-w-0">
+      <div className="grid gap-5 sm:grid-cols-2">
         {toursData.map((tour) => {
           const description =
             tour.tour_plan.description || t("default_description");
@@ -66,30 +66,27 @@ export default function AdminAcceptPlan() {
           return (
             <div
               key={tour.id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col"
-              style={{ minHeight: "400px" }}
+              className="flex min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]"
             >
-              <div className="relative p-3">
+              <div className="relative h-44 bg-[#f4eee4]">
                 <img
-                  src={tour.agency.logo_url || placeholderImage}
+                  src={tour.tour_plan.spot_picture_url || PlanImage1}
+                  onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                   alt={`${tour.tour_plan.location_to} ${t("destination")}`}
-                  className="w-full h-44 rounded-md object-cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
 
-              <div className="p-4 flex flex-col flex-grow">
-                <div className="text-sm text-gray-600 mb-2">
-                  {
-                    tour.tour_plan.start_date,
-                    tour.tour_plan.end_date
-                  }
+              <div className="flex flex-1 flex-col p-5">
+                <div className="mb-2 text-sm text-[#617082]">
+                  {formatDateRange(tour.tour_plan.start_date, tour.tour_plan.end_date)}
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                <h2 className="mb-2 text-xl font-bold tracking-tight text-[#172b43]">
                   {t("tour_to")} {tour.tour_plan.location_to}
                 </h2>
 
-                <p className="text-gray-600 text-sm leading-relaxed font-medium mb-2 flex-grow">
+                <p className="mb-3 flex-grow text-sm leading-6 text-[#617082]">
                   {shownText}
                 </p>
 
@@ -101,16 +98,16 @@ export default function AdminAcceptPlan() {
                         [tour.id]: !isExpanded,
                       }))
                     }
-                    className="text-[#DD9E2C] text-sm mb-3 hover:underline"
+                    className="mb-3 self-start text-sm font-semibold text-[#9b6b22] hover:underline"
                   >
                     {isExpanded ? t("see_less") : t("see_more")}
                   </button>
                 )}
 
-                <div className="mt-auto">
+                <div className="mt-auto border-t border-[#f0eee9] pt-4">
                   <button
                     onClick={() => openModal(tour.tour_plan.id)}
-                    className="py-[5px] px-5 border-2 border-gray-400 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-medium rounded-md hover:bg-blue-50 transition-colors text-[14px]"
+                    className="min-h-10 rounded-xl bg-[#c88f2a] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
                   >
                     {t("view")}
                   </button>
@@ -123,11 +120,11 @@ export default function AdminAcceptPlan() {
 
       {isModalOpen && selectedTourId && (
         <div
-          className="fixed inset-0 bg-[#ffffff6e] backdrop-blur-xs flex items-center justify-center z-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/55 p-4"
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)]"
             onClick={(e) => e.stopPropagation()}
           >
             <TourPlanDetails closeModal={closeModal} id={selectedTourId} />

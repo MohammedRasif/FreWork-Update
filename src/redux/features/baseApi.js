@@ -4,7 +4,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: "https://api.vacanzamycost.it/",
+    baseUrl: import.meta.env.DEV ? "/api/" : "https://api.vacanzamycost.it/",
      //baseUrl: "http://31.97.39.215/",
     
     // prepareHeaders: (headers) => {
@@ -73,7 +73,7 @@ export const baseApi = createApi({
       providesTags: ["Agency"], 
     }),
     searchAgency: builder.query({
-      query: (search) => `/public/agencies/?search=${search}`,
+      query: (search) => `/public/agencies/?search=${encodeURIComponent(search)}`,
       providesTags: ["Agency"], 
     }),
    

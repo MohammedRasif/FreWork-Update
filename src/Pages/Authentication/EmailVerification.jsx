@@ -22,7 +22,7 @@ const EmailVerification = () => {
       const res = await verify({ email }).unwrap();
       console.log("Verify response:", res);
 
-      navigate("/verifica-otp", { state: { email, to: "/recupero-password" } });
+      navigate("/verificare-otp", { state: { email, to: "/resetare-parola" } });
     } catch (error) {
       console.error("Error verifying email:", error);
       alert(
@@ -79,7 +79,7 @@ const EmailVerification = () => {
               </button>
               <div className="flex mx-auto justify-center">
                 <Link
-                  to="/login"
+                  to="/autentificare"
                   className="font-semibold mt-4 text-sm text-[#DD9E2C] hover:text-[#C2851C] hover:underline"
                 >
                   {t("back_to_login")}

@@ -2,14 +2,16 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useMemo } from "react";
 import { GoArrowLeft } from "react-icons/go";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAdminProfileMutation, useGetAgencyProfileQuery } from "@/redux/features/withAuth";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 const AdminProfileEdit = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const categoryMap = useMemo(
     () => ({
@@ -142,34 +144,31 @@ const AdminProfileEdit = () => {
       if (logoFile) formData.append("agency_logo", logoFile);
       if (coverPhotoFile) formData.append("cover_photo", coverPhotoFile);
 
-      const response = await adminProfile(formData).unwrap();
-      console.log("Profile Updated:", response);
-      alert(t("profile_updated_success"));
-      window.location.reload();
+      await adminProfile(formData).unwrap();
+      toast.success(t("profile_updated_success"));
+      navigate("/agentie/profil");
     } catch (err) {
       console.error("Failed to update profile:", err);
-      alert(t("failed_to_update_profile"));
+      toast.error(t("failed_to_update_profile"));
     }
   };
 
   if (isProfileLoading) {
-    return <div>{t("loading_profile")}</div>;
+    return <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-sm text-[#617082]" role="status">{t("loading_profile")}</div>;
   }
 
   return (
-    <div className="p-5">
-      <div className="flex items-center justify-between">
-        <NavLink to="/admin/profilo" className="flex items-center space-x-1 cursor-pointer">
+    <div className="agency-profile-edit mx-auto max-w-5xl">
+      <div className="mb-6">
+        <NavLink to="/agentie/profil" className="inline-flex items-center gap-2 text-sm font-semibold text-[#617082] transition-colors hover:text-[#172b43]">
           <GoArrowLeft size={22} />
-          <h1 className="text-[19px] -mt-1">{t("back")}</h1>
+          <span>{t("back")}</span>
         </NavLink>
-        <h1 className="text-3xl text-black font-semibold text-center pb-10 pt-5">
-          {t("agency_registration")}
-        </h1>
-        <div></div>
       </div>
+      <div className="mb-3 h-1 w-10 rounded-full bg-[#d6a044]" />
+      <h1 className="mb-7 text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">{t("edit_profile_details")}</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-[22px] border border-[#e9e6e0] bg-white p-5 shadow-[0_10px_35px_rgba(23,43,67,0.05)] sm:p-8">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">{t("agency_data")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -254,8 +253,8 @@ const AdminProfileEdit = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">{t("logo")}</label>
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-md">
-              <label className="px-4 py-2 text-gray-700 cursor-pointer bg-gray-300 hover:bg-gray-200">
+            <div className="flex items-center gap-2 overflow-hidden rounded-xl border border-[#dce2e8] bg-[#fafbfc]">
+              <label className="cursor-pointer bg-[#f7f3ec] px-4 py-3 text-sm font-semibold text-[#172b43] hover:bg-[#fff4dd]">
                 {t("choose_file")}
                 <input
                   type="file"
@@ -272,15 +271,14 @@ const AdminProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{logoSizeError}</p>
             )}
             <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
-            <p className="text-xs mt-1 text-red-400">{t("upload_images_mandatory")}</p>
           </div>
 
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
               {t("cover_photo")}
             </label>
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-md">
-              <label className="px-4 py-2 text-gray-700 cursor-pointer bg-gray-300 hover:bg-gray-200">
+            <div className="flex items-center gap-2 overflow-hidden rounded-xl border border-[#dce2e8] bg-[#fafbfc]">
+              <label className="cursor-pointer bg-[#f7f3ec] px-4 py-3 text-sm font-semibold text-[#172b43] hover:bg-[#fff4dd]">
                 {t("choose_file")}
                 <input
                   type="file"
@@ -297,7 +295,6 @@ const AdminProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{coverSizeError}</p>
             )}
             <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
-            <p className="text-xs mt-1 text-red-400">{t("upload_images_mandatory")}</p>
           </div>
         </div>
 
@@ -328,7 +325,7 @@ const AdminProfileEdit = () => {
           {Object.keys(categoryMap).map((category) => (
             <label
               key={category}
-              className="flex items-center gap-2 text-base text-gray-700 bg-white px-4 py-1 rounded-full border border-gray-200 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 rounded-full border border-[#e9e6e0] bg-[#faf9f6] px-4 py-2 text-sm text-[#34485c]"
             >
               <input
                 type="checkbox"
@@ -369,17 +366,17 @@ const AdminProfileEdit = () => {
           </div>
         )}
 
-        <div className="flex justify-center pt-6">
+        <div className="flex justify-end border-t border-[#f0eee9] pt-6">
           <button
             type="submit"
             disabled={isLoading || !!logoSizeError || !!coverSizeError}
-            className={`px-6 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer font-medium text-white rounded-md  focus:ring-2 focus:ring-[#DD9E2C] ${
+            className={`min-h-12 w-full cursor-pointer rounded-xl bg-[#c88f2a] px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-[#ad751c] sm:w-auto ${
               isLoading || logoSizeError || coverSizeError
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
           >
-            {isLoading ? t("updating") : t("complete_registration")}
+            {isLoading ? t("updating") : t("save_changes")}
           </button>
         </div>
       </form>

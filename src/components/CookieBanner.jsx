@@ -39,7 +39,7 @@ const CookieBanner = () => {
         <h4>{t("cookie_title")}</h4>
         <p>
           {t("cookie_desc")}{" "}
-          <a href="/privacy-policy">{t("privacy_policy")}</a>
+          <a href="/politica-de-confidentialitate">{t("privacy_policy")}</a>
         </p>
       </div>
 

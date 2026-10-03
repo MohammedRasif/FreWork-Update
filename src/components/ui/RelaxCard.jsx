@@ -4,6 +4,8 @@ import { MapPin, Navigation } from "lucide-react";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import img from "../../assets/img/badge.png";
 import { useTranslation } from "react-i18next";
+import { localizedContent } from "@/lib/localizedContent";
+
 
 export default function BeachCard({ tourPlan }) {
   const { t } = useTranslation();
@@ -28,7 +30,7 @@ export default function BeachCard({ tourPlan }) {
   }, [tourPlan]);
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.slug}`);
+    navigate(`/cereri/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {
@@ -67,7 +69,7 @@ export default function BeachCard({ tourPlan }) {
                     {isAccepted && (
                       <img
                         src={img}
-                        alt="Accepted Badge"
+                        alt={t("accepted_badge")}
                         className="absolute inset-0 object-contain pointer-events-none"
                       />
                     )}
@@ -76,7 +78,7 @@ export default function BeachCard({ tourPlan }) {
                         offer.agency?.logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                       }
-                      alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                      alt={`${offer.agency?.agency_name || t("agency")} logo`}
                       className={`relative z-10 ${
                         isAccepted ? "w-10 h-10" : "w-12 h-12"
                       } object-contain rounded-full border bg-white ${
@@ -126,7 +128,7 @@ export default function BeachCard({ tourPlan }) {
           </p>
           <p>
             <span className="font-medium">{t("category")}:</span>{" "}
-            {localTourPlan.destination_type}
+            {localizedContent(localTourPlan.destination_type, t)}
           </p>
         </div>
 

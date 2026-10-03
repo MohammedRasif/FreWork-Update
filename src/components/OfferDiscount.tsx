@@ -1,4 +1,6 @@
 "use client"
+import { useTranslation } from "react-i18next";
+
 
 interface OfferDiscountFormProps {
   isOpen: boolean
@@ -23,6 +25,7 @@ export default function OfferDiscountForm({
   onClose,
   onConfirm,
 }: OfferDiscountFormProps) {
+  const { t } = useTranslation();
   if (!isOpen) return null
 
   return (
@@ -38,7 +41,7 @@ export default function OfferDiscountForm({
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {t("back")}
           </button>
           <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,13 +53,13 @@ export default function OfferDiscountForm({
         {/* Content */}
         <div className="p-6">
   {/* Title */}
-  <h1 className="text-xl font-semibold text-center mb-6 text-gray-900">Offer Discount</h1>
+  <h1 className="text-xl font-semibold text-center mb-6 text-gray-900">{t("offer_discount")}</h1>
 
   {/* Form Content */}
   <div className="space-y-6">
     {/* Set Maximum Discount */}
     <div>
-      <h2 className="text-base font-medium text-gray-900 mb-4">Set Maximum Discount</h2>
+      <h2 className="text-base font-medium text-gray-900 mb-4">{t("maximum_discount")}</h2>
 
       {/* Radio Group */}
       <div className="flex gap-6 mb-4">
@@ -69,7 +72,7 @@ export default function OfferDiscountForm({
             onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
             className="w-4 h-4 text-[#DD9E2C] border-gray-300 focus:ring-[#DD9E2C]"
           />
-          <span className="text-gray-700">Price</span>
+          <span className="text-gray-700">{t("price")}</span>
         </label>
         <label className="flex items-center space-x-2 cursor-pointer">
           <input
@@ -80,7 +83,7 @@ export default function OfferDiscountForm({
             onChange={(e) => onDiscountTypeChange(e.target.value as "price" | "percent")}
             className="w-4 h-4 text-[#DD9E2C] border-gray-300 focus:ring-[#DD9E2C]"
           />
-          <span className="text-gray-700">Percent</span>
+          <span className="text-gray-700">{t("percent")}</span>
         </label>
       </div>
 
@@ -93,7 +96,7 @@ export default function OfferDiscountForm({
         </div>
         <input
           type="text"
-          placeholder={discountType === "price" ? "Enter price" : "Enter percent"}
+          placeholder={discountType === "price" ? t("enter_price") : t("enter_percent")}
           value={discountValue}
           onChange={(e) => onDiscountValueChange(e.target.value)}
           className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C]"
@@ -103,9 +106,9 @@ export default function OfferDiscountForm({
 
     {/* Description */}
     <div>
-      <h2 className="text-base font-medium text-gray-900 mb-4">Describe here</h2>
+      <h2 className="text-base font-medium text-gray-900 mb-4">{t("describe_here")}</h2>
       <textarea
-        placeholder="Enter here"
+        placeholder={t("enter_here")}
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}
         rows={4}
@@ -120,7 +123,7 @@ export default function OfferDiscountForm({
       onClick={onConfirm}
       className="w-full bg-[#DD9E2C] hover:bg-[#C2851C] text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:ring-offset-2"
     >
-      Confirm
+      {t("confirm")}
     </button>
   </div>
 </div>

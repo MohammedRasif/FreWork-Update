@@ -28,7 +28,7 @@ export default function MountainCard({ tourPlan }) {
   }, [tourPlan]);
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.slug}`);
+    navigate(`/cereri/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {
@@ -67,7 +67,7 @@ export default function MountainCard({ tourPlan }) {
                     {isAccepted && (
                       <img
                         src={img}
-                        alt="Accepted Badge"
+                        alt={t("accepted_badge")}
                         className="absolute inset-0 object-contain pointer-events-none"
                       />
                     )}
@@ -76,7 +76,7 @@ export default function MountainCard({ tourPlan }) {
                         offer.agency?.logo_url ||
                         "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                       }
-                      alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                      alt={`${offer.agency?.agency_name || t("agency")} logo`}
                       className={`relative z-10 ${
                         isAccepted ? "w-10 h-10" : "w-12 h-12"
                       } object-contain rounded-full border bg-white ${
@@ -127,7 +127,7 @@ export default function MountainCard({ tourPlan }) {
           <p>
             <span className="font-medium">{t("category")}:</span>{" "}
             {localTourPlan.destination_type === "mountain"
-              ? "Montagna"
+              ? t("mountain")
               : localTourPlan.destination_type}
           </p>
 

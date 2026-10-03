@@ -10,7 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { FiSearch, FiStar, FiMapPin, FiUsers } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
 
 const UserAccepte = () => {
   const { t, i18n } = useTranslation();
@@ -108,43 +108,40 @@ const UserAccepte = () => {
   };
 
   return (
-    <div className="">
-      <Helmet>
-        <title>vacanzamycost.it | user | richieste-accettate</title>
-      </Helmet>
+    <div className="min-w-0">
       <Toaster />
-      <div className="flex flex-col sm:flex-row justify-between mt-6 mb-6 border-b border-gray-300">
-        <div className="flex space-x-4 sm:space-x-8 mb-4 sm:mb-0">
+      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-[#e9e6e0] pb-4 sm:flex-row sm:items-end">
+        <div className="flex gap-4 sm:gap-8">
           <button
             onClick={() => setActiveTab("upcoming")}
-            className={`text-base sm:text-lg font-medium pb-2 transition-colors cursor-pointer ${
+            className={`cursor-pointer border-b-2 pb-2 text-sm font-bold transition-colors sm:text-base ${
               activeTab === "upcoming"
-                ? "text-[#C2851C] border-b-2 border-[#C2851C]"
-                : "text-gray-500 border-transparent hover:text-gray-700"
+                ? "border-[#c88f2a] text-[#172b43]"
+                : "border-transparent text-[#617082] hover:text-[#172b43]"
             }`}
           >
             {t("upcoming")}
           </button>
           <button
             onClick={() => setActiveTab("completed")}
-            className={`text-base sm:text-lg font-medium pb-2 transition-colors cursor-pointer ${
+            className={`cursor-pointer border-b-2 pb-2 text-sm font-bold transition-colors sm:text-base ${
               activeTab === "completed"
-                ? "text-[#C2851C] border-b-2 border-[#C2851C]"
-                : "text-gray-500 border-transparent hover:text-gray-700"
+                ? "border-[#c88f2a] text-[#172b43]"
+                : "border-transparent text-[#617082] hover:text-[#172b43]"
             }`}
           >
             {t("completed")}
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <div className="relative">
             <input
               type="text"
               placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent w-full sm:w-64 text-sm text-gray-700 bg-white"
+              className="h-11 w-full rounded-xl border border-[#dce2e8] bg-white pl-10 pr-4 text-sm text-[#172b43] outline-none focus:border-[#c88f2a] focus:ring-2 focus:ring-[#c88f2a]/15 sm:w-64"
             />
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
@@ -153,7 +150,7 @@ const UserAccepte = () => {
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent w-full sm:w-44 text-sm text-gray-700 bg-white"
+              className="h-11 w-full rounded-xl border border-[#dce2e8] bg-white px-4 text-sm text-[#172b43] outline-none focus:border-[#c88f2a] focus:ring-2 focus:ring-[#c88f2a]/15 sm:w-44"
             />
           </div>
         </div>
@@ -165,8 +162,8 @@ const UserAccepte = () => {
           {isLoading ? (
             <FullScreenInfinityLoader />
           ) : upcomingTours.length === 0 ? (
-            <div className="w-full rounded-xl p-4 flex justify-center items-center">
-              <p className="text-[#70798F] text-base sm:text-lg">
+            <div className="flex min-h-56 w-full items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+              <p className="text-base font-semibold text-[#172b43]">
                 {t("no_upcoming_tours")}
               </p>
             </div>
@@ -174,18 +171,16 @@ const UserAccepte = () => {
             upcomingTours.map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden mb-6 flex flex-col md:flex-row"
+                className="mb-5 flex flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)] md:flex-row"
               >
-                <div className="md:w-3/6 overflow-hidden relative">
+                <div className="relative h-48 overflow-hidden bg-[#f4eee4] md:h-auto md:w-2/5">
                   <img
-                    src={
-                      offer.tour_plan.spot_picture_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                    }
+                    src={offer.tour_plan.spot_picture_url || PlanImage1}
+                    onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                     alt={t("tour_to", {
                       location: offer.tour_plan.location_to,
                     })}
-                    className="w-full h-48 md:h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
 
@@ -194,13 +189,13 @@ const UserAccepte = () => {
                     <div className="flex flex-col h-full">
                       <div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-2">
-                          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+                          <h2 className="text-xl font-bold tracking-tight text-[#172b43] sm:text-2xl">
                             {t("tour_to", {
                               location: offer.tour_plan.location_to,
                             })}
                           </h2>
                           {offer.tour_plan.is_completed === false && (
-                            <span className="bg-blue-100 text-[#C2851C] px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                            <span className="flex items-center gap-1 rounded-full bg-[#e9f3ed] px-3 py-1 text-xs font-bold text-[#397055]">
                               <FaCheckCircle className="w-4 h-4 rounded-full" />
                               {t("offer_accepted")}
                             </span>
@@ -208,7 +203,7 @@ const UserAccepte = () => {
                         </div>
                         <div className="flex items-center gap-2 mb-2">
                           <FiUsers className="text-gray-600" />
-                          <span className="text-base sm:text-lg font-semibold">
+                          <span className="text-base font-semibold text-[#172b43] sm:text-lg">
                             €{offer.offered_budget} / {t("total")}{" "}
                             {offer.tour_plan.total_members}{" "}
                             {offer.tour_plan.total_members === 1
@@ -294,7 +289,7 @@ const UserAccepte = () => {
               </div>
             ) : completedTours.length === 0 ? (
               <div className="w-full rounded-xl p-4 flex justify-center items-center">
-                <p className="text-[#70798F] text-base sm:text-lg">
+                <p className="text-base font-semibold text-[#172b43]">
                   {t("no_completed_tours")}
                 </p>
               </div>
@@ -302,16 +297,14 @@ const UserAccepte = () => {
               completedTours.map((offer) => (
                 <div
                   key={offer.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  className="overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]"
                 >
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-800 p-4">
                     {t("previous_tour_plans")}
                   </h3>
                   <img
-                    src={
-                      offer.tour_plan.spot_picture_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                    }
+                    src={offer.tour_plan.spot_picture_url || PlanImage1}
+                    onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                     alt={t("tour_to", {
                       location: offer.tour_plan.location_to,
                     })}
@@ -334,7 +327,7 @@ const UserAccepte = () => {
                         setSelectedOffer(offer);
                         setIsReviewModalOpen(true);
                       }}
-                      className="px-4 border border-[#C2851C] text-[#C2851C] py-2 rounded-md font-medium hover:bg-blue-50 transition-colors w-full sm:w-auto"
+                      className="w-full rounded-xl border border-[#c88f2a] px-4 py-2 text-sm font-bold text-[#986919] transition-colors hover:bg-[#fff4dd] sm:w-auto"
                     >
                       {t("give_review")}
                     </button>

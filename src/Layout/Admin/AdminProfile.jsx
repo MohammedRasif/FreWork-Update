@@ -1,376 +1,142 @@
-"use client";
-import FullScreenInfinityLoader from "@/lib/Loading";
-import {
-  useGetAgencyProfileQuery,
-  useUpdateAgencyProfileMutation,
-} from "@/redux/features/withAuth";
 import { useEffect, useState } from "react";
-import {
-  FaStar,
-  FaEdit,
-  FaPhone,
-  FaEnvelope,
-  FaGlobe,
-  FaMapMarkerAlt,
-  FaCheckCircle,
-  FaArrowLeft,
-  FaCalendarAlt,
-} from "react-icons/fa";
-import { IoMdSend } from "react-icons/io";
-import { NavLink } from "react-router-dom";
+import { CalendarDays, Mail, MapPin, Pencil, Phone, ShieldCheck, Star, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { toast } from "react-toastify";
+import { useGetAgencyProfileQuery, useUpdateAgencyProfileMutation } from "@/redux/features/withAuth";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
 
-const AdminProfile = () => {
-  const { t } = useTranslation();
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+function parseList(value) {
+  if (!Array.isArray(value)) return [];
+  if (value.length === 1 && typeof value[0] === "string") {
+    try {
+      const parsed = JSON.parse(value[0]);
+      if (Array.isArray(parsed)) return parsed;
+    } catch { /* A plain category string is still usable. */ }
+  }
+  return value.filter((item) => typeof item === "string");
+}
+
+export default function AdminProfile() {
+  const { t, i18n } = useTranslation();
+  const { data: profile, isLoading, isError, error, refetch } = useGetAgencyProfileQuery();
+  const [updateProfile, { isLoading: isSaving }] = useUpdateAgencyProfileMutation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const {
-    data: profileData,
-    isLoading: isProfileLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetAgencyProfileQuery();
-  const [update, { isLoading }] = useUpdateAgencyProfileMutation();
-
-  const handleOpenPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-    setFromDate("");
-    setToDate("");
-  };
-
-  const handleReset = async () => {
-    setFromDate("");
-    setToDate("");
-    const payload = {
-      start_unavailable: "",
-      end_unavailable: "",
-    };
-
-    try {
-      await update(payload).unwrap();
-      refetch();
-      handleClosePopup();
-    } catch (err) {
-      console.error("Failed to reset unavailability:", err);
-      const errorMessage =
-        err?.data?.detail ||
-        err?.data?.message ||
-        t("failed_to_reset_unavailability");
-      alert(errorMessage);
-    }
-  };
+  const name = profile?.agency_name || t("unnamed_agency");
+  const categories = parseList(profile?.service_categories);
+  const facilities = parseList(profile?.facilities);
+  const categoryNames = { beach: t("beach_trips"), mountain: t("mountain_adventures"), desert: t("relaxing_tours"), island: t("group_packages") };
+  const locale = i18n.language === "ru" ? "ru-RU" : "ro-RO";
 
   useEffect(() => {
-    if (profileData) {
-      setFromDate(profileData.start_unavailable?.split("T")[0] || "");
-      setToDate(profileData.end_unavailable?.split("T")[0] || "");
+    if (profile) {
+      setFromDate(profile.start_unavailable?.split("T")[0] || "");
+      setToDate(profile.end_unavailable?.split("T")[0] || "");
     }
-  }, [profileData, t]);
+  }, [profile]);
 
-  const handleConfirm = async () => {
-    if (!fromDate || !toDate) {
-      alert(t("select_both_dates"));
-      return;
-    }
-
-    const parsedFromDate = new Date(fromDate);
-    const parsedToDate = new Date(toDate);
-
-    if (isNaN(parsedFromDate) || isNaN(parsedToDate)) {
-      alert(t("invalid_date_format"));
-      return;
-    }
-
-    if (parsedFromDate >= parsedToDate) {
-      alert(t("end_date_after_start"));
-      return;
-    }
-
+  const closeModal = () => setIsModalOpen(false);
+  const handleReset = async () => {
     try {
-      const payload = {
-        start_unavailable: new Date(
-          parsedFromDate.setHours(14, 36, 34, 327),
-        ).toISOString(),
-        end_unavailable: new Date(
-          parsedToDate.setHours(14, 36, 34, 327),
-        ).toISOString(),
-      };
-
-      await update(payload).unwrap();
-      refetch();
-      handleClosePopup();
+      await updateProfile({ start_unavailable: "", end_unavailable: "" }).unwrap();
+      await refetch();
+      setFromDate("");
+      setToDate("");
+      closeModal();
     } catch (err) {
-      console.error("Failed to set unavailability:", err);
-      const errorMessage =
-        err?.data?.detail ||
-        err?.data?.message ||
-        t("failed_to_set_unavailability");
-      alert(errorMessage);
+      toast.error(err?.data?.detail || err?.data?.message || t("failed_to_reset_unavailability"));
+    }
+  };
+  const handleConfirm = async () => {
+    if (!fromDate || !toDate) return toast.error(t("select_both_dates"));
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return toast.error(t("invalid_date_format"));
+    if (start >= end) return toast.error(t("end_date_after_start"));
+    try {
+      start.setHours(14, 36, 34, 327);
+      end.setHours(14, 36, 34, 327);
+      await updateProfile({ start_unavailable: start.toISOString(), end_unavailable: end.toISOString() }).unwrap();
+      await refetch();
+      closeModal();
+    } catch (err) {
+      toast.error(err?.data?.detail || err?.data?.message || t("failed_to_set_unavailability"));
     }
   };
 
-  if (isProfileLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <FullScreenInfinityLoader />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg font-semibold text-red-600">
-          {t("error")}: {error?.data?.message || t("failed_to_load_profile")}
-        </div>
-      </div>
-    );
-  }
-
-  if (!profileData) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg font-semibold text-gray-600">
-          {t("no_profile_data")}
-        </div>
-      </div>
-    );
-  }
-
-  let facilitiesDetails = [];
-  let serviceCategoriesDetails = [];
-
-  try {
-    if (profileData?.facilities?.[0]) {
-      facilitiesDetails = JSON.parse(profileData.facilities[0]).map((name) => ({
-        name,
-      }));
-    }
-  } catch (err) {
-    console.error("Failed to parse facilities:", err);
-  }
-  try {
-    if (profileData?.service_categories?.[0]) {
-      serviceCategoriesDetails = JSON.parse(
-        profileData.service_categories[0],
-      ).map((name) => ({ name }));
-    }
-  } catch (err) {
-    console.error("Failed to parse service categories:", err);
-  }
-
-  const contactInformation = [
-    profileData?.contact_phone && {
-      icon: <FaPhone className="w-4 h-4 text-gray-500" />,
-      text: profileData.contact_phone,
-    },
-    profileData?.contact_email && {
-      icon: <FaEnvelope className="w-4 h-4 text-gray-500" />,
-      text: profileData.contact_email,
-    },
-  ].filter(Boolean);
+  if (isLoading) return <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-sm text-[#617082]" role="status">{t("loading")}</div>;
+  if (isError || !profile) return <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center text-sm text-[#9d4635]">{error?.data?.message || t("failed_to_load_profile")}</div>;
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-screen">
-      <Helmet>
-        <title>vacanzamycost.it | admin | profilo</title>
-      </Helmet>
-      {isPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4 sm:p-6 relative">
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-4 left-4 text-gray-600 hover:text-gray-800"
-              title={t("back")}
-            >
-              <FaArrowLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleReset}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 text-sm"
-            >
-              {t("reset")}
-            </button>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 text-center mb-4 sm:mb-6">
-              {t("set_unavailability")}
-            </h2>
-            <div className="space-y-4 mb-4 sm:mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <label className="w-full sm:w-20 text-gray-700 font-medium">
-                  {t("from")}
-                </label>
-                <div className="relative w-full sm:flex-1">
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] appearance-none"
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                  <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <label className="w-full sm:w-20 text-gray-700 font-medium">
-                  {t("to")}
-                </label>
-                <div className="relative w-full sm:flex-1">
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] appearance-none"
-                    min={fromDate || new Date().toISOString().split("T")[0]}
-                  />
-                  <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className={`w-full py-2 sm:py-3 rounded-md font-medium text-white ${
-                isLoading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer"
-              }`}
-            >
-              {isLoading ? t("submitting") : t("confirm")}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="pb-4 sm:pb-7">
-        <h1 className="text-2xl sm:text-3xl text-black font-semibold text-center">
-          {t("agency_profile")}
-        </h1>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2">
-          <div className="hidden sm:block"></div>
-          <h1 className="text-sm sm:text-md text-[#5E6282] font-semibold text-center sm:pl-32">
-            {t("set_profile_for_best_match")}
-          </h1>
-          <button
-            onClick={handleOpenPopup}
-            className="flex items-center gap-1 mt-2 text-[#DD9E2C] underline cursor-pointer self-center sm:self-end"
-          >
-            <FaEdit className="w-5 h-5" />
-            <span className="text-sm">{t("set_unavailability")}</span>
-          </button>
-        </div>
-        <h1 className="text-sm sm:text-md font-semibold text-gray-700 text-center mt-2">
-          {t("vat_id")}: {profileData?.vat_id || t("na")}
-        </h1>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><div className="mb-3 h-1 w-10 rounded-full bg-[#d6a044]" /><h2 className="text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">{t("agency_profile")}</h2><p className="mt-2 text-sm text-[#617082]">{t("set_profile_for_best_match")}</p></div>
+        <Link to="/agentie/modifica-profil" className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl bg-[#c88f2a] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"><Pencil size={17} aria-hidden="true" />{t("edit")}</Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <div className="w-full sm:w-96 flex-shrink-0">
-          <img
-            src={
-              profileData?.cover_photo_url ||
-              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-            }
-            alt={t("agency_cover")}
-            className="w-full h-48 sm:h-72 object-cover rounded-lg"
-          />
+      <section className="overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+        <div className="relative h-44 bg-[#f4eee4] sm:h-56">
+          <img src={profile.cover_photo_url || PlanImage1} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }} alt={t("agency_cover")} className="h-full w-full object-cover" />
         </div>
-        <div className="flex-1 bg-white p-3 sm:p-4 rounded-md h-auto sm:h-72">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-3">
-            <div>
-              <div className="flex items-center justify-center gap-5">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  {profileData?.agency_name || t("unnamed_agency")}
-                </h2>
-                <NavLink
-                  to="/admin/modifica-profilo"
-                  className="flex items-center gap-1 cursor-pointer underline"
-                >
-                  <FaEdit className="w-5 h-5" />
-                  <span className="text-sm sm:text-[16px]">{t("edit")}</span>
-                </NavLink>
-              </div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex items-center">
-                  <FaStar className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="text-sm sm:text-[15px] font-medium text-gray-900 ml-1">
-                    {profileData?.rating || 0}
-                  </span>
-                </div>
-                <span className="text-sm sm:text-[15px] text-[#DD9E2C]">
-                  ({profileData?.review_count || 0} {t("reviews")})
-                </span>
-              </div>
+        <div className="px-5 pb-6 sm:px-7">
+          <div className="-mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-5">
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-[#172b43] text-2xl font-bold text-white shadow-sm sm:h-20 sm:w-20">
+              <span aria-hidden="true">{name.charAt(0).toUpperCase()}</span>
+              {profile.agency_logo_url && <img src={profile.agency_logo_url} onError={(event) => { event.currentTarget.style.display = "none"; }} alt={name} className="absolute inset-0 h-full w-full object-cover" />}
             </div>
+            <div className="min-w-0 pb-1"><h3 className="break-words text-xl font-bold text-[#172b43] sm:text-2xl">{name}</h3><p className="mt-1 text-sm text-[#617082]">{t("agency")}</p></div>
+            {profile.is_verified && <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-[#e9f3ed] px-3 py-1.5 text-xs font-bold text-[#397055] sm:mb-2 sm:ml-auto sm:self-end"><ShieldCheck size={15} aria-hidden="true" />{t("verified")}</span>}
           </div>
-          <div>
-            <div className="pb-5">
-              <h1 className="text-2xl font-semibold text-black">
-                {t("our_service_category")}
-              </h1>
-              {profileData?.service_categories?.length > 0 ? (
-                <span className="text-gray-700 text-md">
-                  {JSON.parse(profileData.service_categories[0])
-                    .map(
-                      (category) =>
-                        category.charAt(0).toUpperCase() + category.slice(1),
-                    )
-                    .join(", ")}
-                </span>
-              ) : (
-                <span>{t("no_categories_available")}</span>
-              )}
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
-              {t("about")}
-            </h3>
-            <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed line-clamp-5">
-              {profileData?.about || t("no_description_available")}
-            </p>
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#617082]">
+            <span className="inline-flex items-center gap-1.5"><Star size={15} fill="#c88f2a" className="text-[#c88f2a]" aria-hidden="true" />{profile.rating || 0} ({profile.review_count || 0} {t("reviews")})</span>
+            {profile.vat_id && <span className="font-semibold">{t("vat_id")}: {profile.vat_id}</span>}
           </div>
         </div>
+      </section>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="space-y-5">
+          <section className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+            <h3 className="text-lg font-bold text-[#172b43]">{t("about")}</h3>
+            <p className="mt-3 text-sm leading-7 text-[#617082]">{profile.about || t("no_description_available")}</p>
+          </section>
+          <section className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+            <h3 className="text-lg font-bold text-[#172b43]">{t("our_service_category")}</h3>
+            {categories.length ? <div className="mt-4 flex flex-wrap gap-2">{categories.map((category) => <span key={category} className="rounded-full bg-[#fff4dd] px-3 py-1.5 text-xs font-bold text-[#986919]">{categoryNames[category] || category}</span>)}</div> : <p className="mt-3 text-sm text-[#617082]">{t("no_categories_available")}</p>}
+            {facilities.length > 0 && <div className="mt-5 border-t border-[#f0eee9] pt-5"><h4 className="text-sm font-bold text-[#34485c]">{t("facilities")}</h4><p className="mt-2 text-sm leading-6 text-[#617082]">{facilities.join(", ")}</p></div>}
+          </section>
+        </div>
+        <aside className="space-y-5">
+          <section className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+            <h3 className="text-base font-bold text-[#172b43]">{t("contact_information")}</h3>
+            <div className="mt-4 space-y-3 text-sm text-[#617082]">
+              {profile.contact_phone && <p className="flex items-start gap-2 break-all"><Phone size={16} className="mt-0.5 shrink-0 text-[#b98427]" aria-hidden="true" />{profile.contact_phone}</p>}
+              {profile.contact_email && <p className="flex items-start gap-2 break-all"><Mail size={16} className="mt-0.5 shrink-0 text-[#b98427]" aria-hidden="true" />{profile.contact_email}</p>}
+              {typeof profile.address === "string" && profile.address && <p className="flex items-start gap-2"><MapPin size={16} className="mt-0.5 shrink-0 text-[#b98427]" aria-hidden="true" />{profile.address}</p>}
+              {!profile.contact_phone && !profile.contact_email && !profile.address && <p>{t("no_contact_info")}</p>}
+            </div>
+          </section>
+          <section className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427]"><CalendarDays size={19} aria-hidden="true" /></div>
+            <h3 className="mt-4 text-base font-bold text-[#172b43]">{t("set_unavailability")}</h3>
+            {profile.start_unavailable && profile.end_unavailable && <p className="mt-2 text-sm leading-6 text-[#617082]">{new Date(profile.start_unavailable).toLocaleDateString(locale)} — {new Date(profile.end_unavailable).toLocaleDateString(locale)}</p>}
+            <button type="button" onClick={() => setIsModalOpen(true)} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#d8dfe5] px-4 text-sm font-bold text-[#172b43] hover:bg-[#f7f3ec]"><Pencil size={16} aria-hidden="true" />{t("edit")}</button>
+          </section>
+        </aside>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
-        <div className="bg-white p-3 sm:p-4 rounded-md">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
-            {t("contact_information")}
-          </h3>
-          <div className="space-y-3">
-            {contactInformation.length > 0 ? (
-              contactInformation.map((item, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  {item.icon}
-                  <span className="text-sm sm:text-[15px] text-gray-600">
-                    {item.text}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm sm:text-[15px] text-gray-600">
-                {t("no_contact_info")}
-              </p>
-            )}
+      {isModalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/55 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
+        <div role="dialog" aria-modal="true" aria-labelledby="unavailability-title" className="w-full max-w-md rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_24px_70px_rgba(16,36,58,0.25)] sm:p-8">
+          <div className="mb-6 flex items-start justify-between gap-4"><div><div className="mb-3 h-1 w-9 rounded-full bg-[#d6a044]" /><h2 id="unavailability-title" className="text-xl font-bold text-[#172b43]">{t("set_unavailability")}</h2></div><button type="button" onClick={closeModal} aria-label={t("close")} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#617082] hover:bg-[#f2f4f5]"><X size={20} aria-hidden="true" /></button></div>
+          <div className="space-y-4">
+            <div><label htmlFor="agency-unavailable-from" className="mb-1.5 block text-sm font-semibold text-[#34485c]">{t("from")}</label><input id="agency-unavailable-from" type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} min={new Date().toISOString().split("T")[0]} className="h-11 w-full rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 text-sm focus:border-[#c88f2a] focus:outline-none focus:ring-2 focus:ring-[#c88f2a]/15" /></div>
+            <div><label htmlFor="agency-unavailable-to" className="mb-1.5 block text-sm font-semibold text-[#34485c]">{t("to")}</label><input id="agency-unavailable-to" type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} min={fromDate || new Date().toISOString().split("T")[0]} className="h-11 w-full rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 text-sm focus:border-[#c88f2a] focus:outline-none focus:ring-2 focus:ring-[#c88f2a]/15" /></div>
+            <div className="flex gap-2 pt-2"><button type="button" onClick={handleReset} disabled={isSaving} className="min-h-11 flex-1 rounded-xl border border-[#d8dfe5] px-4 text-sm font-semibold text-[#172b43] hover:bg-[#f7f3ec]">{t("reset")}</button><button type="button" onClick={handleConfirm} disabled={isSaving} className="min-h-11 flex-1 rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white hover:bg-[#ad751c] disabled:opacity-60">{isSaving ? t("submitting") : t("confirm")}</button></div>
           </div>
         </div>
-
-        {/* <div className="bg-white p-3 sm:p-4 rounded-md">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-            {t("our_aim")}
-          </h3>
-          <p className="text-gray-700 text-sm sm:text-[15px] leading-relaxed">
-            {profileData?.our_aim || t("no_aim_description")}
-          </p>
-        </div> */}
-      </div>
+      </div>}
     </div>
   );
-};
-
-export default AdminProfile;
+}

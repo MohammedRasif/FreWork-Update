@@ -1,8 +1,11 @@
 
 import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
+import { useTranslation } from "react-i18next";
+
 
 const SubscriptionSuccess = () => {
+  const { t } = useTranslation();
     const [showIcon, setShowIcon] = useState(false)
     const [showText, setShowText] = useState(false)
 
@@ -89,9 +92,9 @@ const SubscriptionSuccess = () => {
                     className={`transition-all duration-1000 ease-out ${showText ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
                         }`}
                 >
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">Success!</h1>
-                    <p className="text-xl text-gray-600 mb-6">Your subscription has been</p>
-                    <p className="text-2xl font-semibold text-gray-800 mb-8">Successfully Verified</p>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-4">{t("success")}</h1>
+                    <p className="text-xl text-gray-600 mb-6">{t("subscription_has_been")}</p>
+                    <p className="text-2xl font-semibold text-gray-800 mb-8">{t("successfully_verified")}</p>
 
                     {/* Continue Button */}
                     <NavLink to="/">
@@ -109,7 +112,7 @@ const SubscriptionSuccess = () => {
                                     e.target.style.backgroundColor = "#DD9E2C"
                                 }}
                             >
-                                Continue to Home
+                                {t("continue_home")}
                             </button>
                         </div>
                     </NavLink>

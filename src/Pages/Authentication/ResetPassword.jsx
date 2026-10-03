@@ -34,7 +34,7 @@ const ResetPassword = () => {
 
       console.log("Password reset response:", res);
       alert(res.message || t("password_reset_success"));
-      navigate("/login");
+      navigate("/autentificare");
     } catch (error) {
       console.error(error);
       alert(error.data?.message || t("error_resetting_password"));

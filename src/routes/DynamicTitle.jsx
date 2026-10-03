@@ -1,25 +1,14 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { getPageTitle } from "@/lib/pageTitle";
 
-const DynamicTitle = () => {
-  const location = useLocation();
+const DynamicTitle = ({ pathname }) => {
+  const { t, i18n } = useTranslation();
 
-  useEffect(() => {
-    const path = location.pathname;
-
-    if (path === "/") {
-      document.title = "Vacanza | Home";
-      return;
-    }
-
-    const title = path
-      .replace("/", "")
-      .split("-")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-
-    document.title = `Vacanza | ${title}`;
-  }, [location]);
+  // Set the route fallback before individual pages provide a more specific title.
+  useLayoutEffect(() => {
+    document.title = `TreiOferte | ${getPageTitle(pathname, t)}`;
+  }, [pathname, t, i18n.language]);
 
   return null;
 };

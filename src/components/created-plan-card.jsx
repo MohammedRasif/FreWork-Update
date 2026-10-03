@@ -44,6 +44,9 @@ import {
   FaStar,
 } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
+import i18n from "../../i18n.js";
+import { localizedContent } from "@/lib/localizedContent";
+
 
 export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   const { t } = useTranslation();
@@ -58,7 +61,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
 
   const handleMessage = async (offer) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       return;
     }
 
@@ -72,7 +75,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
     try {
       await invite({ other_user_id: otherUserId });
       toast.success(t("chat_invitation_sent"));
-      navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
     } catch (error) {
       console.error("Invite error:", error);
       toast.error(t("failed_to_send_chat"));
@@ -108,83 +111,81 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-xl p-4 shadow-[0_3px_7.3px_0px_#0000001A] flex flex-col md:flex-row gap-4">
-      <div className="w-full md:w-[168px] h-[200px] md:h-[147px] rounded-md overflow-hidden relative">
+    <article className="flex w-full min-w-0 flex-col gap-5 overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white p-4 shadow-[0_10px_35px_rgba(23,43,67,0.05)] sm:p-5 lg:flex-row lg:gap-6">
+      <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-[16px] bg-[#f4eee4] lg:h-auto lg:min-h-[218px] lg:w-[220px]">
         <img
-          src={
-            plan.spot_picture_url ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-          }
-          alt="Plan Image"
+          src={plan.spot_picture_url || PlanImage1}
+          onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
+          alt={t("plan_image_alt")}
           className="w-full h-full object-cover object-center"
         />
       </div>
 
-      <div className="flex-1 flex flex-col justify-between">
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="col-span-2 space-y-2">
-            <h4 className="text-xl font-semibold text-[#343E4B] capitalize">
+          <div className="col-span-2 space-y-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#a36f1d]">{t("created_plan")}</p>
+            <h4 className="break-words text-xl font-bold leading-snug tracking-tight text-[#172b43] sm:text-2xl">
               {plan.location_from} {t("to")} {plan.location_to}
             </h4>
-            <p className="text-sm text-[#70798F]">
+            <p className="text-sm text-[#617082]">
               {t("dates")}:{" "}
-              <span className="text-[#343E4B] font-medium">
-                {new Date(plan.start_date).toLocaleDateString()} —{" "}
-                {new Date(plan.end_date).toLocaleDateString()}
+              <span className="font-medium text-[#34485c]">
+                {new Date(plan.start_date).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU")} —{" "}
+                {new Date(plan.end_date).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU")}
               </span>
             </p>
-            <p className="text-sm text-[#70798F]">
-              <span className="text-sm text-gray-700">
+            <p className="text-sm text-[#617082]">
+              <span className="text-sm text-[#617082]">
                 <span className="font-medium">{t("total")}:</span>{" "}
                 {plan.total_members}{" "}
                 {plan.total_members === 1 ? t("person") : t("persons")}
               </span>
             </p>
 
-            <p className="text-sm text-[#70798F] ">
+            <p className="text-sm text-[#617082]">
               <span className="font-medium">{t("category")}:</span>{" "}
-              <span className="text-[#343E4B] font-medium">
+              <span className="font-medium text-[#34485c]">
                 {plan.destination_type === "beach"
-                  ? "Mare"
+                  ? t("beach")
                   : plan.destination_type === "mountain"
-                  ? "Montagna"
+                  ? t("mountain")
                   : plan.destination_type === "relax"
-                  ? "Relax"
+                  ? t("relaxation")
                   : plan.destination_type === "group"
-                  ? "Gruppi"
+                  ? t("group")
                   : t("na")}
               </span>
             </p>
-            <p className="text-sm text-[#70798F] flex items-center gap-1">
+            <p className="flex flex-wrap items-center gap-2 text-sm text-[#617082]">
               {t("approval_status")}:{" "}
               <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[14px] font-medium ${
+                className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${
                   plan.approval_status === "Rifiutato"
-                    ? "bg-red-100 text-red-700"
+                    ? "bg-[#fceceb] text-[#a34b43]"
                     : plan.approval_status === "In attesa"
-                    ? "bg-gray-100 text-black"
-                    : "bg-green-100 text-green-700"
+                    ? "bg-[#fff4dd] text-[#986919]"
+                    : "bg-[#e9f3ed] text-[#397055]"
                 }`}
               >
-                {plan.approval_status}
+                {localizedContent(plan.approval_status, t)}
               </span>
             </p>
           </div>
 
-          <div className="flex flex-col justify-between items-end gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col items-end">
-                <span className="text-[#343E4B] font-medium">
-                  {t("budget")} €{plan.budget}
-                </span>
+          <div className="flex flex-col items-start justify-between gap-4 md:items-end">
+            <div className="flex w-full items-start justify-between gap-3 md:w-auto md:justify-end">
+              <div className="flex flex-col md:items-end">
+                <span className="text-xs font-medium text-[#718092]">{t("budget")}</span>
+                <span className="text-xl font-bold text-[#172b43]">€{plan.budget}</span>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="cursor-pointer">
-                    <EllipsisVertical className="text-[#70798F]" size={18} />
+                  <button type="button" aria-label={t("settings")} className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-[#617082] transition-colors hover:bg-[#f7f3ec] hover:text-[#172b43]">
+                    <EllipsisVertical size={19} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuContent className="w-56 rounded-xl border-[#e9e6e0]" align="end">
                   <DropdownMenuItem
                     disabled={updateLoading}
                     onClick={handlePublishToggle}
@@ -197,7 +198,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                       : t("publish_plan")}
                   </DropdownMenuItem>
                   <Link
-                    to={"/user/crea-richiesta"}
+                    to={"/cont/creeaza-cerere"}
                     state={{ from: "edit", id: plan.id }}
                   >
                     <DropdownMenuItem>
@@ -215,14 +216,14 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
               </DropdownMenu>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Dialog className="">
                 <DialogTrigger asChild>
-                  <Button variant="secondary">{t("view")}</Button>
+                  <button type="button" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#d8dfe5] bg-white px-4 text-sm font-bold text-[#172b43] transition-colors hover:bg-[#f7f3ec]">{t("view")}</button>
                 </DialogTrigger>
                 <Overlay className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" />
 
-                <DialogContent className="max-w-3xl h-[80vh] overflow-auto">
+                <DialogContent className="max-h-[85vh] max-w-3xl overflow-auto rounded-[22px] border-[#e9e6e0] p-5 sm:p-7">
                   <DialogClose>
                     <button className="flex justify-start hover:cursor-pointer w-10">
                       <IoArrowBackSharp size={20} />
@@ -264,11 +265,11 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                 {t("meal_plan")}:
                               </span>{" "}
                               {plan.meal_plan === "breakfast"
-                                ? "Colazione"
+                                ? t("breakfast")
                                 : plan.meal_plan === "half-board"
-                                ? "Mezza Pensione (Colazione & Cena)"
+                                ? t("half_board")
                                 : plan.meal_plan === "full-board"
-                                ? "Pensione Completa (Tutti i Pasti)"
+                                ? t("full_board")
                                 : "N/A"}
                             </span>
                           </p>
@@ -281,15 +282,15 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                                   {t("type_of_accommodation")}:
                                 </span>{" "}
                                 {plan.type_of_accommodation === "hotel"
-                                  ? "Hotel"
+                                  ? t("hotel")
                                   : plan.type_of_accommodation === "resort"
-                                  ? "Resort"
+                                  ? t("resort")
                                   : plan.type_of_accommodation === "homestay"
-                                  ? "Famiglia"
+                                  ? t("homestay")
                                   : plan.type_of_accommodation === "apartment"
-                                  ? "Appartamento"
+                                  ? t("apartment")
                                   : plan.type_of_accommodation === "hostel"
-                                  ? "Ostello"
+                                  ? t("hostel")
                                   : "N/A"}
                               </span>
                             </p>
@@ -346,7 +347,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                     <div className="w-full h-[300px] rounded-md overflow-hidden">
                       <img
                         src={plan.spot_picture_url || PlanImage1}
-                        alt="Plan Image"
+                        alt={t("plan_image_alt")}
                         className="w-full h-full object-center"
                       />
                     </div>
@@ -403,7 +404,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                 </DialogContent>
               </Dialog>
               {plan.status !== "published" && (
-                <Button disabled={updateLoading} onClick={handlePublishToggle}>
+                <Button disabled={updateLoading} onClick={handlePublishToggle} className="min-h-10 rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white hover:bg-[#ad751c]">
                   {updateLoading ? t("publishing") : t("publish_now")}
                 </Button>
               )}
@@ -411,6 +412,6 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

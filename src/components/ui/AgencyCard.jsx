@@ -1,6 +1,8 @@
 import { Star, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n.js";
+
 
 export default function AgencyCard({ agency }) {
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
@@ -91,7 +93,7 @@ export default function AgencyCard({ agency }) {
                               review.tourist_first_name || "User"
                             }&background=random`
                           }
-                          alt={review.tourist_first_name || "User"}
+                          alt={review.tourist_first_name || t("user")}
                           className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                           onError={(e) => {
                             e.target.src =
@@ -102,7 +104,7 @@ export default function AgencyCard({ agency }) {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1.5">
                             <p className="font-semibold text-gray-800 text-base">
-                              {review.tourist_first_name || "Anonymous"}
+                              {review.tourist_first_name || t("anonymous")}
                             </p>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
@@ -129,7 +131,7 @@ export default function AgencyCard({ agency }) {
                           {/* Date */}
                           <p className="text-xs text-gray-500">
                             {new Date(review.created_at).toLocaleDateString(
-                              "en-US",
+                              i18n.language === "ro" ? "ro-RO" : "ru-RU",
                               {
                                 year: "numeric",
                                 month: "long",

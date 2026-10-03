@@ -1,57 +1,77 @@
-import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../i18n.js";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
-const LanguageToggleButton = () => {
-  const { t } = useTranslation();
-  const [currentLang, setCurrentLang] = useState(i18n.language || "en");
+const languages = [
+  { code: "ro", name: "Română" },
+  { code: "ru", name: "Русский" },
+];
 
-  useEffect(() => {
-    const changeHandler = (lng) => {
-      setCurrentLang(lng);
-    };
-    i18n.on("languageChanged", changeHandler);
-    return () => i18n.off("languageChanged", changeHandler);
-  }, []);
+function useLanguageSelection() {
+  const { t, i18n } = useTranslation();
+  const currentLanguage = (i18n.resolvedLanguage || i18n.language || "ro").split("-")[0];
 
-  const isItalian = currentLang === "ita" || currentLang === "it";
-
-  const toggleLanguage = () => {
-    const newLang = isItalian ? "en" : "ita";
-    i18n.changeLanguage(newLang);
+  const selectLanguage = (language) => {
+    if (language !== currentLanguage) i18n.changeLanguage(language);
   };
+
+  return { t, currentLanguage, selectLanguage };
+}
+
+export function LanguageMenuItems() {
+  const { t, currentLanguage, selectLanguage } = useLanguageSelection();
+
+  return (
+    <>
+      <DropdownMenuSeparator className="bg-[#e9e6e0]" />
+      <DropdownMenuLabel className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#617082]">
+        {t("language")}
+      </DropdownMenuLabel>
+      <DropdownMenuRadioGroup value={currentLanguage} onValueChange={selectLanguage} aria-label={t("language")}>
+        {languages.map(({ code, name }) => (
+          <DropdownMenuRadioItem
+            key={code}
+            value={code}
+            className="min-h-10 cursor-pointer rounded-lg text-[#617082] data-[state=checked]:bg-[#f7f3ec] data-[state=checked]:font-semibold data-[state=checked]:text-[#172b43] focus:bg-[#f7f3ec] focus:text-[#172b43]"
+          >
+            <span lang={code}>{name}</span>
+            <span aria-hidden="true" className="ml-auto text-[11px] font-bold uppercase tracking-wider text-[#8b7554]">{code}</span>
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
+      <DropdownMenuSeparator className="bg-[#e9e6e0]" />
+    </>
+  );
+}
+
+export default function LanguageToggleButton({ className = "" }) {
+  const { t, currentLanguage, selectLanguage } = useLanguageSelection();
 
   return (
     <div
-      onClick={toggleLanguage}
-      className="w-[75px] h-9 bg-gray-200 rounded-full flex justify-between items-center py-1 cursor-pointer relative shadow-md"
+      role="group"
+      aria-label={t("language")}
+      className={cn("inline-flex shrink-0 items-center gap-0.5 rounded-xl border border-[#e1e5e9] bg-[#f4f5f6] p-0.5", className)}
     >
-      {/* Sliding Ball - Without framer-motion, using only Tailwind */}
-      <div
-        className={`w-[30px] h-7 rounded-full absolute top-[5px] flex justify-center items-center font-bold text-white shadow-lg bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] transition-all duration-300 ease-in-out ${
-          isItalian ? "left-[40px]" : "left-[8px]"
-        }`}
-      />
-
-      {/* EN */}
-      <span
-        className={`text-sm w-1/2 pl-2 pt-[1px] text-center z-10 font-semibold ${
-          isItalian ? "text-gray-500" : "text-white"
-        }`}
-      >
-        En
-      </span>
-
-      {/* IT */}
-      <span
-        className={`text-sm w-1/2 pt-[1px] text-center z-10 font-semibold ${
-          isItalian ? "text-white" : "text-gray-500"
-        }`}
-      >
-        It
-      </span>
+      {languages.map(({ code, name }) => (
+        <button
+          key={code}
+          type="button"
+          lang={code}
+          aria-label={name}
+          title={name}
+          aria-pressed={currentLanguage === code}
+          onClick={() => selectLanguage(code)}
+          className={`flex h-9 min-w-10 items-center justify-center rounded-[9px] px-2 text-xs font-extrabold uppercase tracking-[0.06em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c88f2a] focus-visible:ring-offset-2 motion-reduce:transition-none ${currentLanguage === code ? "bg-[#172b43] text-white" : "text-[#617082] hover:bg-white hover:text-[#172b43]"}`}
+        >
+          {code.toUpperCase()}
+        </button>
+      ))}
     </div>
   );
-};
-
-export default LanguageToggleButton;
+}

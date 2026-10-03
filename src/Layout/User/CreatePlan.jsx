@@ -10,7 +10,6 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
 
 // Global flag to ensure Google Maps script loads only once
 let isGoogleScriptLoaded = false;
@@ -70,8 +69,6 @@ const CreatePlan = () => {
   useEffect(() => {
     const initAutocomplete = () => {
       if (!window.google || !window.google.maps || !window.google.maps.places) {
-        console.error("Google Maps Places API is not available");
-        toast.error(t("google_maps_error"));
         return;
       }
 
@@ -108,7 +105,7 @@ const CreatePlan = () => {
         setTimeout(initAutocomplete, 100);
       };
       script.onerror = () => {
-        toast.error(t("google_maps_load_error"));
+        isGoogleScriptLoaded = false;
       };
       document.head.appendChild(script);
     } else if (window.google) {
@@ -189,7 +186,7 @@ const CreatePlan = () => {
 
       reset();
       setSelectedFile(null);
-      navigate("/user");
+      navigate("/cont");
     } catch (error) {
       toast.error(t("error_creating_plan", { action: state?.id ? t("updating") : t("creating") }));
     } finally {
@@ -228,26 +225,24 @@ const CreatePlan = () => {
   });
 
   return (
-    <div className="p-6">
-      <Helmet>
-        <title>vacanzamycost.it | user | crea-richiesta</title>
-      </Helmet>
+    <div className="user-create-plan mx-auto max-w-5xl">
       <div className="mx-auto">
         <Toaster />
-        <div className="flex items-center mb-8">
-          <NavLink to="/user">
-            <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
+        <div className="mb-6 flex items-center">
+          <NavLink to="/cont">
+            <button type="button" className="flex items-center gap-2 text-sm font-semibold text-[#617082] transition-colors hover:text-[#172b43]">
               <FiArrowLeft className="w-5 h-5" />
               <span className="text-md">{t("back")}</span>
             </button>
           </NavLink>
         </div>
 
-        <h1 className="text-3xl font-semibold text-gray-800 text-center mb-8">
+        <div className="mb-6 h-1 w-10 rounded-full bg-[#d6a044]" />
+        <h1 className="mb-7 text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">
           {state?.id ? t("edit_tour_plan") : t("create_tour_plan")}
         </h1>
 
-        <form className="space-y-6">
+        <form className="space-y-6 rounded-[22px] border border-[#e9e6e0] bg-white p-5 shadow-[0_10px_35px_rgba(23,43,67,0.05)] sm:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
@@ -267,7 +262,7 @@ const CreatePlan = () => {
             </div>
             <div>
               <label className="block text-[16px] font-medium text-gray-700 mb-2">
-                {t("email")}
+                {t("email_address_label")}
               </label>
               <input
                 type="email"
@@ -523,7 +518,7 @@ const CreatePlan = () => {
             <button
               type="button"
               onClick={handleSubmit((data) => onSubmit(data, "published"))}
-              className="px-8 py-3 bg-[#DD9E2C] text-white rounded-md hover:bg-[#C2851C] transition-colors font-medium"
+              className="min-h-12 rounded-xl bg-[#c88f2a] px-8 py-3 font-bold text-white transition-colors hover:bg-[#ad751c]"
               disabled={isSavingDraft || isPublishing}
             >
               {isPublishing ? t("publishing") : t("publish_now")}

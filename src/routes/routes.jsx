@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, useLocation, useParams } from "react-router-dom";
 import Main from "../Layout/Main";
 import Home from "../Pages/Home/Home";
 import Registration from "../Pages/Authentication/Registration";
@@ -40,6 +40,55 @@ import Terms from "@/Pages/Home/Terms";
 import WhoItWork from "@/Pages/Home/WhoItWork";
 import PendingForAdmin from "@/Pages/Home/PanndingForAdmin";
 
+const legacyPaths = [
+  ["/agenzie-certificate", "/agentii-verificate"],
+  ["/per-agenzie", "/pentru-agentii"],
+  ["/crea-richiesta", "/creeaza-cerere"],
+  ["/richieste", "/cereri"],
+  ["/richieste/:id", "/cereri/:id"],
+  ["/offerte-accettate", "/oferte-acceptate"],
+  ["/contatti", "/contact"],
+  ["/tutte-le-richieste", "/toate-cererile"],
+  ["/come-funziona", "/cum-functioneaza"],
+  ["/privacy-policy", "/politica-de-confidentialitate"],
+  ["/termini-e-condizioni", "/termeni-si-conditii"],
+  ["/registrazione", "/inregistrare"],
+  ["/login", "/autentificare"],
+  ["/registrazione-completata", "/inregistrare-finalizata"],
+  ["/verifica-account", "/verificare-cont"],
+  ["/verifica-otp", "/verificare-otp"],
+  ["/recupero-password", "/resetare-parola"],
+  ["/successo", "/succes"],
+  ["/in-attesa", "/in-asteptare"],
+  ["/admin", "/agentie"],
+  ["/admin/dashboard", "/agentie/dashboard"],
+  ["/admin/profilo", "/agentie/profil"],
+  ["/admin/modifica-profilo", "/agentie/modifica-profil"],
+  ["/admin/gestione-abbonamento", "/agentie/abonament"],
+  ["/admin/notifiche", "/agentie/notificari"],
+  ["/admin/chat", "/agentie/mesaje"],
+  ["/admin/chat/:id", "/agentie/mesaje/:id"],
+  ["/user", "/cont"],
+  ["/user/dashboard", "/cont/dashboard"],
+  ["/user/richieste-pubblicate", "/cont/cereri-publicate"],
+  ["/user/richieste-accettate", "/cont/cereri-acceptate"],
+  ["/user/preferiti", "/cont/favorite"],
+  ["/user/chat", "/cont/mesaje"],
+  ["/user/chat/:id", "/cont/mesaje/:id"],
+  ["/user/profilo", "/cont/profil"],
+  ["/user/crea-richiesta", "/cont/creeaza-cerere"],
+  ["/user/modifica-richiesta", "/cont/modifica-cerere"],
+  ["/user/notification", "/cont/notificari"],
+  ["/user/modifica-profilo", "/cont/modifica-profil"],
+];
+
+function LegacyRedirect({ to }) {
+  const params = useParams();
+  const { search, hash } = useLocation();
+  const pathname = to.replace(/:([a-z]+)/gi, (_, key) => params[key] ?? "");
+  return <Navigate to={{ pathname, search, hash }} replace />;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -48,32 +97,33 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/blog", element: <Blog /> },
-      { path: "/blog/:id", element: <BlogDetails /> },
-      { path: "/agenzie-certificate", element: <Membership /> },
-      { path: "/per-agenzie", element: <Pricing /> },
-      { path: "/crea-richiesta", element: <TourPlan /> },
-      { path: "/richieste", element: <TourPlanDouble /> },
-      { path: "/offerte-accettate", element: <AcceptedOffers /> },
-      { path: "/contatti", element: <Contact /> },
-      { path: "/tutte-le-richieste", element: <ViewAllPost /> },
-      { path: "/come-funziona", element: <WhoItWork /> },
-      { path: "/privacy-policy", element: <Privacy /> },
-      { path: "/termini-e-condizioni", element: <Terms /> },
+      { path: "/blog/:slug", element: <BlogDetails /> },
+      { path: "/agentii-verificate", element: <Membership /> },
+      { path: "/pentru-agentii", element: <Pricing /> },
+      { path: "/creeaza-cerere", element: <TourPlan /> },
+      { path: "/cereri", element: <TourPlanDouble /> },
+      { path: "/cereri/:slug", element: <SinglePost /> },
+      { path: "/oferte-acceptate", element: <AcceptedOffers /> },
+      { path: "/contact", element: <Contact /> },
+      { path: "/toate-cererile", element: <ViewAllPost /> },
+      { path: "/cum-functioneaza", element: <WhoItWork /> },
+      { path: "/politica-de-confidentialitate", element: <Privacy /> },
+      { path: "/termeni-si-conditii", element: <Terms /> },
     ],
   },
 
   {
-    path: "/admin",
+    path: "/agentie",
     element: <PrivateRoute><AdminDashboardLayout /></PrivateRoute>,
     children: [
       { index: true, element: <AdminHome /> },
       { path: "dashboard", element: <AdminHome /> },
-      { path: "profilo", element: <AdminProfile /> },
-      { path: "modifica-profilo", element: <AdminProfileEdit /> },
-      { path: "gestione-abbonamento", element: <AdminPricing /> },
-      { path: "notifiche", element: <AdminNotification /> },
+      { path: "profil", element: <AdminProfile /> },
+      { path: "modifica-profil", element: <AdminProfileEdit /> },
+      { path: "abonament", element: <AdminPricing /> },
+      { path: "notificari", element: <AdminNotification /> },
       {
-        path: "chat", 
+        path: "mesaje",
         element: <ChatInterface />,
         children: [
           {
@@ -86,85 +136,37 @@ export const router = createBrowserRouter([
   },
 
   {
-    path: "/user",
+    path: "/cont",
     element: <PrivateRoute><UserDashboardLayout /></PrivateRoute>,
     children: [
+      { index: true, element: <HomeLayout><CreatedPlan /></HomeLayout> },
+      { path: "dashboard", element: <HomeLayout><CreatedPlan /></HomeLayout> },
+      { path: "cereri-publicate", element: <HomeLayout><PublishedPlan /></HomeLayout> },
+      { path: "cereri-acceptate", element: <HomeLayout><UserAccepte /></HomeLayout> },
+      { path: "favorite", element: <HomeLayout><Favorite /></HomeLayout> },
       {
-        index: true,
-        path: "",
-        element: (
-          <HomeLayout>
-            <CreatedPlan />
-          </HomeLayout>
-        ),
-      }, 
-      {
-        index: true,
-        path: "richieste-pubblicate",
-        element: (
-          <HomeLayout>
-            <PublishedPlan />
-          </HomeLayout>
-        ),
-      }, 
-      {
-        index: true,
-        path: "richieste-accettate",
-        element: (
-          <HomeLayout>
-            <UserAccepte />
-          </HomeLayout>
-        ),
-      },
-      {
-        index: true,
-        path: "preferiti",
-        element: (
-          <HomeLayout>
-            <Favorite />
-          </HomeLayout>
-        ),
-      },
-    ],
-  },
-
-  { path: "/registrazione", element: <Registration /> },
-  { path: "/login", element: <Login /> },
-  { path: "/registrazione-completata", element: <SubscriptionSuccess /> },
-  { path: "/verifica-account", element: <EmailVerification /> },
-  { path: "/verifica-otp", element: <OTP_Verification /> },
-  { path: "/recupero-password", element: <ResetPassword /> },
-  { path: "/successo", element: <SubscriptionSuccess /> },
-  { path: "/in-attesa", element: <PendingForAdmin /> },
-  {
-    path: "/user",
-    element: <UserDashboardLayout />,
-    children: [
-      { index: true, element: <HomeLayout /> },
-      { path: "dashboard", element: <HomeLayout /> },
-      {
-        path: "chat", 
+        path: "mesaje",
         element: <ChatInterface />,
-        children: [
-          {
-            path: ":id",
-            element: <Messages />,
-          },
-        ],
+        children: [{ path: ":id", element: <Messages /> }],
       },
-      { path: "profilo", element: <UserProfile /> },
-      { path: "crea-richiesta", element: <CreatePlan /> },
-      { path: "modifica-richiesta", element: <CreatePlan /> },
-      { path: "notification", element: <AdminNotification /> },
-      { path: "modifica-profilo", element: <UserEditProfile /> },
+      { path: "profil", element: <UserProfile /> },
+      { path: "creeaza-cerere", element: <CreatePlan /> },
+      { path: "modifica-cerere", element: <CreatePlan /> },
+      { path: "notificari", element: <AdminNotification /> },
+      { path: "modifica-profil", element: <UserEditProfile /> },
     ],
   },
 
-  
-  { path: `/richieste/:id`, element: <SinglePost /> },
-  { path: "/registrazione", element: <Registration /> },
-  { path: "/login", element: <Login /> },
-  { path: "/verifica-account", element: <EmailVerification /> },
-  { path: "/verifica-otp", element: <OTP_Verification /> },
-  { path: "/recupero-password", element: <ResetPassword /> },
+  { path: "/inregistrare", element: <Registration /> },
+  { path: "/autentificare", element: <Login /> },
+  { path: "/inregistrare-finalizata", element: <SubscriptionSuccess /> },
+  { path: "/verificare-cont", element: <EmailVerification /> },
+  { path: "/verificare-otp", element: <OTP_Verification /> },
+  { path: "/resetare-parola", element: <ResetPassword /> },
+  { path: "/succes", element: <SubscriptionSuccess /> },
+  { path: "/in-asteptare", element: <PendingForAdmin /> },
+  ...legacyPaths.map(([path, to]) => ({
+    path,
+    element: <LegacyRedirect to={to} />,
+  })),
 ]);

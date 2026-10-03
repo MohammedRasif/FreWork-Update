@@ -6,12 +6,13 @@ import { IoMdSearch } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
 import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
 
 export default function ChatInterface() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const isUserArea = location.pathname.startsWith("/cont/");
+  const isDashboardArea = isUserArea || location.pathname.startsWith("/agentie/");
   const { id: urlChatId } = useParams();
   const [selectedAgencyId, setSelectedAgencyId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -98,9 +99,9 @@ export default function ChatInterface() {
       if (selectedChat) {
         setSelectedAgencyId(urlChatId);
       } else if (!isChatListLoading) {
-        const basePath = location.pathname.includes("/admin/")
-          ? "/admin/chat"
-          : "/user/chat";
+        const basePath = location.pathname.includes("/agentie/")
+          ? "/agentie/mesaje"
+          : "/cont/mesaje";
         navigate(basePath, { replace: true });
         setSelectedAgencyId(null);
       }
@@ -112,15 +113,14 @@ export default function ChatInterface() {
   const handleAgencyClick = (agency) => {
     if (!agency.id) return;
     setSelectedAgencyId(agency.id);
-    const basePath = location.pathname.includes("/admin/")
-      ? "/admin/chat"
-      : "/user/chat";
+    const basePath = location.pathname.includes("/agentie/")
+      ? "/agentie/mesaje"
+      : "/cont/mesaje";
     navigate(`${basePath}/${agency.id}`, { state: { agency } });
-     window.location.href = `${basePath}/${agency.id}`;
   };
 
   const isBaseRoute =
-    location.pathname === "/user/chat" || location.pathname === "/admin/chat";
+    location.pathname === "/cont/mesaje" || location.pathname === "/agentie/mesaje";
 
   // Filter agencies based on search term and active tab
   const filteredAgencies = chatsList.filter(
@@ -135,10 +135,7 @@ export default function ChatInterface() {
   // Mobile Layout
   if (isMobile) {
     return (
-      <div className="h-screen flex flex-col">
-        <Helmet>
-        <title>vacanzamycost.it | admin | chat</title>
-      </Helmet>
+      <div className={isDashboardArea ? "user-chat-mobile flex h-[calc(100vh-120px)] min-h-[500px] flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white" : "h-screen flex flex-col"}>
         <div className="p-4 border-b border-gray-300">
           <h1 className="text-xl font-semibold mb-3">{t("messages")}</h1>
           <div className="relative">
@@ -156,7 +153,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("inbox")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "inbox"
-                  ? "bg-[#DD9E2C] text-white"
+                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
@@ -166,7 +163,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("archived")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "archived"
-                  ? "bg-[#DD9E2C] text-white"
+                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >
@@ -238,7 +235,7 @@ export default function ChatInterface() {
 
   // Desktop Layout
   return (
-    <div className="roboto p-4">
+    <div className={isDashboardArea ? "user-chat-desktop" : "p-4"}>
       <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
         {t("messages")}
       </h1>
@@ -259,7 +256,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("inbox")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "inbox"
-                  ? "bg-[#DD9E2C] text-white"
+                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
                   : "bg-gray-200 text-gray-700"
               } rounded-l-lg`}
             >
@@ -269,7 +266,7 @@ export default function ChatInterface() {
               onClick={() => setActiveTab("archived")}
               className={`flex-1 py-2 text-center hover:cursor-pointer ${
                 activeTab === "archived"
-                  ? "bg-[#DD9E2C] text-white"
+                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
                   : "bg-gray-200 text-gray-700"
               } rounded-r-lg`}
             >

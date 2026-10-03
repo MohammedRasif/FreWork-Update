@@ -29,7 +29,9 @@ import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { FaClock } from "react-icons/fa6";
-import { Helmet } from "react-helmet-async";
+import i18n from "../../../i18n.js";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
+
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -109,7 +111,7 @@ function PublishedPlan() {
 
   const handleLike = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_like"));
       return;
     }
@@ -132,7 +134,7 @@ function PublishedPlan() {
   const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
     if (!role) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_message"));
       return;
     }
@@ -140,7 +142,7 @@ function PublishedPlan() {
     try {
       await invite({ ...data, other_user_id: data.other_user_id }).unwrap();
       toast.success(t("chat_invitation_sent"));
-      navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
     } catch (error) {
       console.error("Invite to chat error:", error);
       toast.error(error?.data?.detail || t("failed_send_invitation"));
@@ -149,14 +151,14 @@ function PublishedPlan() {
 
   const handleShare = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_share"));
       return;
     }
 
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:5173/post?postid=${tourId}`
+        `${window.location.origin}/cereri/${tourId}`
       );
       toast.success(t("post_link_copied"));
 
@@ -189,7 +191,7 @@ function PublishedPlan() {
 
   const handleSubmitOffer = async (tourId, budget, comment) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_submit_offer"));
       return;
     }
@@ -285,8 +287,8 @@ function PublishedPlan() {
 
   if (!publishedPlans.length)
     return (
-      <div className="w-full rounded-xl p-4 flex justify-center items-center">
-        <p className="text-[#70798F] text-base sm:text-lg">
+      <div className="flex min-h-56 w-full items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+        <p className="text-base font-semibold text-[#172b43]">
           {t("no_published_plans")}
         </p>
       </div>
@@ -308,22 +310,19 @@ function PublishedPlan() {
   };
 
   return (
-    <div className="min-h-screen">
-      <Helmet>
-        <title>vacanzamycost.it | user | richieste-pubblicate</title>
-      </Helmet>
+    <div className="min-w-0">
       <Toaster />
       <div className="flex flex-col">
-        <div className="flex-1 flex flex-col gap-3">
+        <div className="flex-1 flex flex-col gap-5">
           {publishedPlans.map((plan) => {
             const { likeCount, shareCount } = getInteractionCounts(plan);
             return (
-              <div key={plan.id}>
-                <div className="bg-white rounded-t-lg border-x border-t border-gray-200">
+              <article key={plan.id} className="overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]">
+                <div className="bg-white">
                   <div className="p-4 sm:p-6 pb-4">
                     <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
                       <div>
-                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                        <h2 className="mb-2 text-xl font-bold tracking-tight text-[#172b43] sm:text-2xl">
                           {t("tour_from_to", {
                             from: plan.location_from,
                             to: plan.location_to,
@@ -334,7 +333,7 @@ function PublishedPlan() {
                             {t("willing_to_go")}{" "}
                             <span className="font-medium">
                               {new Date(plan.start_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                i18n.language === "ro" ? "ro-RO" : "ru-RU",
                                 { day: "numeric", month: "long", year: "numeric" }
                               )}
                             </span>
@@ -359,7 +358,7 @@ function PublishedPlan() {
                       </div>
                       <div className="flex items-center relative mt-4 sm:mt-0">
                         <div>
-                          <p className="text-base sm:text-lg font-bold text-gray-700">
+                          <p className="text-base font-bold text-[#172b43] sm:text-lg">
                             {t("budget")} €{plan.budget}
                           </p>
                           {/* <p className="text-xs sm:text-md text-gray-800">
@@ -384,7 +383,7 @@ function PublishedPlan() {
                         {isDropdownOpen && (
                           <div
                             ref={dropdownRef}
-                            className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10 animate-dropdown"
+                            className="absolute right-0 top-8 z-10 w-40 animate-dropdown rounded-xl border border-[#e9e6e0] bg-white py-2 shadow-lg"
                           >
                             <button
                               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white"
@@ -430,23 +429,21 @@ function PublishedPlan() {
                     </div>
                   </div>
                   <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
-                    <div className="rounded-lg overflow-hidden relative">
+                    <div className="relative overflow-hidden rounded-[16px] bg-[#f4eee4]">
                       <img
-                        src={
-                          plan.spot_picture_url ||
-                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                        }
+                        src={plan.spot_picture_url || PlanImage1}
+                        onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                         alt={t("tour_destination")}
-                        className="w-full h-64 sm:h-96 object-cover"
+                        className="h-52 w-full object-cover sm:h-72"
                       />
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
+                <div className="border-t border-[#f0eee9] bg-white">
                   <div className="px-4 sm:px-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 pt-3 flex items-center space-x-2">
+                        <h3 className="flex items-center space-x-2 pt-3 text-lg font-bold text-[#172b43] sm:text-xl">
                           <GoArrowLeft />
                           <p>{t("all_offers")}</p>
                         </h3>
@@ -468,7 +465,7 @@ function PublishedPlan() {
                         return (
                           <div
                             key={offer.id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-4 rounded-lg"
+                            className="flex flex-col items-start justify-between gap-3 rounded-xl border border-[#f0eee9] bg-[#faf9f6] px-3 py-3 sm:flex-row sm:items-center sm:px-4"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
                              <button className="cursor-pointer"  onClick={() =>
@@ -537,10 +534,10 @@ function PublishedPlan() {
                               >
                                 {t("response")}
                               </button> */}
-                              <Link to={`/user/chat/${offer.room_id}`}>
+                              <Link to={`/cont/mesaje/${offer.room_id}`}>
                               <button
                                 
-                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white text-xs sm:text-md rounded-md  transition-colors cursor-pointer"
+                                className="min-h-10 cursor-pointer rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
                               >
                                 {t("response")}
                               </button>
@@ -557,7 +554,7 @@ function PublishedPlan() {
                     <div className="border-t border-gray-200 my-4"></div>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -595,7 +592,7 @@ function PublishedPlan() {
                             {t("willing_to_go")}{" "}
                             <span className="font-medium">
                               {new Date(selectedTour.start_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                i18n.language === "ro" ? "ro-RO" : "ru-RU",
                                 { day: "numeric", month: "long", year: "numeric" }
                               )}
                             </span>
@@ -1071,7 +1068,7 @@ function PublishedPlan() {
                                           <span className="text-xs sm:text-sm text-gray-500 italic">
                                             {new Date(
                                               review.created_at
-                                            ).toLocaleDateString(i18n.language === 'it' ? 'it-IT' : 'en-GB', {
+                                            ).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
                                               day: "numeric",
                                               month: "long",
                                               year: "numeric",

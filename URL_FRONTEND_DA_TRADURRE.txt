@@ -1,0 +1,49 @@
+PAGINE PUBBLICHE
+/
+/blog
+/blog/:slug
+/agentii-verificate
+/pentru-agentii
+/creeaza-cerere
+/cereri
+/cereri/:slug
+/oferte-acceptate
+/contact
+/toate-cererile
+/cum-functioneaza
+/politica-de-confidentialitate
+/termeni-si-conditii
+
+ACCESSO E REGISTRAZIONE
+/inregistrare
+/autentificare
+/inregistrare-finalizata
+/verificare-cont
+/verificare-otp
+/resetare-parola
+/succes
+/in-asteptare
+
+DASHBOARD AGENZIE
+/agentie
+/agentie/dashboard
+/agentie/profil
+/agentie/modifica-profil
+/agentie/abonament
+/agentie/notificari
+/agentie/mesaje
+/agentie/mesaje/:id
+
+DASHBOARD UTENTI
+/cont
+/cont/dashboard
+/cont/cereri-publicate
+/cont/cereri-acceptate
+/cont/favorite
+/cont/mesaje
+/cont/mesaje/:id
+/cont/profil
+/cont/creeaza-cerere
+/cont/modifica-cerere
+/cont/notificari
+/cont/modifica-profil

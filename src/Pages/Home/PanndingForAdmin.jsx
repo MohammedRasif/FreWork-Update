@@ -2,7 +2,7 @@
 import React from 'react';
 import { Clock, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import image from "../../assets/img/removebg.png"
+import BrandWordmark from "@/components/BrandWordmark";
 import { NavLink } from 'react-router-dom';
 function PendingForAdmin() {
   const { t } = useTranslation();
@@ -15,7 +15,7 @@ function PendingForAdmin() {
         <div className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer px-8 py-3 text-center">
          <NavLink to="/">
            <div className='flex items-center justify-center pb-5'>
-          <img src={image} className='h-16' alt="" />
+          <BrandWordmark className="rounded-xl bg-white px-4 py-3" />
         </div>
          </NavLink>
           <div className="relative inline-block mb-6">
@@ -104,7 +104,7 @@ function PendingForAdmin() {
 
         <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 text-center">
           <p className="text-sm text-gray-500">
-            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © VacanzaMyCost.it
+            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © TreiOferte
           </p>
         </div>
       </div>

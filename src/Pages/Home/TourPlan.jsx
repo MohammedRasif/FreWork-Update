@@ -18,11 +18,14 @@ import {
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
 
 const TourPlanWithPopup = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
   const [isLiked, setIsLiked] = useState({});
   const [isShared, setIsShared] = useState({});
@@ -46,11 +49,13 @@ const TourPlanWithPopup = () => {
   const [offerComment, setOfferComment] = useState("");
   const [tourPlanPublicUser, setTourPlanPublicUser] = useState({});
 
+  // Add this to the state declarations at the top of the component (if not already present)
   const [offerForm, setOfferForm] = useState({
     applyDiscount: false,
     discount: "",
   });
 
+  // Add this handler function to manage offer form changes (if not already present)
   const handleOfferChange = (e) => {
     const { name, value, type, checked } = e.target;
     setOfferForm((prev) => ({
@@ -59,6 +64,7 @@ const TourPlanWithPopup = () => {
     }));
   };
 
+  // Utility function to truncate text to a specified word limit
   const truncateText = (text, wordLimit = 100) => {
     if (!text) return { truncated: "", isTruncated: false };
     const words = text.split(/\s+/);
@@ -71,6 +77,7 @@ const TourPlanWithPopup = () => {
     };
   };
 
+  // Toggle description expansion
   const toggleDescription = (tourId) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -78,6 +85,7 @@ const TourPlanWithPopup = () => {
     }));
   };
 
+  // Toggle offer message expansion
   const toggleOfferMessage = (offerId) => {
     setExpandedOfferMessages((prev) => ({
       ...prev,
@@ -85,6 +93,7 @@ const TourPlanWithPopup = () => {
     }));
   };
 
+  // RTK Queries
   const { data: tourPlanPublic, isLoading: isTourPlanPublicLoading } =
     useGetTourPlanPublicQuery();
   console.log(tourPlanPublic, "tourPlanPublic");
@@ -105,6 +114,7 @@ const TourPlanWithPopup = () => {
     useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
 
+  // Initialize tours and like/share status
   useEffect(() => {
     const data = filteredTourPlan || tourPlanPublic || [];
     setTours(data);
@@ -123,11 +133,11 @@ const TourPlanWithPopup = () => {
             String(interaction.user) === String(currentUserId) &&
             interaction.interaction_type === "share"
         );
-        tourUsers[tour.id] = tour.user; 
+        tourUsers[tour.id] = tour.user; // Store user ID for each tour
       });
       setIsLiked(initialLikes);
       setIsShared(initialShares);
-      setTourPlanPublicUser(tourUsers); 
+      setTourPlanPublicUser(tourUsers); // Set user IDs in state
     }
   }, [tourPlanPublic, filteredTourPlan, currentUserId]);
 
@@ -177,19 +187,19 @@ const TourPlanWithPopup = () => {
 
   const handleSubmitOffer = async (tourId, budget, comment) => {
     if (!token) {
-      navigate("/login");
-      toast.error("Please log in to submit an offer");
+      navigate("/autentificare");
+      toast.error(t("login_to_submit_offer"));
       return;
     }
 
     if (!budget || !comment.trim()) {
-      toast.error("Please provide both a budget and a comment");
+      toast.error(t("provide_budget_and_comment"));
       return;
     }
 
     if (offerForm.applyDiscount && !offerForm.discount) {
       toast.error(
-        "Please provide a discount percentage if discount is applied"
+        t("discount_required_if_applied")
       );
       return;
     }
@@ -259,20 +269,20 @@ const TourPlanWithPopup = () => {
       setOfferBudget("");
       setOfferComment("");
       setOfferForm({ applyDiscount: false, discount: "" });
-      toast.success("Offer submitted successfully");
-      navigate("/admin/chat");
+      toast.success(t("offer_submitted"));
+      navigate("/agentie/mesaje");
     } catch (error) {
       console.error("Failed to submit offer:", error);
       toast.error(
         error?.data?.detail
           ? `${error.data.detail} Only agency can do this.`
-          : "Something went wrong"
+          : t("something_went_wrong")
       );
     }
   };
   const handleLike = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       return;
     }
 
@@ -338,15 +348,15 @@ const TourPlanWithPopup = () => {
 
   const handleShare = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:5173/post?postid=${tourId}`
+        `${window.location.origin}/cereri/${tourId}`
       );
-      toast.success("Post link is copied");
+      toast.success(t("post_link_copied"));
 
       await interact({
         id: tourId,
@@ -405,14 +415,14 @@ const TourPlanWithPopup = () => {
       });
     } catch (error) {
       console.error("Failed to update share:", error);
-      toast.error("Failed to copy link or update share");
+      toast.error(t("failed_copy_link"));
     }
   };
 
   const acceptOfferHandler = async (offerId, tourId) => {
     if (!token) {
-      navigate("/login");
-      toast.error("Please log in to accept an offer");
+      navigate("/autentificare");
+      toast.error(t("login_to_accept_offer"));
       return;
     }
 
@@ -425,10 +435,10 @@ const TourPlanWithPopup = () => {
         setSelectedTour(null);
       }
 
-      toast.success("Offer accepted successfully");
+      toast.success(t("offer_accepted_success"));
     } catch (error) {
       console.error("Failed to accept offer:", error);
-      toast.error(error.data?.detail || "Failed to accept offer");
+      toast.error(error.data?.detail || t("failed_to_accept_offer"));
     }
   };
 
@@ -452,7 +462,7 @@ const TourPlanWithPopup = () => {
     if (role) {
       try {
         await invite(data);
-        navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+        navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
       } catch (error) {
         console.log(error, "invite to message");
       }
@@ -460,7 +470,7 @@ const TourPlanWithPopup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20 roboto">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20">
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">
         <button
@@ -468,7 +478,7 @@ const TourPlanWithPopup = () => {
           onClick={toggleMobileFilter}
         >
           <Menu size={18} />
-          <span>Filters</span>
+          <span>{t("filters")}</span>
         </button>
 
         <div className="flex flex-col md:flex-row gap-4 md:gap-6">
@@ -476,7 +486,7 @@ const TourPlanWithPopup = () => {
             <div className="mb-4 md:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-gray-600 mb-2 sm:mb-0">
-                  Published Tour Plans
+                  {t("published_tour_plans")}
                 </h1>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                   <div className="w-full sm:w-auto">
@@ -487,20 +497,20 @@ const TourPlanWithPopup = () => {
                         handleFilterChange("category", e.target.value)
                       }
                     >
-                      <option value="">Select a category</option>
-                      <option value="adventure">Adventure</option>
-                      <option value="cultural">Cultural</option>
-                      <option value="relaxation">Relaxation</option>
-                      <option value="historical">Historical</option>
-                      <option value="beach">Beach</option>
-                      <option value="wildlife">Wildlife</option>
-                      <option value="romantic">Romantic</option>
+                      <option value="">{t("select_category")}</option>
+                      <option value="adventure">{t("adventure")}</option>
+                      <option value="cultural">{t("cultural")}</option>
+                      <option value="relaxation">{t("relaxation")}</option>
+                      <option value="historical">{t("historical")}</option>
+                      <option value="beach">{t("beach")}</option>
+                      <option value="wildlife">{t("wildlife")}</option>
+                      <option value="romantic">{t("romantic")}</option>
                     </select>
                   </div>
                   <div className="relative w-full sm:w-auto">
                     <input
                       type="text"
-                      placeholder="Search..."
+                      placeholder={t("search_placeholder")}
                       className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full sm:w-64"
                       value={filters.search}
                       onChange={(e) =>
@@ -524,7 +534,7 @@ const TourPlanWithPopup = () => {
                 </div>
               </div>
               <p className="text-gray-500 text-md font-medium">
-                All posted tour plans are here
+                {t("all_posted_tour_plans_here")}
               </p>
             </div>
 
@@ -553,19 +563,19 @@ const TourPlanWithPopup = () => {
                             </h2>
                             <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                               <p>
-                                Willing to go on{" "}
+                                {t("willing_to_go")}{" "}
                                 <span className="font-medium">
                                   {tour.start_date}
                                 </span>
                               </p>
                               <p>
-                                Include:{" "}
+                                {t("include")}:{" "}
                                 <span className="font-medium">
                                   {tour.duration}
                                 </span>
                               </p>
                               <p>
-                                Category:{" "}
+                                {t("category")}:{" "}
                                 <span className="font-medium">
                                   {tour.category}
                                 </span>
@@ -575,10 +585,10 @@ const TourPlanWithPopup = () => {
                           <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                             <div>
                               <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                                Budget ${tour.budget}
+                                {t("budget")}${tour.budget}
                               </p>
                               <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                                Total {tour.total_members} person
+                                {t("total")} {tour.total_members} {t("person")}
                               </p>
                             </div>
                           </div>
@@ -594,7 +604,7 @@ const TourPlanWithPopup = () => {
                                 onClick={() => toggleDescription(tour.id)}
                                 className="text-[#DD9E2C] hover:underline text-sm ml-1"
                               >
-                                See More
+                                {t("see_more")}
                               </button>
                             )}
                             {isTruncated && expandedDescriptions[tour.id] && (
@@ -602,7 +612,7 @@ const TourPlanWithPopup = () => {
                                 onClick={() => toggleDescription(tour.id)}
                                 className="text-[#DD9E2C] hover:underline text-sm ml-1"
                               >
-                                Show Less
+                                {t("show_less")}
                               </button>
                             )}
                           </p>
@@ -610,7 +620,7 @@ const TourPlanWithPopup = () => {
 
                         <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                           <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
-                            Interested Travel Points:
+                            {t("interested_travel_points")}:
                           </p>
                           <div className="flex flex-wrap gap-1">
                             {tour.tourist_spots ? (
@@ -629,7 +639,7 @@ const TourPlanWithPopup = () => {
                                 ))
                             ) : (
                               <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                                None
+                                {t("none")}
                               </span>
                             )}
                           </div>
@@ -641,7 +651,7 @@ const TourPlanWithPopup = () => {
                               tour.spot_picture_url ||
                               "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                             }
-                            alt="Tour destination"
+                            alt={t("tour_destination")}
                             className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                           />
                         </div>
@@ -657,12 +667,12 @@ const TourPlanWithPopup = () => {
                               </div>
                             </div>
                             <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
-                              {likeCount} Likes
+                              {likeCount} {t("likes")}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-                            <span>{tour.offer_count} Offers</span>
-                            <span>{shareCount} Shares</span>
+                            <span>{tour.offer_count} {t("offers")}</span>
+                            <span>{shareCount} {t("shares")}</span>
                           </div>
                         </div>
 
@@ -683,7 +693,7 @@ const TourPlanWithPopup = () => {
                                 }`}
                               />
                               <span>
-                                {isLiked[tour.id] ? "Unlike" : "Like"}
+                                {isLiked[tour.id] ? t("unlike") : t("like")}
                               </span>
                             </button>
                             <button
@@ -691,7 +701,7 @@ const TourPlanWithPopup = () => {
                               className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-[#C2851C] transition-colors"
                             >
                               <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
-                              <span>Comments</span>
+                              <span>{t("comments")}</span>
                             </button>
                             <button
                               onClick={() => handleShare(tour.id)}
@@ -708,7 +718,7 @@ const TourPlanWithPopup = () => {
                                 }`}
                               />
                               <span>
-                                {isShared[tour.id] ? "Share" : "Share"}
+                                {isShared[tour.id] ? t("share") : t("share")}
                               </span>
                             </button>
                           </div>
@@ -773,7 +783,7 @@ const TourPlanWithPopup = () => {
                                               }
                                               className="text-[#DD9E2C] hover:underline text-sm ml-1"
                                             >
-                                              See More
+                                              {t("see_more")}
                                             </button>
                                           )}
                                         {isTruncated &&
@@ -784,7 +794,7 @@ const TourPlanWithPopup = () => {
                                               }
                                               className="text-[#DD9E2C] hover:underline text-sm ml-1"
                                             >
-                                              Show Less
+                                              {t("show_less")}
                                             </button>
                                           )}
                                       </p>
@@ -800,7 +810,7 @@ const TourPlanWithPopup = () => {
                                       <button
                                         onClick={() => {
                                           if (!token) {
-                                            navigate("/login");
+                                            navigate("/autentificare");
                                           } else {
                                             const userId = tour.user; // Use tour.user instead of tourPlanPublic[0]?.user
                                             if (userId) {
@@ -816,12 +826,12 @@ const TourPlanWithPopup = () => {
                                         }}
                                         className="flex items-center space-x-2 bg-[#DD9E2C] text-white px-4 py-2 rounded-full hover:bg-[#C2851C] transition-colors w-full sm:w-auto hover:cursor-pointer"
                                         aria-label={`Message ${
-                                          offer.agency.agency_name || "Agency"
+                                          offer.agency.agency_name || t("agency")
                                         }`}
                                       >
                                         <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                                         <span className="text-sm sm:text-base font-medium">
-                                          Message
+                                          {t("message")}
                                         </span>
                                       </button>
                                       {tour.user ==
@@ -840,7 +850,7 @@ const TourPlanWithPopup = () => {
                                               : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                                           }`}
                                         >
-                                          Accept
+                                          {t("accept")}
                                         </button>
                                       )}
                                     </div>
@@ -854,8 +864,8 @@ const TourPlanWithPopup = () => {
                               className="text-blue-600 hover:underline text-sm"
                             >
                               {expandedOffers[tour.id]
-                                ? "Show Less"
-                                : "See More"}
+                                ? t("show_less")
+                                : t("see_more")}
                             </button>
                           )}
                         </div>
@@ -864,7 +874,7 @@ const TourPlanWithPopup = () => {
                   );
                 })
               ) : (
-                <div className="h-screen">No tours found</div>
+                <div className="h-screen">{t("no_tours_found")}</div>
               )}
             </div>
           </div>
@@ -875,7 +885,7 @@ const TourPlanWithPopup = () => {
           >
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 top-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t("filters")}</h3>
                 <button
                   className="md:hidden text-gray-500"
                   onClick={toggleMobileFilter}
@@ -887,7 +897,7 @@ const TourPlanWithPopup = () => {
                 <div>
                   <input
                     type="text"
-                    placeholder="search to available plan"
+                    placeholder={t("search_tour_plans")}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
@@ -897,12 +907,12 @@ const TourPlanWithPopup = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price range (USD)
+                    {t("price_range_usd")}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="text"
-                      placeholder="Min"
+                      placeholder={t("min")}
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                       value={filters.min}
                       onChange={(e) =>
@@ -911,7 +921,7 @@ const TourPlanWithPopup = () => {
                     />
                     <input
                       type="text"
-                      placeholder="Max"
+                      placeholder={t("max")}
                       className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                       value={filters.max}
                       onChange={(e) =>
@@ -922,7 +932,7 @@ const TourPlanWithPopup = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Country
+                    {t("select_country")}
                   </label>
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent hover:border-blue-400 transition-colors"
@@ -931,24 +941,24 @@ const TourPlanWithPopup = () => {
                       handleFilterChange("country", e.target.value)
                     }
                   >
-                    <option value="">Select a country</option>
-                    <option value="thailand">Thailand</option>
-                    <option value="india">India</option>
-                    <option value="malaysia">Malaysia</option>
-                    <option value="singapore">Singapore</option>
-                    <option value="japan">Japan</option>
-                    <option value="indonesia">Indonesia</option>
-                    <option value="vietnam">Vietnam</option>
-                    <option value="sri_lanka">Sri Lanka</option>
+                    <option value="">{t("select_country")}</option>
+                    <option value="thailand">{t("thailand")}</option>
+                    <option value="india">{t("india")}</option>
+                    <option value="malaysia">{t("malaysia")}</option>
+                    <option value="singapore">{t("singapore")}</option>
+                    <option value="japan">{t("japan")}</option>
+                    <option value="indonesia">{t("indonesia")}</option>
+                    <option value="vietnam">{t("vietnam")}</option>
+                    <option value="sri_lanka">{t("sri_lanka")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tour Destination
+                    {t("tour_destination")}
                   </label>
                   <input
                     type="text"
-                    placeholder="search destination"
+                    placeholder={t("search_by_destination")}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
@@ -967,7 +977,7 @@ const TourPlanWithPopup = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">
-                Tour Details
+                {t("tour_details")}
               </h2>
               <button
                 onClick={closePopup}
@@ -987,19 +997,19 @@ const TourPlanWithPopup = () => {
                         </h2>
                         <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
                           <p>
-                            Willing to go on{" "}
+                            {t("willing_to_go")}{" "}
                             <span className="font-medium">
                               {selectedTour.start_date}
                             </span>
                           </p>
                           <p>
-                            Include:{" "}
+                            {t("include")}:{" "}
                             <span className="font-medium">
                               {selectedTour.duration}
                             </span>
                           </p>
                           <p>
-                            Category:{" "}
+                            {t("category")}:{" "}
                             <span className="font-medium">
                               {selectedTour.category}
                             </span>
@@ -1009,10 +1019,10 @@ const TourPlanWithPopup = () => {
                       <div className="flex items-start justify-between lg:justify-end lg:text-right lg:flex-col lg:items-end space-x-2 lg:space-x-0 relative">
                         <div>
                           <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700">
-                            Budget ${selectedTour.budget}
+                            {t("budget")}${selectedTour.budget}
                           </p>
                           <p className="text-xs sm:text-sm lg:text-md text-gray-800">
-                            Total {selectedTour.total_members} person
+                            {t("total")} {selectedTour.total_members} {t("person")}
                           </p>
                         </div>
                       </div>
@@ -1030,7 +1040,7 @@ const TourPlanWithPopup = () => {
                               onClick={() => toggleDescription(selectedTour.id)}
                               className="text-blue-600 hover:underline text-sm ml-1"
                             >
-                              See More
+                              {t("see_more")}
                             </button>
                           )}
                         {truncateText(selectedTour.description, 100)
@@ -1040,14 +1050,14 @@ const TourPlanWithPopup = () => {
                               onClick={() => toggleDescription(selectedTour.id)}
                               className="text-blue-600 hover:underline text-sm ml-1"
                             >
-                              Show Less
+                              {t("show_less")}
                             </button>
                           )}
                       </p>
                     </div>
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                       <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                        Interested Travel Points:
+                        {t("interested_travel_points")}:
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {selectedTour.tourist_spots ? (
@@ -1066,7 +1076,7 @@ const TourPlanWithPopup = () => {
                             ))
                         ) : (
                           <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                            None
+                            {t("none")}
                           </span>
                         )}
                       </div>
@@ -1077,7 +1087,7 @@ const TourPlanWithPopup = () => {
                           selectedTour.spot_picture_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
-                        alt="Tour destination"
+                        alt={t("tour_destination")}
                         className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                       />
                     </div>
@@ -1092,13 +1102,13 @@ const TourPlanWithPopup = () => {
                           </div>
                         </div>
                         <span className="text-xs sm:text-sm lg:text-sm text-gray-600 ml-2">
-                          {getInteractionCounts(selectedTour).likeCount} Likes
+                          {getInteractionCounts(selectedTour).likeCount} {t("likes")}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 sm:gap-4 lg:gap-4 text-xs sm:text-sm lg:text-sm text-gray-600">
-                        <span>{selectedTour.offer_count} Offers</span>
+                        <span>{selectedTour.offer_count} {t("offers")}</span>
                         <span>
-                          {getInteractionCounts(selectedTour).shareCount} Shares
+                          {getInteractionCounts(selectedTour).shareCount} {t("shares")}
                         </span>
                       </div>
                     </div>
@@ -1119,12 +1129,12 @@ const TourPlanWithPopup = () => {
                             }`}
                           />
                           <span>
-                            {isLiked[selectedTour.id] ? "Unlike" : "Like"}
+                            {isLiked[selectedTour.id] ? t("unlike") : t("like")}
                           </span>
                         </button>
                         <button className="flex items-center gap-1 sm:gap-2 lg:gap-2 text-xs sm:text-sm lg:text-sm text-gray-600 hover:text-blue-600 transition-colors">
                           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4" />
-                          <span>Comments</span>
+                          <span>{t("comments")}</span>
                         </button>
                         <button
                           onClick={() => handleShare(selectedTour.id)}
@@ -1141,7 +1151,7 @@ const TourPlanWithPopup = () => {
                             }`}
                           />
                           <span>
-                            {isShared[selectedTour.id] ? "Share" : "Share"}
+                            {isShared[selectedTour.id] ? t("share") : t("share")}
                           </span>
                         </button>
                       </div>
@@ -1149,7 +1159,7 @@ const TourPlanWithPopup = () => {
 
                     <div className="mt-4 space-y-4">
                       {isLoading ? (
-                        <div>Loading user data...</div>
+                        <div>{t("loading_user_data")}</div>
                       ) : (
                         selectedTour.offers
                           .slice(
@@ -1210,7 +1220,7 @@ const TourPlanWithPopup = () => {
                                             }
                                             className="text-blue-600 hover:underline text-sm ml-1"
                                           >
-                                            See More
+                                            {t("see_more")}
                                           </button>
                                         )}
                                       {isTruncated &&
@@ -1221,7 +1231,7 @@ const TourPlanWithPopup = () => {
                                             }
                                             className="text-blue-600 hover:underline text-sm ml-1"
                                           >
-                                            Show Less
+                                            {t("show_less")}
                                           </button>
                                         )}
                                     </p>
@@ -1237,7 +1247,7 @@ const TourPlanWithPopup = () => {
                                     <button
                                       onClick={() => {
                                         if (!token) {
-                                          navigate("/login");
+                                          navigate("/autentificare");
                                         } else {
                                           const userId = selectedTour.user;
                                           if (userId) {
@@ -1253,12 +1263,12 @@ const TourPlanWithPopup = () => {
                                       }}
                                       className="flex items-center space-x-2 bg-[#3776E2] text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors w-full sm:w-auto hover:cursor-pointer"
                                       aria-label={`Message ${
-                                        offer.agency.agency_name || "Agency"
+                                        offer.agency.agency_name || t("agency")
                                       }`}
                                     >
                                       <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                                       <span className="text-sm sm:text-base font-medium">
-                                        Message
+                                        {t("message")}
                                       </span>
                                     </button>
                                     {selectedTour.user ==
@@ -1277,7 +1287,7 @@ const TourPlanWithPopup = () => {
                                             : "bg-[#3776E2] text-white hover:bg-blue-700"
                                         }`}
                                       >
-                                        Accept
+                                        {t("accept")}
                                       </button>
                                     )}
                                   </div>
@@ -1292,8 +1302,8 @@ const TourPlanWithPopup = () => {
                           className="text-blue-600 hover:underline text-sm"
                         >
                           {expandedOffers[selectedTour.id]
-                            ? "Show Less"
-                            : "See More"}
+                            ? t("show_less")
+                            : t("see_more")}
                         </button>
                       )}
                     </div>
@@ -1311,18 +1321,18 @@ const TourPlanWithPopup = () => {
                       </div> */}
                       <div className="flex-1 w-full">
                         <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
-                          Place your offer
+                          {t("place_your_offer")}
                         </p>
                         <div className="flex flex-col gap-3">
                           <input
                             type="number"
-                            placeholder="Enter your budget"
+                            placeholder={t("enter_your_budget")}
                             value={offerBudget}
                             onChange={(e) => setOfferBudget(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
                           />
                           <textarea
-                            placeholder="Enter your comment"
+                            placeholder={t("enter_your_comment")}
                             value={offerComment}
                             onChange={(e) => setOfferComment(e.target.value)}
                             className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
@@ -1339,14 +1349,11 @@ const TourPlanWithPopup = () => {
                                 className="h-4 w-4 text-blue-600 focus:ring-[#DD9E2C] border-gray-300 rounded"
                               />
                               <span className="ml-2 lg:text-md text-gray-700">
-                                Apply an additional discount
+                                {t("apply_additional_discount")}
                               </span>
                             </label>
                             <p className="text-xs text-gray-500 mt-1">
-                              The site automatically suggests to visitors to
-                              request an additional discount, increasing
-                              conversions by 30%. If you want to offer more, do
-                              so by checking this.
+                              {t("discount_details")}
                             </p>
                           </div>
 
@@ -1355,7 +1362,7 @@ const TourPlanWithPopup = () => {
                               htmlFor="discount"
                               className="block lg:text-md font-medium text-gray-700 mb-1"
                             >
-                              Discount
+                              {t("discount")}
                             </label>
                             <input
                               type="number"
@@ -1363,7 +1370,7 @@ const TourPlanWithPopup = () => {
                               id="discount"
                               value={offerForm.discount}
                               onChange={handleOfferChange}
-                              placeholder="Enter discount percentage"
+                              placeholder={t("enter_discount_percentage")}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] transition"
                               disabled={!offerForm.applyDiscount}
                             />
@@ -1384,7 +1391,7 @@ const TourPlanWithPopup = () => {
                             disabled={!offerBudget || !offerComment.trim()}
                           >
                             <IoIosSend size={24} />
-                            <span>Submit Offer</span>
+                            <span>{t("submit_offer")}</span>
                           </button>
                         </div>
                       </div>

@@ -1,83 +1,48 @@
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
-import { ChevronDown, Mail, Lock, Building, Phone } from "lucide-react";
-import img from "../../assets/img/Mask group (3).png";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ArrowRight, Building2, Eye, EyeOff, Lock, Mail, Phone, UserRound } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "@/redux/features/baseApi";
-import img1 from "../../assets/img/1000062305-removebg-preview.png";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import AuthLayout, { authInputClass } from "./AuthLayout";
 
-const Register = () => {
+const fieldErrorClass = "mt-1.5 text-xs text-[#b3483d]";
+const fieldLabelClass = "mb-2 block text-sm font-semibold text-[#34485c]";
+
+function Register() {
   const { t } = useTranslation();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState("tourist");
-  const [createUser, { isLoading, isError, error, isSuccess }] =
-    useCreateUserMutation();
   const navigate = useNavigate();
+  const [createUser, { isLoading }] = useCreateUserMutation();
   const [errorMessage, setErrorMessage] = useState("");
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm({
-    defaultValues: {
-      userType: "tourist",
-      agency_name: "",
-      telephone_number: "",
-      vatId: "",
-    },
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
+    defaultValues: { userType: "tourist", agency_name: "", telephone_number: "", vatId: "" },
   });
-
   const password = watch("password");
-  const userType = watch("userType");
-
-  // useEffect(() => {
-  //   return () => {
-  //     localStorage.removeItem("pricing_status");
-  //   };
-  // }, []);
+  const isAgency = watch("userType") === "agency";
 
   useEffect(() => {
-    const pricingStatus = localStorage.getItem("pricing_status");
-
-    if (pricingStatus === "agency") {
-      setSelectedUserType("agency");
-      setValue("userType", "agency");
-    }
-  }, [setValue]);
-
-  useEffect(() => {
+    if (localStorage.getItem("pricing_status") === "agency") setValue("userType", "agency");
     const pendingPlan = localStorage.getItem("pendingPlan");
     if (pendingPlan) {
       try {
         const parsedPlan = JSON.parse(pendingPlan);
-        if (parsedPlan.email) {
-          setValue("email", parsedPlan.email);
-        }
-      } catch (err) {
-        console.error("Error parsing pendingPlan:", err);
+        if (parsedPlan.email) setValue("email", parsedPlan.email);
+      } catch (error) {
+        console.error("Error parsing pendingPlan:", error);
       }
     }
   }, [setValue]);
 
-
   useEffect(() => {
-  const handleBeforeUnload = () => {
-    localStorage.removeItem("pricing_status");
-  };
-
-  window.addEventListener("beforeunload", handleBeforeUnload);
-
-  return () => {
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-    localStorage.removeItem("pricing_status");  
-  };
-}, []);
-  const userTypes = ["tourist", "agency"];
+    const clearPricingStatus = () => localStorage.removeItem("pricing_status");
+    window.addEventListener("beforeunload", clearPricingStatus);
+    return () => {
+      window.removeEventListener("beforeunload", clearPricingStatus);
+      clearPricingStatus();
+    };
+  }, []);
 
   const onSubmit = async (data) => {
     try {
@@ -87,368 +52,108 @@ const Register = () => {
         password: data.password,
         invitation_code: data.invitationCode || undefined,
       };
-
-      // Add agency-specific fields only if agency is selected
       if (data.userType === "agency") {
         payload.agency_name = data.agency_name;
         payload.telephone_number = data.telephone_number;
         payload.vat_id = data.vatId || undefined;
       }
-
       localStorage.setItem("userType", data.userType);
       localStorage.setItem("userEmail", data.email);
-
-      const res = await createUser(payload).unwrap();
-      console.log("User created:", res);
+      await createUser(payload).unwrap();
       localStorage.removeItem("pricing_status");
-
-      navigate("/verifica-otp", {
-        state: { email: data.email, from: "register" },
-      });
-    } catch (err) {
-      console.error("Registration error:", err);
-      const msg = err.data?.error || t("registration_error");
-      setErrorMessage(msg);
-      alert(msg);
+      navigate("/verificare-otp", { state: { email: data.email, from: "register" } });
+    } catch (error) {
+      const message = error?.data?.error;
+      setErrorMessage(typeof message === "string" ? message : t("registration_error"));
     }
   };
 
-  const handleUserTypeSelect = (type) => {
-    setSelectedUserType(type);
-    setValue("userType", type);
-    setIsDropdownOpen(false);
-  };
-
-  const isAgency = userType === "agency";
-
   return (
-    <div className="min-h-screen flex">
-      <Helmet>
-        <title>vacanzamycost.it | registrazione</title>
-      </Helmet>
-      {/* Left Side - Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
-        <img
-          src={img}
-          alt={t("background_image")}
-          className="w-full h-full object-cover absolute inset-0"
-        />
-      </div>
-
-      {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-100">
-        <div className="w-full max-w-xl">
-          {/* Logo & Title */}
-          <div className="text-center mb-8">
-            <NavLink to="/">
-              <div className="flex items-center justify-center mb-6">
-                <img src={img1} className="h-20" alt={t("logo")} />
-              </div>
-            </NavLink>
-            {/* <h1 className="text-4xl font-semibold text-gray-700">
-              {t("welcome_to_frework")}
-            </h1> */}
+    <AuthLayout title={t("auth_register_title")} description={t("auth_register_description")} wide>
+      {errorMessage && <div role="alert" className="mb-5 rounded-xl border border-[#f1c9c3] bg-[#fff5f3] px-4 py-3 text-sm text-[#a13b32]">{errorMessage}</div>}
+      <form onSubmit={handleSubmit(onSubmit)} onChange={() => setErrorMessage("")} className="space-y-5" noValidate>
+        <fieldset>
+          <legend className={fieldLabelClass}>{t("user_type_label")}</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[{ value: "tourist", icon: UserRound }, { value: "agency", icon: Building2 }].map(({ value, icon: Icon }) => (
+              <label key={value} className="cursor-pointer">
+                <input type="radio" value={value} {...register("userType", { required: t("user_type_required") })} className="peer sr-only" />
+                <span className="flex min-h-16 items-center gap-3 rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 text-sm font-semibold text-[#536477] transition-colors hover:border-[#d5ad63] peer-checked:border-[#c88f2a] peer-checked:bg-[#fff8e9] peer-checked:text-[#172b43] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd8525]">
+                  <Icon size={21} className="shrink-0 text-[#b98427]" aria-hidden="true" />{t(`user_type_${value}`)}
+                </span>
+              </label>
+            ))}
           </div>
+          {errors.userType && <p role="alert" className={fieldErrorClass}>{errors.userType.message}</p>}
+        </fieldset>
 
-          {errorMessage && (
-            <div className="p-4 mb-4 text-center text-red-500">
-              {errorMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("email")}
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <input
-                  {...register("email", {
-                    required: t("email_required"),
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: t("invalid_email"),
-                    },
-                  })}
-                  type="email"
-                  placeholder={t("email_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C] focus:border-transparent"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            {/* User Type Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("user_type_label")}
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-sm bg-white text-left flex items-center justify-between focus:ring-2 focus:ring-[#C2851C]"
-                >
-                  <span
-                    className={
-                      selectedUserType ? "text-gray-900" : "text-gray-400"
-                    }
-                  >
-                    {selectedUserType
-                      ? t(`user_type_${selectedUserType}`)
-                      : t("select_one")}
-                  </span>
-                  <ChevronDown
-                    className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {isDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-sm shadow-lg">
-                    {userTypes.map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => handleUserTypeSelect(type)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-50"
-                      >
-                        {t(`user_type_${type}`)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <input
-                type="hidden"
-                {...register("userType", { required: t("user_type_required") })}
-              />
-              {errors.userType && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.userType.message}
-                </p>
-              )}
-            </div>
-
-            {isAgency && (
-              <>
-                {/* Agency Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t("agency_name")}
-                  </label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                    <input
-                      {...register("agency_name", {
-                        required: isAgency ? t("agency_name_required") : false,
-                        minLength: {
-                          value: 2,
-                          message: t("agency_name_too_short"),
-                        },
-                      })}
-                      type="text"
-                      placeholder={
-                        t("agency_name_placeholder") || "e.g. Arnob Agency"
-                      }
-                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C]"
-                    />
-                  </div>
-                  {errors.agency_name && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.agency_name.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Telephone Number */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t("telephone_number")}
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                    <input
-                      {...register("telephone_number")}
-                      type="tel"
-                      placeholder="01XXXXXXXXX"
-                      className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#C2851C]"
-                    />
-                  </div>
-                  {errors.telephone_number && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.telephone_number.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* VAT ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t("vat_id")}
-                  </label>
-                  <input
-                    {...register("vatId", {
-                      required: isAgency ? t("vat_id_required") : false,
-                      pattern: {
-                        value: /^\d{11}$/,
-                        message: t("vat_id_digits"),
-                      },
-                    })}
-                    type="text"
-                    placeholder={t("vat_id_placeholder")}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
-                  />
-                  {errors.vatId && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.vatId.message}
-                    </p>
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("password")}
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <input
-                  {...register("password", {
-                    required: t("password_required"),
-                    minLength: { value: 6, message: t("password_min_length") },
-                  })}
-                  type="password"
-                  placeholder={t("password_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
-                />
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("confirm_password")}
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <input
-                  {...register("confirmPassword", {
-                    required: t("confirm_password_required"),
-                    validate: (value) =>
-                      value === password || t("passwords_do_not_match"),
-                  })}
-                  type="password"
-                  placeholder={t("password_placeholder")}
-                  className="w-full pl-10 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
-                />
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            {/* Invitation Code (optional) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("invitation_code")}
-              </label>
-              <input
-                {...register("invitationCode")}
-                type="text"
-                placeholder={t("enter_here")}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#DD9E2C]"
-              />
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading || !watch("termsAccepted")}
-              className={`w-full mt-6 py-3.5 px-4 rounded-lg font-medium text-white transition-all
-                ${
-                  isLoading || !watch("termsAccepted")
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] hover:shadow-lg transform hover:-translate-y-0.5"
-                }`}
-            >
-              {isLoading ? t("registering") + "..." : t("register")}
-            </button>
-          </form>
-
-          {/* Terms Checkbox */}
-          <div className="mt-8 pb-6 border-b border-gray-200">
-            <label className="flex items-start gap-4 cursor-pointer select-none">
-             <input
-          type="checkbox"
-          {...register("termsAccepted", {
-            required: t("please_accept_terms"),
-          })}
-          className="w-6 h-6 accent-[#C2851C] border-2 border-gray-300 rounded-md focus:ring-0"
-        />
-              <span className="text-sm text-gray-700 leading-relaxed">
-                {t("by_registering_agree")}{" "}
-                <NavLink
-                  to="/termini-e-condizioni"
-                  target="_blank"
-                  className="text-[#DD9E2C] hover:underline"
-                >
-                  {t("terms_and_conditions")}
-                </NavLink>{" "}
-                &{" "}
-                <NavLink
-                  to="/privacy-policy"
-                  target="_blank"
-                  className="text-[#DD9E2C] hover:underline"
-                >
-                  {t("privacy_policy")}
-                </NavLink>
-              </span>
-            </label>
-            {errors.termsAccepted && (
-              <p className="text-red-500 text-xs mt-3 flex items-center gap-2 ml-10">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {errors.termsAccepted.message}
-              </p>
-            )}
+        <div>
+          <label htmlFor="register-email" className={fieldLabelClass}>{t("email_address_label")}</label>
+          <div className="relative">
+            <Mail size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" />
+            <input id="register-email" type="email" autoComplete="email" placeholder={t("email_placeholder")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "register-email-error" : undefined} className={`${authInputClass} pl-11`} {...register("email", { required: t("email_required"), pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: t("invalid_email") } })} />
           </div>
+          {errors.email && <p id="register-email-error" role="alert" className={fieldErrorClass}>{errors.email.message}</p>}
+        </div>
 
-          {/* Already have account */}
-          <div className="text-center mt-6">
-            <NavLink to="/login" className="text-gray-600">
-              {t("already_have_account")}{" "}
-              <span className="text-[#DD9E2C] font-medium">{t("login")}</span>
-            </NavLink>
+        {isAgency && <div className="grid gap-5 sm:grid-cols-2">
+          <div className="min-w-0">
+            <label htmlFor="register-agency" className={fieldLabelClass}>{t("agency_name")}</label>
+            <div className="relative"><Building2 size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" /><input id="register-agency" type="text" autoComplete="organization" placeholder={t("agency_name_placeholder")} aria-invalid={!!errors.agency_name} className={`${authInputClass} pl-11`} {...register("agency_name", { required: isAgency ? t("agency_name_required") : false, minLength: { value: 2, message: t("agency_name_too_short") } })} /></div>
+            {errors.agency_name && <p role="alert" className={fieldErrorClass}>{errors.agency_name.message}</p>}
+          </div>
+          <div className="min-w-0">
+            <label htmlFor="register-phone" className={fieldLabelClass}>{t("telephone_number")}</label>
+            <div className="relative"><Phone size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" /><input id="register-phone" type="tel" autoComplete="tel" placeholder="01XXXXXXXXX" className={`${authInputClass} pl-11`} {...register("telephone_number")} /></div>
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="register-vat" className={fieldLabelClass}>{t("vat_id")}</label>
+            <input id="register-vat" type="text" inputMode="numeric" placeholder={t("vat_id_placeholder")} aria-invalid={!!errors.vatId} className={authInputClass} {...register("vatId", { required: isAgency ? t("vat_id_required") : false, pattern: { value: /^\d{11}$/, message: t("vat_id_digits") } })} />
+            {errors.vatId && <p role="alert" className={fieldErrorClass}>{errors.vatId.message}</p>}
+          </div>
+        </div>}
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="min-w-0">
+            <label htmlFor="register-password" className={fieldLabelClass}>{t("password")}</label>
+            <div className="relative">
+              <Lock size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" />
+              <input id="register-password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder={t("password_placeholder")} aria-invalid={!!errors.password} className={`${authInputClass} pl-11 pr-11`} {...register("password", { required: t("password_required"), minLength: { value: 6, message: t("password_min_length") } })} />
+              <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? t("hide_password") : t("show_password")} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#7c8b9a] hover:text-[#172b43]">{showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}</button>
+            </div>
+            {errors.password && <p role="alert" className={fieldErrorClass}>{errors.password.message}</p>}
+          </div>
+          <div className="min-w-0">
+            <label htmlFor="register-confirm" className={fieldLabelClass}>{t("confirm_password")}</label>
+            <div className="relative">
+              <Lock size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" />
+              <input id="register-confirm" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder={t("password_placeholder")} aria-invalid={!!errors.confirmPassword} className={`${authInputClass} pl-11 pr-11`} {...register("confirmPassword", { required: t("confirm_password_required"), validate: (value) => value === password || t("passwords_do_not_match") })} />
+              <button type="button" onClick={() => setShowConfirmPassword((value) => !value)} aria-label={showConfirmPassword ? t("hide_password") : t("show_password")} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#7c8b9a] hover:text-[#172b43]">{showConfirmPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}</button>
+            </div>
+            {errors.confirmPassword && <p role="alert" className={fieldErrorClass}>{errors.confirmPassword.message}</p>}
           </div>
         </div>
-      </div>
-    </div>
+
+        <div>
+          <label htmlFor="register-invitation" className={fieldLabelClass}>{t("invitation_code")}</label>
+          <input id="register-invitation" type="text" placeholder={t("enter_here")} className={authInputClass} {...register("invitationCode")} />
+        </div>
+
+        <div className="rounded-xl border border-[#e9e6e0] bg-[#faf9f6] p-4">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#c88f2a]" aria-invalid={!!errors.termsAccepted} {...register("termsAccepted", { required: t("please_accept_terms") })} />
+            <span className="text-sm leading-6 text-[#536477]">{t("by_registering_agree")} <Link to="/termeni-si-conditii" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#9b6b22] hover:underline">{t("terms_and_conditions")}</Link> &amp; <Link to="/politica-de-confidentialitate" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#9b6b22] hover:underline">{t("privacy_policy")}</Link></span>
+          </label>
+          {errors.termsAccepted && <p role="alert" className={`${fieldErrorClass} pl-8`}>{errors.termsAccepted.message}</p>}
+        </div>
+
+        <button type="submit" disabled={isLoading} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#c88f2a] px-5 font-bold text-white transition-colors hover:bg-[#ad751c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ad751c] disabled:cursor-wait disabled:bg-[#d8c49f]">
+          {isLoading ? t("registering") : t("register")}{!isLoading && <ArrowRight size={18} aria-hidden="true" />}
+        </button>
+      </form>
+      <p className="mt-7 border-t border-[#edf0f2] pt-6 text-center text-sm text-[#617082]">{t("already_have_account")} <Link to="/autentificare" className="font-bold text-[#9b6b22] hover:underline">{t("login")}</Link></p>
+    </AuthLayout>
   );
-};
+}
 
 export default Register;
