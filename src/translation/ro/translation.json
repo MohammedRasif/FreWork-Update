@@ -1,4 +1,17 @@
 {
+  "home_mobile": {
+    "steps": {
+      "publish": "Publică cererea",
+      "receive": "Primește 3 oferte",
+      "choose": "Alege agenția"
+    },
+    "benefits": {
+      "no_commission": { "title": "Fără comisioane", "description": "Plătești doar vacanța, direct agenției." },
+      "fast_replies": { "title": "Răspunsuri rapide", "description": "Primești până la 3 oferte în câteva ore." },
+      "verified_agencies": { "title": "Agenții verificate", "description": "Colaborăm doar cu agenții serioase și verificate." },
+      "verified_agencies_contact": { "title": "Date private", "description": "Tu alegi când și cui comunici datele de contact." }
+    }
+  },
   "blog_page": {
     "articles_title": "Mai multe povești și idei de călătorie",
     "empty_title": "Poveștile de călătorie revin în curând",

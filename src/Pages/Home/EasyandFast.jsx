@@ -13,30 +13,30 @@ const EasyandFast = () => {
   ];
 
   return (
-    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
+    <section className="bg-white px-5 py-10 md:px-8 md:py-24 lg:px-10">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 max-w-3xl sm:mb-12">
+        <div className="mb-6 max-w-3xl md:mb-12">
           <div className="mb-4 h-1 w-12 rounded-full bg-[#d6a044]" />
-          <h2 className="text-3xl font-bold leading-tight tracking-tight text-[#172b43] sm:text-4xl lg:text-[44px]">
+          <h2 className="text-2xl font-bold leading-tight tracking-tight text-[#172b43] md:text-4xl lg:text-[44px]">
             {t("why_use_vacanza")}
           </h2>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:gap-6">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 lg:gap-6">
           {benefits.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="flex min-w-0 gap-5 rounded-[22px] border border-[#e9edf0] bg-[#f8fafb] p-6 sm:p-8">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e8f0f2] text-[#243e51]">
-                <Icon size={24} strokeWidth={1.8} aria-hidden="true" />
+            <div key={title} className="flex min-w-0 flex-col gap-3 rounded-2xl border border-[#e9edf0] bg-[#f8fafb] p-3.5 md:flex-row md:gap-5 md:rounded-[22px] md:p-8">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#e8f0f2] text-[#243e51] md:h-12 md:w-12 md:rounded-2xl">
+                <Icon size={24} strokeWidth={1.8} className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <h3 className="break-words text-lg font-bold leading-snug text-[#1d334a] sm:text-xl">{t(title)}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#5b6978] sm:text-base">{t(description)}</p>
+                <h3 className="break-words text-sm font-bold leading-snug text-[#1d334a] md:text-xl"><span className="md:hidden">{t(`home_mobile.benefits.${title}.title`)}</span><span className="hidden md:inline">{t(title)}</span></h3>
+                <p className="mt-2 text-xs leading-5 text-[#5b6978] md:text-base md:leading-6"><span className="md:hidden">{t(`home_mobile.benefits.${title}.description`)}</span><span className="hidden md:inline">{t(description)}</span></p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-20 overflow-hidden rounded-[28px] bg-[#172b43] text-white shadow-[0_24px_65px_rgba(23,43,67,0.13)] lg:mt-24 lg:grid lg:grid-cols-2">
+        <div className="mt-10 overflow-hidden rounded-[28px] bg-[#172b43] text-white shadow-[0_24px_65px_rgba(23,43,67,0.13)] md:mt-20 lg:mt-24 lg:grid lg:grid-cols-2">
           <div className="relative min-h-[250px] sm:min-h-[360px] lg:min-h-full">
             <img src={agencyImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#172b43]/35 to-transparent" />
