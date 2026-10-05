@@ -4,9 +4,9 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: "https://api.vacanzamycost.it/",
-     //baseUrl: "http://31.97.39.215/",
-    
+    baseUrl: "https://api.treioferte.md/",
+    //baseUrl: "http://31.97.39.215/",
+
     // prepareHeaders: (headers) => {
     //   headers.set("ngrok-skip-browser-warning", "true");
     //   return headers;
@@ -21,7 +21,7 @@ export const baseApi = createApi({
         method: "POST",
         body: userData,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     logIn: builder.mutation({
       query: (loginData) => ({
@@ -29,7 +29,7 @@ export const baseApi = createApi({
         method: "POST",
         body: loginData,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     otpVerify: builder.mutation({
       query: (otpData) => ({
@@ -37,7 +37,7 @@ export const baseApi = createApi({
         method: "POST",
         body: otpData,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     reSendOtp: builder.mutation({
       query: (email) => ({
@@ -45,7 +45,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     verifyEmail: builder.mutation({
       query: (email) => ({
@@ -53,7 +53,7 @@ export const baseApi = createApi({
         method: "POST",
         body: email,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     updatePassword: builder.mutation({
       query: (data) => ({
@@ -61,26 +61,26 @@ export const baseApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
     // Agency-related queries
     getAllAgency: builder.query({
       query: () => "/public/agencies/",
-      providesTags: ["Agency"], 
+      providesTags: ["Agency"],
     }),
     getTopAgency: builder.query({
       query: () => "/public/top-agencies/",
-      providesTags: ["Agency"], 
+      providesTags: ["Agency"],
     }),
     searchAgency: builder.query({
       query: (search) => `/public/agencies/?search=${search}`,
-      providesTags: ["Agency"], 
+      providesTags: ["Agency"],
     }),
-   
+
     filterTourPlanPublic: builder.query({
       query: (query) =>
         `/public/tour-plans/?search=${query.search}&min_budget=${query.min}&max_budget=${query.max}&country=${query.country}&type=${query.type}&category=${query.category}`,
-      providesTags: ["TourPlan"], 
+      providesTags: ["TourPlan"],
     }),
 
     AcceptedAllOffers: builder.query({

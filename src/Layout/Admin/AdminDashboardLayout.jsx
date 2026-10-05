@@ -85,8 +85,8 @@ export default function AdminDashboardLayout() {
       items: userData?.is_profile_complete
         ? allMenuItems[0].items
         : allMenuItems[0].items.filter((item) =>
-            [t("profile"), t("logout")].includes(item.name),
-          ),
+          [t("profile"), t("logout")].includes(item.name),
+        ),
     },
   ];
 
@@ -210,23 +210,23 @@ export default function AdminDashboardLayout() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
-    const baseUrl = "//api.vacanzamycost.it";
+    const baseUrl = "//api.treioferte.md";
     const socketUrl = `wss:${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
-    ws.current.onopen = () => {};
+    ws.current.onopen = () => { };
     ws.current.onmessage = (event) => {
       try {
         const messageData = JSON.parse(event.data);
         if (messageData.unread_count !== undefined) {
           setUnreadCount(messageData.unread_count);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
-    ws.current.onerror = () => {};
-    ws.current.onclose = () => {};
+    ws.current.onerror = () => { };
+    ws.current.onclose = () => { };
 
-  
+
     return () => {
       if (ws.current) ws.current.close();
     };
@@ -267,8 +267,8 @@ export default function AdminDashboardLayout() {
                     isLoading
                       ? ""
                       : agencyData?.profile_handler_image ||
-                        agencyData?.agency_logo_url ||
-                        ""
+                      agencyData?.agency_logo_url ||
+                      ""
                   }
                   alt={agencyData?.agency_name || t("user")}
                   className="w-16 h-16 rounded-full"
@@ -295,10 +295,9 @@ export default function AdminDashboardLayout() {
                         end={item.exact}
                         onClick={() => handleItemClick(item.name, item.path)}
                         className={({ isActive }) =>
-                          `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
-                            isActive || selectedItem === item.name
-                              ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
-                              : ""
+                          `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
+                            ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
+                            : ""
                           }`
                         }
                       >
@@ -306,11 +305,10 @@ export default function AdminDashboardLayout() {
                           {item.icon}
                         </span>
                         <span
-                          className={`transform transition-all duration-500 text-md font-semibold ${
-                            isCollapsed
+                          className={`transform transition-all duration-500 text-md font-semibold ${isCollapsed
                               ? "opacity-0 -translate-x-full"
                               : "opacity-100 translate-x-0"
-                          } whitespace-nowrap`}
+                            } whitespace-nowrap`}
                         >
                           {item.name}
                         </span>
@@ -398,10 +396,9 @@ export default function AdminDashboardLayout() {
                         end={item.exact}
                         onClick={() => handleItemClick(item.name, item.path)}
                         className={({ isActive }) =>
-                          `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
-                            isActive || selectedItem === item.name
-                              ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
-                              : ""
+                          `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
+                            ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C] text-white font-semibold"
+                            : ""
                           }`
                         }
                       >

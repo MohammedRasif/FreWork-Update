@@ -1,5 +1,5 @@
 // const baseUrl = "wss://well-anteater-happy.ngrok-free.app";
-const baseUrl = "wss://api.vacanzamycost.it";
+const baseUrl = "wss://api.treioferte.md";
 const token = localStorage.getItem("access_token");
 const notification_url = `${baseUrl}/ws/notifications/?token=${token}`;
 function chat_sockit(id) {

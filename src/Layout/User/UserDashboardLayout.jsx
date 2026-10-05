@@ -147,7 +147,7 @@ export default function UserDashboardLayout() {
       return;
     }
 
-    const baseUrl = "api.vacanzamycost.it";
+    const baseUrl = "api.treioferte.md";
     const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
     ws.current = new WebSocket(socketUrl);
 
@@ -297,9 +297,8 @@ export default function UserDashboardLayout() {
 
       {/* Sidebar - Desktop */}
       <aside
-        className={`hidden lg:block ${
-          isCollapsed ? "w-20" : "w-80"
-        } transition-all duration-500 ease-in-out`}
+        className={`hidden lg:block ${isCollapsed ? "w-20" : "w-80"
+          } transition-all duration-500 ease-in-out`}
       >
         <NavLink to="/" className="w-full">
           <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
@@ -311,11 +310,10 @@ export default function UserDashboardLayout() {
             <div className="flex flex-col w-full justify-center items-center mt-16">
               <div className="relative">
                 <div
-                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50  ${
-                    isCollapsed
+                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50  ${isCollapsed
                       ? "opacity-0 -translate-x-full"
                       : "opacity-100 translate-x-0"
-                  }`}
+                    }`}
                 >
                   <img
                     src={profileData.profile_picture_url || ""}
@@ -351,10 +349,9 @@ export default function UserDashboardLayout() {
                       end={item.exact}
                       onClick={() => handleItemClick(item.name, item.path)}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
-                          isActive || selectedItem === item.name
-                            ? "bg-[#3776E2] text-white font-semibold"
-                            : ""
+                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
+                          ? "bg-[#3776E2] text-white font-semibold"
+                          : ""
                         }`
                       }
                     >
@@ -362,11 +359,10 @@ export default function UserDashboardLayout() {
                         {item.icon}
                       </span>
                       <span
-                        className={`transform transition-all duration-500 text-md font-semibold ${
-                          isCollapsed
+                        className={`transform transition-all duration-500 text-md font-semibold ${isCollapsed
                             ? "opacity-0 -translate-x-full"
                             : "opacity-100 translate-x-0"
-                        } whitespace-nowrap`}
+                          } whitespace-nowrap`}
                       >
                         {item.name}
                       </span>
@@ -400,9 +396,8 @@ export default function UserDashboardLayout() {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`mobile-sidebar fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`mobile-sidebar fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-[#343E4B]">{t("menu")}</h2>
@@ -443,7 +438,7 @@ export default function UserDashboardLayout() {
                 {isProfileLoading
                   ? t("loading")
                   : profileData?.first_name + " " + profileData?.last_name ||
-                    t("user")}
+                  t("user")}
               </h3>
               <span className="text-center text-sm text-[#8C8C8C]">
                 {isProfileLoading
@@ -464,10 +459,9 @@ export default function UserDashboardLayout() {
                       end={item.exact}
                       onClick={() => handleItemClick(item.name, item.path)}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${
-                          isActive || selectedItem === item.name
-                            ? "bg-[#3776E2] text-white font-semibold"
-                            : ""
+                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
+                          ? "bg-[#3776E2] text-white font-semibold"
+                          : ""
                         }`
                       }
                     >

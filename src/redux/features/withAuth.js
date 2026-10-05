@@ -3,7 +3,7 @@ export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: "https://api.vacanzamycost.it/",
+    baseUrl: "https://api.treioferte.md/",
     // baseUrl: "http://31.97.39.215/",
     prepareHeaders: (headers, { endpoint }) => {
       // headers.set("ngrok-skip-browser-warning", "true");
@@ -83,9 +83,9 @@ export const sqQuery = createApi({
 
     // search plan
     searchPlan: builder.query({
-  query: (searchTerm) => `public/tour-plans/?search=${encodeURIComponent(searchTerm)}`,
-  providesTags: ["TourPlan"],
-}),
+      query: (searchTerm) => `public/tour-plans/?search=${encodeURIComponent(searchTerm)}`,
+      providesTags: ["TourPlan"],
+    }),
 
     // showSubscription data
     showSubscriptionData: builder.query({
@@ -238,7 +238,7 @@ export const sqQuery = createApi({
     }),
 
     rejectOffer: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `initial-reject/${id}`,
         method: "PATCH",
         body: data,

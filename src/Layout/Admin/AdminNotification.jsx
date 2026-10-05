@@ -30,7 +30,7 @@ const AdminNotification = () => {
   }, []);
 
   useEffect(() => {
-    const baseUrl = "api.vacanzamycost.it";
+    const baseUrl = "api.treioferte.md";
     const socketUrl = `wss://${baseUrl}/ws/notifications/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
