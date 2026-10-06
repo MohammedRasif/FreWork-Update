@@ -21,7 +21,7 @@ Politica trebuie citită împreună cu Termenii și Condițiile și Politica pri
 
 Operator: Ilie Fabian
 Statut: persoană fizică
-Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+Adresă: Strada Libertatii, Colibasi, Republica Moldova
 E-mail general: info@treioferte.md
 E-mail pentru protecția datelor: legal@treioferte.md
 
@@ -625,7 +625,7 @@ Versiunile trebuie să aibă același conținut substanțial.
 TreiOferte.md
 
 Operator: Ilie Fabian
-Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+Adresă: Strada Libertatii, Colibasi, Republica Moldova
 E-mail general: info@treioferte.md
 E-mail suport: suport@treioferte.md
 E-mail pentru protecția datelor: legal@treioferte.md

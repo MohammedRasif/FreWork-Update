@@ -13,7 +13,7 @@ Platforma este administrată, în etapa actuală de testare, de:
 
 Operator: Ilie Fabian
 Statut: persoană fizică
-Adresă de contact: Strada Libertatii, 52, Colibasi, Republica Moldova
+Adresă de contact: Strada Libertatii, Colibasi, Republica Moldova
 E-mail: info@treioferte.md
 
 Prin crearea unui cont și utilizarea Platformei, utilizatorul confirmă că a citit și a înțeles prezentele Termene și că acceptă regulile aplicabile utilizării serviciului.
@@ -633,7 +633,7 @@ Pentru întrebări privind TreiOferte:
 
 TreiOferte.md
 Operator: Ilie Fabian
-Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+Adresă: Strada Libertatii, Colibasi, Republica Moldova
 E-mail general: info@treioferte.md
 E-mail suport/reclamații: suport@treioferte.md
 
