@@ -6,10 +6,22 @@
       "choose": "Alege agenția"
     },
     "benefits": {
-      "no_commission": { "title": "Fără comisioane", "description": "Plătești doar vacanța, direct agenției." },
-      "fast_replies": { "title": "Răspunsuri rapide", "description": "Primești până la 3 oferte în câteva ore." },
-      "verified_agencies": { "title": "Agenții verificate", "description": "Colaborăm doar cu agenții serioase și verificate." },
-      "verified_agencies_contact": { "title": "Date private", "description": "Tu alegi când și cui comunici datele de contact." }
+      "no_commission": {
+        "title": "Fără comisioane",
+        "description": "Plătești doar vacanța, direct agenției."
+      },
+      "fast_replies": {
+        "title": "Răspunsuri rapide",
+        "description": "Primești până la 3 oferte în câteva ore."
+      },
+      "verified_agencies": {
+        "title": "Agenții verificate",
+        "description": "Colaborăm doar cu agenții serioase și verificate."
+      },
+      "verified_agencies_contact": {
+        "title": "Date private",
+        "description": "Tu alegi când și cui comunici datele de contact."
+      }
     }
   },
   "blog_page": {
@@ -894,7 +906,7 @@
     },
     "8": {
       "title": "Drepturile persoanei vizate (art. 15–22 GDPR)",
-      "text": "Utilizatorul poate exercita oricând următoarele drepturi:\nacces la date · rectificare · ștergere („dreptul de a fi uitat”) · restricționarea prelucrării · portabilitatea datelor · opoziție · retragerea consimțământului\nCereri prin e-mail: privacy@vacanzamycost.it\nOperatorul răspunde în termen de 30 de zile."
+      "text": "Utilizatorul poate exercita oricând următoarele drepturi:\nacces la date · rectificare · ștergere („dreptul de a fi uitat”) · restricționarea prelucrării · portabilitatea datelor · opoziție · retragerea consimțământului\nCereri prin e-mail: privacy@treioferte.md\nOperatorul răspunde în termen de 30 de zile."
     },
     "9": {
       "title": "Măsuri tehnice și organizatorice de securitate",
@@ -940,7 +952,7 @@
     },
     "13": {
       "title": "Contact",
-      "text": "Pentru informații, clarificări sau exercitarea drepturilor GDPR:\nprivacy@vacanzamycost.it"
+      "text": "Pentru informații, clarificări sau exercitarea drepturilor GDPR:\nprivacy@treioferte.md"
     }
   },
   "pendings": {
@@ -1030,7 +1042,7 @@
     },
     "16": {
       "title": "Clauza ODR (obligatorie în UE)",
-      "text": "Reclamațiile pot fi trimise la info@vacanzamycost.it.\nPlatforma ODR a UE: https://ec.europa.eu/consumers/odr\nProprietarul nu este obligat să participe la proceduri ADR."
+      "text": "Reclamațiile pot fi trimise la info@treioferte.md.\nPlatforma ODR a UE: https://ec.europa.eu/consumers/odr\nProprietarul nu este obligat să participe la proceduri ADR."
     },
     "17": {
       "title": "Jurisdicție",

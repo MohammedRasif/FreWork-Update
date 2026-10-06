@@ -3,7 +3,7 @@ export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: import.meta.env.DEV ? "/api/" : "https://api.vacanzamycost.it/",
+    baseUrl: import.meta.env.DEV ? "/api/" : "https://api.treioferte.md/",
     // baseUrl: "http://31.97.39.215/",
     prepareHeaders: (headers, { endpoint }) => {
       // headers.set("ngrok-skip-browser-warning", "true");

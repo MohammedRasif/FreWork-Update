@@ -4,7 +4,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://well-anteater-happy.ngrok-free.app/",
-    baseUrl: import.meta.env.DEV ? "/api/" : "https://api.vacanzamycost.it/",
+    baseUrl: import.meta.env.DEV ? "/api/" : "https://api.treioferte.md/",
     //baseUrl: "http://31.97.39.215/",
 
     // prepareHeaders: (headers) => {

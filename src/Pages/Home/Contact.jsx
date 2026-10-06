@@ -107,7 +107,7 @@ const Contact = () => {
             <div className="mt-6 space-y-5">
               <div className="flex items-start gap-4">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427]"><Mail size={21} aria-hidden="true" /></span>
-                <div className="min-w-0 pt-0.5"><p className="text-sm font-bold">{t("email")}</p><a href="mailto:info@vacanzamycost.it" className="mt-1 inline-flex min-h-8 items-center gap-1 text-sm font-semibold text-[#9d6b1e] hover:text-[#755018]">{t("email_contact")} <ArrowUpRight size={15} className="shrink-0" aria-hidden="true" /></a></div>
+                <div className="min-w-0 pt-0.5"><p className="text-sm font-bold">{t("email")}</p><a href="mailto:info@treioferte.md" className="mt-1 inline-flex min-h-8 items-center gap-1 text-sm font-semibold text-[#9d6b1e] hover:text-[#755018]">{t("email_contact")} <ArrowUpRight size={15} className="shrink-0" aria-hidden="true" /></a></div>
               </div>
               <div className="flex items-start gap-4 border-t border-[#edf0f2] pt-5">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8f0f2] text-[#34546d]"><MapPin size={21} aria-hidden="true" /></span>

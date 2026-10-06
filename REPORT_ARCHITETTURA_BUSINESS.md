@@ -418,7 +418,7 @@ Restano da provare con tastiera e dispositivi: ordine del focus, chiusura e rito
 | Etichette API | `localizedContent` traduce una lista di stringhe riconosciute, lasciando le altre invariate |
 | Prezzi/date | Formattazione romena o russa in diverse viste; moneta euro |
 | URL | Italiani e non prefissati per lingua |
-| Identità | `company_name` è `VacanzaMyCost.it` in romeno e `Vacanza Vision` in russo |
+| Identità | `company_name` è `treioferte.md` in romeno e `Vacanza Vision` in russo |
 
 Questa configurazione rende possibile un'interfaccia tradotta sopra contratti API precedenti, ma non garantisce che contenuti liberi, articoli e nuove descrizioni dei piani vengano localizzati. Una modifica delle stringhe server può interrompere la mappatura esatta. Inoltre persistere nomi di schede già tradotti può generare incongruenze dopo il cambio lingua.
 
@@ -439,9 +439,9 @@ Il blog cerca il singolo post nell'elenco completo. Per un catalogo più ampio a
 | Build frontend | `vite build` in `package.json` | Produzione di file statici pubblicabili |
 | Hosting Vercel | `vercel.json` con rewrite universale verso `/` | Configurazione di fallback SPA compatibile con Vercel; non prova di deployment attivo |
 | Redirect statici | `public/_redirects` | Regole in formato compatibile con hosting come Netlify |
-| Backend HTTP | URL `https://api.vacanzamycost.it/` in entrambi i client | Dipendenza esterna configurata |
+| Backend HTTP | URL `https://api.treioferte.md/` in entrambi i client | Dipendenza esterna configurata |
 | API in sviluppo | Proxy `/api` di Vite verso il dominio API, con rimozione del prefisso | Le richieste API locali sono inoltrate al backend configurato, potenzialmente reale |
-| Tempo reale | `wss://api.vacanzamycost.it` | Chat e notifiche richiedono un servizio WebSocket esterno |
+| Tempo reale | `wss://api.treioferte.md` | Chat e notifiche richiedono un servizio WebSocket esterno |
 | File chat | `VITE_API_BASE_URL`, con fallback a un dominio Netlify | Configurazione specifica dei link relativi agli allegati, non base URL universale delle API |
 | Media e servizi di terzi | URL immagini API, fallback Cloudinary, Google Fonts/Places | Dipendenze di rendering e funzionalità |
 | Pagamenti | API di checkout e URL ricevuto | Creazione e conferma della sessione demandate al server |
@@ -466,7 +466,7 @@ Il frontend può essere pubblicato separatamente dal backend. Il proxy di `vite.
 
 ### 8.3 Regole di navigazione e domini
 
-`vercel.json` riscrive `/(.*)` su `/` per servire l'app nelle route client. `public/_redirects` contiene sia `/* /index.html 200` sia un redirect universale verso `https://www.vacanzamycost.it/:splat`. Sono intenzioni di fallback e canonicalizzazione che devono essere validate sul provider realmente utilizzato: ordine delle regole, dominio sorgente, percorsi diretti e comportamento dei redirect.
+`vercel.json` riscrive `/(.*)` su `/` per servire l'app nelle route client. `public/_redirects` contiene sia `/* /index.html 200` sia un redirect universale verso `https://www.treioferte.md/:splat`. Sono intenzioni di fallback e canonicalizzazione che devono essere validate sul provider realmente utilizzato: ordine delle regole, dominio sorgente, percorsi diretti e comportamento dei redirect.
 
 La presenza contemporanea di Vercel, `_redirects`, dominio API e fallback Netlify indica configurazioni per più contesti o fasi del progetto, **non dimostra una strategia multi-cloud attiva**. I vecchi indirizzi commentati nel codice non sono stati considerati infrastruttura corrente.
 
@@ -679,7 +679,7 @@ Il documento può essere usato come base per un workshop: per ogni riga assegnar
 
 ## 14. Appendice: contratti API
 
-Le definizioni sotto sono estratte dai due client RTK Query correnti. Sono **contratti invocati dal frontend**, non documentazione certificata del server. Percorsi simili possono essere duplicati con nomi diversi; le variabili indicano parametri runtime. La presenza di una definizione non implica che un percorso utente la utilizzi. L'origine di produzione configurata è `https://api.vacanzamycost.it/`; in sviluppo si usa il proxy `/api/`.
+Le definizioni sotto sono estratte dai due client RTK Query correnti. Sono **contratti invocati dal frontend**, non documentazione certificata del server. Percorsi simili possono essere duplicati con nomi diversi; le variabili indicano parametri runtime. La presenza di una definizione non implica che un percorso utente la utilizzi. L'origine di produzione configurata è `https://api.treioferte.md/`; in sviluppo si usa il proxy `/api/`.
 
 | Client | Definizione | Metodo | Percorso / query |
 |---|---|---|---|

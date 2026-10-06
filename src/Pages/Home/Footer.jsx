@@ -14,7 +14,7 @@ const Footer = () => {
               <BrandWordmark inverse />
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/65">{t("address_line1")}<br />{t("address_line2")}</p>
-            <a className="mt-3 inline-block text-sm font-medium text-white/80 hover:text-[#e4b154]" href="mailto:info@vacanzamycost.it">{t("email_contact")}</a>
+            <a className="mt-3 inline-block text-sm font-medium text-white/80 hover:text-[#e4b154]" href="mailto:info@treioferte.md">{t("email_contact")}</a>
           </div>
           <div>
             <h3 className="text-sm font-bold uppercase tracking-[0.13em] text-[#e4b154]">{t("about_us")}</h3>

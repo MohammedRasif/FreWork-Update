@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api.vacanzamycost.it",
+        target: "https://api.treioferte.md",
         changeOrigin: true,
         rewrite: (url) => url.replace(/^\/api/, ""),
       },

@@ -92,7 +92,7 @@ export default function AdminDashboardLayout() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
-    const socket = new WebSocket(`wss://api.vacanzamycost.it/ws/notification-count/?token=${token}`);
+    const socket = new WebSocket(`wss://api.treioferte.md/ws/notification-count/?token=${token}`);
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
