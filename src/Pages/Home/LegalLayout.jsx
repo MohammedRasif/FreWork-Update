@@ -24,7 +24,7 @@ function SectionLinks({ sections, label, onSelect }) {
   );
 }
 
-function LegalLayout({ title, documentTitle, otherPage, sections, children }) {
+function LegalLayout({ title, documentTitle, documentIntro, documentLanguage, otherPage, sections, children }) {
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -72,11 +72,12 @@ function LegalLayout({ title, documentTitle, otherPage, sections, children }) {
         </aside>
 
         <div className="min-w-0">
-          <div className="mb-5 rounded-[22px] border border-[#e9e6e0] bg-white px-6 py-7 shadow-[0_12px_35px_rgba(23,43,67,0.05)] sm:px-9 sm:py-9">
+          <div lang={documentLanguage} className="mb-5 rounded-[22px] border border-[#e9e6e0] bg-white px-6 py-7 shadow-[0_12px_35px_rgba(23,43,67,0.05)] sm:px-9 sm:py-9">
             <div className="mb-4 h-1 w-10 rounded-full bg-[#d6a044]" />
             <h2 className="break-words text-[15px] font-semibold leading-[1.5] min-[370px]:text-[17px] sm:text-2xl sm:font-bold sm:leading-snug">{documentTitle}</h2>
+            {documentIntro && <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[#617082]">{documentIntro}</p>}
           </div>
-          <article className="legal-article space-y-5">{children}</article>
+          <article lang={documentLanguage} className="legal-article space-y-5">{children}</article>
           <p className="mt-10 text-center text-sm text-[#718092]">{t("copyright_2026")}</p>
         </div>
       </div>

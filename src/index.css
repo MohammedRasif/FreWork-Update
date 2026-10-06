@@ -443,6 +443,10 @@ text-align: center;
   opacity: 0.8;
 }
 
+.home-page .home-carousel .swiper-slide {
+  height: auto;
+}
+
 .home-page .home-carousel .swiper-pagination {
   position: relative;
   margin-top: 12px;

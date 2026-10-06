@@ -1,0 +1,631 @@
+POLITICA DE CONFIDENȚIALITATE
+
+TreiOferte.md
+
+Versiune: 1.1
+Ultima actualizare: 6 octombrie 2026
+
+1. Scopul Politicii
+
+Prezenta Politică de Confidențialitate explică modul în care sunt colectate, utilizate, stocate, divulgate și protejate datele cu caracter personal în legătură cu platforma TreiOferte, disponibilă la adresa treioferte.md („Platforma”).
+
+Prelucrarea datelor se realizează în conformitate cu legislația aplicabilă a Republicii Moldova, inclusiv Legea nr. 195/2024 privind protecția datelor cu caracter personal.
+
+Politica trebuie citită împreună cu Termenii și Condițiile și Politica privind Cookie-urile.
+
+---
+
+2. Operatorul datelor
+
+În etapa actuală de testare, operatorul datelor este:
+
+Operator: Ilie Fabian
+Statut: persoană fizică
+Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+E-mail general: info@treioferte.md
+E-mail pentru protecția datelor: legal@treioferte.md
+
+Dacă activitatea TreiOferte va fi transferată unei societăți, documentația juridică și informațiile privind operatorul vor fi actualizate, iar persoanele vizate vor fi informate atunci când acest lucru este necesar potrivit legii.
+
+---
+
+3. Principiile utilizate
+
+TreiOferte urmărește ca datele să fie:
+
+- prelucrate legal, echitabil și transparent;
+- colectate pentru scopuri determinate și legitime;
+- limitate la ceea ce este necesar;
+- corecte și actualizate atunci când este necesar;
+- păstrate numai atât timp cât există un scop și un temei justificat;
+- protejate prin măsuri tehnice și organizatorice adecvate.
+
+---
+
+4. Date colectate la înregistrare
+
+Pentru crearea contului putem solicita:
+
+- numele;
+- adresa de e-mail;
+- numărul de telefon;
+- nickname-ul;
+- parola;
+- confirmarea/verificarea adresei de e-mail;
+- identificatori tehnici ai contului;
+- data creării contului;
+- date privind autentificarea și securitatea.
+
+Numărul de telefon este obligatoriu pentru procesul actual de verificare a solicitării.
+
+Numărul nu este verificat prin SMS în configurația actuală.
+
+Parolele trebuie stocate folosind mecanisme tehnice de protecție adecvate și nu în format text lizibil.
+
+Platforma este destinată exclusiv persoanelor care au împlinit 18 ani.
+
+---
+
+5. Verificarea telefonică a solicitării
+
+O solicitare de vacanță nu este publicată automat imediat după completare.
+
+TreiOferte poate contacta telefonic utilizatorul pentru:
+
+- confirmarea faptului că solicitarea este reală;
+- verificarea intenției utilizatorului de a publica solicitarea;
+- clarificarea unor informații necesare;
+- prevenirea solicitărilor false, fraudei și abuzului;
+- menținerea calității solicitărilor disponibile agențiilor.
+
+Solicitarea poate fi publicată după finalizarea verificării.
+
+Apelurile de verificare nu sunt înregistrate în configurația actuală.
+
+TreiOferte poate păstra informația că verificarea a fost efectuată, data acesteia, rezultatul verificării și note interne strict necesare.
+
+---
+
+6. Note interne de verificare și moderare
+
+Personalul autorizat TreiOferte poate introduce note interne necesare pentru:
+
+- verificarea solicitării;
+- prevenirea fraudei;
+- prevenirea abuzurilor;
+- moderare;
+- securitate;
+- documentarea unor incidente;
+- soluționarea reclamațiilor.
+
+Aceste note nu sunt publice și nu sunt puse la dispoziția agențiilor în cadrul funcționării normale a Platformei.
+
+Notele trebuie să fie relevante, proporționale și limitate la scopurile pentru care sunt necesare.
+
+Nu trebuie introduse în aceste note categorii speciale de date sau informații excesive atunci când acestea nu sunt necesare.
+
+În configurația actuală, notele pot fi păstrate pentru maximum 36 de luni de la închiderea solicitării, sub rezerva unei perioade diferite atunci când aceasta este impusă sau justificată de legislația aplicabilă.
+
+---
+
+7. Date privind solicitarea de vacanță
+
+Putem prelucra:
+
+- destinația;
+- perioada călătoriei;
+- orașul/aeroportul de plecare;
+- numărul de adulți;
+- numărul de copii;
+- vârsta copiilor;
+- bugetul;
+- preferințele privind cazarea;
+- regimul de masă;
+- alte preferințe;
+- notele private;
+- data publicării;
+- modificările solicitării;
+- starea solicitării;
+- agențiile participante;
+- agenția selectată.
+
+---
+
+8. Date vizibile public
+
+Anumite informații ale solicitării pot fi vizibile public pe Internet, inclusiv persoanelor care nu au cont TreiOferte.
+
+Pot fi publice:
+
+- destinația;
+- perioada;
+- orașul/aeroportul de plecare;
+- bugetul;
+- numărul de adulți;
+- numărul de copii;
+- preferințele generale;
+- starea 0/3, 1/3, 2/3 sau 3/3;
+- numele și logo-ul agențiilor participante.
+
+Nu sunt destinate afișării publice:
+
+- numele real al utilizatorului;
+- telefonul;
+- e-mailul;
+- nickname-ul;
+- vârsta copiilor;
+- notele private;
+- conversațiile;
+- ofertele individuale.
+
+Utilizatorul va fi informat că datele indicate drept publice pot deveni accesibile pe Internet.
+
+---
+
+9. Date disponibile agențiilor participante
+
+Agențiile care intră efectiv într-o solicitare pot primi acces la informațiile necesare pentru pregătirea unei propuneri, inclusiv, după caz:
+
+- nickname-ul;
+- vârsta copiilor;
+- notele private;
+- informațiile din solicitare;
+- informațiile transmise direct în propria conversație cu utilizatorul.
+
+O agenție nu poate vedea conversațiile sau ofertele celorlalte agenții.
+
+---
+
+10. Date sensibile și documente
+
+TreiOferte nu este destinat colectării prin formular sau chat a unor informații sensibile care nu sunt necesare serviciului.
+
+Utilizatorii nu trebuie să transmită prin Platformă:
+
+- copii ale pașapoartelor;
+- copii ale actelor de identitate;
+- datele cardurilor bancare;
+- parole;
+- date medicale care nu sunt necesare;
+- alte informații sensibile sau excesive.
+
+Documentele necesare rezervării efective trebuie transmise direct agenției printr-un canal adecvat, în afara TreiOferte.
+
+---
+
+11. Chatul intern
+
+Fiecare agenție participantă comunică cu utilizatorul printr-o conversație separată.
+
+TreiOferte poate prelucra:
+
+- mesajele;
+- data și ora acestora;
+- participanții;
+- fișierele permise;
+- informațiile tehnice necesare funcționării chatului.
+
+TreiOferte poate accesa conversațiile atunci când este necesar pentru:
+
+- furnizarea serviciului;
+- asistență;
+- securitate;
+- prevenirea fraudei;
+- investigarea abuzurilor;
+- gestionarea reclamațiilor;
+- aplicarea Termenilor;
+- stabilirea, exercitarea sau apărarea unor drepturi.
+
+Accesul administrativ trebuie limitat persoanelor autorizate.
+
+---
+
+12. Date comunicate voluntar în chat
+
+Clientul poate comunica voluntar unei agenții numărul de telefon, e-mailul, WhatsApp sau alte date înainte de selectarea unei oferte.
+
+În acest caz, informațiile devin accesibile agenției respective.
+
+TreiOferte nu poate garanta ștergerea unei informații din sistemele unei agenții după ce aceasta i-a fost comunicată în mod legitim.
+
+---
+
+13. Alegerea ofertei
+
+Atunci când utilizatorul apasă „Aleg această ofertă”, TreiOferte poate transmite automat agenției selectate:
+
+- numele;
+- numărul de telefon;
+- adresa de e-mail.
+
+Utilizatorul trebuie să fie informat despre această consecință înainte de confirmarea acțiunii.
+
+Datele nu sunt transmise automat celorlalte agenții prin această funcție.
+
+Selectarea ofertei în TreiOferte nu reprezintă încheierea contractului de călătorie și nu reprezintă efectuarea unei rezervări.
+
+---
+
+14. Scopurile și temeiurile prelucrării
+
+TreiOferte poate prelucra datele pentru următoarele scopuri, în funcție de situație:
+
+Crearea și administrarea contului
+
+Pentru înregistrare, autentificare, verificarea e-mailului și administrarea serviciului.
+
+Temei juridic: executarea serviciului solicitat de utilizator și demersurile necesare furnizării acestuia.
+
+Publicarea și administrarea solicitării
+
+Pentru furnizarea funcționalității principale TreiOferte.
+
+Temei juridic: executarea serviciului solicitat de utilizator.
+
+Verificarea telefonică
+
+Pentru confirmarea autenticității solicitării, prevenirea solicitărilor false și controlul calității.
+
+Temeiul juridic concret va fi documentat în funcție de operațiunea efectivă, inclusiv, după caz, furnizarea serviciului și/sau interesul legitim al TreiOferte privind prevenirea fraudei și protejarea Platformei.
+
+Comunicarea cu agențiile
+
+Pentru funcționarea sistemului de solicitări și chat.
+
+Temei juridic: furnizarea serviciului solicitat de utilizator.
+
+Transmiterea datelor către agenția selectată
+
+Pentru a permite utilizatorului să continue relația cu agenția pe care a ales-o.
+
+Temeiul juridic va fi stabilit și documentat în raport cu funcționarea concretă a serviciului.
+
+Securitate și prevenirea fraudei
+
+Pentru protejarea utilizatorilor, agențiilor și Platformei.
+
+Temei juridic: interes legitim și, atunci când este cazul, obligații legale.
+
+Reclamații și apărarea drepturilor
+
+Pentru investigarea incidentelor, soluționarea reclamațiilor și apărarea unor drepturi.
+
+Temei juridic: interes legitim și/sau obligații legale, după caz.
+
+Marketing
+
+Pentru marketing prin e-mail, telefon, SMS și WhatsApp, numai atunci când există consimțământul separat necesar.
+
+Temei juridic: consimțământul, atunci când acesta este necesar conform legislației aplicabile.
+
+---
+
+15. Marketing și consimțământ
+
+Acceptarea marketingului nu este obligatorie pentru utilizarea TreiOferte.
+
+Utilizatorul poate utiliza serviciul chiar dacă refuză comunicările comerciale.
+
+Cu acordul corespunzător, TreiOferte poate transmite comunicări comerciale prin:
+
+- e-mail;
+- apel telefonic;
+- SMS;
+- WhatsApp.
+
+Consimțământul pentru marketing trebuie să fie separat de acceptarea Termenilor și de operațiunile necesare furnizării serviciului.
+
+Utilizatorul își poate retrage consimțământul pentru marketing în orice moment.
+
+Retragerea consimțământului nu afectează legalitatea prelucrării realizate înainte de retragere.
+
+TreiOferte va păstra, atunci când este necesar, evidența opțiunilor de consimțământ și retragere pentru a putea demonstra respectarea acestora.
+
+---
+
+16. Notificările operaționale nu sunt marketing
+
+TreiOferte poate trimite comunicări necesare serviciului, precum:
+
+- verificarea e-mailului;
+- securitatea contului;
+- confirmarea solicitării;
+- modificarea solicitării;
+- apariția unei agenții participante;
+- mesaj nou;
+- ofertă nouă;
+- expirarea sau închiderea solicitării;
+- informații importante privind serviciul.
+
+Aceste mesaje sunt distincte de comunicările comerciale.
+
+Refuzul marketingului nu împiedică primirea mesajelor strict necesare funcționării serviciului.
+
+---
+
+17. Agențiile ca destinatari ai datelor
+
+Agențiile primesc numai datele la care au drept de acces conform funcționării TreiOferte.
+
+TreiOferte va impune agențiilor reguli privind utilizarea datelor, inclusiv interzicerea, în măsura aplicabilă, a:
+
+- vânzării datelor;
+- transmiterii neautorizate;
+- spamului;
+- introducerii automate în liste de marketing;
+- utilizării datelor pentru scopuri incompatibile cu solicitarea.
+
+În funcție de modul în care o agenție prelucrează ulterior datele în scopuri proprii, aceasta poate avea propriile obligații legale independente privind protecția datelor.
+
+---
+
+18. Furnizori tehnici
+
+Pentru furnizarea serviciului pot fi utilizate servicii externe.
+
+În configurația planificată:
+
+Frontend și distribuirea conținutului: Cloudflare
+Hosting backend și bază de date: DigitalOcean
+Serviciu e-mail: Brevo
+Analytics: Google Analytics
+Marketing/measurement: Meta Pixel
+Procesator de plăți pentru abonamentele agențiilor: Stripe
+Alți furnizori: niciunul
+
+Furnizorii efectivi și rolurile acestora trebuie verificate înainte de lansarea definitivă.
+
+---
+
+19. DigitalOcean și localizarea datelor
+
+Infrastructura de backend și baza de date TreiOferte sunt găzduite pe DigitalOcean.
+
+Utilizarea DigitalOcean nu înseamnă automat că toate prelucrările au loc într-o singură țară.
+
+Furnizorii, subprocessatorii, sistemele de backup, suportul tehnic sau alte servicii pot implica acces sau transferuri către alte jurisdicții.
+
+TreiOferte va verifica aceste fluxuri și va utiliza mecanismele legale necesare pentru transferurile internaționale aplicabile.
+
+---
+
+20. Google Analytics și Meta Pixel
+
+TreiOferte intenționează să utilizeze Google Analytics și Meta Pixel pentru analiză, măsurarea performanței și optimizarea campaniilor.
+
+În funcție de configurația tehnică, aceste instrumente pot prelucra:
+
+- identificatori tehnici;
+- browser/dispozitiv;
+- pagini accesate;
+- interacțiuni;
+- sursa traficului;
+- evenimente de utilizare.
+
+TreiOferte va configura aceste instrumente urmărind principiul minimizării datelor.
+
+Conținutul chatului, notele private și datele sensibile nu trebuie transmise intenționat către Meta Pixel sau Google Analytics ca parametri de tracking.
+
+Activarea tehnologiilor neesențiale va fi gestionată conform cerințelor aplicabile privind consimțământul.
+
+---
+
+21. Cookie-uri
+
+Platforma poate utiliza:
+
+- cookie-uri strict necesare;
+- cookie-uri funcționale;
+- analytics;
+- tehnologii de marketing.
+
+Cookie-urile și tehnologiile neesențiale pentru care este necesar consimțământul vor fi gestionate prin mecanismul de consimțământ al Platformei.
+
+Detaliile sunt descrise în Politica privind Cookie-urile.
+
+---
+
+22. Perioadele de păstrare
+
+TreiOferte nu păstrează datele mai mult decât este justificat.
+
+Cont
+
+Datele necesare contului pot fi păstrate cât timp contul este activ și ulterior numai atunci când există un temei justificat.
+
+Solicitări
+
+Istoricul poate rămâne disponibil cât timp contul este activ, sub rezerva regulilor legale de păstrare și minimizare.
+
+Chat
+
+Conversațiile pot fi păstrate până la 36 de luni de la închiderea solicitării, pentru funcționarea serviciului, gestionarea reclamațiilor, prevenirea abuzurilor și apărarea drepturilor, sub rezerva verificării periodice a necesității acestei perioade.
+
+Note interne
+
+Notele de verificare/moderare pot fi păstrate până la 36 de luni de la închiderea solicitării, dacă păstrarea continuă să fie necesară și proporțională.
+
+Consimțământ marketing
+
+Informațiile necesare pentru demonstrarea acordării sau retragerii consimțământului pot fi păstrate pentru perioada justificată de necesitatea demonstrării respectării obligațiilor legale.
+
+Loguri tehnice și securitate
+
+Perioada va fi stabilită în funcție de necesitatea de securitate și minimizarea datelor.
+
+Date comerciale/fiscale
+
+După introducerea abonamentelor pentru agenții, datele necesare fiscalității și contabilității vor fi păstrate conform perioadelor prevăzute de lege.
+
+---
+
+23. Ștergerea contului
+
+Utilizatorul poate solicita sau utiliza funcția disponibilă pentru ștergerea contului.
+
+După ștergere:
+
+- numele, telefonul și e-mailul vor fi șterse sau anonimizate dacă nu există un temei pentru păstrare;
+- ratingurile pot rămâne în formă anonimizată;
+- conversațiile pot fi păstrate intern în formă anonimizată, atunci când este tehnic posibil și juridic justificat, până la expirarea perioadei aplicabile;
+- anumite informații pot fi păstrate dacă acest lucru este necesar pentru respectarea legii sau apărarea unor drepturi.
+
+Ștergerea contului TreiOferte nu determină automat ștergerea datelor deja comunicate unei agenții și prelucrate independent de aceasta.
+
+---
+
+24. Transferurile internaționale
+
+Unii furnizori pot implica transferuri sau acces la date din alte state.
+
+Atunci când legislația Republicii Moldova impune garanții pentru un transfer, TreiOferte va utiliza mecanismele permise de Legea nr. 195/2024, după caz.
+
+Acestea pot include decizii privind caracterul adecvat al protecției, garanții adecvate, clauze contractuale aplicabile sau alte mecanisme legale.
+
+---
+
+25. Securitatea
+
+TreiOferte va implementa măsuri tehnice și organizatorice proporționale cu riscul, inclusiv, după caz:
+
+- controlul accesului;
+- protejarea parolelor;
+- conexiuni securizate;
+- limitarea privilegiilor administrative;
+- backup;
+- loguri de securitate;
+- actualizări;
+- protejarea bazei de date;
+- proceduri pentru incidente.
+
+Niciun sistem informatic nu poate garanta securitate absolută.
+
+---
+
+26. Incidente privind datele
+
+În cazul unui incident privind datele personale, TreiOferte va evalua natura și riscul acestuia și va respecta obligațiile aplicabile privind documentarea, remedierea și, atunci când legea o impune, notificarea autorității competente și/sau informarea persoanelor afectate.
+
+---
+
+27. Drepturile persoanei vizate
+
+În condițiile Legii nr. 195/2024, persoana poate avea, după caz, dreptul:
+
+- la informare;
+- la acces;
+- la rectificare;
+- la ștergere;
+- la restricționarea prelucrării;
+- la opoziție;
+- la portabilitatea datelor;
+- la retragerea consimțământului;
+- la protecție în raport cu anumite decizii automatizate;
+- la depunerea unei plângeri la autoritatea competentă.
+
+Drepturile pot fi supuse condițiilor și excepțiilor prevăzute de lege.
+
+---
+
+28. Exercitarea drepturilor
+
+Solicitările pot fi transmise la:
+
+legal@treioferte.md
+
+TreiOferte poate solicita informații rezonabile pentru verificarea identității persoanei înainte de executarea unei cereri care privește datele acesteia.
+
+Cererile vor fi gestionate în termenele prevăzute de legislația aplicabilă.
+
+---
+
+29. Autoritatea de supraveghere
+
+Persoana vizată are dreptul, în condițiile legii, să depună o plângere la:
+
+Centrul Național pentru Protecția Datelor cu Caracter Personal al Republicii Moldova (CNPDCP).
+
+Contactarea TreiOferte înaintea unei plângeri este încurajată pentru soluționarea rapidă a problemei, dar aceasta nu limitează drepturile persoanei prevăzute de lege.
+
+---
+
+30. Datele copiilor
+
+Persoanele sub 18 ani nu pot crea cont TreiOferte în configurația actuală.
+
+Un utilizator adult poate indica numărul și vârsta copiilor care participă la călătorie atunci când informația este necesară pentru pregătirea ofertelor.
+
+Vârsta copiilor nu este afișată public.
+
+Aceasta poate fi pusă la dispoziția agențiilor participante atunci când este necesară calculării sau pregătirii ofertei.
+
+---
+
+31. Decizii automatizate și profilare
+
+În configurația actuală, TreiOferte nu intenționează să adopte decizii exclusiv automatizate care produc efecte juridice asupra utilizatorului sau îl afectează în mod similar într-o măsură semnificativă.
+
+Dacă modelul se modifică, Politica va fi actualizată înainte de introducerea unor asemenea operațiuni, atunci când legea o impune.
+
+---
+
+32. Evaluările agențiilor
+
+Utilizatorii care au interacționat cu o agenție pot acorda acesteia între 1 și 5 stele.
+
+TreiOferte poate păstra legătura tehnică dintre evaluare și cont atât cât este necesar pentru:
+
+- verificarea interacțiunii;
+- prevenirea evaluărilor multiple;
+- prevenirea fraudei;
+- protejarea integrității sistemului.
+
+După ștergerea contului, ratingul poate rămâne în formă anonimizată.
+
+---
+
+33. Furnizarea obligatorie și facultativă a datelor
+
+Anumite informații sunt necesare pentru utilizarea serviciului.
+
+În configurația actuală, acestea includ informațiile necesare creării contului și numărul de telefon necesar verificării solicitării.
+
+Dacă utilizatorul nu furnizează datele obligatorii necesare procesului, TreiOferte poate să nu poată crea contul, verifica sau publica solicitarea.
+
+Furnizarea consimțământului pentru marketing este facultativă și refuzul acestuia nu împiedică utilizarea serviciului principal.
+
+---
+
+34. Modificarea Politicii
+
+Politica poate fi actualizată ca urmare a:
+
+- modificării legislației;
+- schimbării furnizorilor;
+- modificării infrastructurii;
+- introducerii unor funcționalități;
+- modificării scopurilor sau fluxurilor de date.
+
+În cazul modificărilor materiale, persoanele vizate vor fi informate atunci când acest lucru este necesar potrivit legii.
+
+---
+
+35. Limba
+
+Politica va putea fi disponibilă în română și rusă.
+
+Versiunile trebuie să aibă același conținut substanțial.
+
+În măsura permisă de legislația aplicabilă, versiunea română poate fi stabilită drept versiune de referință în cazul unor neconcordanțe de traducere.
+
+---
+
+36. Contact
+
+TreiOferte.md
+
+Operator: Ilie Fabian
+Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+E-mail general: info@treioferte.md
+E-mail suport: suport@treioferte.md
+E-mail pentru protecția datelor: legal@treioferte.md

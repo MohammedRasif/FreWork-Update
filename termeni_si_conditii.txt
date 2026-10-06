@@ -1,0 +1,654 @@
+TERMENI ȘI CONDIȚII PENTRU UTILIZATORI
+
+TreiOferte.md
+
+Versiune: 1.0
+Data ultimei actualizări: 6 octombrie 2026
+
+1. Informații generale
+
+Prezentele Termene și Condiții („Termenii”) reglementează accesul și utilizarea platformei online TreiOferte, disponibilă la adresa treioferte.md („Platforma”).
+
+Platforma este administrată, în etapa actuală de testare, de:
+
+Operator: Ilie Fabian
+Statut: persoană fizică
+Adresă de contact: Strada Libertatii, 52, Colibasi, Republica Moldova
+E-mail: info@treioferte.md
+
+Prin crearea unui cont și utilizarea Platformei, utilizatorul confirmă că a citit și a înțeles prezentele Termene și că acceptă regulile aplicabile utilizării serviciului.
+
+În cazul în care utilizatorul nu este de acord cu Termenii, acesta nu trebuie să utilizeze Platforma.
+
+---
+
+2. Ce este TreiOferte
+
+TreiOferte este o platformă digitală care facilitează contactul dintre persoane interesate de servicii turistice și agenții de turism participante.
+
+Utilizatorul poate publica o solicitare privind o vacanță, iar agențiile eligibile pot manifesta interes și pot comunica cu acesta prin intermediul Platformei.
+
+TreiOferte nu este, în cadrul modelului descris în prezentele Termene, agenția care furnizează serviciul turistic utilizatorului.
+
+TreiOferte:
+
+- nu organizează vacanța utilizatorului;
+- nu stabilește prețul serviciilor turistice;
+- nu garantează disponibilitatea unei vacanțe;
+- nu efectuează rezervarea serviciului turistic;
+- nu încheie în nume propriu contractul de călătorie cu utilizatorul;
+- nu încasează prețul vacanței;
+- nu emite vouchere sau documente de călătorie în nume propriu;
+- nu garantează executarea serviciilor turistice oferite de agenție.
+
+Contractul privind serviciile turistice, dacă este încheiat, se încheie direct între utilizator și agenția de turism aleasă, în afara TreiOferte.
+
+Plata vacanței se efectuează direct către agenția respectivă.
+
+---
+
+3. Eligibilitatea utilizatorului
+
+Platforma este destinată persoanelor care au împlinit 18 ani.
+
+Prin crearea unui cont, utilizatorul declară că:
+
+- are cel puțin 18 ani;
+- informațiile furnizate sunt reale și actuale;
+- utilizează Platforma în scopuri legitime;
+- nu creează conturi sau solicitări false;
+- nu utilizează identitatea altei persoane fără drept.
+
+TreiOferte poate suspenda sau elimina un cont atunci când există motive rezonabile să considere că aceste condiții nu sunt respectate.
+
+---
+
+4. Crearea contului
+
+Pentru publicarea unei solicitări este necesară crearea unui cont.
+
+Înregistrarea se realizează prin:
+
+adresă de e-mail + parolă + verificarea adresei de e-mail.
+
+Utilizatorul este responsabil pentru păstrarea confidențialității parolei și pentru activitatea realizată prin contul său, în măsura permisă de lege.
+
+Utilizatorul trebuie să informeze TreiOferte dacă suspectează utilizarea neautorizată a contului.
+
+TreiOferte poate aplica măsuri tehnice de securitate, inclusiv blocarea temporară a accesului, atunci când detectează activități suspecte.
+
+---
+
+5. Publicarea unei solicitări
+
+Un utilizator poate avea o singură solicitare activă la un moment dat.
+
+Solicitarea poate include, printre altele:
+
+- destinația;
+- perioada călătoriei;
+- orașul/aeroportul de plecare;
+- numărul de adulți;
+- numărul de copii;
+- bugetul;
+- preferințe privind cazarea;
+- regimul de masă;
+- alte preferințe relevante.
+
+Utilizatorul este responsabil pentru corectitudinea informațiilor introduse.
+
+Utilizatorul poate modifica solicitarea după publicare.
+
+Agențiile deja participante pot fi informate despre modificările relevante.
+
+---
+
+6. Informațiile vizibile public
+
+Utilizatorul înțelege că anumite informații din solicitare pot fi afișate public pe treioferte.md.
+
+Pot fi publice:
+
+- destinația;
+- perioada călătoriei;
+- orașul/aeroportul de plecare;
+- bugetul;
+- numărul de adulți;
+- numărul de copii;
+- preferințele generale privind vacanța.
+
+Nu vor fi afișate public, în mod normal:
+
+- numele real;
+- adresa de e-mail;
+- numărul de telefon;
+- nickname-ul utilizatorului;
+- vârsta copiilor;
+- notele private.
+
+Utilizatorul trebuie să evite introducerea în câmpurile publice a unor informații prin care el sau alte persoane pot fi identificate.
+
+---
+
+7. Notele private și informațiile sensibile
+
+Notele private pot deveni accesibile numai agențiilor care participă efectiv la solicitarea respectivă.
+
+Utilizatorul nu trebuie să introducă în Platformă, dacă nu este necesar și permis expres:
+
+- date medicale;
+- informații sensibile;
+- copii ale pașaportului;
+- copii ale buletinului de identitate;
+- numere ale documentelor de identitate;
+- informații financiare;
+- parole;
+- date privind cardurile bancare.
+
+Documentele necesare unei eventuale rezervări trebuie transmise direct agenției prin modalități adecvate convenite între utilizator și agenție, în afara TreiOferte.
+
+---
+
+8. Vizibilitatea solicitărilor pentru agenții
+
+Solicitările publicate pot fi vizibile agențiilor participante la TreiOferte.
+
+Doar agențiile autorizate de Platformă pot ocupa un loc și iniția comunicarea aferentă unei solicitări.
+
+TreiOferte poate aplica un proces propriu de verificare a agențiilor, care poate include verificarea informațiilor societății, documentelor, registrelor disponibile și contactarea reprezentantului agenției.
+
+Faptul că o agenție este indicată drept „verificată” înseamnă că TreiOferte a efectuat verificările stabilite de Platformă la momentul respectiv.
+
+Această verificare nu constituie o garanție oferită de TreiOferte privind calitatea, solvabilitatea, comportamentul viitor sau executarea serviciilor agenției.
+
+---
+
+9. Maximum trei agenții
+
+O solicitare poate avea simultan maximum 3 agenții participante.
+
+Starea solicitării poate fi afișată astfel:
+
+0/3 – 1/3 – 2/3 – 3/3.
+
+Numele și logo-ul agențiilor participante pot fi afișate în legătură cu solicitarea.
+
+La atingerea limitei de 3/3, alte agenții nu pot intra în solicitare cât timp toate cele trei poziții sunt ocupate.
+
+---
+
+10. Retragerea unei agenții
+
+O agenție participantă se poate retrage din solicitare.
+
+În acest caz, poziția respectivă poate deveni disponibilă unei alte agenții.
+
+Dacă utilizatorul respinge o agenție, agenția respectivă nu mai poate reintra în aceeași solicitare.
+
+Poziția pierdută ca urmare a respingerii de către utilizator nu este în mod obligatoriu pusă din nou la dispoziția unei alte agenții.
+
+---
+
+11. Regula celor 12 ore
+
+Agențiile participante trebuie să trateze solicitările într-un termen rezonabil.
+
+TreiOferte poate elibera poziția ocupată de o agenție în cazul unei inactivități nejustificate de aproximativ 12 ore, conform regulilor operaționale ale Platformei.
+
+Dacă agenția a solicitat informații suplimentare necesare pregătirii unei propuneri și așteaptă răspunsul utilizatorului, aceasta nu va fi considerată automat inactivă.
+
+TreiOferte poate lua în considerare circumstanțele concrete înainte de eliberarea poziției.
+
+---
+
+12. „Până la 3 oferte”
+
+Expresia „până la 3 oferte” indică un număr maxim posibil de propuneri și nu reprezintă o garanție că utilizatorul va primi trei oferte.
+
+Numărul efectiv poate fi:
+
+0, 1, 2 sau maximum 3, în funcție de participarea agențiilor, disponibilitate, caracteristicile solicitării și alte circumstanțe.
+
+TreiOferte nu garantează:
+
+- un număr minim de oferte;
+- existența unei oferte pentru fiecare solicitare;
+- un anumit preț;
+- cel mai mic preț de pe piață;
+- disponibilitatea serviciilor;
+- acceptarea solicitării de către o agenție.
+
+---
+
+13. Comunicarea prin chat
+
+Fiecare agenție participantă comunică cu utilizatorul printr-o conversație separată.
+
+O agenție nu are acces la conversațiile sau ofertele celorlalte agenții.
+
+Utilizatorul poate discuta cu fiecare agenție separat și poate solicita informații suplimentare.
+
+TreiOferte poate avea acces la conversații în măsura necesară pentru:
+
+- funcționarea serviciului;
+- suport tehnic;
+- securitate;
+- prevenirea fraudei și abuzurilor;
+- investigarea reclamațiilor;
+- aplicarea Termenilor;
+- apărarea drepturilor și intereselor legitime, în limitele legii.
+
+---
+
+14. Datele de contact transmise voluntar în chat
+
+Utilizatorul și agenția pot transmite voluntar în conversație propriile date de contact.
+
+Dacă utilizatorul comunică voluntar numărul de telefon, adresa de e-mail, WhatsApp sau alte date de contact înainte de selectarea unei oferte, aceste informații devin accesibile agenției respective.
+
+Utilizatorul trebuie să transmită date personale numai atunci când consideră necesar.
+
+TreiOferte nu solicită utilizatorului să publice date de contact în mesajele vizibile public.
+
+---
+
+15. Fișiere și documente
+
+Platforma poate permite transmiterea anumitor fișiere prin chat.
+
+Este interzisă utilizarea acestei funcționalități pentru transmiterea prin TreiOferte a:
+
+- copiilor pașapoartelor;
+- copiilor actelor de identitate;
+- datelor cardurilor bancare;
+- parolelor;
+- documentelor care conțin date personale excesive sau care nu sunt necesare pentru comunicarea inițială.
+
+TreiOferte poate limita tipurile și dimensiunile fișierelor și poate elimina sau bloca fișiere care prezintă riscuri tehnice, juridice sau de securitate.
+
+---
+
+16. Alegerea unei oferte
+
+Utilizatorul poate indica prin funcția „Aleg această ofertă” că dorește să continue cu o anumită agenție.
+
+Această acțiune reprezintă o selecție realizată în cadrul Platformei.
+
+Apăsarea butonului „Aleg această ofertă” nu constituie o rezervare, nu încheie contractul de servicii turistice și nu creează obligația de plată a vacanței către TreiOferte.
+
+Contractul și rezervarea se realizează separat, direct între utilizator și agenția aleasă.
+
+După selectarea unei agenții:
+
+- conversațiile cu celelalte agenții pot fi închise pentru mesaje noi;
+- acestea pot rămâne disponibile ca istoric;
+- alegerea nu poate fi anulată prin mecanismul standard al TreiOferte.
+
+Această regulă privește exclusiv funcționarea Platformei și nu limitează drepturile pe care utilizatorul le poate avea potrivit legii în raport cu agenția sau cu un eventual contract de servicii turistice.
+
+---
+
+17. Transmiterea datelor către agenția aleasă
+
+La selectarea unei oferte, TreiOferte poate pune la dispoziția agenției alese:
+
+- numele utilizatorului;
+- numărul de telefon;
+- adresa de e-mail.
+
+Înainte de efectuarea acțiunii, utilizatorului trebuie să îi fie clar că selectarea ofertei determină această transmitere.
+
+Agențiile care nu au fost selectate nu primesc automat aceste date prin această funcție.
+
+Prelucrarea datelor este descrisă detaliat în Politica de Confidențialitate.
+
+---
+
+18. Contractul de servicii turistice
+
+Orice contract privind vacanța, pachetul turistic sau alte servicii turistice este negociat și încheiat direct între utilizator și agenția de turism.
+
+Agenția este responsabilă, potrivit legii și contractului încheiat, pentru informațiile și serviciile pe care le furnizează.
+
+Utilizatorul trebuie să verifice înainte de contractare cel puțin:
+
+- identitatea agenției;
+- conținutul ofertei;
+- prețul final;
+- serviciile incluse;
+- serviciile neincluse;
+- condițiile de plată;
+- condițiile de anulare;
+- documentele contractuale;
+- condițiile de călătorie relevante.
+
+---
+
+19. Prețurile și disponibilitatea
+
+Prețurile, disponibilitatea, hotelurile, transportul, mesele, asigurările și alte elemente ale unei propuneri sunt furnizate de agenția respectivă.
+
+TreiOferte nu garantează că:
+
+- o ofertă rămâne disponibilă pentru o anumită perioadă;
+- prețul nu se modifică;
+- o anumită cameră, cursă sau destinație rămâne disponibilă;
+- o ofertă este cea mai ieftină de pe piață.
+
+Utilizatorul trebuie să confirme condițiile finale direct cu agenția înainte de contractare și plată.
+
+---
+
+20. Plățile pentru vacanță
+
+TreiOferte nu încasează plata vacanței în cadrul modelului actual.
+
+Plățile aferente serviciilor turistice sunt efectuate direct între utilizator și agenție.
+
+Utilizatorul nu trebuie să considere că o plată solicitată de o agenție reprezintă o plată către TreiOferte.
+
+---
+
+21. Durata solicitării
+
+O solicitare rămâne activă pentru maximum 7 zile, dacă nu este închisă mai devreme.
+
+După expirare, solicitarea nu poate fi reactivată.
+
+Utilizatorul poate crea o nouă solicitare conform regulilor Platformei.
+
+Utilizatorul poate închide voluntar solicitarea înainte de expirarea celor 7 zile.
+
+Închiderea unei solicitări împiedică participarea unor noi agenții, fără a elimina automat istoricul existent.
+
+---
+
+22. Istoricul contului
+
+TreiOferte poate păstra în contul utilizatorului istoricul:
+
+- solicitărilor;
+- agențiilor participante;
+- conversațiilor;
+- ofertelor;
+- selecțiilor efectuate.
+
+Perioadele efective de păstrare a datelor sunt stabilite conform Politicii de Confidențialitate și legislației aplicabile.
+
+---
+
+23. Păstrarea conversațiilor
+
+În configurația actuală, conversațiile pot fi păstrate pentru o perioadă de până la 36 de luni de la închiderea solicitării, în scopurile prevăzute în Politica de Confidențialitate.
+
+Conversația cu agenția aleasă poate rămâne utilizabilă în perioada în care funcționalitatea este disponibilă.
+
+TreiOferte poate modifica disponibilitatea tehnică a funcției de chat din motive de securitate, funcționare, suspendarea unui cont sau alte motive legitime.
+
+---
+
+24. Evaluarea agențiilor
+
+Un utilizator care a interacționat efectiv cu o agenție prin TreiOferte poate acorda acesteia o evaluare de la 1 la 5 stele.
+
+Evaluarea nu necesită cumpărarea unei vacanțe.
+
+Sistemul nu permite, în configurația actuală, publicarea unui comentariu textual împreună cu evaluarea.
+
+TreiOferte poate elimina sau exclude din calcul evaluări în cazul unor indicii rezonabile de:
+
+- fraudă;
+- manipulare;
+- conturi false;
+- evaluări multiple nepermise;
+- abuz al sistemului.
+
+---
+
+25. Obligațiile utilizatorului
+
+Utilizatorului îi este interzis:
+
+- să publice solicitări false;
+- să utilizeze identități false;
+- să încerce accesarea conturilor altor persoane;
+- să interfereze cu funcționarea Platformei;
+- să transmită malware;
+- să utilizeze Platforma pentru spam;
+- să colecteze automat date de pe Platformă fără autorizare;
+- să copieze sau exploateze sistematic baza de date;
+- să utilizeze Platforma pentru activități ilegale;
+- să amenințe sau hărțuiască alți utilizatori sau reprezentanți ai agențiilor;
+- să încerce ocolirea măsurilor de securitate.
+
+TreiOferte poate lua măsuri tehnice și administrative împotriva utilizării abuzive.
+
+---
+
+26. Suspendarea și închiderea contului
+
+TreiOferte poate suspenda temporar sau, în cazuri justificate, închide accesul unui utilizator atunci când există indicii rezonabile privind:
+
+- fraudă;
+- încălcarea Termenilor;
+- activități ilegale;
+- amenințări la securitatea Platformei;
+- utilizare abuzivă;
+- conturi sau solicitări false;
+- prejudicierea altor utilizatori sau a Platformei.
+
+În cazurile urgente privind securitatea, frauda sau protejarea altor persoane, suspendarea poate fi aplicată imediat, urmând ca situația să fie analizată ulterior.
+
+Această prevedere nu limitează drepturile imperative ale utilizatorului prevăzute de lege.
+
+---
+
+27. Agenții suspendate
+
+TreiOferte poate suspenda sau elimina o agenție care încalcă regulile Platformei sau prezintă un risc pentru utilizatori.
+
+În cazul unei suspendări definitive, agenția poate pierde accesul la conversațiile existente.
+
+Agenția va fi obligată, în condițiile contractuale și legale aplicabile, să înceteze utilizarea datelor obținute prin TreiOferte pentru noi contacte comerciale, cu excepția situațiilor în care păstrarea sau utilizarea este necesară pentru executarea unui raport deja existent ori este permisă sau impusă de lege.
+
+---
+
+28. Reclamații privind serviciile turistice
+
+Problemele privind:
+
+- rezervarea;
+- plata vacanței;
+- hotelul;
+- transportul;
+- anularea;
+- rambursarea;
+- executarea pachetului;
+- serviciile turistice contractate
+
+trebuie adresate în primul rând agenției cu care utilizatorul a încheiat contractul, atunci când problema privește prestația agenției.
+
+TreiOferte poate analiza separat reclamațiile privind funcționarea Platformei sau comportamentul unei agenții în cadrul TreiOferte.
+
+---
+
+29. Reclamații privind TreiOferte
+
+Pentru probleme privind Platforma, utilizatorul poate contacta:
+
+suport@treioferte.md
+
+TreiOferte poate solicita informațiile rezonabil necesare pentru identificarea contului, solicitării sau incidentului.
+
+---
+
+30. Limitarea responsabilității
+
+TreiOferte răspunde pentru propriile obligații în limitele prevăzute de legislația aplicabilă.
+
+În măsura permisă de lege, TreiOferte nu este responsabil pentru executarea obligațiilor asumate independent de agenția de turism față de utilizator.
+
+În particular, TreiOferte nu controlează și nu poate garanta în mod absolut:
+
+- disponibilitatea serviciilor turistice;
+- modificarea prețurilor de către furnizori sau agenții;
+- calitatea hotelului sau transportului;
+- anularea ori modificarea curselor;
+- condițiile meteorologice;
+- deciziile autorităților;
+- condițiile de intrare într-o țară;
+- comportamentul unor furnizori terți;
+- executarea unui contract încheiat exclusiv între utilizator și agenție.
+
+Nicio prevedere din Termeni nu exclude și nu limitează o răspundere care, potrivit legislației imperative aplicabile, nu poate fi exclusă sau limitată.
+
+---
+
+31. Disponibilitatea Platformei
+
+TreiOferte urmărește menținerea Platformei funcționale, dar nu garantează funcționarea neîntreruptă sau lipsită de erori.
+
+Platforma poate fi temporar indisponibilă pentru:
+
+- mentenanță;
+- actualizări;
+- probleme tehnice;
+- incidente de securitate;
+- probleme ale furnizorilor infrastructurii;
+- cauze aflate în afara controlului rezonabil al TreiOferte.
+
+TreiOferte poate modifica, suspenda sau retrage anumite funcționalități atunci când există motive tehnice, juridice, de securitate sau comerciale legitime, cu respectarea drepturilor imperative aplicabile.
+
+---
+
+32. Servicii și linkuri externe
+
+Platforma poate conține linkuri către servicii externe.
+
+TreiOferte nu controlează automat conținutul sau funcționarea tuturor serviciilor terțe.
+
+Utilizatorul trebuie să consulte condițiile și politicile furnizorului extern înainte de utilizarea acestuia.
+
+---
+
+33. Protecția datelor
+
+Prelucrarea datelor personale este descrisă în Politica de Confidențialitate TreiOferte.
+
+Aceasta va include informații privind, după caz:
+
+- datele colectate;
+- scopurile;
+- temeiurile juridice;
+- destinatarii;
+- agențiile participante;
+- perioada de păstrare;
+- drepturile persoanei vizate;
+- furnizorii tehnici;
+- transferurile internaționale;
+- măsurile relevante privind securitatea.
+
+Utilizarea Meta Pixel, Google Analytics și a altor tehnologii similare va fi tratată și prin documentația privind cookie-urile și tehnologiile de urmărire.
+
+---
+
+34. Ștergerea contului
+
+Utilizatorul poate solicita sau utiliza funcția disponibilă pentru ștergerea contului.
+
+Ștergerea contului nu înseamnă în mod necesar ștergerea instantanee a tuturor informațiilor din toate sistemele.
+
+Datele vor fi șterse, anonimizate sau păstrate, după caz, conform legislației aplicabile și Politicii de Confidențialitate.
+
+Evaluările acordate agențiilor pot rămâne în formă anonimizată.
+
+Conversațiile pot fi păstrate intern în formă anonimizată atunci când există un scop legitim și o bază juridică pentru aceasta.
+
+---
+
+35. Proprietatea intelectuală
+
+Denumirea TreiOferte, designul Platformei, elementele grafice, software-ul, textele proprii și alte elemente protejate aparțin titularilor lor și nu pot fi copiate, exploatate sau reproduse fără drept.
+
+Conținutul aparținând agențiilor rămâne supus drepturilor titularilor respectivi.
+
+Utilizarea Platformei nu transferă utilizatorului drepturi de proprietate intelectuală asupra TreiOferte.
+
+---
+
+36. Prevenirea utilizării comerciale neautorizate
+
+Este interzisă utilizarea automatizată sau sistematică a Platformei pentru:
+
+- extragerea solicitărilor;
+- construirea unor baze de date concurente;
+- scraping;
+- revânzarea datelor;
+- reproducerea sistematică a conținutului;
+- exploatarea comercială neautorizată a informațiilor.
+
+TreiOferte își rezervă dreptul de a utiliza măsuri tehnice și juridice rezonabile pentru protejarea Platformei.
+
+---
+
+37. Modificarea Termenilor
+
+TreiOferte poate modifica Termenii pentru a reflecta:
+
+- schimbări legislative;
+- modificări ale Platformei;
+- noi funcționalități;
+- cerințe de securitate;
+- modificări ale modelului operațional.
+
+În cazul modificărilor materiale care afectează drepturile utilizatorilor, TreiOferte va furniza informarea necesară conform legislației aplicabile.
+
+Versiunea actuală va fi disponibilă pe Platformă.
+
+---
+
+38. Limba
+
+Platforma poate fi disponibilă în limba română și limba rusă.
+
+TreiOferte urmărește ca versiunile documentelor juridice să aibă același conținut substanțial.
+
+În cazul unei neconcordanțe de traducere, versiunea în limba română va constitui versiunea de referință, în măsura în care această regulă este permisă de legislația aplicabilă.
+
+---
+
+39. Legea aplicabilă
+
+Prezentele Termene sunt guvernate de legislația Republicii Moldova, fără a aduce atingere normelor imperative aplicabile și drepturilor consumatorilor care nu pot fi înlăturate prin contract.
+
+Eventualele litigii vor fi soluționate potrivit regulilor de competență stabilite de legislația aplicabilă.
+
+Nicio prevedere din acești Termeni nu trebuie interpretată ca limitând dreptul consumatorului de a se adresa autorităților sau instanțelor competente atunci când acest drept este prevăzut de lege.
+
+---
+
+40. Contact
+
+Pentru întrebări privind TreiOferte:
+
+TreiOferte.md
+Operator: Ilie Fabian
+Adresă: Strada Libertatii, 52, Colibasi, Republica Moldova
+E-mail general: info@treioferte.md
+E-mail suport/reclamații: suport@treioferte.md
+
+---
+
+41. Dispoziții finale
+
+Dacă o prevedere a prezentelor Termene este declarată nevalabilă sau inaplicabilă, celelalte prevederi rămân aplicabile în măsura permisă de lege.
+
+Neexercitarea imediată de către TreiOferte a unui drept prevăzut de Termeni nu reprezintă renunțarea definitivă la acel drept.
+
+Prezentele Termene trebuie interpretate împreună cu:
+
+- Politica de Confidențialitate;
+- Politica privind Cookie-urile;
+- regulile și notificările specifice afișate în Platformă.
+
+Prin utilizarea TreiOferte, utilizatorul înțelege că Platforma facilitează contactul cu agențiile de turism și că eventuala contractare și achiziție a serviciilor turistice se realizează direct cu agenția aleasă, conform condițiilor acesteia și legislației aplicabile.

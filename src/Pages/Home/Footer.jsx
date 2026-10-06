@@ -13,7 +13,7 @@ const Footer = () => {
             <h2 className="text-2xl font-bold tracking-tight">
               <BrandWordmark />
             </h2>
-            <p className="mt-4 text-sm leading-7 text-white/65">{t("address_line1")}<br />{t("address_line2")}</p>
+            <p className="mt-4 text-sm leading-7 text-white/65">{t("address_line1")}<br />{t("footer_address")}</p>
             <a className="mt-3 inline-block text-sm font-medium text-white/80 hover:text-[#e4b154]" href="mailto:info@treioferte.md">{t("email_contact")}</a>
           </div>
           <div>

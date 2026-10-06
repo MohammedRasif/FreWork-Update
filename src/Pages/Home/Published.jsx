@@ -5,10 +5,7 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import BeachCard from "@/components/ui/BeachCard";
-import MountainCard from "@/components/ui/MountainCard";
-import RelaxCard from "@/components/ui/RelaxCard";
-import GroupCard from "@/components/ui/GroupCard";
+import TourPlanCard from "@/components/TourPlanCard";
 import { ArrowUpRight } from "lucide-react";
 import { useGetTourPlanPublicQuery } from "@/redux/features/withAuth";
 import { useTranslation } from "react-i18next";
@@ -22,10 +19,10 @@ const Published = () => {
     const plans = Array.isArray(data) ? data : [];
     const sorted = [...plans].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return [
-      { key: "beach", label: "beach_trips", Card: BeachCard },
-      { key: "mountain", label: "mountain_adventures", Card: MountainCard },
-      { key: "relax", label: "relaxing_tours", Card: RelaxCard },
-      { key: "group", label: "group_packages", Card: GroupCard },
+      { key: "beach", label: "beach_trips" },
+      { key: "mountain", label: "mountain_adventures" },
+      { key: "relax", label: "relaxing_tours" },
+      { key: "group", label: "group_packages" },
     ].map((category) => ({
       ...category,
       plans: sorted.filter((plan) => plan.destination_type?.trim().toLowerCase() === category.key).slice(0, 6),
@@ -52,7 +49,7 @@ const Published = () => {
           </NavLink>
         </div>
         <div className="space-y-12">
-          {categories.map(({ key, label, Card, plans }) => (
+          {categories.map(({ key, label, plans }) => (
             <div key={key}>
               <button type="button" onClick={() => handleCategoryClick(key)} className="mb-5 inline-flex items-center gap-2 text-xl font-bold text-[#23374d] hover:text-[#9d6b1e] sm:text-2xl">
                 {t(label)} <ArrowUpRight size={20} aria-hidden="true" />
@@ -66,7 +63,13 @@ const Published = () => {
                 className="home-carousel"
               >
                 {plans.map((plan) => (
-                  <SwiperSlide key={plan.id} className="pb-12"><Card tourPlan={plan} /></SwiperSlide>
+                  <SwiperSlide key={plan.id} className="pb-12">
+                    <TourPlanCard
+                      tour={plan}
+                      onDetails={(tour) => navigate("/cereri/" + (tour.slug || tour.id))}
+                      className="h-full"
+                    />
+                  </SwiperSlide>
                 ))}
               </Swiper>
             </div>
