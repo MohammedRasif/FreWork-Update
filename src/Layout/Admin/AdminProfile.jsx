@@ -180,7 +180,7 @@ const AdminProfile = () => {
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-screen">
       <Helmet>
-        <title>vacanzamycost.it | admin | profilo</title>
+        <title>treioferte.md | admin | profilo</title>
       </Helmet>
       {isPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">

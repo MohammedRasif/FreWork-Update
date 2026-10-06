@@ -342,7 +342,7 @@ const TourPlanDouble = () => {
   return (
     <div className="bg-gray-50 p-3 sm:p-4 md:p-6 lg:pb-20 roboto ">
       <Helmet>
-        <title>vacanzamycost.it | richieste</title>
+        <title>treioferte.md | richieste</title>
       </Helmet>
       <Toaster />
       <div className="px-2 sm:px-4 lg:px-6">

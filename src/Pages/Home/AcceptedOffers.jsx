@@ -88,7 +88,7 @@ function AcceptedOffers() {
   return (
     <div className="pt-24 container mx-auto lg:px-3 px-5">
       <Helmet>
-        <title>vacanzamycost.it | offerte-accettate</title>
+        <title>treioferte.md | offerte-accettate</title>
       </Helmet>
       <h1 className="lg:text-4xl text-[28px] font-semibold pb-3">
         {t("all_accepted_offers")}

@@ -11,7 +11,7 @@ function Terms() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 font-sans text-gray-800 leading-relaxed text-base pt-24">
       <Helmet>
-        <title>vacanzamycost.it | termini-e-condizioni</title>
+        <title>treioferte.md | termini-e-condizioni</title>
       </Helmet>
       <h1 className="lg:text-3xl text-xl font-bold text-center mb-8">
         {t("terms.title")}
@@ -104,7 +104,7 @@ function Terms() {
       </div>
 
       <p className="text-center text-gray-600 mt-16 text-sm">
-        © 2026 VacanzaMyCost.it – Tutti i diritti riservati.
+        © 2026 treioferte.md – Tutti i diritti riservati.
       </p>
     </div>
   );

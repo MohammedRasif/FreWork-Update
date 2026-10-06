@@ -62,7 +62,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex">
       <Helmet>
-        <title>vacanzamycost.it | login</title>
+        <title>treioferte.md | login</title>
       </Helmet>
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">

@@ -72,7 +72,7 @@ export default function BlogDetails() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24 ">
       <Helmet>
-        <title>{`vacanzamycost.it | blog | ${post?.slug || ""}`}</title>
+        <title>{`treioferte.md | blog | ${post?.slug || ""}`}</title>
       </Helmet>
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">

@@ -19,7 +19,7 @@ const Favorite = () => {
   return (
     <div className="p-4">
       <Helmet>
-        <title>vacanzamycost.it | user | preferiti</title>
+        <title>treioferte.md | user | preferiti</title>
       </Helmet>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}

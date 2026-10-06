@@ -310,7 +310,7 @@ function PublishedPlan() {
   return (
     <div className="min-h-screen">
       <Helmet>
-        <title>vacanzamycost.it | user | richieste-pubblicate</title>
+        <title>treioferte.md | user | richieste-pubblicate</title>
       </Helmet>
       <Toaster />
       <div className="flex flex-col">

@@ -203,7 +203,7 @@ const Membership = () => {
   return (
     <div className="flex flex-col sm:flex-row bg-gray-50 px-4 sm:px-10 pb-16 font-roboto pt-16">
        <Helmet>
-        <title>vacanzamycost.it | agenzie-certificate</title>
+        <title>treioferte.md | agenzie-certificate</title>
       </Helmet>
       <div className="w-full sm:w-4/5 p-4 sm:p-6">
         <div className="mb-6">

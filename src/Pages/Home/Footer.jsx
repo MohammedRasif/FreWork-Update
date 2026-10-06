@@ -9,14 +9,14 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white py-10">
   <div className="container mx-auto px-4 md:hidden">
     <div className="grid grid-cols-2 gap-10 text-start">
-      {/* VacanzaMyCost.it */}
+      {/* treioferte.md */}
       <div className="space-y-4">
-        <h3 className="text-2xl font-bold text-gray-100">VacanzaMyCost.it</h3>
+        <h3 className="text-2xl font-bold text-gray-100">treioferte.md</h3>
         <p className="text-sm text-gray-400">
          {t("address_line1")}: <br />
           Verona, Italia
         </p>
-        <p className="text-sm text-gray-400">info@vacanzamycost.it</p>
+        <p className="text-sm text-gray-400">info@treioferte.md</p>
       </div>
 
       {/* About Us */}
@@ -50,7 +50,7 @@ const Footer = () => {
     <div className="flex justify-between items-start container mx-auto ">
       {/* Left: Company Info */}
       <div className="space-y-4">
-        <h3 className="text-3xl font-bold text-gray-100">VacanzaMyCost.it</h3>
+        <h3 className="text-3xl font-bold text-gray-100">treioferte.md</h3>
         <p className="text-sm text-gray-400">
           {t("address_line1")} <br />
           {t("address_line2")}

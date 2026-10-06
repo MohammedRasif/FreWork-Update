@@ -137,7 +137,7 @@ export default function ChatInterface() {
     return (
       <div className="h-screen flex flex-col">
         <Helmet>
-        <title>vacanzamycost.it | admin | chat</title>
+        <title>treioferte.md | admin | chat</title>
       </Helmet>
         <div className="p-4 border-b border-gray-300">
           <h1 className="text-xl font-semibold mb-3">{t("messages")}</h1>

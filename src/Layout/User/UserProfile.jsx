@@ -21,7 +21,7 @@ function UserProfile() {
   return (
     <div className="mx-auto p-4">
       <Helmet>
-        <title>vacanzamycost.it | user | profilo</title>
+        <title>treioferte.md | user | profilo</title>
       </Helmet>
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 space-y-2 sm:space-y-0">

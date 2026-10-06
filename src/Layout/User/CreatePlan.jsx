@@ -230,7 +230,7 @@ const CreatePlan = () => {
   return (
     <div className="p-6">
       <Helmet>
-        <title>vacanzamycost.it | user | crea-richiesta</title>
+        <title>treioferte.md | user | crea-richiesta</title>
       </Helmet>
       <div className="mx-auto">
         <Toaster />

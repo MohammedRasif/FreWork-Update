@@ -213,7 +213,7 @@ const EasyandFast = () => {
             </span>
             <h1 className="text-[22px] sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 font-bold leading-tight pb-4 sm:pb-5 px-2 sm:px-4">
               {t("add_your_agency")} <br className="hidden md:block" />
-              {/* <span className="">VacanzaMyCost.it</span> */}
+              {/* <span className="">treioferte.md</span> */}
             </h1>
             <div className="space-y-3 sm:space-y-4 text-gray-600 px-2 sm:px-4">
               <p className="text-sm sm:text-md leading-relaxed">

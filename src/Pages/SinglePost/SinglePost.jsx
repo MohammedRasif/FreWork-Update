@@ -299,7 +299,7 @@ function SinglePost({ prid }) {
   return (
     <div className="min-h-screen bg-gray-50 px-4 flex flex-col items-center justify-center relative container mx-auto">
       <Helmet>
-      <title>{`vacanzamycost.it | richieste | ${slug}`}</title>
+      <title>{`treioferte.md | richieste | ${slug}`}</title>
     </Helmet>
       <Toaster />
       <button

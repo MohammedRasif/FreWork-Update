@@ -124,7 +124,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex">
       <Helmet>
-        <title>vacanzamycost.it | registrazione</title>
+        <title>treioferte.md | registrazione</title>
       </Helmet>
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">

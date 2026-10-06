@@ -10,7 +10,7 @@ const Home = () => {
   return (
     <div className="roboto pt-16">
       <Helmet>
-        <title> vacanzamycost.it | Home</title>
+        <title> treioferte.md | Home</title>
       </Helmet>
       <Banner />
       <VacanzaMycost />

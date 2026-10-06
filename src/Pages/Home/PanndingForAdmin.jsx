@@ -104,7 +104,7 @@ function PendingForAdmin() {
 
         <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 text-center">
           <p className="text-sm text-gray-500">
-            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © VacanzaMyCost.it
+            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © treioferte.md
           </p>
         </div>
       </div>

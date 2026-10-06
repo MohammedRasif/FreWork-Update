@@ -42,7 +42,7 @@ function BlogCard({ post }) {
   return (
     <div>
       <Helmet>
-        <title>vacanzamycost.it | blog</title>
+        <title>treioferte.md | blog</title>
       </Helmet>
       <NavLink to={`/blog/${post.slug}`}>
         <article className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100">

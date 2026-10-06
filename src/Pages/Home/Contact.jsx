@@ -27,7 +27,7 @@ const Contact = () => {
   return (
     <div className="relative min-h-screen w-full roboto">
       <Helmet>
-        <title>vacanzamycost.it | contatti</title>
+        <title>treioferte.md | contatti</title>
       </Helmet>
       {/* Background Image */}
       <div

@@ -289,7 +289,7 @@ export default function UserDashboardLayout() {
   return (
     <div className="flex h-screen bg-[#F8F9FA]">
       <Helmet>
-        <title>vacanzamycost.it | user</title>
+        <title>treioferte.md | user</title>
       </Helmet>
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"></div>

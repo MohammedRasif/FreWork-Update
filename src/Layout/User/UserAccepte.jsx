@@ -110,7 +110,7 @@ const UserAccepte = () => {
   return (
     <div className="">
       <Helmet>
-        <title>vacanzamycost.it | user | richieste-accettate</title>
+        <title>treioferte.md | user | richieste-accettate</title>
       </Helmet>
       <Toaster />
       <div className="flex flex-col sm:flex-row justify-between mt-6 mb-6 border-b border-gray-300">

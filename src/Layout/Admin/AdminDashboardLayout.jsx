@@ -241,7 +241,7 @@ export default function AdminDashboardLayout() {
     <UnreadCountContext.Provider value={{ unreadCount, setUnreadCount }}>
       <div className="flex h-screen bg-[#F8F9FA]">
         <Helmet>
-          <title>vacanzamycost.it | admin</title>
+          <title>treioferte.md | admin</title>
         </Helmet>
         {isMobileMenuOpen && (
           <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"></div>

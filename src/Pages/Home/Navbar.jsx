@@ -136,7 +136,7 @@ const Navbar = () => {
     <nav className="w-full bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Logo */}
       <NavLink to="/">
-        <img src={img} className="h-8 lg:h-11" alt="VacanzaMyCost.it" />
+        <img src={img} className="h-8 lg:h-11" alt="treioferte.md" />
       </NavLink>
 
       {/* Hamburger - Mobile */}
