@@ -35,14 +35,14 @@ const VacanzaMycost = () => {
         </div>
         <div className="grid grid-cols-3 gap-2 md:gap-4 lg:gap-6">
           {steps.map(({ icon: Icon, title, mobileTitle, description }, index) => (
-            <div key={title} className="min-w-0 rounded-2xl border border-[#e9e6e0] bg-white px-2.5 py-4 shadow-[0_10px_35px_rgba(24,42,60,0.04)] md:rounded-[22px] md:p-8">
+            <div key={title} className="min-w-0 rounded-2xl border border-[#e9e6e0] bg-white px-1 py-4 shadow-[0_10px_35px_rgba(24,42,60,0.04)] md:rounded-[22px] md:p-8">
               <div className="mb-2 flex items-center justify-center md:mb-7 md:justify-between">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427] md:h-14 md:w-14 md:rounded-2xl">
                   <Icon size={28} strokeWidth={1.8} className="h-5 w-5 md:h-7 md:w-7" aria-hidden="true" />
                 </div>
                 <span className="hidden text-sm font-bold tracking-[0.16em] text-[#a8b0ba] md:inline">0{index + 1}</span>
               </div>
-              <h3 className="break-words text-center text-xs font-bold leading-snug text-[#172b43] md:break-normal md:text-left md:text-2xl"><span className="md:hidden">{mobileTitle}</span><span className="hidden md:inline">{title}</span></h3>
+              <h3 className="break-normal text-center text-[clamp(10px,3.125vw,12px)] font-bold leading-snug text-[#172b43] md:text-left md:text-2xl"><span className="md:hidden">{mobileTitle}</span><span className="hidden md:inline">{title}</span></h3>
               <p className="mt-3 hidden text-base leading-7 text-[#5a6878] md:block">{description}</p>
             </div>
           ))}

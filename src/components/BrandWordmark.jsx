@@ -1,14 +1,18 @@
 import { cn } from "@/lib/utils";
+import logo from "@/assets/img/normal_2.png";
 
 export default function BrandWordmark({ className = "", inverse = false }) {
   return (
     <span
-      role="img"
-      aria-label="TreiOferte"
-      className={cn("inline-flex items-baseline whitespace-nowrap font-display text-2xl font-extrabold leading-none tracking-tight", className)}
+      className={cn("inline-flex shrink-0 items-center", inverse && "rounded-xl bg-white px-3 py-2", className)}
     >
-      <span aria-hidden="true" className={inverse ? "text-white" : "text-[#113b6d]"}>Trei</span>
-      <span aria-hidden="true" className="text-[#c88f2a]">Oferte</span>
+      <img
+        src={logo}
+        alt="TreiOferte"
+        width={866}
+        height={288}
+        className="block h-auto w-[168px] max-w-full sm:w-[184px] xl:w-[200px]"
+      />
     </span>
   );
 }
