@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 import logo from "@/assets/img/normal_2.png";
 
-export default function BrandWordmark({ className = "", inverse = false }) {
+export default function BrandWordmark({ className = "" }) {
   return (
     <span
-      className={cn("inline-flex shrink-0 items-center", inverse && "rounded-xl bg-white px-3 py-2", className)}
+      className={cn("inline-flex shrink-0 items-center", className)}
     >
       <img
         src={logo}

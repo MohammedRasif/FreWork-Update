@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid gap-10 border-b border-white/15 pb-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:gap-16">
           <div className="max-w-sm">
             <h2 className="text-2xl font-bold tracking-tight">
-              <BrandWordmark inverse />
+              <BrandWordmark />
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/65">{t("address_line1")}<br />{t("address_line2")}</p>
             <a className="mt-3 inline-block text-sm font-medium text-white/80 hover:text-[#e4b154]" href="mailto:info@treioferte.md">{t("email_contact")}</a>
