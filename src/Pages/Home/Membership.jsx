@@ -1,520 +1,168 @@
-import { Search, Star, MessageCircle, X } from "lucide-react";
-import { VscVerifiedFilled } from "react-icons/vsc";
-import { FaHeart } from "react-icons/fa";
-import {
-  useGetAllAgencyQuery,
-  useGetTopAgencyQuery,
-  useSearchAgencyQuery,
-} from "@/redux/features/baseApi";
-import { useCallback, useEffect, useState } from "react";
-import { debounce } from "lodash";
-import FullScreenInfinityLoader from "@/lib/Loading";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useAddToFavoritMutation,
-  useInviteToChatMutation,
-  useShowUserInpormationQuery,
-} from "@/redux/features/withAuth";
-import { toast, ToastContainer } from "react-toastify";
-import { FaAward } from "react-icons/fa6";
-import { RiAwardLine } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ArrowUpRight, Award, BadgeCheck, Building2, Compass, Heart, RotateCcw, Search, Star, X } from "lucide-react";
+import { useGetAllAgencyQuery, useGetTopAgencyQuery, useSearchAgencyQuery } from "@/redux/features/baseApi";
+import { useAddToFavoritMutation } from "@/redux/features/withAuth";
 
-const Membership = () => {
-  const { t } = useTranslation();
-  const [agency, setAgency] = useState([]);
-  const [topAgencie, setTopAgency] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [favorites, setFavorites] = useState([]);
-  const token = localStorage.getItem("access_token");
-  const currentUserId = parseInt(localStorage.getItem("user_id"), 10);
-  const navigate = useNavigate();
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+const asList = (value) => Array.isArray(value) ? value : Array.isArray(value?.results) ? value.results : [];
 
-  const { data: AgencyAll, isLoading: isAgencyDataLoading } =
-    useGetAllAgencyQuery();
-  const { data: TopAgencies, isLoading: isTopAgencyLoading } =
-    useGetTopAgencyQuery();
-  const { data: SearchAgencies, isLoading: isSearchLoading } =
-    useSearchAgencyQuery(searchTerm, { skip: !searchTerm });
-  const [addToFavo, { isLoading: isAddFevLoading }] = useAddToFavoritMutation();
-  const { data: userData, isLoading } = useShowUserInpormationQuery();
+function categoryLabel(category, t) {
+  const labels = { beach: "beach", mountain: "mountain", desert: "agency_desert", island: "agency_island" };
+  return labels[category] ? t(labels[category]) : category;
+}
 
-  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
-    useInviteToChatMutation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  const debouncedSearch = useCallback(
-    debounce((value) => {
-      setSearchTerm(value);
-    }, 500),
-    []
+function AgencyLogo({ agency, size = "h-12 w-12" }) {
+  const [failed, setFailed] = useState(false);
+  return agency.logo_url && !failed
+    ? <img src={agency.logo_url} alt="" loading="lazy" onError={() => setFailed(true)} className={size + " shrink-0 rounded-full border border-[#e5e9e8] bg-white object-cover"} />
+    : <span className={size + " flex shrink-0 items-center justify-center rounded-full bg-[#e9eff3] text-lg font-bold text-[#34546d]"} aria-hidden="true">{(agency.agency_name || "A").charAt(0)}</span>;
+}
+
+function AgencyCover({ agency }) {
+  const [failed, setFailed] = useState(false);
+  return agency.cover_photo_url && !failed
+    ? <img src={agency.cover_photo_url} alt={agency.agency_name || ""} loading="lazy" onError={() => setFailed(true)} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    : <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#25445e] via-[#40627a] to-[#8ca5ae] text-white/45"><Building2 size={68} strokeWidth={1.1} aria-hidden="true" /></div>;
+}
+
+function ReviewSummary({ agency, onOpen, t }) {
+  const count = Number(agency.review_count) || 0;
+  const rating = Number(agency.average_rating);
+  if (count === 0) return <span className="text-sm text-[#718092]">{t("no_reviews_yet")}</span>;
+  return <button type="button" onClick={() => onOpen(agency)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#536477] hover:text-[#a36f1d]">
+    <Star size={15} className="fill-[#d49a36] text-[#d49a36]" aria-hidden="true" />
+    {Number.isFinite(rating) ? rating.toFixed(1) : "—"} <span className="font-normal text-[#718092]">({count} {count === 1 ? t("review") : t("reviews")})</span>
+  </button>;
+}
+
+function AgencyCard({ agency, isFavorite, onFavorite, onOpen, favoriteLoading, t }) {
+  const categories = Array.isArray(agency.service_categories) ? agency.service_categories : [];
+  return (
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_12px_36px_rgba(23,43,67,0.06)]">
+      <div className="relative h-52 overflow-hidden bg-[#29465e]">
+        <AgencyCover agency={agency} />
+        {agency.is_verified && <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-[#edf6f1] px-3 py-1.5 text-xs font-bold text-[#397055] shadow-sm"><BadgeCheck size={15} aria-hidden="true" /> {t("verified")}</span>}
+        <button type="button" onClick={() => onFavorite(agency.user)} disabled={favoriteLoading || !agency.user} aria-label={isFavorite ? t("remove_from_favorites") : t("add_to_favorites")} aria-pressed={isFavorite} className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#526274] shadow-sm transition-colors hover:text-[#b54450] disabled:opacity-50">
+          <Heart size={19} className={isFavorite ? "fill-[#cf5360] text-[#cf5360]" : ""} aria-hidden="true" />
+        </button>
+      </div>
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex min-w-0 items-start gap-3">
+          <AgencyLogo agency={agency} />
+          <div className="min-w-0">
+            <h3 className="break-words text-xl font-bold leading-tight text-[#172b43]">{agency.agency_name || t("unknown_agency")}</h3>
+            <div className="mt-1.5"><ReviewSummary agency={agency} onOpen={onOpen} t={t} /></div>
+          </div>
+        </div>
+        {categories.length > 0 && <div className="mt-5 flex flex-wrap gap-2" aria-label={t("our_service_category")}>{categories.map((category) => <span key={category} className="rounded-full bg-[#f1f4f5] px-3 py-1.5 text-xs font-semibold text-[#526274]">{categoryLabel(category, t)}</span>)}</div>}
+        <p className="mt-5 line-clamp-3 min-h-18 break-words text-sm leading-6 text-[#617082]">{agency.about || t("no_description")}</p>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[#edf0f2] pt-5">
+          {Number(agency.badge_count) > 0
+            ? <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#a36f1d]" aria-label={String(agency.badge_count) + " " + t("agency_badges")}><Award size={18} aria-hidden="true" /> {agency.badge_count}</span>
+            : <span />}
+          <button type="button" onClick={() => onOpen(agency)} className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d8e0e6] px-4 text-sm font-bold text-[#243b50] transition-colors hover:bg-[#f1f5f7]">{t("agency_profile")} <ArrowUpRight size={17} aria-hidden="true" /></button>
+        </div>
+      </div>
+    </article>
   );
+}
 
-  const handleSearch = (e) => {
-    debouncedSearch(e.target.value);
-  };
-  const handleOpenReviews = (plan) => {
-    setSelectedPlan(plan);
-    setShowReviewModal(true);
-  };
-
-  const handleCloseReviews = () => {
-    setShowReviewModal(false);
-    setSelectedPlan(null);
-  };
-
-  const handleFavoriteToggle = async (agencyUserId) => {
-    if (!token || !currentUserId) {
-      navigate("/login");
-      return;
-    }
-
-    const prevFavorites = [...favorites];
-    const prevAgency = [...agency];
-    const isAdding = !favorites.includes(agencyUserId);
-
-    setFavorites((prev) =>
-      isAdding
-        ? [...prev, agencyUserId]
-        : prev.filter((id) => id !== agencyUserId)
-    );
-
-    setAgency((prev) =>
-      prev.map((item) =>
-        item.user === agencyUserId
-          ? {
-              ...item,
-              favorite_users: isAdding
-                ? [...item.favorite_users, currentUserId]
-                : item.favorite_users.filter((id) => id !== currentUserId),
-            }
-          : item
-      )
-    );
-
-    try {
-      await addToFavo(agencyUserId).unwrap();
-    } catch (error) {
-      setFavorites(prevFavorites);
-      setAgency(prevAgency);
-      const errorMessage =
-        error?.data?.detail || error?.detail || t("failed_to_update_favorite");
-      toast.error(errorMessage);
-    }
-  };
-
+function AgencyDialog({ agency, onClose }) {
+  const { t, i18n } = useTranslation();
+  const dialogRef = useRef(null);
+  const categories = Array.isArray(agency.service_categories) ? agency.service_categories : [];
+  const reviews = Array.isArray(agency.received_reviews) ? agency.received_reviews : [];
   useEffect(() => {
-    if (searchTerm && SearchAgencies) {
-      setAgency(
-        SearchAgencies.map((item) => ({
-          id: item.id,
-          image:
-            item.cover_photo_url ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
-          verified: item.is_verified,
-          agency: item.agency_name || t("unknown_agency"),
-          rating: item.average_rating.toFixed(1),
-          received_reviews: item.received_reviews || [],
-          reviews: item.review_count,
-          about: item.about || t("no_description"),
-          location: "Unknown Location",
-          price: t("contact_for_pricing"),
-          logo_url: item.logo_url || "",
-          user: item.user || null,
-          favorite_users: item.favorite_users || [],
-          badge_count: item.badge_count || 0,
-          service_categories: item.service_categories || [],
-        }))
-      );
-      if (currentUserId) {
-        setFavorites(
-          SearchAgencies.filter((item) =>
-            item.favorite_users.includes(currentUserId)
-          ).map((item) => item.user)
-        );
-      }
-    } else if (AgencyAll) {
-      setAgency(
-        AgencyAll.map((item) => ({
-          id: item.id,
-          image:
-            item.cover_photo_url ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
-          verified: item.is_verified,
-          agency: item.agency_name || t("unknown_agency"),
-          rating: item.average_rating.toFixed(1),
-          reviews: item.review_count,
-          received_reviews: item.received_reviews || [],
-          about: item.about || t("no_description"),
-          location: "Unknown Location",
-          price: t("contact_for_pricing"),
-          logo_url: item.logo_url || "",
-          user: item.user || null,
-          favorite_users: item.favorite_users || [],
-          badge_count: item.badge_count || 0,
-          service_categories: item.service_categories || [],
-        }))
-      );
-      if (currentUserId) {
-        setFavorites(
-          AgencyAll.filter((item) =>
-            item.favorite_users.includes(currentUserId)
-          ).map((item) => item.user)
-        );
-      }
-    }
-  }, [AgencyAll, SearchAgencies, searchTerm, currentUserId, t]);
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
 
+  return (
+    <dialog ref={dialogRef} onClose={onClose} onClick={(event) => { if (event.target === dialogRef.current) dialogRef.current.close(); }} aria-labelledby={"agency-dialog-title-" + agency.id} className="m-auto max-h-[90vh] w-[calc(100%-32px)] max-w-3xl overflow-y-auto rounded-[24px] border border-[#e9e6e0] bg-white p-0 text-[#172b43] shadow-[0_30px_90px_rgba(16,36,58,0.25)] backdrop:bg-[#10243a]/70">
+      <div className="relative h-48 overflow-hidden bg-[#29465e] sm:h-56"><AgencyCover agency={agency} /><button type="button" onClick={() => dialogRef.current?.close()} aria-label={t("close")} className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#243b50] shadow-sm"><X size={20} aria-hidden="true" /></button></div>
+      <div className="p-6 sm:p-8">
+        <div className="flex min-w-0 items-start gap-4"><AgencyLogo agency={agency} size="h-14 w-14" /><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#a36f1d]">{t("agency_profile")}</p><h2 id={"agency-dialog-title-" + agency.id} className="mt-1 break-words text-2xl font-bold leading-tight sm:text-3xl">{agency.agency_name || t("unknown_agency")}</h2></div></div>
+        <div className="mt-5 flex flex-wrap items-center gap-4">{agency.is_verified && <span className="inline-flex items-center gap-1.5 rounded-full bg-[#edf6f1] px-3 py-1.5 text-xs font-bold text-[#397055]"><BadgeCheck size={15} aria-hidden="true" /> {t("verified")}</span>}<ReviewSummary agency={agency} onOpen={() => document.getElementById("agency-reviews")?.scrollIntoView({ behavior: "smooth", block: "nearest" })} t={t} />{Number(agency.badge_count) > 0 && <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#a36f1d]"><Award size={17} aria-hidden="true" /> {agency.badge_count} {t("agency_badges")}</span>}</div>
+        <div className="mt-7 border-t border-[#edf0f2] pt-6"><h3 className="text-lg font-bold">{t("about")}</h3><p className="mt-3 whitespace-pre-line break-words text-sm leading-7 text-[#586879] sm:text-base">{agency.about || t("no_description")}</p></div>
+        {categories.length > 0 && <div className="mt-7"><h3 className="text-lg font-bold">{t("our_service_category")}</h3><div className="mt-3 flex flex-wrap gap-2">{categories.map((category) => <span key={category} className="rounded-full bg-[#f1f4f5] px-3 py-1.5 text-sm font-semibold text-[#526274]">{categoryLabel(category, t)}</span>)}</div></div>}
+        <div id="agency-reviews" className="mt-7 border-t border-[#edf0f2] pt-6"><h3 className="text-lg font-bold">{t("reviews")} ({Number(agency.review_count) || 0})</h3>{reviews.length === 0 ? <p className="mt-3 text-sm text-[#718092]">{t("no_reviews_yet")}</p> : <div className="mt-4 space-y-3">{reviews.map((review, index) => <div key={review.id || index} className="rounded-xl bg-[#f8fafb] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><p className="font-bold text-[#243b50]">{review.tourist_first_name || t("anonymous")}</p><span className="inline-flex items-center gap-1 text-sm font-semibold text-[#a36f1d]"><Star size={15} className="fill-[#d49a36] text-[#d49a36]" aria-hidden="true" /> {Number(review.rating || 0).toFixed(1)}</span></div><p className="mt-2 text-sm leading-6 text-[#586879]">{review.comment?.trim() || t("no_comment_provided")}</p>{review.created_at && <p className="mt-2 text-xs text-[#8793a0]">{new Date(review.created_at).toLocaleDateString(i18n.language === "ru" ? "ru-RU" : "ro-RO")}</p>}</div>)}</div>}</div>
+      </div>
+    </dialog>
+  );
+}
+
+function Membership() {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("access_token");
+  const currentUserId = Number(localStorage.getItem("user_id")) || null;
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [selectedAgency, setSelectedAgency] = useState(null);
+  const { data: allData, isLoading, isError, refetch } = useGetAllAgencyQuery();
+  const { data: topData } = useGetTopAgencyQuery();
+  const { currentData: searchedData } = useSearchAgencyQuery(debouncedSearch, { skip: !debouncedSearch });
+  const [toggleFavorite, { isLoading: favoriteLoading }] = useAddToFavoritMutation();
+  const allAgencies = asList(allData);
+  const topAgencies = asList(topData);
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => { document.title = "TreiOferte | " + t("certified_agencies_title"); }, [i18n.language, t]);
+  useEffect(() => { const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 350); return () => window.clearTimeout(timer); }, [search]);
   useEffect(() => {
-    if (TopAgencies) {
-      setTopAgency(
-        TopAgencies.map((item, index) => ({
-          name: item.agency_name || t("unknown_agency"),
-          rating: item.average_rating.toFixed(1),
-          reviews: item.review_count,
-          received_reviews: item.received_reviews || [],
-          color: `bg-gradient-to-br from-${
-            ["purple-500", "blue-500", "green-500", "pink-500"][index % 4]
-          } to-${
-            ["pink-500", "green-500", "purple-500", "blue-500"][index % 4]
-          }`,
-          logo_url: item.logo_url || "",
-        }))
-      );
-    }
-  }, [TopAgencies, t]);
+    if (!currentUserId) return;
+    setFavoriteIds(allAgencies.filter((agency) => Array.isArray(agency.favorite_users) && agency.favorite_users.includes(currentUserId)).map((agency) => agency.user));
+  }, [allData, currentUserId]);
 
-  const handleMessage = async (data) => {
-    const role = localStorage.getItem("role");
-    if (role) {
-      try {
-        await invite(data);
-        navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
-      } catch (error) {
-        console.log(error, "invite to message");
-      }
+  const categories = useMemo(() => [...new Set(allAgencies.flatMap((agency) => Array.isArray(agency.service_categories) ? agency.service_categories : []))], [allData]);
+  const agencies = useMemo(() => {
+    const source = debouncedSearch && debouncedSearch === search.trim() && searchedData ? asList(searchedData) : allAgencies;
+    const query = search.trim().toLocaleLowerCase();
+    return source.filter((agency) => (!query || String(agency.agency_name || "").toLocaleLowerCase().includes(query)) && (!category || agency.service_categories?.includes(category)));
+  }, [allData, searchedData, debouncedSearch, search, category]);
+  const hasFilters = Boolean(search || category);
+  const clearFilters = () => { setSearch(""); setDebouncedSearch(""); setCategory(""); };
+
+  const handleFavorite = async (agencyUserId) => {
+    if (!token || !currentUserId) { navigate("/autentificare", { state: { from: "/agentii-verificate" } }); return; }
+    if (!agencyUserId) return;
+    const wasFavorite = favoriteIds.includes(agencyUserId);
+    setFavoriteIds((ids) => wasFavorite ? ids.filter((id) => id !== agencyUserId) : [...ids, agencyUserId]);
+    try { await toggleFavorite(agencyUserId).unwrap(); }
+    catch (error) {
+      setFavoriteIds((ids) => wasFavorite ? [...ids, agencyUserId] : ids.filter((id) => id !== agencyUserId));
+      toast.error(error?.data?.detail || t("failed_to_update_favorite"));
     }
   };
 
   return (
-    <div className="flex flex-col sm:flex-row bg-gray-50 px-4 sm:px-10 pb-16 font-roboto pt-16">
-       <Helmet>
-        <title>treioferte.md | agenzie-certificate</title>
-      </Helmet>
-      <div className="w-full sm:w-4/5 p-4 sm:p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold sm:font-medium text-gray-600 mb-3 sm:mb-5">
-            {t("search_for_tour_planner")}
-          </h1>
-          <p className="text-gray-500 text-sm sm:text-base font-medium">
-            {t("all_posted_tour_plans")}
-          </p>
+    <main className="certified-agencies-page min-h-screen bg-[#faf9f6] pt-[72px] text-[#172b43] xl:pt-[82px]">
+      <section className="bg-[#172b43] px-5 pb-24 pt-14 text-white sm:px-8 sm:pb-28 sm:pt-20 lg:px-10">
+        <div className="mx-auto max-w-7xl"><div className="mb-5 h-1 w-12 rounded-full bg-[#d6a044]" /><h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">{t("certified_agencies_title")}</h1><p className="mt-4 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">{t("certified_agencies_intro")}</p></div>
+      </section>
+      <div className="relative mx-auto -mt-10 max-w-7xl px-5 pb-20 sm:px-8 lg:px-10">
+        <div className="grid gap-4 rounded-[22px] border border-[#e9e6e0] bg-white p-4 shadow-[0_16px_48px_rgba(23,43,67,0.1)] sm:p-5 md:grid-cols-[minmax(0,1fr)_250px]">
+          <label className="relative block min-w-0"><span className="sr-only">{t("search_by_agency_name")}</span><Search size={20} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8997a5]" aria-hidden="true" /><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("search_by_agency_name")} className="h-12 w-full rounded-xl border border-[#dce2e8] bg-[#fafbfc] pl-12 pr-4 text-[#24364b] placeholder:text-[#8997a5] focus:border-[#bd8525] focus:outline-none focus:ring-2 focus:ring-[#e5ad42]/20" /></label>
+          <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label={t("our_service_category")} className="h-12 w-full min-w-0 rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 text-[#24364b] focus:border-[#bd8525] focus:outline-none focus:ring-2 focus:ring-[#e5ad42]/20"><option value="">{t("agency_all_categories")}</option>{categories.map((item) => <option key={item} value={item}>{categoryLabel(item, t)}</option>)}</select>
         </div>
-
-        <div className="relative mb-6 sm:mb-8 w-full sm:w-96">
-          <div className="flex">
-            <input
-              type="text"
-              placeholder={t("search_placeholder")}
-              onChange={handleSearch}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#C2851C] focus:border-transparent text-sm sm:text-base"
-              aria-label={t("search_tour_plans")}
-            />
-            <button
-              className="px-4 sm:px-5 py-2 sm:py-3 bg-[#DD9E2C] hover:bg-[#C2851C] cursor-pointer text-white rounded-r-lg transition-colors"
-              aria-label={t("search")}
-            >
-              <Search className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-          </div>
-        </div>
-
-        {isAgencyDataLoading || isSearchLoading ? (
-          <div className="text-center text-gray-600">
-            <FullScreenInfinityLoader />
-          </div>
-        ) : agency.length === 0 ? (
-          <div className="text-center text-gray-600 h-full">
-            <div className="min-h-[400px]">{t("no_tour_plans_available")}</div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {agency.map((plan) => (
-              <div
-                key={plan.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col sm:flex-row"
-              >
-                <div className="w-full sm:w-72 h-48 sm:h-60 relative">
-                  <img
-                    src={
-                      plan.image ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                    }
-                    alt={`${plan.agency} tour`}
-                    className="w-full h-full object-cover"
-                  />
-                  {plan.verified && (
-                    <div className="absolute top-3 right-2 bg-black/50 text-white px-2 py-1 text-sm sm:text-base font-medium flex items-center space-x-2 rounded-full">
-                      <span>{t("verified")}</span>
-                      <VscVerifiedFilled size={20} className="text-green-500" />
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleFavoriteToggle(plan.user)}
-                    className="bg-gray-300 rounded-full absolute bottom-3 right-2 p-1 hover:bg-gray-400 transition-colors hover:cursor-pointer"
-                    aria-label={
-                      favorites.includes(plan.user)
-                        ? t("remove_from_favorites")
-                        : t("add_to_favorites")
-                    }
-                    disabled={isAddFevLoading}
-                  >
-                    <FaHeart
-                      className={`${
-                        favorites.includes(plan.user)
-                          ? "text-red-500"
-                          : "text-gray-600"
-                      } pt-[1px]`}
-                      size={18}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex-1 p-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
-                    <div className="flex items-center space-x-3 mb-3 sm:mb-0">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full overflow-hidden">
-                          <img
-                            className=""
-                            src={
-                              plan.logo_url ||
-                              "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                            }
-                            alt="logo"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg sm:text-xl text-gray-800">
-                          {plan.agency}
-                        </h3>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm text-gray-600 font-medium">
-                            {plan.rating}
-                          </span>
-                          <span
-                            onClick={() => handleOpenReviews(plan)}
-                            className="text-xs text-[#DD9E2C] underline font-medium cursor-pointer"
-                          >
-                            ({plan.reviews} {t("reviews")})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {plan.badge_count > 0 && (
-                      <div className="relative">
-                        <RiAwardLine size={40} className="text-[#DD9E2C]" />
-                        <h1 className="absolute top-[3px] left-[15px] font-bold">
-                          {plan.badge_count}
-                        </h1>
-                      </div>
-                    )}
-                  </div>
-                  <div className="pb-2">
-                    <h1 className="text-2xl font-semibold text-black">
-                      {t("our_service_category")}
-                    </h1>
-                    {plan?.service_categories?.length > 0 ? (
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {plan.service_categories.map((category, index) => (
-                          <span
-                            key={index}
-                            className="text-gray-700 text-sm bg-gray-100 px-2 py-1 rounded"
-                          >
-                            {category === "beach"
-                              ? "Mare"
-                              : category === "mountain"
-                              ? "Montagna"
-                              : category === "desert"
-                              ? "Relax"
-                              : category === "island"
-                              ? "Gruppi"
-                              : category}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span></span>
-                    )}
-                  </div>
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-gray-800 mb-2 text-base">
-                      {t("about")}
-                    </h4>
-                    <p className="text-gray-600 font-medium text-sm leading-relaxed line-clamp-3">
-                      {plan.about}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <section className="pt-10" aria-live="polite">
+          <div className="mb-6 flex flex-wrap items-center gap-3"><h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("agencies")}</h2>{!isLoading && !isError && <span className="rounded-full bg-[#f4e5c8] px-3 py-1 text-sm font-bold text-[#875f1d]">{agencies.length}</span>}{hasFilters && <button type="button" onClick={clearFilters} className="ml-auto inline-flex items-center gap-2 text-sm font-bold text-[#a36f1d] hover:text-[#7e5416]"><RotateCcw size={16} aria-hidden="true" /> {t("reset")}</button>}</div>
+          {isLoading ? <div className="grid gap-5 md:grid-cols-2">{[0, 1, 2, 3].map((index) => <div key={index} className="h-[455px] animate-pulse rounded-[22px] bg-[#e8ecee]" />)}</div>
+            : isError ? <div className="flex min-h-[360px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center"><Compass size={48} className="text-[#b98427]" strokeWidth={1.5} aria-hidden="true" /><h3 className="mt-5 text-xl font-bold">{t("something_went_wrong")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{t("agency_load_error")}</p><button type="button" onClick={refetch} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#c88f2a] px-5 font-bold text-white hover:bg-[#ad751c]"><RotateCcw size={17} aria-hidden="true" /> {t("try_again")}</button></div>
+              : agencies.length === 0 ? <div className="flex min-h-[390px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center shadow-[0_10px_35px_rgba(23,43,67,0.04)]"><div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#fff4dd] text-[#b98427]"><Building2 size={32} strokeWidth={1.5} aria-hidden="true" /></div><h3 className="mt-6 text-2xl font-bold">{hasFilters ? t("agency_no_matches") : t("agency_no_results")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{hasFilters ? t("agency_no_matches_description") : t("agency_empty_description")}</p>{hasFilters && <button type="button" onClick={clearFilters} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#c88f2a] px-6 font-bold text-white hover:bg-[#ad751c]"><RotateCcw size={17} aria-hidden="true" /> {t("reset")}</button>}</div>
+                : <div className="grid gap-5 md:grid-cols-2">{agencies.map((agency) => <AgencyCard key={agency.id} agency={agency} isFavorite={favoriteIds.includes(agency.user)} onFavorite={handleFavorite} onOpen={setSelectedAgency} favoriteLoading={favoriteLoading} t={t} />)}</div>}
+        </section>
+        {topAgencies.length > 0 && <section className="pt-20"><div className="mb-7 h-1 w-12 rounded-full bg-[#d6a044]" /><h2 className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">{t("top_agencies")}</h2><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{topAgencies.map((agency) => <button key={agency.id} type="button" onClick={() => setSelectedAgency(agency)} className="flex min-w-0 items-center gap-4 rounded-[20px] border border-[#e9e6e0] bg-white p-5 text-left shadow-[0_10px_35px_rgba(23,43,67,0.04)] hover:border-[#d5ad63]"><AgencyLogo agency={agency} /><span className="min-w-0"><span className="block break-words font-bold text-[#172b43]">{agency.agency_name}</span><span className="mt-1 block text-sm text-[#718092]">{Number(agency.review_count) || 0} {t("reviews")}</span></span><ArrowUpRight size={17} className="ml-auto shrink-0 text-[#b98427]" aria-hidden="true" /></button>)}</div></section>}
       </div>
-
-      <div className="w-full sm:w-1/5 bg-white border border-gray-200 p-4 sm:p-6 sm:ml-5 sm:mt-20 rounded-xl lg:mt-52">
-        <h2 className="font-semibold text-gray-800 mb-6 text-center text-lg sm:text-xl">
-          {t("top_agencies")}
-        </h2>
-        {isTopAgencyLoading ? (
-          <div className="text-center text-gray-600">
-            <FullScreenInfinityLoader />
-          </div>
-        ) : topAgencie.length === 0 ? (
-          <div className="text-center text-gray-600">
-            {t("no_top_agencies_available")}
-          </div>
-        ) : (
-          <div className="space-y-5">
-            {topAgencie.map((agency, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 ${agency.color} rounded-full flex items-center justify-center flex-shrink-0`}
-                >
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
-                    <img className="" src={agency.logo_url || ""} alt="logo" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-800 text-sm sm:text-base truncate">
-                    {agency.name}
-                  </h4>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-xs text-gray-600 font-medium">
-                      {agency.rating}
-                    </span>
-                    <span
-                      onClick={() => handleOpenReviews(agency)}
-                      className="text-xs text-[#DD9E2C] underline font-medium cursor-pointer"
-                    >
-                      ({agency.reviews} {t("reviews")})
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      {showReviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg sm:max-w-xl rounded-2xl shadow-2xl p-6 sm:px-8 relative max-h-[90vh] overflow-hidden">
-            {/* Close Button */}
-            <button
-              onClick={handleCloseReviews}
-              className="absolute top-4  text-gray-500 hover:text-gray-800 transition-colors text-xl font-bold"
-              aria-label="Close"
-            >
-              <X className="w-6 h-6 text-gray-600 " />
-            </button>
-
-            {/* Header */}
-            {/* <h2 className="text-2xl font-bold text-gray-800 mb-6 pr-10">
-        {selectedPlan?.agency || selectedPlan?.name} – {t("reviews")}
-        <span className="text-gray-500 text-lg ml-2">
-          ({selectedPlan?.reviews || 0})
-        </span>
-      </h2> */}
-
-            {/* Reviews List */}
-            {selectedPlan?.received_reviews?.length > 0 ? (
-              <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mt-5">
-                {selectedPlan.received_reviews.map((review, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-xl p-5 bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-start gap-4">
-                      {/* Tourist Image */}
-                      <img
-                        src={
-                          review.tourist_image ||
-                          "https://ui-avatars.com/api/?name=" +
-                            (review.tourist_first_name || "User") +
-                            "&background=random"
-                        }
-                        alt={review.tourist_first_name}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
-                        onError={(e) => {
-                          e.target.src =
-                            "https://ui-avatars.com/api/?name=User&background=random";
-                        }}
-                      />
-
-                      <div className="flex-1 min-w-0">
-                        {/* Name + Rating */}
-                        <div className="flex items-center justify-between mb-1.5">
-                          <p className="font-semibold text-gray-800 text-base">
-                            {review.tourist_first_name || "Anonymous"}
-                          </p>
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < Math.floor(review.rating)
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            ))}
-                            <span className="text-sm font-medium text-gray-600 ml-1">
-                              {review.rating.toFixed(1)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Comment */}
-                        <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                          {review.comment?.trim() || t("no_comment_provided")}
-                        </p>
-
-                        {/* Date */}
-                        <p className="text-xs text-gray-500">
-                          {new Date(review.created_at).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-gray-500">
-                <p className="text-lg font-medium">{t("no_reviews_yet")}</p>
-                <p className="text-sm mt-2">{t("be_the_first_to_review")}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <ToastContainer />
-    </div>
+      {selectedAgency && <AgencyDialog agency={selectedAgency} onClose={() => setSelectedAgency(null)} />}
+      <ToastContainer position="top-right" autoClose={5000} />
+    </main>
   );
-};
+}
 
 export default Membership;

@@ -4,20 +4,23 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useShowBlogPostQuery } from "@/redux/features/withAuth";
 import { format } from "date-fns";
-import { Helmet } from "react-helmet-async";
+import { ro, ru } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n.js";
+
 
 const formatDate = (dateString) => {
   try {
-    return format(new Date(dateString), "MMMM d, yyyy");
+    return format(new Date(dateString), "PPP", { locale: i18n.language === "ro" ? ro : ru });
   } catch (error) {
-    return "Date not available";
+    return i18n.t("date_unavailable");
   }
 };
 
 export default function BlogDetails() {
-  const { id } = useParams();
-  console.log("URL param (slug):", id);
-  const slug = id;
+  const { t, i18n } = useTranslation();
+  const { slug } = useParams();
+  console.log("URL param (slug):", slug);
   const {
     data: posts = [],
     isLoading,
@@ -25,7 +28,11 @@ export default function BlogDetails() {
     error,
   } = useShowBlogPostQuery();
 
-  const post = posts.find((p) => p.slug === id);
+  const post = posts.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    document.title = `TreiOferte | ${post?.title || t("blog")}`;
+  }, [post?.title, t, i18n.language]);
 
   console.log("Total posts loaded:", posts.length);
   console.log("Found post:", post ? post.title : "Not found");
@@ -37,7 +44,7 @@ export default function BlogDetails() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl text-gray-600">Loading blog post...</div>
+        <div className="text-xl text-gray-600">{t("loading_blog_post")}</div>
       </div>
     );
   }
@@ -46,11 +53,11 @@ export default function BlogDetails() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
         <h1 className="text-4xl font-bold text-red-600 mb-4">
-          Error Loading Post
+          {t("error_loading_post")}
         </h1>
         <p className="text-gray-600">
           {error?.data?.message ||
-            "Something went wrong while fetching the blog post."}
+            t("blog_fetch_error")}
         </p>
       </div>
     );
@@ -59,11 +66,11 @@ export default function BlogDetails() {
   if (!post) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-24 text-center h-screen">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Post Not Found</h1>
+        <h1 className="text-4xl font-bold text-red-600 mb-4">{t("post_not_found")}</h1>
         <p className="text-gray-600">
-          No blog post found with slug: <strong>{id}</strong>
+          {t("post_slug_not_found")} <strong>{slug}</strong>
           <br />
-          Please check the URL or try another post.
+          {t("check_post_url")}
         </p>
       </div>
     );
@@ -71,9 +78,6 @@ export default function BlogDetails() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 font-sans pt-24 ">
-      <Helmet>
-        <title>{`treioferte.md | blog | ${post?.slug || ""}`}</title>
-      </Helmet>
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
           {post.title}
@@ -98,7 +102,7 @@ export default function BlogDetails() {
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         ) : (
           <p className="text-gray-500 italic">
-            {post.introductory_description || "No content available."}
+            {post.introductory_description || t("no_content")}
           </p>
         )}
       </article>
@@ -106,7 +110,7 @@ export default function BlogDetails() {
       {post.author && (
         <div className="mt-16 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-600">
-            <strong>Written by:</strong> {post.author}
+            <strong>{t("written_by")}</strong> {post.author}
           </p>
         </div>
       )}

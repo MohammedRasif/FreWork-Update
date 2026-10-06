@@ -29,7 +29,9 @@ import { X } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { FaClock } from "react-icons/fa6";
-import { Helmet } from "react-helmet-async";
+import i18n from "../../../i18n.js";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
+
 
 const token = localStorage.getItem("access_token");
 const currentUserId = localStorage.getItem("user_id");
@@ -109,7 +111,7 @@ function PublishedPlan() {
 
   const handleLike = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_like"));
       return;
     }
@@ -132,7 +134,7 @@ function PublishedPlan() {
   const handleMessage = async (data) => {
     const role = localStorage.getItem("role");
     if (!role) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_message"));
       return;
     }
@@ -140,7 +142,7 @@ function PublishedPlan() {
     try {
       await invite({ ...data, other_user_id: data.other_user_id }).unwrap();
       toast.success(t("chat_invitation_sent"));
-      navigate(role === "tourist" ? "/user/chat" : "/admin/chat");
+      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
     } catch (error) {
       console.error("Invite to chat error:", error);
       toast.error(error?.data?.detail || t("failed_send_invitation"));
@@ -149,14 +151,14 @@ function PublishedPlan() {
 
   const handleShare = async (tourId) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_share"));
       return;
     }
 
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:5173/post?postid=${tourId}`
+        `${window.location.origin}/cereri/${tourId}`
       );
       toast.success(t("post_link_copied"));
 
@@ -189,7 +191,7 @@ function PublishedPlan() {
 
   const handleSubmitOffer = async (tourId, budget, comment) => {
     if (!token) {
-      navigate("/login");
+      navigate("/autentificare");
       toast.error(t("login_to_submit_offer"));
       return;
     }
@@ -285,8 +287,8 @@ function PublishedPlan() {
 
   if (!publishedPlans.length)
     return (
-      <div className="w-full rounded-xl p-4 flex justify-center items-center">
-        <p className="text-[#70798F] text-base sm:text-lg">
+      <div className="flex min-h-56 w-full items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+        <p className="text-base font-semibold text-[#172b43]">
           {t("no_published_plans")}
         </p>
       </div>
@@ -308,22 +310,19 @@ function PublishedPlan() {
   };
 
   return (
-    <div className="min-h-screen">
-      <Helmet>
-        <title>treioferte.md | user | richieste-pubblicate</title>
-      </Helmet>
+    <div className="min-w-0">
       <Toaster />
       <div className="flex flex-col">
-        <div className="flex-1 flex flex-col gap-3">
+        <div className="flex-1 flex flex-col gap-5">
           {publishedPlans.map((plan) => {
             const { likeCount, shareCount } = getInteractionCounts(plan);
             return (
-              <div key={plan.id}>
-                <div className="bg-white rounded-t-lg border-x border-t border-gray-200">
+              <article key={plan.id} className="overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]">
+                <div className="bg-white">
                   <div className="p-4 sm:p-6 pb-4">
                     <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
                       <div>
-                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                        <h2 className="mb-2 text-xl font-bold tracking-tight text-[#172b43] sm:text-2xl">
                           {t("tour_from_to", {
                             from: plan.location_from,
                             to: plan.location_to,
@@ -334,7 +333,7 @@ function PublishedPlan() {
                             {t("willing_to_go")}{" "}
                             <span className="font-medium">
                               {new Date(plan.start_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                i18n.language === "ro" ? "ro-RO" : "ru-RU",
                                 { day: "numeric", month: "long", year: "numeric" }
                               )}
                             </span>
@@ -354,12 +353,12 @@ function PublishedPlan() {
                                 : "N/A"}
                             </span>
                           </p> */}
-                          
+
                         </div>
                       </div>
                       <div className="flex items-center relative mt-4 sm:mt-0">
                         <div>
-                          <p className="text-base sm:text-lg font-bold text-gray-700">
+                          <p className="text-base font-bold text-[#172b43] sm:text-lg">
                             {t("budget")} €{plan.budget}
                           </p>
                           {/* <p className="text-xs sm:text-md text-gray-800">
@@ -384,7 +383,7 @@ function PublishedPlan() {
                         {isDropdownOpen && (
                           <div
                             ref={dropdownRef}
-                            className="absolute right-0 top-8 bg-gray-100 shadow-lg rounded-md py-2 w-40 z-10 animate-dropdown"
+                            className="absolute right-0 top-8 z-10 w-40 animate-dropdown rounded-xl border border-[#e9e6e0] bg-white py-2 shadow-lg"
                           >
                             <button
                               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:cursor-pointer hover:bg-white"
@@ -430,23 +429,21 @@ function PublishedPlan() {
                     </div>
                   </div>
                   <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
-                    <div className="rounded-lg overflow-hidden relative">
+                    <div className="relative overflow-hidden rounded-[16px] bg-[#f4eee4]">
                       <img
-                        src={
-                          plan.spot_picture_url ||
-                          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                        }
+                        src={plan.spot_picture_url || PlanImage1}
+                        onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                         alt={t("tour_destination")}
-                        className="w-full h-64 sm:h-96 object-cover"
+                        className="h-52 w-full object-cover sm:h-72"
                       />
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-b-lg border-x border-b border-gray-200">
+                <div className="border-t border-[#f0eee9] bg-white">
                   <div className="px-4 sm:px-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 pt-3 flex items-center space-x-2">
+                        <h3 className="flex items-center space-x-2 pt-3 text-lg font-bold text-[#172b43] sm:text-xl">
                           <GoArrowLeft />
                           <p>{t("all_offers")}</p>
                         </h3>
@@ -468,19 +465,19 @@ function PublishedPlan() {
                         return (
                           <div
                             key={offer.id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-4 rounded-lg"
+                            className="flex flex-col items-start justify-between gap-3 rounded-xl border border-[#f0eee9] bg-[#faf9f6] px-3 py-3 sm:flex-row sm:items-center sm:px-4"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
-                             <button className="cursor-pointer"  onClick={() =>
-                                  handleResponseClick(offer, offer.agency.user)
-                                }> <img
-                                src={
-                                  offer.agency.logo_url ||
-                                  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                                }
-                                alt={t("agency_avatar", { name: offer.company })}
-                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                              /></button>
+                              <button className="cursor-pointer" onClick={() =>
+                                handleResponseClick(offer, offer.agency.user)
+                              }> <img
+                                  src={
+                                    offer.agency.logo_url ||
+                                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
+                                  }
+                                  alt={t("agency_avatar", { name: offer.company })}
+                                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
+                                /></button>
                               <div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-gray-900 text-xs sm:text-sm">
@@ -537,13 +534,13 @@ function PublishedPlan() {
                               >
                                 {t("response")}
                               </button> */}
-                              <Link to={`/user/chat/${offer.room_id}`}>
-                              <button
-                                
-                                className="px-3 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] text-white text-xs sm:text-md rounded-md  transition-colors cursor-pointer"
-                              >
-                                {t("response")}
-                              </button>
+                              <Link to={`/cont/mesaje/${offer.room_id}`}>
+                                <button
+
+                                  className="min-h-10 cursor-pointer rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
+                                >
+                                  {t("response")}
+                                </button>
                               </Link>
                             </div>
                           </div>
@@ -557,7 +554,7 @@ function PublishedPlan() {
                     <div className="border-t border-gray-200 my-4"></div>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -595,7 +592,7 @@ function PublishedPlan() {
                             {t("willing_to_go")}{" "}
                             <span className="font-medium">
                               {new Date(selectedTour.start_date).toLocaleDateString(
-                                i18n.language === "it" ? "it-IT" : "en-GB",
+                                i18n.language === "ro" ? "ro-RO" : "ru-RU",
                                 { day: "numeric", month: "long", year: "numeric" }
                               )}
                             </span>
@@ -649,7 +646,7 @@ function PublishedPlan() {
                                 {location.trim()}
                                 {index <
                                   selectedTour.tourist_spots.split(",").length -
-                                    1 && ", "}
+                                  1 && ", "}
                               </span>
                             ))
                         ) : (
@@ -695,16 +692,14 @@ function PublishedPlan() {
                         <button
                           onClick={() => handleLike(selectedTour.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                            isLiked[selectedTour.id]
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${isLiked[selectedTour.id]
                               ? "text-[#DD9E2C]"
                               : "text-gray-600"
-                          } hover:text-[#DD9E2C] cursor-pointer transition-colors`}
+                            } hover:text-[#DD9E2C] cursor-pointer transition-colors`}
                         >
                           <ThumbsUp
-                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                              isLiked[selectedTour.id] ? "fill-current" : ""
-                            }`}
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${isLiked[selectedTour.id] ? "fill-current" : ""
+                              }`}
                           />
                           <span>
                             {isLiked[selectedTour.id] ? t("unlike") : t("like")}
@@ -720,16 +715,14 @@ function PublishedPlan() {
                         <button
                           onClick={() => handleShare(selectedTour.id)}
                           disabled={isInteractLoading}
-                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                            isShared[selectedTour.id]
+                          className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${isShared[selectedTour.id]
                               ? "text-[#DD9E2C]"
                               : "text-gray-600"
-                          } hover:text-[#C2851C] cursor-pointer transition-colors`}
+                            } hover:text-[#C2851C] cursor-pointer transition-colors`}
                         >
                           <Share2
-                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                              isShared[selectedTour.id] ? "fill-current" : ""
-                            }`}
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${isShared[selectedTour.id] ? "fill-current" : ""
+                              }`}
                           />
                           <span>
                             {isShared[selectedTour.id] ? t("unshare") : t("share")}
@@ -775,11 +768,10 @@ function PublishedPlan() {
                                 offerComment
                               )
                             }
-                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-2 sm:gap-3 justify-center ${
-                              offerBudget && offerComment.trim()
+                            className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-2 sm:gap-3 justify-center ${offerBudget && offerComment.trim()
                                 ? "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
+                              }`}
                             disabled={!offerBudget || !offerComment.trim()}
                           >
                             <IoIosSend size={20} />
@@ -1027,65 +1019,64 @@ function PublishedPlan() {
                         <div className="text-gray-600 text-xs sm:text-sm">
                           {showResponseData?.recent_reviews?.length
                             ? showResponseData.recent_reviews.map(
-                                (review, index) => (
-                                  <div
-                                    key={index}
-                                    className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white rounded-lg shadow-md border border-pink-200"
-                                  >
-                                    <div className="flex items-center gap-3 sm:gap-4">
-                                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-base sm:text-lg">
-                                        {review.tourist_name
-                                          .charAt(0)
-                                          .toUpperCase()}
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center justify-between">
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-base sm:text-lg text-gray-800">
-                                              {
-                                                review.tourist_name.split(
-                                                  "@"
-                                                )[0]
-                                              }
-                                            </span>
-                                            <div className="flex">
-                                              {Array.from(
-                                                { length: 5 },
-                                                (_, i) => (
-                                                  <svg
-                                                    key={i}
-                                                    className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                                                      i < review.rating
-                                                        ? "text-yellow-400"
-                                                        : "text-gray-300"
-                                                    }`}
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                  >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.357 2.44a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.357-2.44a1 1 0 00-1.175 0l-3.357 2.44c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.31 9.397c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.97z" />
-                                                  </svg>
-                                                )
-                                              )}
-                                            </div>
-                                          </div>
-                                          <span className="text-xs sm:text-sm text-gray-500 italic">
-                                            {new Date(
-                                              review.created_at
-                                            ).toLocaleDateString(i18n.language === 'it' ? 'it-IT' : 'en-GB', {
-                                              day: "numeric",
-                                              month: "long",
-                                              year: "numeric",
-                                            })}
+                              (review, index) => (
+                                <div
+                                  key={index}
+                                  className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white rounded-lg shadow-md border border-pink-200"
+                                >
+                                  <div className="flex items-center gap-3 sm:gap-4">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-base sm:text-lg">
+                                      {review.tourist_name
+                                        .charAt(0)
+                                        .toUpperCase()}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-semibold text-base sm:text-lg text-gray-800">
+                                            {
+                                              review.tourist_name.split(
+                                                "@"
+                                              )[0]
+                                            }
                                           </span>
+                                          <div className="flex">
+                                            {Array.from(
+                                              { length: 5 },
+                                              (_, i) => (
+                                                <svg
+                                                  key={i}
+                                                  className={`w-4 h-4 sm:w-5 sm:h-5 ${i < review.rating
+                                                      ? "text-yellow-400"
+                                                      : "text-gray-300"
+                                                    }`}
+                                                  fill="currentColor"
+                                                  viewBox="0 0 20 20"
+                                                >
+                                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.357 2.44a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.357-2.44a1 1 0 00-1.175 0l-3.357 2.44c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.31 9.397c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.97z" />
+                                                </svg>
+                                              )
+                                            )}
+                                          </div>
                                         </div>
-                                        <p className="text-xs sm:text-base text-gray-600 mt-2">
-                                          {review.comment}
-                                        </p>
+                                        <span className="text-xs sm:text-sm text-gray-500 italic">
+                                          {new Date(
+                                            review.created_at
+                                          ).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
+                                            day: "numeric",
+                                            month: "long",
+                                            year: "numeric",
+                                          })}
+                                        </span>
                                       </div>
+                                      <p className="text-xs sm:text-base text-gray-600 mt-2">
+                                        {review.comment}
+                                      </p>
                                     </div>
                                   </div>
-                                )
+                                </div>
                               )
+                            )
                             : t("no_reviews_available")}
                         </div>
                       </div>

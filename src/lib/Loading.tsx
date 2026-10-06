@@ -1,6 +1,9 @@
 "use client";
+import { useTranslation } from "react-i18next";
+
 
 export default function FullScreenInfinityLoader() {
+  const { t } = useTranslation();
   return (
     <div className="h-full w-full flex items-center justify-center relative overflow-hidden">
       {/* Background particles */}
@@ -130,7 +133,7 @@ export default function FullScreenInfinityLoader() {
       {/* Optional loading text */}
       <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
         <div className="text-black text-xl font-light tracking-wider animate-pulse">
-          Loading...
+          {t("loading")}
         </div>
       </div>
     </div>

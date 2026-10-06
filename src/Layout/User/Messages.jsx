@@ -22,6 +22,8 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import i18n from "../../../i18n.js";
+
 
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
@@ -100,9 +102,9 @@ function Messages() {
     if (!agency && id && chatList && !isChatListLoading) {
       const currentChat = chatList.find((chat) => chat.id?.toString() === id);
       if (currentChat) {
-        const basePath = location.pathname.includes("/admin/")
-          ? "/admin/chat"
-          : "/user/chat";
+        const basePath = location.pathname.includes("/agentie/")
+          ? "/agentie/mesaje"
+          : "/cont/mesaje";
 
         const agencyData = {
           id: currentChat.id?.toString() || "",
@@ -606,7 +608,7 @@ function Messages() {
       alert(t("no_tour_plan_provided"));
       return;
     }
-    navigate(`/richieste/${agency.tour_plan_id}`);
+    navigate(`/cereri/${agency.tour_plan_id}`);
     setIsButtonVisible(false);
   };
 
@@ -893,7 +895,7 @@ function Messages() {
                       )}
                       <span className="text-[8px] text-gray-300">
                         {message.timestamp.toLocaleTimeString(
-                          i18n.language === "it" ? "it-IT" : "en-US",
+                          i18n.language === "ro" ? "ro-RO" : "ru-RU",
                           {
                             hour: "2-digit",
                             minute: "2-digit",

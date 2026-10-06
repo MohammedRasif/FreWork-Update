@@ -10,6 +10,8 @@ import { useTranslation } from "react-i18next";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaArrowLeft } from "react-icons/fa";
 import { GoChevronDown } from "react-icons/go";
+import i18n from "../../../i18n.js";
+
 
 let isGoogleScriptLoaded = false;
 
@@ -259,7 +261,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (!accessToken) {
       localStorage.setItem("pendingPlan", JSON.stringify(data));
       toast.error(t("please_login"));
-      navigate("/registrazione", { state: { fromLogin: true } });
+      navigate("/inregistrare", { state: { fromLogin: true } });
       return;
     }
     if (!data.adults && !data.children) {
@@ -334,7 +336,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       reset();
       setSelectedFile(null);
       localStorage.removeItem("pendingPlan");
-      navigate("/user");
+      navigate("/cont");
       closeForm();
     } catch (error) {
       console.error("API Error:", error);
@@ -513,7 +515,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 {/* Start Date */}
                 <div>
                   <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                    {t("start_date") || "Start Date"}
+                    {t("start_date")}
                   </label>
                   <div className="relative">
                     <input
@@ -534,12 +536,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 {/* End Date */}
                 <div>
                   <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                    {t("end_date") || "End Date"}
+                    {t("end_date")}
                   </label>
                   <div className="relative">
                     <input
                       {...register("endingDate", {
-                        required: t("ending_date_required") || "End date required",
+                        required: t("ending_date_required"),
                       })}
                       type="date"
                       defaultValue={formData.endingDate}
@@ -621,7 +623,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   {t("budget_label")}
                 </label>
                 <span className="text-base font-bold text-gray-800">
-                  €{parseInt(formData.budget || 5000).toLocaleString()}
+                  €{parseInt(formData.budget || 5000).toLocaleString(i18n.language === "ro" ? "ro-RO" : "ru-RU")}
                 </span>
               </div>
               <input
@@ -738,7 +740,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                     },
                   })}
                   type="email"
-                  placeholder={t("email")}
+                  placeholder="email@example.com"
                   defaultValue={formData.email}
                   onChange={(e) => updateFormData("email", e.target.value)}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"

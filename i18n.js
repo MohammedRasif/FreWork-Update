@@ -2,15 +2,17 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import en from "./src/translation/en/translation.json";
-import ita from "./src/translation/ita/translation.json";
+import ru from "./src/translation/ru/translation.json";
+import ro from "./src/translation/ro/translation.json";
 
 const resources = {
-  en: { translation: en },
-  ita: { translation: ita },
+  ru: { translation: ru },
+  ro: { translation: ro },
 };
 
-const savedLanguage = localStorage.getItem("i18nextLng") || "ita";
+const storedLanguage = localStorage.getItem("i18nextLng")?.split("-")[0];
+const savedLanguage =
+  { ita: "ro", it: "ro", en: "ru", ro: "ro", ru: "ru" }[storedLanguage] || "ro";
 
 i18n
   .use(LanguageDetector) 
@@ -18,18 +20,22 @@ i18n
   .init({
     resources,
     lng: savedLanguage, 
-    fallbackLng: "en",
+    fallbackLng: "ru",
+    supportedLngs: ["ro", "ru"],
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ["local strickenStorage", "navigator"], 
+      order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
   });
 
 i18n.on("languageChanged", (lng) => {
   localStorage.setItem("i18nextLng", lng);
+  document.documentElement.lang = lng;
 });
+
+document.documentElement.lang = savedLanguage;
 
 export default i18n;

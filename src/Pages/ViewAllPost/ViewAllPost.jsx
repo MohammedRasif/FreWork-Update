@@ -4,8 +4,11 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Card from "@/components/ui/Card";
 import { useGetTourPlanPublicQuery } from "@/redux/features/withAuth";
+import { useTranslation } from "react-i18next";
+
 
 const ViewAllPost = () => {
+  const { t } = useTranslation();
   const {
     data: publishedData = [],
     isLoading,
@@ -21,11 +24,11 @@ const ViewAllPost = () => {
           </div>
         ) : isError ? (
           <div className="text-center text-red-500 py-8">
-            Error loading tour plans. Please try again later.
+            {t("error_loading")}
           </div>
         ) : publishedData.length === 0 ? (
           <div className="text-center text-gray-600 py-8">
-            No tour plans available at the moment.
+            {t("no_tour_plans")}
           </div>
         ) : (
           <div className="flex items-center justify-center">

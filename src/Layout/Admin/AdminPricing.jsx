@@ -1,8 +1,7 @@
+import { localizedContent } from "@/lib/localizedContent";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
-import img from "../../assets/img/Vector 63.png";
-import img1 from "../../assets/img/Rectangle 161124457.png";
 import { useNavigate } from "react-router-dom";
 import {
   useShowSubscriptionDataQuery,
@@ -11,12 +10,11 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
 
 const AdminPricing = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const language = localStorage.getItem("i18nextLng") || "en";
+  const language = i18n.language === "ro" ? "ita" : "en";
   const accessToken = localStorage.getItem("access_token");
 
   const {
@@ -69,44 +67,43 @@ const AdminPricing = () => {
   const isLoadingState = isLoading || isFetching;
 
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#DD9E2C" : "#C2851C");
-  const getHoverColor = (plan) => (plan?.isSpecial ? "#C2851C" : "#2a5bb5");
 
- const handleSelectPlan = async (plan) => {
-  if (plan?.cta?.action === "apply_partner") {
-    localStorage.setItem("pricing_status", "agency");
-    navigate("/registrazione", {
-      state: {
-        pricing_id: plan.price_id, 
-      },
-    });
-    return;
-  }
-
-  if (!accessToken) {
-    toast.info(t("login_required_for_premium"));
-    
-    navigate("/login", { state: { from: "/per-agenzie" } });
-    return;
-  }
-
-  try {
-    const response = await subscription({
-      price_id: plan.price_id, 
-    }).unwrap();
-
-    if (response?.checkout_url) {
-      window.location.href = response.checkout_url;
-    } else {
-      toast.success(t("subscription_success"));
+  const handleSelectPlan = async (plan) => {
+    if (plan?.cta?.action === "apply_partner") {
+      localStorage.setItem("pricing_status", "agency");
+      navigate("/inregistrare", {
+        state: {
+          pricing_id: plan.price_id,
+        },
+      });
+      return;
     }
-  } catch (err) {}
-};
+
+    if (!accessToken) {
+      toast.info(t("login_required_for_premium"));
+
+      navigate("/autentificare", { state: { from: "/pentru-agentii" } });
+      return;
+    }
+
+    try {
+      const response = await subscription({
+        price_id: plan.price_id,
+      }).unwrap();
+
+      if (response?.checkout_url) {
+        window.location.href = response.checkout_url;
+      } else {
+        toast.success(t("subscription_success"));
+      }
+    } catch (err) { }
+  };
   const PricingSkeleton = ({ count = 1 }) => (
     <>
       {Array.from({ length: count }).map((_, i) => (
         <motion.div
           key={i}
-          className="bg-white w-[45vh] max-w-sm rounded-2xl shadow-xl border border-gray-200 p-6"
+          className="w-full max-w-sm rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.05)]"
         >
           <div className="animate-pulse space-y-4">
             <div className="h-32 bg-gray-200 rounded-lg"></div>
@@ -125,17 +122,13 @@ const AdminPricing = () => {
   );
 
   return (
-    <section className="pt-24 roboto bg-gray-50 min-h-screen pb-14">
-      <Helmet>
-        <title>treioferte.md | admin |gestione-abbonamento</title>
-      </Helmet>
-      <div className="container mx-auto px-4">
-        <h1 className="uppercase text-center text-3xl sm:text-4xl font-medium text-gray-600 mb-8 tracking-wider">
-          {t("pricing")}
-        </h1>
+    <section className="agency-pricing mx-auto max-w-5xl pb-10">
+      <div className="mx-auto">
+        <div className="mb-7 h-1 w-10 rounded-full bg-[#d6a044]" />
+        <h1 className="mb-8 text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">{t("subscription_management")}</h1>
 
         {isLoadingState && (
-          <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="flex min-h-56 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8">
             <div className="grid gap-8 place-items-center">
               <PricingSkeleton
                 count={accessToken ? Math.min(2, allPlans.length - 1 || 2) : 1}
@@ -145,31 +138,31 @@ const AdminPricing = () => {
         )}
 
         {isError && !isLoadingState && (
-          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+          <div className="flex min-h-56 flex-col items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white px-6 py-10 text-center">
             <div className="text-2xl text-red-600 mb-4 font-semibold">
-              {t("error_loading_plans") || "Errore nel caricamento dei piani"}
+              {t("error_loading_plans")}
             </div>
             <p className="text-gray-600 mb-6 max-w-md">
               {error?.data?.message || t("something_went_wrong_try_again")}
             </p>
             <button
               onClick={() => refetch()}
-              className="px-8 py-3 text-white rounded-md hover:opacity-90 transition"
+              className="min-h-11 rounded-xl px-8 py-3 font-bold text-white transition hover:opacity-90"
               style={{
                 backgroundColor: visiblePlans[0]
                   ? getPrimaryColor(visiblePlans[0])
-                  : "#FF6600",
+                  : "#c88f2a",
               }}
             >
-              {t("try_again") || "Riprova"}
+              {t("try_again")}
             </button>
           </div>
         )}
 
         {!isLoadingState && !isError && visiblePlans.length === 0 && (
-          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+          <div className="flex min-h-56 flex-col items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white px-6 py-10 text-center">
             <div className="text-2xl text-gray-600 mb-4">
-              {t("no_plans_available") || "Nessun piano disponibile al momento"}
+              {t("no_plans_available")}
             </div>
             <p className="text-gray-500 mb-8 max-w-md">
               {accessToken
@@ -178,12 +171,12 @@ const AdminPricing = () => {
             </p>
             {!accessToken && (
               <button
-                onClick={() => navigate("/registrazione")}
-                className="px-8 py-3 text-white rounded-md hover:opacity-90 transition"
+                onClick={() => navigate("/inregistrare")}
+                className="min-h-11 rounded-xl px-8 py-3 font-bold text-white transition hover:opacity-90"
                 style={{
                   backgroundColor: visiblePlans[0]
                     ? getPrimaryColor(visiblePlans[0])
-                    : "#FF6600",
+                    : "#c88f2a",
                 }}
               >
                 {t("register_now")}
@@ -191,7 +184,7 @@ const AdminPricing = () => {
             )}
             <button
               onClick={() => refetch()}
-              className="mt-4 px-6 py-2 border border-gray-400 rounded-md hover:bg-gray-100"
+              className="mt-4 min-h-10 rounded-xl border border-[#d8dfe5] px-6 text-sm font-semibold text-[#172b43] hover:bg-[#f7f3ec]"
             >
               {t("refresh")}
             </button>
@@ -200,49 +193,28 @@ const AdminPricing = () => {
 
         {!isLoadingState && !isError && visiblePlans.length > 0 && (
           <div
-            className={`grid gap-8 mx-auto place-items-center
-              ${
-                isSingleCardView
-                  ? "grid-cols-1 max-w-md"
-                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 max-w-4xl"
+            className={`mx-auto grid gap-5
+              ${isSingleCardView
+                ? "max-w-lg grid-cols-1"
+                : "grid-cols-1 md:grid-cols-2"
               }
             `}
           >
             {visiblePlans.map((plan, index) => (
               <div
                 key={plan.plan_id || index}
-                className="bg-white w-[45vh] rounded-2xl shadow-xl overflow-hidden flex flex-col border border-gray-200"
+                className="flex w-full min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]"
               >
-                <div className="relative">
-                  <div className="w-3/4 rounded-r-lg my-10 relative">
-                    <img
-                      src={
-                        plan.name === "Founder Partner" ||
-                        plan.name === "Partner Fondatore"
-                          ? img1
-                          : img
-                      }
-                      alt="Plan background"
-                      className="w-full h-auto"
-                    />
-                    <h3
-                      className={`absolute top-6 left-2 z-10 font-bold ${
-                        plan.name === "Founder Partner" ||
-                        plan.name === "Partner Fondatore"
-                          ? "text-white"
-                          : "text-slate-700"
-                      }`}
-                    >
-                      {plan.name}
-                    </h3>
-                  </div>
+                <div className="bg-[#172b43] px-6 py-7 text-white">
+                  <div className="mb-4 h-1 w-9 rounded-full bg-[#d6a044]" />
+                  <h3 className="text-xl font-bold tracking-tight">{localizedContent(plan.name, t)}</h3>
                 </div>
 
-                <div className="px-6 pb-6 flex flex-col flex-grow">
+                <div className="flex flex-grow flex-col px-6 pb-6 pt-7">
                   <div className="mb-5">
                     <div className="flex items-end">
-                      <span className="text-4xl font-bold text-slate-700">
-                        {plan.price}
+                      <span className="text-4xl font-bold text-[#172b43]">
+                        {localizedContent(plan.price, t)}
                       </span>
 
                       <span className="text-xl text-slate-500 ml-1">
@@ -251,26 +223,26 @@ const AdminPricing = () => {
                     </div>
                     {plan?.subtitle && (
                       <p className="text-[14px] font-semibold pb-5 pt-2">
-                        {plan.subtitle}
+                        {localizedContent(plan.subtitle, t)}
                       </p>
                     )}
                     {/* <p className="text-slate-500 text-base mt-1">
                       {t("measurable_results")}
                     </p> */}
-                    <p className="text-[15px]">{plan.description}</p>
+                    <p className="text-[15px] leading-6 text-[#617082]">{localizedContent(plan.description, t)}</p>
                   </div>
                   {/* <p className="text-[14px]">{plan.features}</p> */}
                   {/* {plan?.cta && (
                     <div className="mb-4 text-[16px] text-slate-600">
                       {plan.cta.label && (
                         <p className="font-semibold text-slate-700">
-                          {plan.cta.label}
+                          {localizedContent(plan.cta.label, t)}
                         </p>
                       )}
 
                       {plan.cta.subLabel && (
                         <p className="text-slate-500 text-[14px]">
-                          {plan.cta.subLabel}
+                          {localizedContent(plan.cta.subLabel, t)}
                         </p>
                       )}
                     </div>
@@ -295,7 +267,7 @@ const AdminPricing = () => {
 
                     <ul className="space-y-3 text-base text-slate-600">
                       {Array.isArray(plan.features) &&
-                      plan.features.length > 0 ? (
+                        plan.features.length > 0 ? (
                         plan.features.map((feature, i) => (
                           <li key={i} className="flex items-start">
                             <IoCheckmarkDoneSharp
@@ -303,7 +275,7 @@ const AdminPricing = () => {
                               className="mt-1 mr-2 flex-shrink-0"
                               size={20}
                             />
-                            <span>{feature}</span>
+                            <span>{localizedContent(feature, t)}</span>
                           </li>
                         ))
                       ) : (
@@ -319,39 +291,35 @@ const AdminPricing = () => {
                     </ul>
                   </div>
                   {plan?.warningBox && (
-                    <div className="shadow-2xl border-2 rounded-md p-2 text-[14px] font-semibold">
+                    <div className="rounded-xl border border-[#eadac0] bg-[#fffaf0] p-4 text-sm font-semibold text-[#34485c]">
                       <p className="flex items-center gap-1">
                         <span>⚠️</span>
-                        <span>{plan.warningBox.title}</span>
+                        <span>{localizedContent(plan.warningBox.title, t)}</span>
                       </p>
-                      <p>{plan.warningBox.text}</p>
+                      <p>{localizedContent(plan.warningBox.text, t)}</p>
                     </div>
                   )}
                   {plan?.cta ? (
                     <div className="mb-4">
                       <button
                         className={`
-                          w-full mt-5 text-white py-3 rounded-md mb-2
-                          transition-colors cursor-pointer text-lg font-semibold
-                          ${plan.isSpecial ? "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#C2851C]" : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer hover:bg-[#e65f05]"}
+                          mb-2 mt-5 min-h-12 w-full cursor-pointer rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c]
                         `}
                         onClick={() => handleSelectPlan(plan)}
                         disabled={isSubscribing}
                       >
-                        {isSubscribing ? t("subscribing") : plan.cta.label}
+                        {isSubscribing ? t("subscribing") : localizedContent(plan.cta.label, t)}
                       </button>
                       {plan.cta.subLabel && (
                         <p className="text-slate-500 text-center text-[14px] mt-1">
-                          {plan.cta.subLabel}
+                          {localizedContent(plan.cta.subLabel, t)}
                         </p>
                       )}
                     </div>
                   ) : (
                     <button
                       className={`
-                        w-full mt-5 text-white py-3 rounded-md mb-4
-                        transition-colors cursor-pointer text-lg font-semibold
-                        ${plan.isSpecial ? "bg-[#DD9E2C] hover:bg-[#C2851C]" : "bg-[#DD9E2C] hover:bg-[#C2851C]"}
+                        mb-4 mt-5 min-h-12 w-full cursor-pointer rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c]
                       `}
                       onClick={() => handleSelectPlan(plan)}
                       disabled={isSubscribing}
@@ -364,10 +332,10 @@ const AdminPricing = () => {
             ))}
           </div>
         )}
-        
+
       </div>
       <ToastContainer position="top-right" autoClose={5000} />
-      
+
     </section>
   );
 };

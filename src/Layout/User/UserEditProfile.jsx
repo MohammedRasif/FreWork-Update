@@ -141,24 +141,25 @@ function UserEditProfile() {
   if (profileLoading) return <p className="text-center">{t("loading_profile")}</p>;
 
   return (
-    <div className="p-3 sm:p-4 lg:p-4 font-semibold">
+    <div className="user-edit-profile mx-auto max-w-5xl">
       <ToastContainer />
 
-      <div className="mb-3 sm:mb-4 lg:mb-5">
+      <div className="mb-5">
         <NavLink
-          to="/user/profilo"
-          className="inline-flex items-center px-2 sm:px-3 lg:px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 text-sm sm:text-base lg:text-base"
+          to="/cont/profil"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#617082] transition-colors hover:text-[#172b43]"
         >
           <IoArrowBack className="h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 mr-1 sm:mr-2 lg:mr-2 text-gray-700" />
           {t("back")}
         </NavLink>
       </div>
 
-      <h1 className="text-xl sm:text-2xl lg:text-3xl pb-3 sm:pb-4 lg:pb-5">
+      <div className="mb-3 h-1 w-10 rounded-full bg-[#d6a044]" />
+      <h1 className="pb-6 text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">
         {t("welcome")}, <span className="font-normal">{t("edit_profile_details")}</span>
       </h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="rounded-[22px] border border-[#e9e6e0] bg-white p-5 shadow-[0_10px_35px_rgba(23,43,67,0.05)] sm:p-8">
         {/* Personal Information */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 mb-4">
           {/* First Name */}
@@ -386,10 +387,10 @@ function UserEditProfile() {
           <button
             disabled={updateLoading || !!pictureError}
             type="submit"
-            className={`w-full sm:w-auto lg:w-auto font-medium py-2 px-6 sm:px-8 lg:px-8 rounded-md transition-colors text-sm sm:text-base lg:text-base ${
+            className={`min-h-12 w-full rounded-xl px-8 py-2 text-sm font-bold transition-colors sm:w-auto sm:text-base ${
               updateLoading || pictureError
                 ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                : "bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white"
+                : "cursor-pointer bg-[#c88f2a] text-white hover:bg-[#ad751c]"
             }`}
           >
             {updateLoading ? t("saving") : t("save_changes")}

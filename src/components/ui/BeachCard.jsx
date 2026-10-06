@@ -45,7 +45,7 @@ export default function TourCard({ tourPlan }) {
   };
 
   const handleViewDetails = () => {
-    navigate(`/richieste/${localTourPlan.slug}`);
+    navigate(`/cereri/${localTourPlan.slug}`);
   };
 
   if (!isLocalStorageLoaded) {
@@ -54,7 +54,7 @@ export default function TourCard({ tourPlan }) {
 
   return (
     <>
-      <div className="flex flex-col shadow-lg w-72 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
+      <div className="flex flex-col shadow-lg w-full max-w-72 mx-auto overflow-hidden rounded-2xl border bg-white transition-shadow duration-300 hover:shadow-xl">
         <div className="relative">
           <div className="aspect-[4/3] overflow-hidden">
             <img
@@ -85,7 +85,7 @@ export default function TourCard({ tourPlan }) {
                       {isAccepted && (
                         <img
                           src={img}
-                          alt="Accepted Badge"
+                          alt={t("accepted_badge")}
                           className="absolute inset-0 object-contain pointer-events-none"
                         />
                       )}
@@ -94,7 +94,7 @@ export default function TourCard({ tourPlan }) {
                           offer.agency?.logo_url ||
                           "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
                         }
-                        alt={`${offer.agency?.agency_name || "Agency"} logo`}
+                        alt={`${offer.agency?.agency_name || t("agency")} logo`}
                         className={`relative z-10 ${
                           isAccepted ? "w-10 h-10" : "w-12 h-12"
                         } object-contain rounded-full border bg-white ${
@@ -145,7 +145,7 @@ export default function TourCard({ tourPlan }) {
             <p>
               <span className="font-medium">{t("category")}:</span>{" "}
               {localTourPlan.destination_type === "beach"
-                ? "Mare"
+                ? t("beach")
                 : localTourPlan.destination_type}
             </p>
           </div>
@@ -172,6 +172,7 @@ export default function TourCard({ tourPlan }) {
             }
           >
             <button
+              type="button"
               onClick={handleViewDetails}
               className="block w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-sm"
             >

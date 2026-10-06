@@ -1,741 +1,188 @@
-"use client";
-import img from "../../assets/img/1000062305-removebg-preview.png";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import {
-  Bell,
-  ChevronDown,
-  ClipboardList,
-  CircleArrowUp,
-  LogOut,
-  Mail,
-  MessageCircle,
-  UserRound,
-  Lock,
-  Menu,
-  X,
-  EyeOff,
-  Eye,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import UserAvatar from "../../assets/img/bruce-mars.png";
-import { SlDiamond } from "react-icons/sl";
-import { MdVerified } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  useChangePasswordMutation,
-  useGetTuristProfileQuery,
-} from "@/redux/features/withAuth";
-import { toast, ToastContainer } from "react-toastify";
-import AdminNotification from "../Admin/AdminNotification";
+import { Bell, ChevronDown, ClipboardList, Lock, LogOut, Mail, Menu, MessageCircle, ShieldCheck, UserRound, X, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { toast, ToastContainer } from "react-toastify";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useChangePasswordMutation, useGetTuristProfileQuery } from "@/redux/features/withAuth";
+import AdminNotification from "../Admin/AdminNotification";
+import BrandWordmark from "@/components/BrandWordmark";
+import { getPageTitle } from "@/lib/pageTitle";
+import LanguageToggleButton, { LanguageMenuItems } from "@/Pages/Home/LanguageToggleButton";
+
+const planPaths = ["/cont", "/cont/dashboard", "/cont/cereri-publicate", "/cont/cereri-acceptate", "/cont/favorite", "/cont/creeaza-cerere", "/cont/modifica-cerere"];
+const passwordFields = [
+  { name: "current_password", label: "old_password" },
+  { name: "new_password", label: "new_password" },
+  { name: "confirm_password", label: "confirm_new_password" },
+];
+
+function DashboardNav({ t, pathname, profile, isLoading, onNavigate, onLogout }) {
+  const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || localStorage.getItem("name") || t("user");
+  const items = [
+    { path: "/cont", label: t("my_plans"), icon: ClipboardList, active: planPaths.includes(pathname) },
+    { path: "/cont/profil", label: t("profile"), icon: UserRound, active: pathname === "/cont/profil" || pathname === "/cont/modifica-profil" },
+    { path: "/cont/mesaje", label: t("conversations"), icon: MessageCircle, active: pathname.startsWith("/cont/mesaje") },
+  ];
+
+  return (
+    <>
+      <NavLink to="/" onClick={onNavigate} className="flex h-[76px] items-center border-b border-[#e9e6e0] px-6">
+        <BrandWordmark />
+      </NavLink>
+      <div className="px-4 pb-4 pt-6">
+        <div className="flex items-center gap-3 rounded-[18px] bg-[#f7f3ec] px-3 py-3">
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#172b43] text-lg font-bold text-white">
+            {profile?.profile_picture_url ? <img src={profile.profile_picture_url} alt={t("user_avatar")} className="h-full w-full object-cover" /> : name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-[#172b43]">{isLoading ? t("loading") : name}</p>
+            <p className="truncate text-xs text-[#718092]">{profile?.profession || t("user")}</p>
+          </div>
+          {profile?.is_verified && <ShieldCheck size={17} className="ml-auto shrink-0 text-[#b98427]" aria-label={t("verified")} />}
+        </div>
+      </div>
+      <nav className="flex-1 px-4" aria-label={t("menu")}>
+        <p className="px-3 pb-3 pt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#98a3ad]">{t("menu")}</p>
+        <ul className="space-y-1.5">
+          {items.map(({ path, label, icon: Icon, active }) => (
+            <li key={path}>
+              <NavLink to={path} onClick={onNavigate} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-xl px-3.5 text-sm font-semibold transition-colors ${active ? "bg-[#172b43] text-white shadow-sm" : "text-[#536477] hover:bg-[#f7f3ec] hover:text-[#172b43]"}`}>
+                <Icon size={19} strokeWidth={1.9} className={active ? "text-[#e0a948]" : "text-[#9b6b22]"} aria-hidden="true" />{label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="border-t border-[#e9e6e0] p-4">
+        <button type="button" onClick={onLogout} className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3.5 text-left text-sm font-semibold text-[#617082] transition-colors hover:bg-[#fff3ee] hover:text-[#9d4635]">
+          <LogOut size={19} aria-hidden="true" />{t("logout")}
+        </button>
+      </div>
+    </>
+  );
+}
 
 export default function UserDashboardLayout() {
-  const { t } = useTranslation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: profileData, isLoading: isProfileLoading } =
-    useGetTuristProfileQuery();
-  const [changePassword, { isLoading: isChangePasswordLoading }] =
-    useChangePasswordMutation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showPasswords, setShowPasswords] = useState({ current_password: false, new_password: false, confirm_password: false });
+  const [formData, setFormData] = useState({ current_password: "", new_password: "", confirm_password: "" });
+  const { data: profileData, isLoading: isProfileLoading } = useGetTuristProfileQuery();
+  const [changePassword, { isLoading: isChangePasswordLoading }] = useChangePasswordMutation();
   const notificationRef = useRef(null);
-  const ws = useRef(null);
+  const pathname = location.pathname.replace(/\/$/, "") || "/cont";
+  const pageTitle = getPageTitle(pathname, t);
 
-  const [showPasswords, setShowPasswords] = useState({
-    current_password: false,
-    new_password: false,
-    confirm_password: false,
-  });
-
-  const [formData, setFormData] = useState({
-    current_password: "",
-    new_password: "",
-    confirm_password: "",
-  });
-
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.new_password !== formData.confirm_password) {
-      toast.error(t("passwords_do_not_match"));
-      return;
-    }
-    try {
-      await changePassword({
-        current_password: formData.current_password,
-        new_password: formData.new_password,
-      }).unwrap();
-      toast.success(t("password_changed_success"));
-      setFormData({
-        current_password: "",
-        new_password: "",
-        confirm_password: "",
-      });
-      handleClosePopup();
-    } catch (error) {
-      toast.error(error?.data?.error || t("failed_to_change_password"));
-    }
-  };
-
-  const toggleNotificationDropdown = () => {
-    setIsNotificationOpen((prev) => !prev);
-  };
-
-  const handleClosePopup = () => {
-    setIsChangePasswordOpen(false);
-  };
-
-  const handleItemClick = (itemName, path) => {
-    if (itemName === t("logout")) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("name");
-      localStorage.removeItem("role");
-      localStorage.removeItem("user_id");
-      localStorage.removeItem("userEmail");
-      localStorage.removeItem("userType");
-      localStorage.removeItem("user_image");
-      navigate(path);
-    } else if (itemName === t("change_password")) {
-      setIsChangePasswordOpen(true);
-    } else {
-      setSelectedItem(itemName);
-      navigate(path);
-      setIsMobileMenuOpen(false);
-      setIsNotificationOpen(false);
-    }
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    setIsNotificationOpen(false);
-  };
-
-  // WebSocket setup
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.error("No token found, WebSocket connection aborted");
-      return;
-    }
-
-    const baseUrl = "api.treioferte.md";
-    const socketUrl = `wss://${baseUrl}/ws/notification-count/?token=${token}`;
-    ws.current = new WebSocket(socketUrl);
-
-    ws.current.onopen = () => {
-      console.log("WebSocket connected successfully");
-    };
-
-    ws.current.onmessage = (event) => {
-      console.log("Raw message received:", event.data);
-      try {
-        const messageData = JSON.parse(event.data);
-        console.log("Parsed message:", messageData);
-        if (messageData.unread_count !== undefined) {
-          setUnreadCount(messageData.unread_count);
-          console.log("Updated unreadCount:", messageData.unread_count);
-        } else {
-          console.warn("unread_count not found in message:", messageData);
-        }
-      } catch (error) {
-        console.error("Error parsing message:", error);
-      }
-    };
-
-    ws.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    ws.current.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
-    };
-  }, []);
-
-  // Sync selectedItem with current route
-  useEffect(() => {
-    const normalizedLocation = location.pathname.replace(/\/$/, "");
-    const myPlansRoutes = [
-      "/user",
-      "/user/favourite",
-      "/user/richieste-accettate",
-      "/user/richieste-pubblicate",
-      "/user/crea-richiesta",
-    ];
-    const profileRoutes = ["/user/profilo", "/user/modifica-profilo"];
-
-    if (myPlansRoutes.includes(normalizedLocation)) {
-      setSelectedItem(t("my_plans"));
-      return;
-    }
-    if (profileRoutes.includes(normalizedLocation)) {
-      setSelectedItem(t("profile"));
-      return;
-    }
-    let currentItem = menuItems[0].items.find((item) => {
-      const normalizedPath = item.path.replace(/\/$/, "");
-      return (
-        (!item.exact &&
-          (normalizedPath === normalizedLocation ||
-            normalizedLocation.startsWith(normalizedPath + "/"))) ||
-        (item.exact && normalizedPath === normalizedLocation)
-      );
-    });
-    if (currentItem) {
-      setSelectedItem(currentItem.name);
-    } else {
-      setSelectedItem(null);
-    }
-  }, [location.pathname, t]);
+    document.title = `TreiOferte | ${pageTitle}`;
+  }, [pageTitle, i18n.language]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsNotificationOpen(false);
   }, [location.pathname]);
 
-  // Close mobile menu and notification dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        isMobileMenuOpen &&
-        !event.target.closest(".mobile-sidebar") &&
-        !event.target.closest(".mobile-menu-button")
-      ) {
-        setIsMobileMenuOpen(false);
-      }
-      if (
-        isNotificationOpen &&
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
-        setIsNotificationOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen, isNotificationOpen]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [isMobileMenuOpen]);
 
-  const menuItems = [
-    {
-      items: [
-        {
-          name: t("my_plans"),
-          icon: <ClipboardList size={20} />,
-          path: "/user",
-          exact: true,
-        },
-        {
-          name: t("profile"),
-          icon: <UserRound size={20} />,
-          path: "/user/profilo",
-        },
-        {
-          name: t("conversations"),
-          icon: <MessageCircle size={20} />,
-          path: "/user/chat",
-        },
-        { name: t("logout"), icon: <LogOut size={20} />, path: "/" },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+    const socket = new WebSocket(`wss://api.vacanzamycost.it/ws/notification-count/?token=${token}`);
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.unread_count !== undefined) setUnreadCount(Number(data.unread_count) || 0);
+      } catch { /* Ignore malformed notification counts. */ }
+    };
+    return () => socket.close();
+  }, []);
 
-  const dropdownVariants = {
-    closed: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
-    open: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+  useEffect(() => {
+    const closeOnOutsideClick = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) setIsNotificationOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, []);
+
+  const logout = () => {
+    ["access_token", "refresh_token", "name", "role", "user_id", "userEmail", "userType", "user_image"].forEach((key) => localStorage.removeItem(key));
+    navigate("/");
+  };
+
+  const submitPassword = async (event) => {
+    event.preventDefault();
+    if (formData.new_password !== formData.confirm_password) {
+      toast.error(t("passwords_do_not_match"));
+      return;
+    }
+    try {
+      await changePassword({ current_password: formData.current_password, new_password: formData.new_password }).unwrap();
+      toast.success(t("password_changed_success"));
+      setFormData({ current_password: "", new_password: "", confirm_password: "" });
+      setIsChangePasswordOpen(false);
+    } catch (error) {
+      toast.error(error?.data?.error || t("failed_to_change_password"));
+    }
   };
 
   return (
-    <div className="flex h-screen bg-[#F8F9FA]">
-      <Helmet>
-        <title>treioferte.md | user</title>
-      </Helmet>
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"></div>
-      )}
-
-      {/* Sidebar - Desktop */}
-      <aside
-        className={`hidden lg:block ${isCollapsed ? "w-20" : "w-80"
-          } transition-all duration-500 ease-in-out`}
-      >
-        <NavLink to="/" className="w-full">
-          <div className="font-bold lg:h-11 h-8 text-gray-800 mt-10 flex items-center justify-center">
-            <img src={img} className="h-full" alt={t("logo")} />
-          </div>
-        </NavLink>
-        {!isProfileLoading && profileData && (
-          <div className="h-auto flex items-center px-4">
-            <div className="flex flex-col w-full justify-center items-center mt-16">
-              <div className="relative">
-                <div
-                  className={`transform transition-all duration-500 w-16 h-16 overflow-hidden rounded-full border border-gray-50  ${isCollapsed
-                      ? "opacity-0 -translate-x-full"
-                      : "opacity-100 translate-x-0"
-                    }`}
-                >
-                  <img
-                    src={profileData.profile_picture_url || ""}
-                    alt={t("user_avatar")}
-                    className="w-16 h-16 rounded-full"
-                  />
-                </div>
-                {profileData?.is_verified && (
-                  <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                    <MdVerified className="w-5 h-5 z-20 text-[#C2851C]" />
-                  </div>
-                )}
-              </div>
-              <div className="w-full flex flex-col gap-1 pl-3">
-                <h3 className="text-2xl text-center font-normal text-[#343E4B]">
-                  {profileData.first_name + " " + profileData.last_name}
-                </h3>
-                <span className="text-center text-lg font-bold text-[#343E4B]">
-                  {profileData.profession || t("user")}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-        <nav className="p-4 mt-6">
-          {menuItems.map((section, idx) => (
-            <div key={idx} className="mb-8">
-              <ul className="space-y-2">
-                {section.items.map((item, itemIdx) => (
-                  <li key={itemIdx}>
-                    <NavLink
-                      to={item.path}
-                      end={item.exact}
-                      onClick={() => handleItemClick(item.name, item.path)}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
-                          ? "bg-[#3776E2] text-white font-semibold"
-                          : ""
-                        }`
-                      }
-                    >
-                      <span className="p-2 rounded-lg bg-white text-[#67748E] shadow-[0_2px_4px_-1px_#00000030]">
-                        {item.icon}
-                      </span>
-                      <span
-                        className={`transform transition-all duration-500 text-md font-semibold ${isCollapsed
-                            ? "opacity-0 -translate-x-full"
-                            : "opacity-100 translate-x-0"
-                          } whitespace-nowrap`}
-                      >
-                        {item.name}
-                      </span>
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          {/* <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
-            <div className="w-8 h-8 flex items-center justify-center bg-white shadow-[0_2px_4px_-1px_#00000030] p-2 rounded-md">
-              <SlDiamond size={16} />
-            </div>
-            <div className="w-full flex flex-col gap-1">
-              <h3 className="font-open-sans text-base font-semibold text-white">
-                {t("need_help")}
-              </h3>
-              <h5 className="font-open-sans text-sm font-normal text-white">
-                {t("check_our_docs")}
-              </h5>
-              <Button
-                variant="secondary"
-                className="bg-white text-gray-800 hover:bg-gray-100"
-              >
-                {t("documentation")}
-              </Button>
-            </div>
-          </div> */}
-        </nav>
+    <div className="user-dashboard flex h-screen min-w-0 overflow-hidden bg-[#faf9f6] text-[#172b43]">
+      <aside className="hidden w-[272px] shrink-0 flex-col border-r border-[#e9e6e0] bg-white lg:flex">
+        <DashboardNav t={t} pathname={pathname} profile={profileData} isLoading={isProfileLoading} onNavigate={() => { }} onLogout={logout} />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <aside
-        className={`mobile-sidebar fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-[#343E4B]">{t("menu")}</h2>
-          <button
-            onClick={toggleMobileMenu}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            title={t("close")}
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <div className="h-auto flex items-center px-4">
-          <div className="flex flex-col w-full justify-center items-center">
-            <NavLink to="/" className="w-full">
-              <div className="font-bold lg:h-11 h-8 text-gray-800 mt-5 mb-5 flex items-center justify-center">
-                <img src={img} className="h-full" alt={t("logo")} />
-              </div>
-            </NavLink>
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full overflow-hidden">
-                <img
-                  src={
-                    (!isProfileLoading && profileData?.profile_picture_url) ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                  }
-                  alt={t("user_avatar")}
-                  className="w-full h-full rounded-full"
-                />
-              </div>
-              {profileData?.is_verified && (
-                <div className="bg-white w-fit absolute top-0 right-0 rounded-full">
-                  <MdVerified className="w-5 h-5 z-20 text-[#C2851C]" />
-                </div>
-              )}
-            </div>
-            <div className="w-full flex flex-col gap-1 pl-3 mt-4">
-              <h3 className="text-xl text-center font-normal text-[#343E4B]">
-                {isProfileLoading
-                  ? t("loading")
-                  : profileData?.first_name + " " + profileData?.last_name ||
-                  t("user")}
-              </h3>
-              <span className="text-center text-sm text-[#8C8C8C]">
-                {isProfileLoading
-                  ? t("loading")
-                  : profileData?.profession || t("user")}
-              </span>
-            </div>
-          </div>
-        </div>
-        <nav className="p-4 mt-6">
-          {menuItems.map((section, idx) => (
-            <div key={idx} className="mb-8">
-              <ul className="space-y-2">
-                {section.items.map((item, itemIdx) => (
-                  <li key={itemIdx}>
-                    <NavLink
-                      to={item.path}
-                      end={item.exact}
-                      onClick={() => handleItemClick(item.name, item.path)}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 text-[#67748E] rounded-lg group relative ${isActive || selectedItem === item.name
-                          ? "bg-[#3776E2] text-white font-semibold"
-                          : ""
-                        }`
-                      }
-                    >
-                      <span className="p-2 rounded-lg bg-white text-[#67748E] shadow-[0_2px_4px_-1px_#00000030]">
-                        {item.icon}
-                      </span>
-                      <span className="text-md font-semibold whitespace-nowrap">
-                        {item.name}
-                      </span>
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          {/* <div className="h-44 w-full flex flex-col bg-gradient-to-br from-blue-500 to-purple-600 bg-no-repeat bg-center p-5 gap-2 rounded-2xl">
-            <div className="w-8 h-8 flex items-center justify-center bg-white shadow-[0_2px_4px_-1px_#00000030] p-2 rounded-md">
-              <SlDiamond size={16} />
-            </div>
-            <div className="w-full flex flex-col gap-1">
-              <h3 className="font-open-sans text-base font-semibold text-white">
-                {t("need_help")}
-              </h3>
-              <h5 className="font-open-sans text-sm font-normal text-white">
-                {t("check_our_docs")}
-              </h5>
-              <Button
-                variant="secondary"
-                className="bg-white text-gray-800 hover:bg-gray-100"
-              >
-                {t("documentation")}
-              </Button>
-            </div>
-          </div> */}
-        </nav>
+      {isMobileMenuOpen && <button type="button" aria-label={t("close")} onClick={() => setIsMobileMenuOpen(false)} className="fixed inset-0 z-40 bg-[#10243a]/45 lg:hidden" />}
+      <aside className={`fixed inset-y-0 left-0 z-50 flex w-[min(84vw,300px)] flex-col border-r border-[#e9e6e0] bg-white shadow-xl transition-transform duration-300 lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`} aria-hidden={!isMobileMenuOpen} inert={!isMobileMenuOpen}>
+        <DashboardNav t={t} pathname={pathname} profile={profileData} isLoading={isProfileLoading} onNavigate={() => setIsMobileMenuOpen(false)} onLogout={logout} />
       </aside>
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-[#F8F9FA]">
-          <div className="h-full px-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleMobileMenu}
-                className="mobile-menu-button lg:hidden p-2 hover:bg-gray-200 rounded-full transition-colors duration-300"
-                title={t("open_menu")}
-              >
-                <Menu size={20} />
-              </button>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="relative z-30 flex h-[72px] shrink-0 items-center justify-between border-b border-[#e9e6e0] bg-white px-4 sm:px-6 lg:px-9">
+          <div className="flex min-w-0 items-center gap-3">
+            <button type="button" onClick={() => setIsMobileMenuOpen(true)} aria-label={t("open_menu")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#34485c] hover:bg-[#f7f3ec] lg:hidden"><Menu size={22} aria-hidden="true" /></button>
+            <div className="min-w-0"><p className="hidden text-[11px] font-bold uppercase tracking-[0.14em] text-[#a36f1d] sm:block">TreiOferte</p><h1 className="truncate text-base font-bold sm:text-lg">{pageTitle}</h1></div>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <LanguageToggleButton className="hidden sm:inline-flex" />
+            <div className="relative" ref={notificationRef}>
+              <button type="button" onClick={() => setIsNotificationOpen((value) => !value)} aria-label={t("notifications")} aria-expanded={isNotificationOpen} className="relative flex h-10 w-10 items-center justify-center rounded-xl text-[#34485c] hover:bg-[#f7f3ec]"><Bell size={20} aria-hidden="true" />{unreadCount > 0 && <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c88f2a] px-1 text-[10px] font-bold text-white">{unreadCount}</span>}</button>
+              {isNotificationOpen && <div className="absolute right-0 top-12 z-50 max-h-[min(70vh,500px)] w-[min(88vw,440px)] overflow-y-auto rounded-[18px] border border-[#e9e6e0] bg-white shadow-[0_20px_55px_rgba(23,43,67,0.17)]"><AdminNotification /></div>}
             </div>
-            <div className="flex items-center gap-4 sm:gap-8 me-2 sm:me-10">
-              <div className="relative" ref={notificationRef}>
-                <button
-                  onClick={toggleNotificationDropdown}
-                  className="p-2 rounded-full relative z-10 hover:bg-gray-200 transition-colors duration-200"
-                  title={t("notifications")}
-                >
-                  <Bell size={20} className="sm:w-6 sm:h-6" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
-                <AnimatePresence>
-                  {isNotificationOpen && (
-                    <motion.div
-                      initial="closed"
-                      animate="open"
-                      exit="closed"
-                      variants={dropdownVariants}
-                      className="absolute right-0 mt-2 w-[60vw] max-w-[600px] h-96 bg-white border border-gray-200 shadow-lg rounded-md z-50 overflow-y-auto"
-                    >
-                      <AdminNotification />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <div className="hidden sm:flex items-center justify-center gap-5">
-                <h4 className="text-xl font-medium">{t("settings")}</h4>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="cursor-pointer"
-                      title={t("more_options")}
-                    >
-                      <ChevronDown size={20} />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleItemClick(t("contact_support"), "/user/support")
-                      }
-                    >
-                      <Mail size={20} />
-                      {t("contact_support")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleItemClick(t("change_password"), "")}
-                    >
-                      <Lock size={20} />
-                      {t("change_password")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="sm:hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="cursor-pointer p-2"
-                      title={t("more_options")}
-                    >
-                      <ChevronDown size={16} />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleItemClick(t("upgrade_package"), "/user/upgrade")
-                      }
-                    >
-                      <CircleArrowUp size={20} />
-                      {t("upgrade_package")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleItemClick(t("contact_support"), "/user/support")
-                      }
-                    >
-                      <Mail size={20} />
-                      {t("contact_support")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleItemClick(t("change_password"), "")}
-                    >
-                      <Lock size={20} />
-                      {t("change_password")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild><button type="button" aria-label={t("settings")} className="flex h-10 items-center gap-1 rounded-xl px-2 text-[#34485c] hover:bg-[#f7f3ec]"><UserRound size={19} aria-hidden="true" /><ChevronDown size={15} aria-hidden="true" /></button></DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-xl border-[#e9e6e0] p-1.5">
+                <DropdownMenuItem onClick={() => navigate("/cont/profil")}><UserRound size={17} />{t("profile")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsChangePasswordOpen(true)}><Lock size={17} />{t("change_password")}</DropdownMenuItem>
+                <LanguageMenuItems />
+                <DropdownMenuItem onClick={() => navigate("/contact")}><Mail size={17} />{t("contact_support")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}><LogOut size={17} />{t("logout")}</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
-
-        <main className="flex-1 overflow-auto bg-[#F5F5F6] p-4 sm:p-6">
-          <Outlet />
-        </main>
-
-        {isChangePasswordOpen && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">
-                  {t("change_password")}
-                </h2>
-                <button
-                  onClick={handleClosePopup}
-                  className="text-gray-500 hover:text-gray-700"
-                  disabled={isChangePasswordLoading}
-                  title={t("close")}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("old_password")}
-                  </label>
-                  <input
-                    type={showPasswords.current_password ? "text" : "password"}
-                    name="current_password"
-                    value={formData.current_password}
-                    onChange={handleInputChange}
-                    placeholder={t("enter_password")}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility("current_password")}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={
-                      showPasswords.current_password
-                        ? t("hide_password")
-                        : t("show_password")
-                    }
-                  >
-                    {showPasswords.current_password ? (
-                      <EyeOff size={20} className="text-gray-500" />
-                    ) : (
-                      <Eye size={20} className="text-gray-500" />
-                    )}
-                  </button>
-                </div>
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("new_password")}
-                  </label>
-                  <input
-                    type={showPasswords.new_password ? "text" : "password"}
-                    name="new_password"
-                    value={formData.new_password}
-                    onChange={handleInputChange}
-                    placeholder={t("enter_password")}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility("new_password")}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={
-                      showPasswords.new_password
-                        ? t("hide_password")
-                        : t("show_password")
-                    }
-                  >
-                    {showPasswords.new_password ? (
-                      <EyeOff size={20} className="text-gray-500" />
-                    ) : (
-                      <Eye size={20} className="text-gray-500" />
-                    )}
-                  </button>
-                </div>
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("confirm_new_password")}
-                  </label>
-                  <input
-                    type={showPasswords.confirm_password ? "text" : "password"}
-                    name="confirm_password"
-                    value={formData.confirm_password}
-                    onChange={handleInputChange}
-                    placeholder={t("enter_password")}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility("confirm_password")}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 mt-6"
-                    title={
-                      showPasswords.confirm_password
-                        ? t("hide_password")
-                        : t("show_password")
-                    }
-                  >
-                    {showPasswords.confirm_password ? (
-                      <EyeOff size={20} className="text-gray-500" />
-                    ) : (
-                      <Eye size={20} className="text-gray-500" />
-                    )}
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white py-2 rounded-md disabled:bg-blue-400"
-                  disabled={isChangePasswordLoading}
-                >
-                  {isChangePasswordLoading ? t("processing") : t("confirm")}
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
+        <main className="min-w-0 flex-1 overflow-y-auto bg-[#faf9f6] px-4 py-6 sm:px-6 lg:px-9 lg:py-8"><div className="mx-auto max-w-[1440px]"><Outlet /></div></main>
       </div>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-      />
+
+      {isChangePasswordOpen && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#10243a]/55 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !isChangePasswordLoading) setIsChangePasswordOpen(false); }}>
+        <div role="dialog" aria-modal="true" aria-labelledby="change-password-title" className="w-full max-w-md rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_24px_70px_rgba(16,36,58,0.25)] sm:p-8">
+          <div className="mb-6 flex items-start justify-between gap-4"><div><div className="mb-3 h-1 w-9 rounded-full bg-[#d6a044]" /><h2 id="change-password-title" className="text-xl font-bold">{t("change_password")}</h2></div><button type="button" onClick={() => setIsChangePasswordOpen(false)} disabled={isChangePasswordLoading} aria-label={t("close")} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#617082] hover:bg-[#f2f4f5]"><X size={20} aria-hidden="true" /></button></div>
+          <form onSubmit={submitPassword} className="space-y-4">
+            {passwordFields.map(({ name, label }) => <div key={name}><label htmlFor={name} className="mb-1.5 block text-sm font-semibold text-[#34485c]">{t(label)}</label><div className="relative"><input id={name} type={showPasswords[name] ? "text" : "password"} name={name} value={formData[name]} onChange={(event) => setFormData((value) => ({ ...value, [name]: event.target.value }))} autoComplete={name === "current_password" ? "current-password" : "new-password"} placeholder={t("enter_password")} className="h-11 w-full rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 pr-11 focus:border-[#bd8525] focus:outline-none focus:ring-2 focus:ring-[#e5ad42]/20" required /><button type="button" onClick={() => setShowPasswords((value) => ({ ...value, [name]: !value[name] }))} aria-label={showPasswords[name] ? t("hide_password") : t("show_password")} className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center text-[#7c8b9a]">{showPasswords[name] ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}</button></div></div>)}
+            <button type="submit" disabled={isChangePasswordLoading} className="min-h-11 w-full rounded-xl bg-[#c88f2a] px-4 font-bold text-white hover:bg-[#ad751c] disabled:opacity-60">{isChangePasswordLoading ? t("processing") : t("confirm")}</button>
+          </form>
+        </div>
+      </div>}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

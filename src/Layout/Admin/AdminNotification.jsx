@@ -10,6 +10,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n.js";
+
 
 const AdminNotification = () => {
   const { t } = useTranslation();
@@ -140,7 +142,7 @@ const AdminNotification = () => {
 
   const handleNotificationClick = (planId) => {
     if (planId) {
-      navigate(`/richieste/${planId}`);
+      navigate(`/cereri/${planId}`);
     } else {
       toast.error(t("no_plan_id"));
     }
@@ -175,7 +177,7 @@ const AdminNotification = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-xs sm:text-sm text-gray-500">
-                  {new Date(item.created_at).toLocaleString("default", {
+                  {new Date(item.created_at).toLocaleString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
                     day: "numeric",
                     month: "short",
                     year: "numeric",

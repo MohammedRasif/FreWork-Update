@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Baby, User, X } from "lucide-react";
+import { Baby, User, X, ClipboardList, Send, CheckCircle2, XCircle, Search, Heart, ArrowUpRight, Info } from "lucide-react";
 import { IoIosSend } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -25,11 +25,18 @@ import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
 import AdminDecline from "./AdminDecline";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
+import PlanImage1 from "@/assets/img/plan-image-1.png";
+
+const tabs = [
+  { id: "all", label: "all_plans_tab", icon: ClipboardList },
+  { id: "offered", label: "offered_plans_tab", icon: Send },
+  { id: "accepted", label: "accepted_plans_tab", icon: CheckCircle2 },
+  { id: "declined", label: "decline_plans_tab", icon: XCircle },
+];
 
 const AdminHome = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(t("all_plans_tab"));
+  const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -55,7 +62,7 @@ const AdminHome = () => {
 
   useEffect(() => {
     const savedTab = localStorage.getItem("adminActiveTab");
-    if (savedTab) setActiveTab(savedTab);
+    if (tabs.some((tab) => tab.id === savedTab)) setActiveTab(savedTab);
   }, []);
 
   const handleTabChange = (tab) => {
@@ -82,7 +89,7 @@ const AdminHome = () => {
 
   const filteredPlans = tourPlanPublic.filter((plan) => {
     const matchesSearch = plan.location_to
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesFilter =
       filter === "All" ||
@@ -179,7 +186,7 @@ const AdminHome = () => {
       setOfferForm({ applyDiscount: false, discount: "" });
       setSelectedFile(null);
       toast.success(t("offer_submitted_success"));
-      navigate("/admin/chat");
+      navigate("/agentie/mesaje");
     } catch (error) {
       toast.error(
         error?.data?.error || error?.error || t("failed_to_submit_offer")
@@ -220,17 +227,17 @@ const AdminHome = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case t("all_plans_tab"):
+      case "all":
         if (isTourPlanPublicLoading) {
           return (
-            <div className="text-center text-gray-600">
+            <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-sm font-medium text-[#617082]" role="status">
               {t("loading_plans")}
             </div>
           );
         }
         if (!filteredPlans.length) {
           return (
-            <div className="text-center text-gray-600">
+            <div className="flex min-h-56 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-center text-base font-semibold text-[#172b43] shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
               {t("no_plans_found")}
             </div>
           );
@@ -243,25 +250,24 @@ const AdminHome = () => {
           return (
             <div
               key={plan.id}
-              className="rounded-lg bg-white shadow-sm border border-gray-200 mb-6 mx-auto"
+              className="mb-5 overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.05)]"
             >
               <div className="flex flex-col lg:flex-row">
-                <div className="lg:flex relative">
+                <div className="relative shrink-0 bg-[#f4eee4] lg:w-[215px]">
                   <img
-                    src={
-                      plan.spot_picture_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                    }
+                    src={plan.spot_picture_url || PlanImage1}
+                    onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                     alt={t("tourist_spot")}
-                    className="w-full h-48 object-cover rounded-t-lg lg:h-44 lg:w-56 lg:rounded-l-lg lg:rounded-t-none"
+                    className="h-44 w-full object-cover lg:h-full lg:min-h-[220px]"
                   />
                 </div>
-                <div className="p-3 lg:flex lg:flex-1 lg:justify-between">
-                  <div className="flex-1 lg:-mr-0 -mr-8 pl-1 lg:pl-0">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 mt-2 lg:mt-5">
+                <div className="min-w-0 flex-1 p-5 lg:flex lg:justify-between lg:gap-5 lg:p-6">
+                  <div className="min-w-0 flex-1">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a36f1d]">{t("all_plans_tab")}</p>
+                    <h2 className="mb-3 break-words text-xl font-bold tracking-tight text-[#172b43] sm:text-2xl">
                       {plan.location_to}
                     </h2>
-                    <div className="space-y-1 text-xs sm:text-sm lg:text-sm text-gray-600">
+                    <div className="space-y-2 text-sm text-[#617082]">
                       <p>
                         {t("dates")}:{" "}
                         <span className="font-medium">
@@ -272,33 +278,33 @@ const AdminHome = () => {
                         <span className="">{t("category")}:</span>{" "}
                         <span className="font-medium">
                           {plan.destination_type === "beach"
-                            ? "Mare"
+                            ? t("beach")
                             : plan.destination_type === "mountain"
-                            ? "Montagna"
+                            ? t("mountain")
                             : plan.destination_type === "relax"
-                            ? "Relax"
+                            ? t("relaxation")
                             : plan.destination_type === "group"
-                            ? "Gruppi"
+                            ? t("group")
                             : t("na")}
                         </span>
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col lg:flex-row lg:justify-end lg:items-start mb-4 space-y-3 lg:space-y-0 mt-3 lg:mt-5 lg:mr-3">
+                  <div className="mt-5 flex shrink-0 flex-col gap-3 border-t border-[#f0eee9] pt-4 lg:mt-0 lg:items-end lg:border-t-0 lg:pt-0">
                     <div className="lg:flex lg:items-end lg:justify-between lg:flex-col lg:space-x-0">
-                      <div className="text-center lg:text-right">
-                        <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-700 flex items-center justify-center lg:items-center">
+                      <div className="text-left lg:text-right">
+                        <p className="flex items-center text-lg font-bold text-[#172b43]">
                           {t("budget")} <FaEuroSign /> {plan.budget}
                         </p>
-                        <p className="text-xs sm:text-sm lg:text-md text-gray-800">
+                        <p className="text-sm text-[#617082]">
                           {t("total")} {plan.total_members}{" "}
                           {plan.total_members === 1 ? t("person") : t("persons")}
                         </p>
                       </div>
-                      <div className="flex flex-row justify-center items-center space-x-4 lg:flex-wrap lg:gap-2 mt-4 lg:mt-4">
+                      <div className="mt-4 flex flex-wrap items-center gap-2 lg:justify-end">
                         <button
                           onClick={() => openPopup(plan, "view")}
-                          className="px-4 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md transition-colors"
+                          className="min-h-10 cursor-pointer rounded-xl border border-[#d8dfe5] bg-white px-4 text-sm font-bold text-[#172b43] transition-colors hover:bg-[#f7f3ec]"
                         >
                           {t("view")}
                         </button>
@@ -308,12 +314,12 @@ const AdminHome = () => {
                           <span className="text-xs text-gray-500 italic">
                             {alreadyOffered
                               ? t("already_offered") // "তুমি already offer পাঠিয়েছ"
-                              : "Max 3 offers reached"} {/* offer_count > 3 */}
+                              : t("max_offers_reached")} {/* offer_count > 3 */}
                           </span>
                         ) : (
                           <button
                             onClick={() => openPopup(plan, "offer")}
-                            className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                            className="min-h-10 rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
                           >
                             {t("send_offer")}
                           </button>
@@ -322,7 +328,7 @@ const AdminHome = () => {
                         <button
                           onClick={() => handleDeclineRequest(plan.id)}
                           disabled={isDeclineRequestLoading}
-                          className={`px-4 py-2 bg-gray-600 text-white text-xs sm:text-sm lg:text-sm font-medium rounded-md hover:bg-gray-700 transition-colors ${
+                          className={`min-h-10 rounded-xl border border-[#d8dfe5] bg-white px-4 text-sm font-semibold text-[#617082] transition-colors hover:bg-[#fff3ee] hover:text-[#9d4635] ${
                             isDeclineRequestLoading
                               ? "opacity-50 cursor-not-allowed"
                               : ""
@@ -340,11 +346,11 @@ const AdminHome = () => {
             </div>
           );
         });
-      case t("decline_plans_tab"):
+      case "declined":
         return <AdminDecline />;
-      case t("offered_plans_tab"):
+      case "offered":
         return <AdminOfferPlan />;
-      case t("accepted_plans_tab"):
+      case "accepted":
         return <AdminAcceptPlan />;
       default:
         return null;
@@ -397,11 +403,11 @@ const AdminHome = () => {
                         <span>
                           <span className="font-bold">{t("meal_plan")}:</span>{" "}
                           {selectedPlan.meal_plan === "breakfast"
-                            ? "Colazione"
+                            ? t("breakfast")
                             : selectedPlan.meal_plan === "half-board"
-                            ? "Mezza Pensione (Colazione & Cena)"
+                            ? t("half_board")
                             : selectedPlan.meal_plan === "full-board"
-                            ? "Pensione Completa (Tutti i Pasti)"
+                            ? t("full_board")
                             : "N/A"}
                         </span>
                       </p>
@@ -412,15 +418,15 @@ const AdminHome = () => {
                             {t("type_of_accommodation")}:
                           </span>{" "}
                           {selectedPlan.type_of_accommodation === "hotel"
-                            ? "Hotel"
+                            ? t("hotel")
                             : selectedPlan.type_of_accommodation === "resort"
-                            ? "Resort"
+                            ? t("resort")
                             : selectedPlan.type_of_accommodation === "homestay"
-                            ? "Famiglia"
+                            ? t("homestay")
                             : selectedPlan.type_of_accommodation === "apartment"
-                            ? "Appartamento"
+                            ? t("apartment")
                             : selectedPlan.type_of_accommodation === "hostel"
-                            ? "Ostello"
+                            ? t("hostel")
                             : "N/A"}
                         </span>
                         <p className="text-md text-gray-600 flex items-center gap-2">
@@ -516,10 +522,8 @@ const AdminHome = () => {
               </div>
               <div className="mb-4 relative">
                 <img
-                  src={
-                    selectedPlan.spot_picture_url ||
-                    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                  }
+                  src={selectedPlan.spot_picture_url || PlanImage1}
+                  onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PlanImage1; }}
                   alt={t("tour_destination")}
                   className="w-full h-48 sm:h-64 lg:h-96 object-cover rounded-lg"
                 />
@@ -606,7 +610,7 @@ const AdminHome = () => {
                 className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
+                    : "bg-[#c88f2a] text-white hover:bg-[#ad751c]"
                 }`}
                 disabled={
                   isOfferSubmitting || !offerBudget || !offerComment.trim()
@@ -627,14 +631,13 @@ const AdminHome = () => {
               {selectedPlan.offers.map((offer) => (
                 <div
                   key={offer.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-3 rounded-lg border border-gray-200 mb-3"
+                  className="mb-3 flex flex-col justify-between gap-3 rounded-xl border border-[#e9e6e0] bg-[#faf9f6] px-4 py-3 sm:flex-row sm:items-center"
                 >
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-0">
-                    <img
-                      src={offer.agency.logo_url || "/placeholder.svg"}
-                      alt={`${offer.agency.agency_name} avatar`}
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover"
-                    />
+                    <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#172b43] text-sm font-bold text-white">
+                      {(offer.agency?.agency_name || "A").charAt(0).toUpperCase()}
+                      {offer.agency?.logo_url && <img src={offer.agency.logo_url} onError={(event) => { event.currentTarget.style.display = "none"; }} alt={`${offer.agency.agency_name} avatar`} className="absolute inset-0 h-full w-full object-cover" />}
+                    </span>
                     <div>
                       <span className="font-medium text-gray-900">
                         {offer.agency.agency_name}
@@ -658,45 +661,35 @@ const AdminHome = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="agency-home min-w-0">
       <Toaster />
-      <div className="flex flex-col lg:flex-row">
-        <div className="w-full lg:w-4/5">
-          <div className="mb-24 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              {t("welcome")},{" "}
-              <span className="font-semibold">{t("choose_perfect_offer")}</span>
-            </h1>
-            {activeTab === t("all_plans_tab") && (
-              <div className="flex items-center space-x-4">
-                <div className="relative w-full lg:max-w-[30vh]">
-                  <input
-                    type="text"
-                    placeholder={t("search_by_tour_location")}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 sm:px-4 lg:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] text-xs sm:text-sm lg:text-base text-gray-700 placeholder-gray-400 pr-8 sm:pr-10 lg:pr-10"
-                  />
-                  <svg
-                    className="absolute right-2 sm:right-3 lg:right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 lg:h-5 lg:w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
-                <select
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] text-xs sm:text-sm lg:text-base text-gray-700"
-                >
+      <section className="rounded-[26px] bg-[#172b43] px-6 py-8 text-white sm:px-9 sm:py-10">
+        <div className="mb-5 h-1 w-11 rounded-full bg-[#d6a044]" />
+        <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{t("welcome")}</h2>
+        <p className="mt-3 text-sm leading-7 text-white/75 sm:text-base">{t("choose_perfect_offer")}</p>
+      </section>
+
+      <nav aria-label={t("my_board")} className="mt-6 grid grid-cols-2 gap-2 rounded-[20px] border border-[#e9e6e0] bg-white p-2 shadow-[0_10px_35px_rgba(23,43,67,0.04)] xl:grid-cols-4">
+        {tabs.map(({ id, label, icon: Icon }) => (
+          <button key={id} type="button" onClick={() => handleTabChange(id)} aria-current={activeTab === id ? "page" : undefined}
+            className={"flex min-h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl px-2 text-center text-xs font-semibold leading-tight transition-colors sm:gap-2 sm:px-3 sm:text-sm " + (activeTab === id ? "bg-[#172b43] text-white shadow-sm" : "text-[#536477] hover:bg-[#f7f3ec] hover:text-[#172b43]")}>
+            <Icon size={17} className="shrink-0" aria-hidden="true" /><span>{t(label)}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="mt-8 grid min-w-0 items-start gap-7 xl:grid-cols-[minmax(0,1fr)_260px]">
+        <section className="min-w-0">
+          <div className="mb-5 flex flex-col gap-4 2xl:flex-row 2xl:items-end 2xl:justify-between">
+            <div><div className="mb-3 h-1 w-10 rounded-full bg-[#d6a044]" /><h3 className="text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">{t(tabs.find((tab) => tab.id === activeTab)?.label || "all_plans_tab")}</h3></div>
+            {activeTab === "all" && (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <label className="relative block min-w-0 flex-1">
+                  <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8b99a7]" aria-hidden="true" />
+                  <span className="sr-only">{t("search_by_tour_location")}</span>
+                  <input type="search" placeholder={t("search_by_tour_location")} value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} className="h-11 w-full rounded-xl border border-[#dce2e8] bg-white pl-10 pr-4 text-sm text-[#172b43] outline-none focus:border-[#c88f2a] focus:ring-2 focus:ring-[#c88f2a]/15 sm:w-60" />
+                </label>
+                <select value={filter} onChange={(event) => setFilter(event.target.value)} aria-label={t("filters")} className="h-11 rounded-xl border border-[#dce2e8] bg-white px-3 text-sm font-medium text-[#34485c] outline-none focus:border-[#c88f2a] focus:ring-2 focus:ring-[#c88f2a]/15">
                   <option value="All">{t("all")}</option>
                   <option value="Offered">{t("offered")}</option>
                 </select>
@@ -704,91 +697,40 @@ const AdminHome = () => {
             )}
           </div>
           {renderContent()}
-        </div>
+        </section>
 
-        <div className="fixed lg:right-3 right-[2px] lg:top-20 top-45 w-full md:w-1/6 p-3 sm:p-4 lg:p-2 z-40">
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-700 mb-4 lg:mb-6 text-center hidden md:block">
-                {t("my_board")}
-              </h3>
-              <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-3 overflow-x-auto lg:overflow-x-visible">
-                {[
-                  t("all_plans_tab"),
-                  t("offered_plans_tab"),
-                  t("accepted_plans_tab"),
-                  t("decline_plans_tab"),
-                ].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => handleTabChange(tab)}
-                    className={`flex-shrink-0 lg:w-full text-center px-3 sm:px-4 lg:px-4 py-2 lg:py-3 text-xs sm:text-sm lg:text-base font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap ${
-                      activeTab === tab
-                        ? "bg-white shadow-md border border-blue-200"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-              <div className="pt-4 lg:pt-6 hidden md:block">
-                <div className="flex flex-col gap-1 mt-6">
-                  <p className="text-sm text-gray-900 font-semibold mb-2">
-                    {t("need_fast_response")}
-                  </p>
-                  <NavLink to="/contatti">
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0 underline text-left w-min text-xs"
-                    >
-                      {t("click_here")}
-                    </Button>
-                  </NavLink>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white border-2 border-red-600 rounded-xl shadow-lg overflow-hidden hidden md:block">
-              <div className="bg-red-600 text-white px-4 py-3 flex items-center gap-2">
-                <div className="bg-white text-red-600 rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold">
-                  !
-                </div>
-                <h3 className="text-sm lg:text-base font-bold">
-                  {t("important_notice_for_agencies")}
-                </h3>
-              </div>
-              <div className="p-4 space-y-3 text-gray-800 text-xs lg:text-sm">
-                <p className="font-semibold leading-relaxed">
-                  {t("confirm_deal_mandatory")}
-                </p>
-                <p className="leading-relaxed">
-                  {t("final_confirmation_client")}
-                </p>
-                <p className="font-bold text-red-700 flex items-center gap-1">
-                  <span className="text-xl">X</span>
-                  {t("penalties_for_noncompliance")}
-                </p>
-              </div>
-            </div>
+        <aside className="space-y-5">
+          <div className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427]"><Heart size={19} aria-hidden="true" /></div>
+            <h3 className="mt-4 text-base font-bold text-[#172b43]">{t("need_fast_response")}</h3>
+            <NavLink to="/contact" className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-[#9b6b22] hover:underline">{t("click_here")}<ArrowUpRight size={16} aria-hidden="true" /></NavLink>
           </div>
-        </div>
+          <div className="rounded-[22px] border border-[#eadac0] bg-[#fffaf0] p-6">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#fff0d5] text-[#a36f1d]"><Info size={18} aria-hidden="true" /></span>
+              <h3 className="text-sm font-bold leading-6 text-[#172b43]">{t("important_notice_for_agencies")}</h3>
+            </div>
+            <p className="mt-4 text-sm font-semibold leading-6 text-[#34485c]">{t("confirm_deal_mandatory")}</p>
+            <p className="mt-3 text-sm leading-6 text-[#617082]">{t("final_confirmation_client")}</p>
+            <p className="mt-3 text-xs font-semibold leading-5 text-[#9d4635]">{t("penalties_for_noncompliance")}</p>
+          </div>
+        </aside>
       </div>
 
       {isPopupOpen && selectedPlan && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/55 p-4">
           <div
             ref={popupRef}
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="agency-offer-modal max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)]"
           >
-            <div className="flex justify-between items-center p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between border-b border-[#e9e6e0] p-5 sm:px-7">
+              <h2 className="text-xl font-bold text-[#172b43]">
                 {modalType === "view" ? t("tour_details") : t("send_offer")}
               </h2>
               <button
                 onClick={closePopup}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
+                aria-label={t("close")}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#617082] transition-colors hover:bg-[#f2f4f5]"
               >
                 <X size={24} />
               </button>

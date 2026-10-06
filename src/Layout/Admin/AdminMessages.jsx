@@ -28,18 +28,18 @@ const AdminMessages = () => {
 
   const handleUserClick = (user) => {
     setSelectedUserId(user.id);
-    navigate(`/Admin_Dashboard/Message/${user.id}`, { state: { user } });
+    navigate(`/agentie/mesaje/${user.id}`, { state: { user } });
   };
 
   const handleChatbotClick = () => {
     setSelectedUserId(null);
-    navigate("/Admin_Dashboard/Message/chatbot");
+    navigate("/agentie/mesaje/chatbot");
   };
 
-  const isBaseRoute = location.pathname === "/Admin_Dashboard/Message";
+  const isBaseRoute = location.pathname === "/agentie/mesaje";
 
   return (
-    <div className="p-10 roboto">
+    <div className="p-10">
       <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
         {t("messages")}
       </h1>
@@ -57,7 +57,7 @@ const AdminMessages = () => {
           <div
             onClick={handleChatbotClick}
             className={`flex items-center space-x-2 px-[10px] py-[8px] mt-2 cursor-pointer ${
-              location.pathname === "/Admin_Dashboard/Message/chatbot"
+              location.pathname === "/agentie/mesaje/chatbot"
                 ? "bg-[#B6E3FC]"
                 : "hover:bg-[#B6E3FC]"
             }`}

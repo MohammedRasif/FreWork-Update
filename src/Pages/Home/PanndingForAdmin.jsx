@@ -2,7 +2,7 @@
 import React from 'react';
 import { Clock, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import image from "../../assets/img/removebg.png"
+import BrandWordmark from "@/components/BrandWordmark";
 import { NavLink } from 'react-router-dom';
 function PendingForAdmin() {
   const { t } = useTranslation();
@@ -11,13 +11,13 @@ function PendingForAdmin() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
 
-        
+
         <div className="bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer px-8 py-3 text-center">
-         <NavLink to="/">
-           <div className='flex items-center justify-center pb-5'>
-          <img src={image} className='h-16' alt="" />
-        </div>
-         </NavLink>
+          <NavLink to="/">
+            <div className='flex items-center justify-center pb-5'>
+              <BrandWordmark className="rounded-xl bg-white px-4 py-3" />
+            </div>
+          </NavLink>
           <div className="relative inline-block mb-6">
             <div className="absolute inset-0 bg-white/20 rounded-full blur-xl"></div>
             <div className="relative bg-white/10 backdrop-blur-sm p-6 rounded-full">
@@ -26,7 +26,7 @@ function PendingForAdmin() {
           </div>
 
           <h1 className="text-3xl font-bold text-white mb-3">
-            {t('pendings.title')} 
+            {t('pendings.title')}
           </h1>
           <p className="text-blue-100 text-lg">
             {t('pendings.subtitle')}
@@ -104,7 +104,7 @@ function PendingForAdmin() {
 
         <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 text-center">
           <p className="text-sm text-gray-500">
-            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © treioferte.md
+            {t('pendings.thankYouPatience')} • {new Date().getFullYear()} © TreiOferte
           </p>
         </div>
       </div>

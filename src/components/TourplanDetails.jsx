@@ -2,6 +2,9 @@ import { useGetOneTourPlanQuery } from "@/redux/features/withAuth";
 import { X } from "lucide-react";
 import { MdVerified } from "react-icons/md";
 import { useTranslation } from "react-i18next";
+import i18n from "../../i18n.js";
+import { localizedContent } from "@/lib/localizedContent";
+
 
 export default function TourPlanDetails({ id, closeModal }) {
   const { t } = useTranslation();
@@ -9,19 +12,19 @@ export default function TourPlanDetails({ id, closeModal }) {
 
   const formatDateRange = (startDate, endDate) => {
     try {
-      const start = new Date(startDate).toLocaleDateString("en-US", {
+      const start = new Date(startDate).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
         day: "numeric",
         month: "long",
         year: "numeric",
       });
-      const end = new Date(endDate).toLocaleDateString("en-US", {
+      const end = new Date(endDate).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU", {
         day: "numeric",
         month: "long",
         year: "numeric",
       });
       return `${start} - ${end}`;
     } catch (error) {
-      return t("tbd") || "TBD";
+      return t("tbd");
     }
   };
 
@@ -31,7 +34,7 @@ export default function TourPlanDetails({ id, closeModal }) {
   if (isLoading) {
     return (
       <div className="text-center py-10 text-gray-600 animate-pulse">
-        {t("loading") || "Loading"}...
+        {t("loading")}...
       </div>
     );
   }
@@ -39,7 +42,7 @@ export default function TourPlanDetails({ id, closeModal }) {
   if (isError || !tourData) {
     return (
       <div className="text-center py-10 text-red-500">
-        {t("error_loading") || "Error loading tour plan details."}
+        {t("error_loading") || t("error_loading_tour_details")}
       </div>
     );
   }
@@ -74,40 +77,40 @@ export default function TourPlanDetails({ id, closeModal }) {
         <div className="p-4 sm:p-6">
           {/* Header */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-            {t("tour_to") || "Tour to"} {tourData.location_to}
+            {t("tour_to")} {tourData.location_to}
           </h2>
           <p className="text-sm text-gray-500 mb-4">
-            {t("posted_by") || "Posted by"} User {tourData.name} ·{" "}
+            {t("posted_by")} {t("user")} {tourData.name} ·{" "}
             {new Date(
               tourData.offers?.[0]?.tour_plan?.created_at || Date.now()
-            ).toLocaleDateString()}
+            ).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU")}
           </p>
 
           {/* Tour Plan Details */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              {t("tour_details") || "Tour Details"}
+              {t("tour_details")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
               <p>
-                <strong>{t("route") || "Route"}:</strong> {tourData.location_from} to{" "}
+                <strong>{t("route")}:</strong> {tourData.location_from} {t("to")}{" "}
                 {tourData.location_to}
               </p>
               <p>
-                <strong>{t("dates") || "Dates"}:</strong>{" "}
+                <strong>{t("dates")}:</strong>{" "}
                 {tourData.start_date, tourData.end_date}
               </p>
               <p>
-                <strong>{t("members") || "Members"}:</strong> {tourData.total_members}
+                <strong>{t("members")}:</strong> {tourData.total_members}
               </p>
               <p>
-                <strong>{t("budget") || "Budget"}:</strong> €{Number(tourData.budget).toLocaleString()}
+                <strong>{t("budget")}:</strong> €{Number(tourData.budget).toLocaleString(i18n.language === "ro" ? "ro-RO" : "ru-RU")}
               </p>
               <p>
-                <strong>{t("duration") || "Duration"}:</strong> {tourData.duration} {t("days") || "days"}
+                <strong>{t("duration")}:</strong> {tourData.duration} {t("days")}
               </p>
               <p>
-                <strong>{t("status") || "Status"}:</strong>{" "}
+                <strong>{t("status")}:</strong>{" "}
                 <span
                   className={`capitalize ${
                     tourData.approval_status === "Verificato"
@@ -115,23 +118,23 @@ export default function TourPlanDetails({ id, closeModal }) {
                       : "text-gray-500"
                   }`}
                 >
-                  {t(tourData.approval_status) || tourData.approval_status}
+                  {localizedContent(tourData.approval_status, t)}
                 </span>
               </p>
               <div className="sm:col-span-2">
                 <p>
-                  <strong>{t("description") || "Description"}:</strong>{" "}
-                  {tourData.description || t("no_description") || "No description provided."}
+                  <strong>{t("description")}:</strong>{" "}
+                  {tourData.description || t("no_description")}
                 </p>
                 <p className="pt-5">
-                  <strong>{t("email") || "Email"}:</strong>{" "}
-                  {tourData.email || t("not_provided") || "Not provided"}
+                  <strong>{t("email") || t("email_address_label")}:</strong>{" "}
+                  {tourData.email || t("not_provided")}
                 </p>
               </div>
               <div className="flex items-center justify-between">
                 <p>
-                  <strong>{t("phone") || "Phone"}:</strong>{" "}
-                  {tourData.phone_number || t("not_provided") || "Not provided"}
+                  <strong>{t("phone")}:</strong>{" "}
+                  {tourData.phone_number || t("not_provided")}
                 </p>
               </div>
             </div>
@@ -175,7 +178,7 @@ export default function TourPlanDetails({ id, closeModal }) {
                         : "text-gray-500"
                     }`}
                   >
-                    {t(offer.status) || offer.status}
+                    {localizedContent(offer.status, t)}
                   </span>
                 </p>
               </div> */}

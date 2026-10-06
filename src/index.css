@@ -1,23 +1,38 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
-
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "daisyui";
+
+@font-face {
+  font-family: "TreiOferte Display";
+  src: url("/fonts/manrope-variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TreiOferte Text";
+  src: url("/fonts/nunito-sans-variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+}
+
+body {
+  font-family: var(--font-sans);
+  --toastify-font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(48%) sepia(93%) saturate(2405%) hue-rotate(4deg)
     brightness(102%) contrast(104%);
   cursor: pointer;
 }
-.dm_serif {
-  font-family: "DM Serif Display", serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
 /* Banner Container */
 .vmc-cookie-banner {
 position: fixed;
@@ -35,7 +50,7 @@ justify-content: space-between;
 align-items: center;
 gap: 20px;
 z-index: 10000;
-font-family: 'Open Sans', sans-serif; /* Adjust to site font */
+font-family: var(--font-sans);
 /* Animation states */
 opacity: 0;
 visibility: hidden;
@@ -114,6 +129,7 @@ border-radius: 12px 12px 0 0;
 left: 0;
 transform: none;
 }
+
 .vmc-cookie-actions {
 width: 100%;
 justify-content: flex-end;
@@ -131,6 +147,8 @@ text-align: center;
 
 
 @theme inline {
+  --font-sans: "TreiOferte Text", Arial, sans-serif;
+  --font-display: "TreiOferte Display", Arial, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -168,9 +186,6 @@ text-align: center;
   --color-sidebar-ring: var(--sidebar-ring);
 }
 :root {
-  --font-roboto: "Roboto", sans-serif;
-  --font-nunito-sans: "Nunito Sans", sans-serif;
-  --font-open-sans: "Open Sans", sans-serif;
   --radius: 0.5rem;
   --background: oklch(0.975 0.005 240);
   --foreground: oklch(0.37 0.025 240);
@@ -351,6 +366,10 @@ text-align: center;
   all: revert; /* Tailwind/Prose এর সব ওভাররাইড রিমুভ করে ব্রাউজার ডিফল্টে ফিরিয়ে দেয় */
 }
 
+.blog-content-raw :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+}
+
 .blog-content-raw h1 {
   font-size: 2.5rem;     /* 40px */
   font-weight: 800;
@@ -424,3 +443,198 @@ text-align: center;
   opacity: 0.8;
 }
 
+.home-page .home-carousel .swiper-pagination {
+  position: relative;
+  margin-top: 12px;
+}
+
+.home-page .home-carousel .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #8d9aaa;
+  opacity: 0.45;
+}
+
+.home-page .home-carousel .swiper-pagination-bullet-active {
+  background: #bd8429;
+  opacity: 1;
+}
+
+.legal-article > section {
+  scroll-margin-top: 7rem;
+  min-width: 0;
+  padding: clamp(1.5rem, 3.4vw, 2.5rem);
+  border: 1px solid #e9e6e0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 35px rgba(23, 43, 67, 0.045);
+  overflow-wrap: anywhere;
+}
+
+.legal-article > section:target {
+  border-color: #d6a044;
+  box-shadow: 0 10px 35px rgba(23, 43, 67, 0.08);
+}
+
+.legal-article > section h2 {
+  margin: 0 0 1.15rem;
+  padding-left: 1rem;
+  border-left: 3px solid #d6a044;
+  color: #172b43;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 750;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.legal-article > section h3 {
+  color: #24384e;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.legal-article > section p,
+.legal-article > section li {
+  color: #536477;
+  font-size: 1rem;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.legal-article > section p strong {
+  color: #263b50;
+}
+
+.legal-article > section ol {
+  padding-left: 1.5rem;
+}
+
+.legal-article > section a {
+  color: #986619;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-cookie-banner {
+  max-width: 920px;
+  padding: 18px 22px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 18px 50px rgba(16, 36, 58, 0.18);
+}
+
+body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-cookie-content h4 {
+  color: #172b43;
+}
+
+body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-btn-primary {
+  background: #c88f2a;
+}
+
+@media (max-width: 768px) {
+  body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-cookie-banner,
+  body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-cookie-banner.show {
+    bottom: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page, .agencies-page, .how-it-works-page, .certified-agencies-page, .legal-page, .tour-detail-page)) .vmc-cookie-actions {
+    margin-top: 2px;
+  }
+}
+
+:is(.user-create-plan, .user-edit-profile) form :is(input:not([type="checkbox"]), select, textarea) {
+  min-height: 46px;
+  border: 1px solid #dce2e8;
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #172b43;
+}
+
+:is(.user-create-plan, .user-edit-profile) form :is(input:not([type="checkbox"]), select, textarea):focus {
+  border-color: #c88f2a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 143, 42, 0.14);
+}
+
+:is(.user-create-plan, .user-edit-profile) form label {
+  color: #34485c;
+  font-weight: 600;
+}
+
+.user-chat-desktop > h1,
+.user-chat-mobile h1 {
+  color: #172b43;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.user-chat-desktop > div {
+  overflow: hidden;
+  border: 1px solid #e9e6e0;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 10px 35px rgba(23, 43, 67, 0.05);
+}
+
+.user-chat-desktop > div > div:first-child {
+  flex: 0 0 clamp(260px, 32%, 320px);
+  width: auto;
+  background: #fff;
+  border-color: #e9e6e0;
+}
+
+.user-chat-desktop > div > div:last-child {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  background: #fff;
+}
+
+.user-chat-desktop input,
+.user-chat-mobile input {
+  border: 1px solid #dce2e8;
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #172b43;
+}
+
+.user-chat-desktop .bg-blue-100 {
+  background: #f7f3ec;
+}
+
+.agency-profile-edit form :is(input:not([type="checkbox"]):not([type="file"]), select, textarea) {
+  min-height: 46px;
+  border: 1px solid #dce2e8;
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #172b43;
+}
+
+.agency-profile-edit form :is(input:not([type="checkbox"]):not([type="file"]), select, textarea):focus {
+  border-color: #c88f2a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 143, 42, 0.14);
+}
+
+.agency-profile-edit form label {
+  color: #34485c;
+  font-weight: 600;
+}
+
+.agency-offer-modal :is(input:not([type="checkbox"]), textarea) {
+  min-height: 44px;
+  border: 1px solid #dce2e8;
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #172b43;
+}
+
+.agency-offer-modal :is(input:not([type="checkbox"]), textarea):focus {
+  border-color: #c88f2a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 143, 42, 0.14);
+}

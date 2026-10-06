@@ -1,350 +1,115 @@
-import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
-import { Baby, MapPin, ShieldCheck, User } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import {
-  FaBed,
-  FaClock,
-  FaList,
-  FaListUl,
-  FaLocationArrow,
-  FaLocationDot,
-  FaStar,
-  FaUtensils,
-} from "react-icons/fa6";
-import { IoBed } from "react-icons/io5";
-import { LuNavigation2 as Navigation } from "react-icons/lu";
-import { MdOutlineNoMeals } from "react-icons/md";
-import img from "../../assets/img/badge.png";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
+import { ArrowUpRight, CalendarDays, Check, Compass, MapPin, RotateCcw, Search, Users } from "lucide-react";
+import { useAcceptedAllOffersQuery } from "@/redux/features/baseApi";
+import { localizedContent } from "@/lib/localizedContent";
 
-function AcceptedOffers() {
-  const { t } = useTranslation();
-  const { data, error, isLoading } = useAcceptedAllOffersQuery();
-  const [showSentOfferButton, setShowSentOfferButton] = useState(false);
+const locale = (language) => language === "ru" ? "ru-RU" : "ro-RO";
 
-  const handleSentOfferClick = () => {
-    console.log("Sent Offer clicked");
-  };
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {[...Array(4)].map((_, i) => (
-        <div
-          key={i}
-          className="rounded-xl bg-white shadow-sm border border-gray-200 animate-pulse"
-        >
-          <div className="h-72 bg-gray-300 rounded-t-xl"></div>
-          <div className="p-4 space-y-3">
-            <div className="h-8 bg-gray-300 rounded w-3/4"></div>
-            <div className="h-5 bg-gray-300 rounded w-full"></div>
-            <div className="h-5 bg-gray-300 rounded w-5/6"></div>
-            <div className="h-6 bg-gray-300 rounded w-1/2"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-300 rounded w-full"></div>
-              <div className="h-4 bg-gray-300 rounded w-11/12"></div>
-              <div className="h-4 bg-gray-300 rounded w-10/12"></div>
-            </div>
-          </div>
-        </div>
-      ))}
+function formatDate(value, language) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return new Intl.DateTimeFormat(locale(language), { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
+}
+
+function formatBudget(value, language) {
+  if (value === undefined || value === null || value === "") return "—";
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "—";
+  return new Intl.NumberFormat(locale(language), { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(amount);
+}
+
+function DestinationImage({ tour, title }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="relative h-56 overflow-hidden bg-[#29465e]">
+      {tour.spot_picture_url && !failed
+        ? <img src={tour.spot_picture_url} alt={title} loading="lazy" onError={() => setFailed(true)} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        : <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#25445e] via-[#40627a] to-[#8ca5ae] text-white/45"><Compass size={70} strokeWidth={1.1} aria-hidden="true" /></div>}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#10243a]/90 via-[#10243a]/10 to-transparent" />
+      <h3 className="absolute bottom-5 left-5 right-5 break-words text-2xl font-bold leading-tight text-white">{title}</h3>
     </div>
   );
+}
 
-  const NoDataMessage = () => (
-    <div className="flex flex-col items-center justify-center py-20 text-center min-h-screen -my-56">
-      <h3 className="text-2xl font-semibold text-gray-700 mb-2">
-        {t("no_accepted_offers_yet")}
-      </h3>
-    </div>
-  );
-
-  const ErrorMessage = () => (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="bg-red-100 p-4 rounded-full mb-4">
-        <svg
-          className="w-12 h-12 text-red-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-gray-800 mb-1">
-        {t("something_went_wrong")}
-      </h3>
-      <p className="text-gray-600">{t("failed_to_load_offers")}</p>
-    </div>
-  );
+function AcceptedOfferCard({ tour }) {
+  const { t, i18n } = useTranslation();
+  const title = tour.location_to || t("destination");
+  const agency = (Array.isArray(tour.offers) ? tour.offers.find((offer) => offer.status === "accepted") : null)?.agency;
+  const spots = Array.isArray(tour.tourist_spots) ? tour.tourist_spots.filter(Boolean).join(", ") : tour.tourist_spots;
 
   return (
-    <div className="pt-24 container mx-auto lg:px-3 px-5">
-      <Helmet>
-        <title>treioferte.md | offerte-accettate</title>
-      </Helmet>
-      <h1 className="lg:text-4xl text-[28px] font-semibold pb-3">
-        {t("all_accepted_offers")}
-      </h1>
-
-      {isLoading ? (
-        <LoadingSkeleton />
-      ) : error ? (
-        <ErrorMessage />
-      ) : data && data.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {data.map((tour) => (
-            <div
-              key={tour.id}
-              className="rounded-xl bg-white shadow-sm border border-gray-200 mb-6"
-            >
-              <div className="relative">
-                <div className="overflow-hidden">
-                  <img
-                    src={
-                      tour.spot_picture_url ||
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg"
-                    }
-                    alt={`${tour.location_to} destination`}
-                    className="w-full h-72 object-cover hover:scale-105 transition-transform duration-300 rounded-t-xl"
-                  />
-                  <div className="absolute inset-0 bg-black/20 flex flex-col justify-center items-center text-white rounded-t-xl">
-                    <h2 className="text-2xl md:text-4xl font-semibold text-center px-4 mb-2">
-                      {tour.location_to}
-                    </h2>
-                  </div>
-
-                  {tour.offers && tour.offers.length > 0 && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex justify-center pb-2 flex-row">
-                      {tour.offers.slice(0, 3).map((offer, index) => (
-                        <div
-                          key={offer.id || index}
-                          className="w-20 h-20 flex items-center justify-center"
-                        >
-                          <div className="relative rounded-full shadow-inner flex flex-col items-center justify-center p-2">
-                            {offer.status === "accepted" && (
-                              <img
-                                src={img}
-                                alt={t("badge")}
-                                className="absolute inset-0 object-contain rounded-full pointer-events-none z-10"
-                              />
-                            )}
-                            <img
-                              src={
-                                offer.agency?.logo_url ||
-                                "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"
-                              }
-                              alt={offer.agency?.agency_name || t("agency")}
-                              className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md relative z-30 mt-[1px]"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {tour.offer_count >= 3 && (
-                    <div className="text-sm text-white px-2 rounded-full py-1 font-medium mt-3 absolute top-0 right-5 bg-green-600 flex items-center">
-                      <svg
-                        className="mr-1"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                      </svg>
-                      {t("offers_completed")}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-col flex-grow p-4 space-y-1 rounded-t-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="lg:text-3xl text-2xl font-semibold text-gray-900">
-                    {tour.location_to.length > 8
-                      ? `${tour.location_to.slice(0, 8)}...`
-                      : tour.location_to}
-                  </h3>
-                </div>
-
-                <div className="space-y-1 text-md text-gray-700">
-                  <p>
-                    <span className="font-medium">{t("date")}:</span>{" "}
-                    {tour.start_date}
-                  </p>
-                  {/* <p>
-                    <span className="font-medium">{t("category")}:</span>{" "}
-                    {tour.destination_type || "N/A"}
-                  </p> */}
-                  <p>
-                    <span className="font-medium">{t("category")}:</span>{" "}
-                    {tour.destination_type === "beach"
-                      ? "Mare"
-                      : tour.destination_type === "mountain"
-                        ? "Montagna"
-                        : tour.destination_type === "relax"
-                          ? "Relax"
-                          : tour.destination_type === "group"
-                            ? "Gruppi"
-                            : t("na")}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-semibold text-gray-900">
-                    {t("budget")}: €{tour.budget}
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-10">
-                  <span className="text-md text-gray-700">
-                    <span className="font-medium">{t("total")}:</span>{" "}
-                    {tour.total_members}{" "}
-                    {tour.total_members > 1 ? t("people") : t("person")}
-                  </span>
-                  {/* <div className="flex items-center space-x-4">
-                    <h1 className="text-md text-gray-700">
-                      <span className="font-medium">{t("child")} :</span>{" "}
-                      {tour.child_count}
-                    </h1>
-                    <h1>
-                      <span className="font-medium">{t("adult")} :</span>{" "}
-                      {tour.adult_count}
-                    </h1>
-                  </div> */}
-                </div>
-
-                <div>
-                  {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                    <Baby className="w-6 h-5 text-gray-900" />
-                    <span>
-                      <span className="font-bold">{t("child")}:</span>{" "}
-                      {tour.child_count}
-                    </span>
-                  </p>
-                  <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                    <User className="w-6 h-5 text-gray-900" />
-                    <span>
-                      <span className="font-bold">{t("adult")}:</span>{" "}
-                      {tour.adult_count}
-                    </span>
-                  </p> */}
-                  <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaLocationDot className="w-6 h-5 text-black size-4" />
-                    <span>
-                      <span className="font-medium">
-                        {t("points_of_travel")}:
-                      </span>{" "}
-                      {tour.tourist_spots.length > 14
-                        ? `${tour.tourist_spots.slice(0, 14)}...`
-                        : tour.tourist_spots}
-                    </span>
-                  </p>
-                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaLocationArrow className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">
-                        {t("departure_from")}:
-                      </span>{" "}
-                      {tour.location_from || "N/A"}
-                    </span>
-                  </p> */}
-                  <p className="text-md text-gray-600 flex items-center gap-2">
-                    <MdOutlineNoMeals className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">{t("meal_plan")}:</span>{" "}
-                      {tour.meal_plan === "breakfast"
-                        ? "Colazione"
-                        : tour.meal_plan === "half-board"
-                          ? "Mezza Pensione (Colazione & Cena)"
-                          : tour.meal_plan === "full-board"
-                            ? "Pensione Completa (Tutti i Pasti)"
-                            : "N/A"}
-                    </span>
-                  </p>
-                  <div className="flex items-center  space-x-2">
-                    <p className="text-md text-gray-600 flex items-center gap-2">
-                      <IoBed className="w-6 h-5 text-black" />
-                      <span>
-                        <span className="font-medium">
-                          {t("type_of_accommodation")}:
-                        </span>{" "}
-                        {tour.type_of_accommodation === "hotel"
-                          ? "Hotel"
-                          : tour.type_of_accommodation === "resort"
-                            ? "Resort"
-                            : tour.type_of_accommodation === "homestay"
-                              ? "Famiglia"
-                              : tour.type_of_accommodation === "apartment"
-                                ? "Appartamento"
-                                : tour.type_of_accommodation === "hostel"
-                                  ? "Ostello"
-                                  : "N/A"}
-                      </span>
-                    </p>
-                    <p className="text-md text-gray-600 flex items-center gap-2">
-                      {tour.minimum_star_hotel
-                        ? "⭐".repeat(Number(tour.minimum_star_hotel))
-                        : t("na")}
-                    </p>
-                  </div>
-                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaStar className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">
-                        {t("minimum_rating")}:
-                      </span>{" "}
-                      {tour.minimum_star_hotel || "N/A"}
-                    </span>
-                  </p> */}
-                  {/* <p className="text-md text-gray-600 flex items-center gap-2">
-                    <FaClock className="w-6 h-5 text-black" />
-                    <span>
-                      <span className="font-medium">{t("duration")}:</span>{" "}
-                      {tour.duration
-                        ? `${tour.duration} ${
-                            Number(tour.duration) === 1 ? t("day") : t("days")
-                          }`
-                        : "N/A"}
-                    </span>
-                  </p> */}
-                  <p className="text-md text-gray-600 flex items-center gap-2">
-                    <ShieldCheck className="w-6 h-5 text-green-500" />
-                    <span>
-                      <span className="font-medium">
-                        {t("contact_verified")}
-                      </span>
-                    </span>
-                  </p>
-                </div>
-
-                {showSentOfferButton && (
-                  <div className="pt-2 w-full">
-                    <button
-                      onClick={handleSentOfferClick}
-                      className="block w-full bg-[#DD9E2C] hover:bg-[#C2851C] cursor-pointer text-white text-center py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 text-md"
-                    >
-                      {t("sent_offer")}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_12px_36px_rgba(23,43,67,0.06)]">
+      <div className="relative">
+        <DestinationImage tour={tour} title={title} />
+        <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-[#edf6f1] px-3 py-1.5 text-xs font-bold text-[#397055] shadow-sm">
+          <Check size={14} strokeWidth={3} aria-hidden="true" /> {t("accepted_offer")}
+        </span>
+        {tour.destination_type && <span className="absolute right-5 top-16 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#21364d] shadow-sm sm:top-5">{localizedContent(tour.destination_type, t)}</span>}
+      </div>
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#718092]">{t("budget")}</p>
+          <p className="text-xl font-bold leading-none text-[#172b43]">{formatBudget(tour.budget, i18n.language)}</p>
         </div>
-      ) : (
-        <NoDataMessage />
-      )}
-    </div>
+        <dl className="space-y-3 text-sm leading-6 text-[#536477]">
+          <div className="flex items-start gap-3"><CalendarDays size={17} className="mt-1 shrink-0 text-[#b98427]" aria-hidden="true" /><div><dt className="sr-only">{t("date")}</dt><dd>{formatDate(tour.start_date, i18n.language)} – {formatDate(tour.end_date, i18n.language)}</dd></div></div>
+          <div className="flex items-start gap-3"><Users size={17} className="mt-1 shrink-0 text-[#b98427]" aria-hidden="true" /><div><dt className="sr-only">{t("total")}</dt><dd>{tour.total_members ?? "—"} {tour.total_members != null && (Number(tour.total_members) === 1 ? t("person") : t("people"))}</dd></div></div>
+          {spots && <div className="flex items-start gap-3"><MapPin size={17} className="mt-1 shrink-0 text-[#b98427]" aria-hidden="true" /><div className="min-w-0"><dt className="sr-only">{t("points_of_travel")}</dt><dd className="line-clamp-2 break-words">{spots}</dd></div></div>}
+        </dl>
+        {agency?.agency_name && <div className="mt-5 flex min-w-0 items-center gap-3 rounded-xl bg-[#f7f8f7] px-3 py-3">
+          {agency.logo_url
+            ? <img src={agency.logo_url} alt="" loading="lazy" className="h-10 w-10 shrink-0 rounded-full border border-[#e5e9e8] bg-white object-cover" />
+            : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8eee9] text-[#397055]"><Check size={20} aria-hidden="true" /></div>}
+          <div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#748174]">{t("accepted_agency")}</p><p className="break-words text-sm font-bold text-[#24364b]">{agency.agency_name}</p></div>
+        </div>}
+        <div className="mt-auto pt-5"><Link to={`/cereri/${tour.slug || tour.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d8e0e6] px-4 text-sm font-bold text-[#243b50] transition-colors hover:bg-[#f1f5f7]">{t("view_details")} <ArrowUpRight size={17} aria-hidden="true" /></Link></div>
+      </div>
+    </article>
+  );
+}
+
+function AcceptedOffers() {
+  const { t, i18n } = useTranslation();
+  const { data, isLoading, isError, refetch } = useAcceptedAllOffersQuery();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const tours = Array.isArray(data) ? data : Array.isArray(data?.results) ? data.results : [];
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => { document.title = "TreiOferte | " + t("accepted_offers"); }, [i18n.language, t]);
+
+  const filteredTours = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    return tours.filter((tour) => (!query || String(tour.location_to || "").toLocaleLowerCase().includes(query)) && (!category || tour.destination_type === category));
+  }, [tours, search, category]);
+  const hasFilters = Boolean(search || category);
+  const clearFilters = () => { setSearch(""); setCategory(""); };
+
+  return (
+    <main className="accepted-offers-page min-h-screen bg-[#faf9f6] pt-[72px] text-[#172b43] xl:pt-[82px]">
+      <section className="bg-[#172b43] px-5 pb-24 pt-14 text-white sm:px-8 sm:pb-28 sm:pt-20 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <div className="max-w-3xl"><div className="mb-5 h-1 w-12 rounded-full bg-[#d6a044]" /><h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">{t("all_accepted_offers")}</h1><p className="mt-4 text-base leading-7 text-white/75 sm:text-lg">{t("accepted_offers_intro")}</p></div>
+          <Link to="/cereri" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[#d49a36] px-6 py-3 font-bold text-[#172b43] transition-colors hover:bg-[#ebae47] lg:self-auto">{t("tour_plans")} <ArrowUpRight size={18} aria-hidden="true" /></Link>
+        </div>
+      </section>
+      <div className="relative mx-auto -mt-10 max-w-7xl px-5 pb-20 sm:px-8 lg:px-10">
+        <div className="grid gap-4 rounded-[22px] border border-[#e9e6e0] bg-white p-4 shadow-[0_16px_48px_rgba(23,43,67,0.1)] sm:p-5 md:grid-cols-[minmax(0,1fr)_250px]">
+          <label className="relative block min-w-0"><span className="sr-only">{t("search_by_destination")}</span><Search size={20} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8997a5]" aria-hidden="true" /><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("search_by_destination")} className="h-12 w-full rounded-xl border border-[#dce2e8] bg-[#fafbfc] pl-12 pr-4 text-[#24364b] placeholder:text-[#8997a5] focus:border-[#bd8525] focus:outline-none focus:ring-2 focus:ring-[#e5ad42]/20" /></label>
+          <select aria-label={t("select_category")} value={category} onChange={(event) => setCategory(event.target.value)} className="h-12 w-full min-w-0 rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 text-[#24364b] focus:border-[#bd8525] focus:outline-none focus:ring-2 focus:ring-[#e5ad42]/20"><option value="">{t("select_category")}</option><option value="beach">{t("beach_trips")}</option><option value="mountain">{t("mountain_adventures")}</option><option value="relax">{t("relaxing_tours")}</option><option value="group">{t("group_packages")}</option></select>
+        </div>
+        <section className="pt-10" aria-live="polite">
+          <div className="mb-6 flex flex-wrap items-center gap-3"><h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("accepted_offers")}</h2>{!isLoading && !isError && <span className="rounded-full bg-[#f4e5c8] px-3 py-1 text-sm font-bold text-[#875f1d]">{filteredTours.length}</span>}{hasFilters && <button type="button" onClick={clearFilters} className="ml-auto inline-flex items-center gap-2 text-sm font-bold text-[#a36f1d] hover:text-[#7e5416]"><RotateCcw size={16} aria-hidden="true" /> {t("reset")}</button>}</div>
+          {isLoading ? <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((number) => <div key={number} className="h-[450px] animate-pulse rounded-[22px] bg-[#e8ecee]" />)}</div>
+            : isError ? <div className="flex min-h-[360px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center"><Compass size={48} className="text-[#b98427]" strokeWidth={1.5} aria-hidden="true" /><h3 className="mt-5 text-xl font-bold">{t("something_went_wrong")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{t("failed_to_load_offers")}</p><button type="button" onClick={refetch} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#c88f2a] px-5 font-bold text-white hover:bg-[#ad751c]"><RotateCcw size={17} aria-hidden="true" /> {t("try_again")}</button></div>
+              : filteredTours.length === 0 ? <div className="flex min-h-[390px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center shadow-[0_10px_35px_rgba(23,43,67,0.04)]"><div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#fff4dd] text-[#b98427]"><Compass size={32} strokeWidth={1.5} aria-hidden="true" /></div><h3 className="mt-6 text-2xl font-bold">{hasFilters ? t("no_tours_found") : t("no_accepted_offers_yet")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{hasFilters ? t("tour_no_matches_message") : t("accepted_offers_empty_description")}</p>{hasFilters ? <button type="button" onClick={clearFilters} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#c88f2a] px-6 font-bold text-white hover:bg-[#ad751c]"><RotateCcw size={17} aria-hidden="true" /> {t("reset")}</button> : <Link to="/cereri" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#c88f2a] px-6 font-bold text-white hover:bg-[#ad751c]">{t("tour_plans")} <ArrowUpRight size={17} aria-hidden="true" /></Link>}</div>
+                : <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{filteredTours.map((tour) => <AcceptedOfferCard key={tour.id} tour={tour} />)}</div>}
+        </section>
+      </div>
+    </main>
   );
 }
 

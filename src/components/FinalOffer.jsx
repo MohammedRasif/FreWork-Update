@@ -1,3 +1,5 @@
+
+import { useTranslation } from "react-i18next";
 export default function FinalOfferForm({
   isOpen,
   startingDate,
@@ -12,6 +14,7 @@ export default function FinalOfferForm({
   onReset,
   onConfirm,
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null
 
   return (
@@ -28,8 +31,8 @@ export default function FinalOfferForm({
         <div className="p-6">
           {/* Title */}
           <div className="text-center mb-6">
-            <h1 className="text-lg font-medium text-gray-600 mb-1">Offer Confirmation</h1>
-            <h2 className="text-xl font-semibold text-gray-900">Tour from Dhaka to Chittagong</h2>
+            <h1 className="text-lg font-medium text-gray-600 mb-1">{t("offer_confirmation")}</h1>
+            <h2 className="text-xl font-semibold text-gray-900">{t("demo_tour_route")}</h2>
           </div>
 
           {/* Form Content */}
@@ -38,14 +41,14 @@ export default function FinalOfferForm({
             <div className="grid grid-cols-2 gap-4">
               {/* Starting Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Starting Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("starting_date")}</label>
                 <div className="relative">
                   <input
                     type="date"
                     value={startingDate}
                     onChange={(e) => onStartingDateChange(e.target.value)}
                     className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] text-gray-500"
-                    placeholder="Select date"
+                    placeholder={t("select_date")}
                   />
                  
                 </div>
@@ -53,14 +56,14 @@ export default function FinalOfferForm({
 
               {/* Ending Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Ending Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("ending_date")}</label>
                 <div className="relative">
                   <input
                     type="date"
                     value={endingDate}
                     onChange={(e) => onEndingDateChange(e.target.value)}
                     className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] text-gray-500"
-                    placeholder="Select date"
+                    placeholder={t("select_date")}
                   />
                   
                 </div>
@@ -71,10 +74,10 @@ export default function FinalOfferForm({
             <div className="grid grid-cols-2 gap-4">
               {/* Total Member */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Total Member</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("total_members")}</label>
                 <input
                   type="number"
-                  placeholder="Enter here"
+                  placeholder={t("enter_here")}
                   value={totalMembers}
                   onChange={(e) => onTotalMembersChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C]"
@@ -83,10 +86,10 @@ export default function FinalOfferForm({
 
               {/* Amount */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("amount")}</label>
                 <input
                   type="number"
-                  placeholder="Enter amount"
+                  placeholder={t("enter_amount")}
                   value={amount}
                   onChange={(e) => onAmountChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C]"
@@ -101,7 +104,7 @@ export default function FinalOfferForm({
               onClick={onConfirm}
               className="w-full bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:ring-offset-2"
             >
-              Confirm
+              {t("confirm")}
             </button>
           </div>
         </div>

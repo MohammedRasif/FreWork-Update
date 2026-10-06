@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
@@ -8,14 +8,22 @@ import { store } from "./redux/sotre.js";
 import { Provider } from "react-redux";
 import "../i18n.js";
 import CookieBanner from "./components/CookieBanner";
-import { HelmetProvider } from "react-helmet-async";
+import DynamicTitle from "./routes/DynamicTitle.jsx";
+
+const subscribeToRoute = (onChange) => router.subscribe(onChange);
+const getPathname = () => router.state.location.pathname;
+
+function RouteMetadata() {
+  const pathname = useSyncExternalStore(subscribeToRoute, getPathname, getPathname);
+  return <DynamicTitle pathname={pathname} />;
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <HelmetProvider>
-      <Provider store={store}>
-        <RouterProvider router={router} />
-        <CookieBanner />
-      </Provider>
-    </HelmetProvider>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+      <RouteMetadata />
+      <CookieBanner />
+    </Provider>
   </StrictMode>,
 );
