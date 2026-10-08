@@ -17,7 +17,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
-    defaultValues: { userType: "tourist", agency_name: "", telephone_number: "", vatId: "" },
+    defaultValues: { userType: "tourist", agency_name: "", telephone_number: "+373", idno: "" },
   });
   const password = watch("password");
   const isAgency = watch("userType") === "agency";
@@ -55,7 +55,7 @@ function Register() {
       if (data.userType === "agency") {
         payload.agency_name = data.agency_name;
         payload.telephone_number = data.telephone_number;
-        payload.vat_id = data.vatId || undefined;
+        payload.vat_id = data.idno || undefined;
       }
       localStorage.setItem("userType", data.userType);
       localStorage.setItem("userEmail", data.email);
@@ -104,12 +104,12 @@ function Register() {
           </div>
           <div className="min-w-0">
             <label htmlFor="register-phone" className={fieldLabelClass}>{t("telephone_number")}</label>
-            <div className="relative"><Phone size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" /><input id="register-phone" type="tel" autoComplete="tel" placeholder="01XXXXXXXXX" className={`${authInputClass} pl-11`} {...register("telephone_number")} /></div>
+            <div className="relative"><Phone size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#97a4b0]" aria-hidden="true" /><input id="register-phone" type="tel" autoComplete="tel" placeholder={t("enter_phone_number")} className={`${authInputClass} pl-11`} {...register("telephone_number")} /></div>
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="register-vat" className={fieldLabelClass}>{t("vat_id")}</label>
-            <input id="register-vat" type="text" inputMode="numeric" placeholder={t("vat_id_placeholder")} aria-invalid={!!errors.vatId} className={authInputClass} {...register("vatId", { required: isAgency ? t("vat_id_required") : false, pattern: { value: /^\d{11}$/, message: t("vat_id_digits") } })} />
-            {errors.vatId && <p role="alert" className={fieldErrorClass}>{errors.vatId.message}</p>}
+            <label htmlFor="register-idno" className={fieldLabelClass}>{t("idno_label")}</label>
+            <input id="register-idno" type="text" inputMode="numeric" placeholder={t("idno_placeholder")} aria-invalid={!!errors.idno} aria-describedby={errors.idno ? "register-idno-error" : undefined} className={authInputClass} {...register("idno", { required: isAgency ? t("idno_required") : false, pattern: { value: /^\d{13}$/, message: t("idno_digits") } })} />
+            {errors.idno && <p id="register-idno-error" role="alert" className={fieldErrorClass}>{errors.idno.message}</p>}
           </div>
         </div>}
 

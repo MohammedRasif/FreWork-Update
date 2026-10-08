@@ -569,45 +569,55 @@ body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page,
   font-weight: 600;
 }
 
-.user-chat-desktop > h1,
-.user-chat-mobile h1 {
-  color: #172b43;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+@layer components {
+.messaging-workspace {
+  height: max(480px, calc(100dvh - 245px));
 }
 
-.user-chat-desktop > div {
-  overflow: hidden;
-  border: 1px solid #e9e6e0;
-  border-radius: 22px;
-  background: white;
-  box-shadow: 0 10px 35px rgba(23, 43, 67, 0.05);
+.chat-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: #77818e;
+  transition: background 150ms, color 150ms;
 }
 
-.user-chat-desktop > div > div:first-child {
-  flex: 0 0 clamp(260px, 32%, 320px);
-  width: auto;
-  background: #fff;
-  border-color: #e9e6e0;
+.chat-icon-button:hover:not(:disabled) {
+  background: #f4eee2;
+  color: #9b701f;
 }
 
-.user-chat-desktop > div > div:last-child {
-  flex: 1 1 0;
-  min-width: 0;
-  width: auto;
-  background: #fff;
+.chat-icon-button:focus-visible {
+  outline: 2px solid #c88f2a;
+  outline-offset: 2px;
 }
 
-.user-chat-desktop input,
-.user-chat-mobile input {
-  border: 1px solid #dce2e8;
-  border-radius: 12px;
-  background: #fafbfc;
-  color: #172b43;
+.chat-icon-button:disabled { opacity: 0.4; }
+
+.chat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: left;
 }
 
-.user-chat-desktop .bg-blue-100 {
-  background: #f7f3ec;
+.chat-menu-item:hover, .chat-menu-item:focus-visible {
+  background: #faf6ee;
+  outline-color: #c88f2a;
+}
+
+@media (max-width: 767px) {
+  .messaging-workspace { height: max(420px, calc(100dvh - 225px)); }
+}
+
 }
 
 .agency-profile-edit form :is(input:not([type="checkbox"]):not([type="file"]), select, textarea) {
@@ -641,4 +651,89 @@ body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page,
   border-color: #c88f2a;
   outline: none;
   box-shadow: 0 0 0 3px rgba(200, 143, 42, 0.14);
+}
+
+/* Shared notifications remain mounted across home and dashboard navigation. */
+.site-notifications.Toastify__toast-container {
+  width: min(380px, calc(100vw - 32px));
+}
+
+.site-notifications .Toastify__toast {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 78px;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 18px 16px;
+  border: 1px solid #e9e6e0;
+  border-left: 3px solid #b88424;
+  border-radius: 18px;
+  background: #fff;
+  color: #34485c;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  box-shadow: 0 12px 40px rgba(23, 43, 67, 0.12);
+}
+
+.site-notifications .Toastify__toast--error { border-left-color: #b54a40; }
+.site-notifications .Toastify__toast--warning { border-left-color: #cb8c24; }
+.site-notifications .Toastify__toast--info { border-left-color: #172b43; }
+
+.site-notifications .Toastify__toast-icon {
+  width: 36px;
+  flex: 0 0 36px;
+  margin: 0;
+}
+
+.site-toast-icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #b88424;
+  background: #fbf3e3;
+}
+
+.site-toast-icon--error { color: #b54a40; background: #fff0ed; }
+.site-toast-icon--warning { color: #b88424; background: #fff4dd; }
+.site-toast-icon--info, .site-toast-icon--default { color: #172b43; background: #eef2f5; }
+
+.site-toast-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border-radius: 7px;
+  color: #99a0a9;
+}
+
+.site-toast-close:hover { color: #172b43; background: #f7f3ec; }
+.site-toast-close:focus-visible { outline: 2px solid #c88f2a; outline-offset: 2px; }
+
+.site-notifications .Toastify__progress-bar--wrp { height: 3px; }
+.site-notifications .Toastify__progress-bar { background: #b88424; }
+.site-notifications .Toastify__progress-bar--bg { background: #b88424; opacity: 0.1; }
+.site-notifications .Toastify__progress-bar--error { background: #b54a40; }
+.site-notifications .Toastify__progress-bar--info { background: #172b43; }
+
+@media (max-width: 480px) {
+  .site-notifications.Toastify__toast-container {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-notifications .Toastify--animate { animation-duration: 0.01ms; }
 }

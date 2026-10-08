@@ -5,6 +5,15 @@ import {
   CheckIcon,
   XIcon,
   PaperclipIcon,
+  ArrowLeft,
+  MoreVertical,
+  Archive,
+  ArchiveRestore,
+  FileText,
+  MessagesSquare,
+  LoaderCircle,
+  BadgeCheck,
+  RotateCcw,
 } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
@@ -21,8 +30,8 @@ import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { HiOutlineDotsVertical } from "react-icons/hi";
-import i18n from "../../../i18n.js";
+import * as Dialog from "@radix-ui/react-dialog";
+import ChatAvatar from "./ChatAvatar";
 
 
 const FILE_BASE_URL =
@@ -38,7 +47,7 @@ function Messages() {
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -71,7 +80,6 @@ function Messages() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
-  const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [selectedRejectReason, setSelectedRejectReason] = useState("");
 
@@ -111,7 +119,7 @@ function Messages() {
           name: currentChat.other_participant_name || t("unknown_user"),
           image:
             currentChat.other_participant_image ||
-            "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
+            null,
           other_user_id: currentChat.other_user_id || null,
           tour_plan_id: currentChat.tour_plan_id || null,
           tour_plan_title: currentChat.tour_plan_title || t("no_tour_plan"),
@@ -164,7 +172,8 @@ function Messages() {
   useEffect(() => {
     setMessages([]);
     pendingMessagesRef.current.clear();
-    setSelectedFile(null);
+    setNewMessage("");
+    setMenuOpen(false);
   }, [id]);
 
   useEffect(() => {
@@ -285,6 +294,13 @@ function Messages() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = "auto";
+    input.style.height = `${Math.min(120, Math.max(40, input.scrollHeight))}px`;
+  }, [newMessage, isMessagesLoading, agency]);
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -312,6 +328,7 @@ function Messages() {
         tour_plan_title: tourPlan?.label || null,
         file: filePreviewUrl,
         localFileName: localFileName,
+        originalFile: file,
         isUser: true,
         timestamp: new Date(),
         is_read: false,
@@ -356,15 +373,13 @@ function Messages() {
       } catch (error) {
         console.error("Failed to send file message:", error);
         toast.error(t("failed_send_file"));
-        if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.tempId === tempId
-              ? { ...msg, status: "failed", localFileName: undefined }
+              ? { ...msg, status: "failed" }
               : msg,
           ),
         );
-        pendingMessagesRef.current.delete(tempId);
       }
 
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -373,12 +388,15 @@ function Messages() {
   };
 
   const handleSendMessage = async () => {
-    if (newMessage.trim() === "") return;
+    if (newMessage.trim() === "" || isSending) return;
     if (!selectedDropdown && !agency?.tour_plan_id) {
       alert(t("select_tour_plan_first"));
       return;
     }
 
+    const messageText = newMessage.trim();
+    setIsSending(true);
+    setNewMessage("");
     const tempId = uuidv4();
     const messageId = uuidv4();
     const tourPlan = dropdownOptions.find(
@@ -388,7 +406,7 @@ function Messages() {
     const localMessage = {
       id: messageId,
       message_type: "text",
-      text: newMessage.trim(),
+      text: messageText,
       data: null,
       tour_plan_id: selectedDropdown,
       tour_plan_title: tourPlan?.label || null,
@@ -404,7 +422,7 @@ function Messages() {
     pendingMessagesRef.current.set(tempId, localMessage);
 
     const formData = new FormData();
-    formData.append("text", newMessage.trim());
+    formData.append("text", messageText);
 
     try {
       const response = await sentMessage({
@@ -432,10 +450,9 @@ function Messages() {
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg,
         ),
       );
-      pendingMessagesRef.current.delete(tempId);
     }
 
-    setNewMessage("");
+    setIsSending(false);
     inputRef.current?.focus();
   };
 
@@ -472,7 +489,7 @@ function Messages() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -489,7 +506,8 @@ function Messages() {
     );
 
     const formData = new FormData();
-    formData.append("text", message.text);
+    if (message.originalFile) formData.append("file", message.originalFile);
+    else formData.append("text", message.text);
 
     try {
       const response = await sentMessage({
@@ -513,6 +531,7 @@ function Messages() {
             : msg,
         ),
       );
+      if (message.file?.startsWith("blob:")) URL.revokeObjectURL(message.file);
       pendingMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Failed to retry message:", error);
@@ -522,7 +541,6 @@ function Messages() {
           msg.tempId === tempId ? { ...msg, status: "failed" } : msg,
         ),
       );
-      pendingMessagesRef.current.delete(tempId);
     }
   };
 
@@ -609,7 +627,7 @@ function Messages() {
       return;
     }
     navigate(`/cereri/${agency.tour_plan_id}`);
-    setIsButtonVisible(false);
+
   };
 
   const handleArchiveConversation = async () => {
@@ -644,13 +662,13 @@ function Messages() {
     const isImageFile =
       message.file &&
       (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExt) ||
-        message.file.startsWith("blob:"));
+        (message.file.startsWith("blob:") && message.originalFile?.type.startsWith("image/")));
 
     if (message.text || message.file) {
       return (
         <>
           {message.text && (
-            <p className={message.file ? "mb-2 break-words" : "break-words"}>
+            <p className={`whitespace-pre-wrap [overflow-wrap:anywhere] ${message.file ? "mb-2" : ""}`}>
               {message.text}
             </p>
           )}
@@ -660,11 +678,11 @@ function Messages() {
                 <img
                   src={message.file}
                   alt={message.localFileName || t("attachment")}
-                  className="max-w-full h-auto rounded"
-                  style={{ maxWidth: "200px" }}
+                  className="max-w-full h-auto rounded-xl"
+                  style={{ maxWidth: "min(240px, 100%)" }}
                 />
               ) : (
-                <div className="flex items-center space-x-2 pt-1">
+                <div className="flex min-w-0 items-center gap-2 rounded-lg border border-current/15 p-2">
                   <PaperclipIcon className="h-4 w-4 shrink-0" />
                   <a
                     href={message.file}
@@ -673,7 +691,7 @@ function Messages() {
                     className={`${
                       message.isUser
                         ? "text-white underline"
-                        : "text-blue-500 hover:underline"
+                        : "text-[#9b701f] hover:underline"
                     } truncate max-w-[calc(100%-20px)] text-sm`}
                     title={message.localFileName || getFileName(message.file)}
                   >
@@ -689,324 +707,117 @@ function Messages() {
     return <p>{t("unknown_content")}</p>;
   };
 
-  if (isMessagesLoading) {
-    return (
-      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
-        <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          {t("loading_messages")}
-        </h1>
-      </div>
-    );
-  }
-
-  if (isChatListLoading && !agency) {
-    return (
-      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
-        <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          {t("loading_chat")}
-        </h1>
-      </div>
-    );
-  }
-
-  if (messagesError || (!agency && !isChatListLoading)) {
-    return (
-      <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col items-center justify-center relative">
-        <h1 className="text-lg text-gray-800 dark:text-gray-100">
-          {messagesError ? t("error_loading_chat") : t("chat_not_found")}
-        </h1>
-      </div>
-    );
-  }
-
+  const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
+  const canRejectOffer = currentChat?.is_active === true && localStorage.getItem("role") !== "agency";
+  const isLoading = isMessagesLoading || (isChatListLoading && !agency);
+  const hasError = messagesError || (!agency && !isChatListLoading);
+
+  if (isLoading || hasError) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center text-[#77818e]" role={hasError ? "alert" : "status"}>
+        {isLoading ? <LoaderCircle className="animate-spin text-[#b88424]" size={28} /> : <MessagesSquare size={32} className="text-[#b88424]" />}
+        <p className="text-sm">{isLoading ? t("loading_messages") : messagesError ? t("error_loading_chat") : t("chat_not_found")}</p>
+        <button type="button" onClick={() => navigate(basePath)} className="rounded-xl border border-[#e5ddce] bg-white px-4 py-2 text-sm font-semibold text-[#172b43]">{t("chat_back")}</button>
+      </div>
+    );
+  }
 
   return (
-    <div className="rounded-r-lg bg-[#F5F7FB] dark:bg-[#252c3b] h-full flex flex-col">
-      <div className="flex items-center justify-between space-x-4 p-3 border-b border-gray-200 rounded-tr-lg bg-white dark:bg-[#252c3b]">
-        <div></div>
-        <div className="flex items-center space-x-2">
-          <div className="relative space-x-2 flex items-center " ref={menuRef}>
-            {currentChat?.is_active === true &&
-              localStorage.getItem("role") !== "agency" && (
-                <button
-                  className="bg-gray-100 hover:bg-gray-200 dark:bg-[#1E232E] px-3 py-1 rounded"
-                  type="button"
-                  onClick={() => setIsRejectModalOpen(true)}
-                >
-                  {t("reject_offer")}
-                </button>
-              )}
-
-            {isRejectModalOpen && (
-              <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                <div className="bg-white dark:bg-[#252c3b] w-full max-w-md rounded-xl p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    {t("reject_reason_title")}
-                  </h3>
-
-                  <div className="space-y-3">
-                    {rejectReasons.map((reason) => (
-  <label
-    key={reason.value}
-    className="flex items-center space-x-3 cursor-pointer"
-  >
-    <input
-      type="radio"
-      name="reject_reason"
-      value={reason.value}                    
-      checked={selectedRejectReason === reason.value}
-      onChange={() => setSelectedRejectReason(reason.value)}
-    />
-    <span className="text-gray-700 dark:text-gray-300">
-      {t(reason.labelKey)}                    
-    </span>
-  </label>
-))}
-                  </div>
-
-                  <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                      onClick={() => setIsRejectModalOpen(false)}
-                      className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-600"
-                    >
-                      {t("cancel")}
-                    </button>
-
-                    <button
-                      onClick={async () => {
-                        if (!selectedRejectReason) return;
-
-                        try {
-                          await rejectOffer({
-                            id: currentChat.offer_id,
-                            data: {
-                              reason: selectedRejectReason,
-                            },
-                          }).unwrap();
-                        } catch (err) {
-                          toast.error(t("failed_reject_offer"));
-                          return;
-                        }
-
-                        try {
-                          await finalOfferResponse({
-                            id: Number(id),
-                            data: {
-                              is_accepted: false,
-                              reason: selectedRejectReason,
-                            },
-                          }).unwrap();
-
-                          toast.success(t("offer_rejected"));
-                          setIsRejectModalOpen(false);
-                        } catch (err) {
-                          toast.error(t("failed_final_offer_response"));
-                        }
-                      }}
-                      disabled={!selectedRejectReason}
-                      className="px-4 py-2 rounded bg-[#2F80A9] text-white disabled:opacity-50"
-                    >
-                      {t("sent")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button
-              className="bg-gray-100 hover:cursor-pointer dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 px-2 text-2xl font-semibold rounded focus:outline-none py-1"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              type="button"
-            >
-              <HiOutlineDotsVertical size={22} />
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 mt-40 w-52 bg-white dark:bg-[#252c3b] border border-gray-200 dark:border-gray-700 rounded shadow-lg z-10">
-                <button
-                  className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
-                  onClick={handleViewDetails}
-                >
-                  {t("view_tour_details")}
-                </button>
-                <button
-                  className="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1E232E] hover:cursor-pointer"
-                  onClick={handleArchiveConversation}
-                >
-                  {isConversationArchived
-                    ? t("unarchive_conversation")
-                    : t("archive_conversation")}
-                </button>
-              </div>
-            )}
+    <div className="chat-thread flex h-full min-h-0 flex-col text-[#172b43]">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-3 border-b border-[#eeeae3] bg-white px-3 py-4 sm:px-5">
+        <div className="order-1 flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <button type="button" onClick={() => navigate(basePath)} aria-label={t("chat_back")} className="chat-icon-button md:hidden"><ArrowLeft size={20} /></button>
+          <ChatAvatar name={agency.name} image={agency.image} active={currentChat?.active} className="h-10 w-10" />
+          <div className="min-w-0">
+            <h2 className="flex items-center gap-1.5 text-sm font-semibold sm:text-base"><span className="truncate">{agency.name}</span>{currentChat?.tourist_is_verified && <BadgeCheck size={16} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}</h2>
+            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency.tour_plan_title}</p>
           </div>
         </div>
-      </div>
-
-      <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            {t("no_messages")}
-          </div>
+        {canRejectOffer && (
+          <button type="button" onClick={() => { setMenuOpen(false); setIsRejectModalOpen(true); }} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
+            <XIcon size={16} className="shrink-0" aria-hidden="true" />{t("reject_offer")}
+          </button>
         )}
-        {messages.map((message) => {
-          if (
-            !message.text &&
-            !message.file &&
-            message.message_type !== "start_conversation" &&
-            message.message_type !== "final_offer_sent"
-          ) {
-            return null;
-          }
+        <div className="relative order-2 shrink-0 xl:order-3" ref={menuRef}>
+          <button type="button" aria-label={t("chat_options")} aria-expanded={menuOpen} aria-controls="chat-actions" onClick={() => setMenuOpen(prev => !prev)} onKeyDown={e => { if (e.key === "Escape") setMenuOpen(false); }} className="chat-icon-button"><MoreVertical size={21} /></button>
+          {menuOpen && (
+            <div id="chat-actions" onKeyDown={e => { if (e.key === "Escape") setMenuOpen(false); }} className="absolute right-0 top-full z-20 mt-2 w-56 rounded-2xl border border-[#e9e6e0] bg-white p-1.5 shadow-xl">
+              <button type="button" className="chat-menu-item" onClick={handleViewDetails}><FileText size={17} className="shrink-0 text-[#b88424]" />{t("view_tour_details")}</button>
+              <button type="button" className="chat-menu-item" onClick={handleArchiveConversation}>{isConversationArchived ? <ArchiveRestore size={17} className="shrink-0 text-[#b88424]" /> : <Archive size={17} className="shrink-0 text-[#b88424]" />}{isConversationArchived ? t("unarchive_conversation") : t("archive_conversation")}</button>
+              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={() => { setMenuOpen(false); setIsRejectModalOpen(true); }}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
+            </div>
+          )}
+        </div>
+      </header>
 
-          if (message.message_type === "start_conversation") {
-            return (
-              <div
-                key={message.id || message.tempId}
-                className="flex justify-center w-full"
-              >
-                <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full italic max-w-sm text-center">
-                  {message.text}
+      <Dialog.Root open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-[80] bg-[#172b43]/45 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-[81] max-h-[90dvh] w-[calc(100%-32px)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[24px] border border-[#e9e6e0] bg-white p-6 text-[#172b43] shadow-2xl">
+            <Dialog.Title className="pr-8 text-xl font-semibold">{t("reject_reason_title")}</Dialog.Title>
+            <Dialog.Description className="sr-only">{t("reject_offer")}</Dialog.Description>
+            <Dialog.Close className="chat-icon-button absolute right-4 top-4" aria-label={t("close")}><XIcon size={18} /></Dialog.Close>
+            <div className="mt-5 space-y-2">
+              {rejectReasons.map(reason => <label key={reason.value} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 text-sm ${selectedRejectReason === reason.value ? "border-[#d9b571] bg-[#fbf6ec]" : "border-[#e9e6e0]"}`}><input type="radio" name="reject_reason" value={reason.value} checked={selectedRejectReason === reason.value} onChange={() => setSelectedRejectReason(reason.value)} className="shrink-0 accent-[#b88424]" /><span>{t(reason.labelKey)}</span></label>)}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Dialog.Close className="rounded-xl border border-[#e9e6e0] px-4 py-2.5 text-sm font-semibold">{t("cancel")}</Dialog.Close>
+              <button type="button" disabled={!selectedRejectReason} className="rounded-xl bg-[#dd9e2c] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" onClick={async () => {
+                if (!selectedRejectReason) return;
+                try { await rejectOffer({ id: currentChat.offer_id, data: { reason: selectedRejectReason } }).unwrap(); }
+                catch { toast.error(t("failed_reject_offer")); return; }
+                try {
+                  await finalOfferResponse({ id: Number(id), data: { is_accepted: false, reason: selectedRejectReason } }).unwrap();
+                  toast.success(t("offer_rejected")); setIsRejectModalOpen(false);
+                } catch { toast.error(t("failed_final_offer_response")); }
+              }}>{t("chat_send")}</button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-5 sm:px-6 sm:py-6" aria-label={t("messages")}>
+        {messages.length === 0 && <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-[#77818e]"><MessagesSquare size={30} className="text-[#c8b38d]" />{t("no_messages")}</div>}
+        {messages.map(message => {
+          if (!message.text && !message.file && message.message_type !== "start_conversation" && message.message_type !== "final_offer_sent") return null;
+          if (message.message_type === "start_conversation") return <div key={message.id || message.tempId} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
+          return (
+            <div key={message.id || message.tempId} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
+              {!message.isUser && <ChatAvatar name={agency.name} image={agency.image} className="h-7 w-7 !rounded-xl text-[10px]" />}
+              <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[78%] ${message.isUser ? "rounded-br-sm bg-[#172b43] text-white" : "rounded-bl-sm border border-[#ece7df] bg-white text-[#34485c]"}`}>
+                {renderMessageContent(message)}
+                <div className={`mt-1.5 flex items-center justify-end gap-1.5 ${message.isUser ? "text-[#b9c5d2]" : "text-[#99a0a9]"}`}>
+                  <time className="text-[10px] leading-4">{message.timestamp.toLocaleTimeString(i18n.language === "ro" ? "ro-RO" : "ru-RU", { hour: "2-digit", minute: "2-digit" })}</time>
+                  {message.isUser && message.status === "sending" && <ClockIcon size={12} aria-label={t("chat_sending")} />}
+                  {message.isUser && message.status === "sent" && <CheckIcon size={13} className="text-[#e3b965]" aria-label={t("sent")} />}
+                  {message.isUser && message.status === "failed" && <button type="button" onClick={() => handleRetryMessage(message.tempId)} aria-label={t("chat_retry")} className="rounded p-1 text-[#f3a49b] focus-visible:outline-2"><RotateCcw size={14} /></button>}
                 </div>
               </div>
-            );
-          }
-
-          return (
-            <div key={message.id || message.tempId}>
-              {message.isUser ? (
-                <div className="flex justify-end space-x-2">
-                  <div className="max-w-xs bg-[#2F80A9] text-white rounded-lg p-3 text-md font-medium shadow-md">
-                    {renderMessageContent(message)}
-                    <div className="flex items-center justify-end mt-1 space-x-1">
-                      {message.status === "sending" && (
-                        <ClockIcon className="h-3 w-3 text-gray-300" />
-                      )}
-                      {message.status === "sent" && (
-                        <CheckIcon className="h-3 w-3 text-green-300" />
-                      )}
-                      {message.status === "failed" && (
-                        <button
-                          onClick={() => handleRetryMessage(message.tempId)}
-                          className="text-red-300 hover:text-red-400"
-                        >
-                          <XIcon className="h-3 w-3" />
-                        </button>
-                      )}
-                      <span className="text-[8px] text-gray-300">
-                        {message.timestamp.toLocaleTimeString(
-                          i18n.language === "ro" ? "ro-RO" : "ru-RU",
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          },
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
-                    <span className="text-xs text-gray-600">{t("you")}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start space-x-2">
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                    <img
-                      className="w-full h-full object-cover"
-                      src={agency.image}
-                      alt={agency.name}
-                    />
-                  </div>
-                  <div className="max-w-xs bg-white dark:bg-[#1E232E] text-gray-800 dark:text-gray-200 rounded-lg p-3 text-md font-medium shadow-sm">
-                    {renderMessageContent(message)}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
         <div ref={messagesEndRef} />
-        {currentChat?.final_offer_sent === true &&
-          currentChat?.deal_status !== null &&
-          currentChat?.deal_status === false && (
-            <div className="absolute bottom-30 right-2/8 flex flex-col space-y-2">
-              <button
-                onClick={handleAcceptFinalOffer}
-                disabled={isAccepting}
-                className={`border px-4 py-1 rounded-full text-white ${
-                  isAccepting
-                    ? "bg-green-300 cursor-not-allowed"
-                    : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-                }`}
-              >
-                {isAccepting ? t("accepting") : t("accept_final_offer")}
-              </button>
-              <button
-                onClick={handleDeclineFinalOffer}
-                disabled={isDeclining}
-                className={`border px-4 py-1 rounded-full text-white ${
-                  isDeclining
-                    ? "bg-red-300 cursor-not-allowed"
-                    : "bg-[#2F80A9] hover:bg-[#256f8c] cursor-pointer"
-                }`}
-              >
-                {isDeclining ? t("declining") : t("decline_final_offer")}
-              </button>
-            </div>
-          )}
       </div>
 
+      {currentChat?.final_offer_sent === true && currentChat?.deal_status === false && (
+        <div className="flex shrink-0 flex-wrap gap-2 border-t border-[#eeeae3] bg-[#fbf6ec] px-4 py-3">
+          <button type="button" onClick={handleAcceptFinalOffer} disabled={isAccepting || isDeclining} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><CheckIcon size={16} className="shrink-0" />{isAccepting ? t("accepting") : t("accept_final_offer")}</button>
+          <button type="button" onClick={handleDeclineFinalOffer} disabled={isAccepting || isDeclining} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-3 py-2.5 text-sm font-semibold disabled:opacity-50"><XIcon size={16} className="shrink-0" />{isDeclining ? t("declining") : t("decline_final_offer")}</button>
+        </div>
+      )}
+
       {currentChat?.is_active === true ? (
-        <div className="border-t border-gray-200 p-3 bg-white dark:bg-[#252c3b] dark:border-gray-700">
-          <div className="flex items-center bg-gray-100 dark:bg-[#1E232E] rounded-full px-4 py-2">
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <PaperclipIcon className="h-5 w-5 cursor-pointer" />
-            </button>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*,.pdf,.doc,.docx"
-              onChange={handleFileChange}
-            />
-
-            <input
-              type="text"
-              placeholder={t("type_message_or_select_file")}
-              className="flex-1 bg-transparent border-none focus:outline-none mx-3 text-sm text-gray-800 dark:text-gray-200"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyPress}
-              ref={inputRef}
-              disabled={!!currentChat?.final_offer_response}
-            />
-
-            <button
-              className={`transition-colors duration-200 ${
-                newMessage.trim() === "" || currentChat?.final_offer_response
-                  ? "text-gray-400 cursor-not-allowed"
-                  : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              }`}
-              onClick={handleSendMessage}
-              disabled={
-                newMessage.trim() === "" || !!currentChat?.final_offer_response
-              }
-            >
-              <SendIcon className="h-5 w-5 cursor-pointer" />
-            </button>
+        <div className="shrink-0 border-t border-[#eeeae3] bg-white p-3 sm:p-4">
+          <div className="flex items-end gap-2 rounded-2xl border border-[#e4e7eb] bg-[#fafbfc] p-2 transition focus-within:border-[#c88f2a] focus-within:ring-2 focus-within:ring-[#c88f2a]/10">
+            <button type="button" aria-label={t("attachment")} title={t("attachment")} className="chat-icon-button shrink-0" onClick={() => fileInputRef.current?.click()} disabled={!!currentChat?.final_offer_response}><PaperclipIcon size={20} /></button>
+            <input type="file" aria-label={t("attachment")} ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleFileChange} />
+            <textarea rows={1} aria-label={t("type_message_or_select_file")} placeholder={t("type_message_or_select_file")} className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none" value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={handleKeyPress} ref={inputRef} disabled={!!currentChat?.final_offer_response} />
+            <button type="button" aria-label={t("chat_send")} title={t("chat_send")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]" onClick={handleSendMessage} disabled={!newMessage.trim() || isSending || !!currentChat?.final_offer_response}>{isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}</button>
           </div>
         </div>
       ) : (
-        <div className="border-t border-gray-200 p-3 bg-gray-50 dark:bg-[#1E232E] dark:border-gray-700 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t("conversation_inactive_message")}
-          </p>
-        </div>
+        <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">{t("conversation_inactive_message")}</div>
       )}
     </div>
   );

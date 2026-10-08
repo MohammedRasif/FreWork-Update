@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect, useMemo } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAdminProfileMutation, useGetAgencyProfileQuery } from "@/redux/features/withAuth";
+import { useAdminProfileMutation, useGetAgencyProfileQuery, useShowUserInpormationQuery } from "@/redux/features/withAuth";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
@@ -31,7 +31,8 @@ const AdminProfileEdit = () => {
     [categoryMap]
   );
 
-  const { data: profileData, isLoading: isProfileLoading } = useGetAgencyProfileQuery();
+  const { data: profileData, isLoading: isProfileLoading, isError: isProfileError, error: profileError, refetch } = useGetAgencyProfileQuery();
+  const { data: userData } = useShowUserInpormationQuery();
 
   const {
     register,
@@ -62,16 +63,17 @@ const AdminProfileEdit = () => {
   useEffect(() => {
     if (profileData) {
       try {
-        const categories = profileData.service_categories?.[0]
-          ? JSON.parse(profileData.service_categories[0]).map(
-              (value) => reverseCategoryMap[value] || value
-            )
-          : [];
+        const categories = (profileData.service_categories || []).flatMap((value) => {
+          try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : [value];
+          } catch { return [value]; }
+        }).map((value) => reverseCategoryMap[value] || value);
         reset({
           agencyName: profileData.agency_name || "",
           vatNumber: profileData.vat_id || "",
-          email: profileData.contact_email || "",
-          phoneNumber: profileData.contact_phone || "",
+          email: profileData.contact_email || localStorage.getItem("userEmail") || "",
+          phoneNumber: profileData.contact_phone || "+373",
           description: profileData.about || "",
           categories: categories,
           terms: false,
@@ -140,13 +142,13 @@ const AdminProfileEdit = () => {
       formData.append("contact_email", data.email);
       formData.append("contact_phone", data.phoneNumber);
       formData.append("about", data.description);
-      formData.append("service_categories", JSON.stringify(mappedCategories));
+      mappedCategories.forEach((category) => formData.append("service_categories", category));
       if (logoFile) formData.append("agency_logo", logoFile);
       if (coverPhotoFile) formData.append("cover_photo", coverPhotoFile);
 
       await adminProfile(formData).unwrap();
       toast.success(t("profile_updated_success"));
-      navigate("/agentie/profil");
+      navigate(userData?.agency_is_verified ? "/agentie/profil" : "/in-asteptare");
     } catch (err) {
       console.error("Failed to update profile:", err);
       toast.error(t("failed_to_update_profile"));
@@ -155,6 +157,17 @@ const AdminProfileEdit = () => {
 
   if (isProfileLoading) {
     return <div className="flex min-h-48 items-center justify-center rounded-[22px] border border-[#e9e6e0] bg-white p-8 text-sm text-[#617082]" role="status">{t("loading_profile")}</div>;
+  }
+
+  if (isProfileError) {
+    return <div className="mx-auto max-w-2xl rounded-[22px] border border-[#e9e6e0] bg-white p-6 sm:p-8">
+      <h1 className="text-xl font-bold text-[#172b43]">{t("edit_profile_details")}</h1>
+      <p role="alert" className="mt-4 text-sm leading-6 text-[#617082]">{t(profileError?.status === 403 ? "agency_pending_profile_restricted" : "failed_to_load_profile")}</p>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <NavLink to="/in-asteptare" className="rounded-xl bg-[#c88f2a] px-4 py-3 text-sm font-semibold text-white">{t("agency_pending_view_status")}</NavLink>
+        <button type="button" onClick={refetch} className="rounded-xl border border-[#e1e5e9] px-4 py-3 text-sm font-semibold text-[#34485c]">{t("retry")}</button>
+      </div>
+    </div>;
   }
 
   return (
@@ -189,18 +202,20 @@ const AdminProfileEdit = () => {
           </div>
           <div>
             <label className="block text-base font-medium text-gray-700 mb-2">
-              {t("vat_number")}
+              {t("idno_label")}
             </label>
             <input
               {...register("vatNumber", {
-                required: t("vat_number_required"),
+                required: t("idno_required"),
                 pattern: {
-                  value: /^\d{11}$/,
-                  message: t("vat_11_digits"),
+                  value: /^\d{13}$/,
+                  message: t("idno_digits"),
                 },
               })}
               type="text"
-              placeholder={t("enter_11_digit_vat")}
+              inputMode="numeric"
+              maxLength={13}
+              placeholder={t("idno_placeholder")}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.vatNumber && (
@@ -235,12 +250,12 @@ const AdminProfileEdit = () => {
               {...register("phoneNumber", {
                 required: t("phone_required"),
                 pattern: {
-                  value: /^[0-9]{9,15}$/,
+                  value: /^\+?[0-9]{9,15}$/,
                   message: t("invalid_phone"),
                 },
               })}
               type="tel"
-              placeholder={t("phone_example")}
+              placeholder="+373 6XXXXXXX"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#DD9E2C]"
             />
             {errors.phoneNumber && (
@@ -257,6 +272,7 @@ const AdminProfileEdit = () => {
               <label className="cursor-pointer bg-[#f7f3ec] px-4 py-3 text-sm font-semibold text-[#172b43] hover:bg-[#fff4dd]">
                 {t("choose_file")}
                 <input
+                  {...register("logoFile", { validate: () => Boolean(logoFile || profileData?.agency_logo || profileData?.agency_logo_url) || t("agency_logo_required") })}
                   type="file"
                   className="hidden"
                   onChange={handleLogoChange}
@@ -270,6 +286,7 @@ const AdminProfileEdit = () => {
             {logoSizeError && (
               <p className="text-red-500 text-sm mt-1">{logoSizeError}</p>
             )}
+            {errors.logoFile && !logoSizeError && <p className="mt-1 text-sm text-red-500">{errors.logoFile.message}</p>}
             <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
           </div>
 
@@ -281,6 +298,7 @@ const AdminProfileEdit = () => {
               <label className="cursor-pointer bg-[#f7f3ec] px-4 py-3 text-sm font-semibold text-[#172b43] hover:bg-[#fff4dd]">
                 {t("choose_file")}
                 <input
+                  {...register("coverPhotoFile", { validate: () => Boolean(coverPhotoFile || profileData?.cover_photo || profileData?.cover_photo_url) || t("agency_cover_required") })}
                   type="file"
                   className="hidden"
                   onChange={handleCoverPhotoChange}
@@ -294,6 +312,7 @@ const AdminProfileEdit = () => {
             {coverSizeError && (
               <p className="text-red-500 text-sm mt-1">{coverSizeError}</p>
             )}
+            {errors.coverPhotoFile && !coverSizeError && <p className="mt-1 text-sm text-red-500">{errors.coverPhotoFile.message}</p>}
             <p className="text-xs text-gray-500 mt-1">{t("max_size_10mb")}</p>
           </div>
         </div>

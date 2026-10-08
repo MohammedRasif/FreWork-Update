@@ -7,7 +7,7 @@ import {
   useGetOneDetailQuery,
   useUpdatePlanMutation,
 } from "@/redux/features/withAuth";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useTranslation } from "react-i18next";
 
@@ -166,23 +166,7 @@ const CreatePlan = () => {
         response = await createPlan(formData).unwrap();
       }
 
-      toast.success(t("plan_created_success"), {
-        duration: 4000,
-        style: {
-          background: "linear-gradient(135deg, #3b82f6, #10b981)",
-          color: "#ffffff",
-          borderRadius: "8px",
-          padding: "16px",
-          fontSize: "16px",
-          fontWeight: "500",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          maxWidth: "400px",
-        },
-        iconTheme: {
-          primary: "#ffffff",
-          secondary: "#3b82f6",
-        },
-      });
+      toast.success(t("plan_created_success"), { autoClose: 4000 });
 
       reset();
       setSelectedFile(null);
@@ -227,7 +211,7 @@ const CreatePlan = () => {
   return (
     <div className="user-create-plan mx-auto max-w-5xl">
       <div className="mx-auto">
-        <Toaster />
+
         <div className="mb-6 flex items-center">
           <NavLink to="/cont">
             <button type="button" className="flex items-center gap-2 text-sm font-semibold text-[#617082] transition-colors hover:text-[#172b43]">

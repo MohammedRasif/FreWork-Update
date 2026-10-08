@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Baby, User, X, ClipboardList, Send, CheckCircle2, XCircle, Search, Heart, ArrowUpRight, Info } from "lucide-react";
-import { IoIosSend } from "react-icons/io";
+import { Baby, User, X, ClipboardList, Send, CheckCircle2, XCircle, Search, Heart, ArrowUpRight, TriangleAlert } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { NavLink, useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import {
   useDeclineRequestMutation,
   useGetTourPlanPublicQuery,
@@ -26,6 +26,7 @@ import { IoBed } from "react-icons/io5";
 import AdminDecline from "./AdminDecline";
 import { useTranslation } from "react-i18next";
 import PlanImage1 from "@/assets/img/plan-image-1.png";
+import AgencyOfferForm from "./AgencyOfferForm";
 
 const tabs = [
   { id: "all", label: "all_plans_tab", icon: ClipboardList },
@@ -50,6 +51,7 @@ const AdminHome = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const popupRef = useRef(null);
+  const popupTriggerRef = useRef(null);
   const navigate = useNavigate();
   const { data: userData } = useShowUserInpormationQuery();
   const { data: tourPlanPublic = [], isLoading: isTourPlanPublicLoading } =
@@ -69,21 +71,6 @@ const AdminHome = () => {
     setActiveTab(tab);
     localStorage.setItem("adminActiveTab", tab);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
-        setIsPopupOpen(false);
-        setSelectedPlan(null);
-        setOfferBudget(0);
-        setOfferComment("");
-        setOfferForm({ applyDiscount: false, discount: "" });
-        setSelectedFile(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const currentUserEmail = localStorage.getItem("userEmail");
 
@@ -115,23 +102,18 @@ const AdminHome = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
-
   const handleSubmitOffer = async (planId, budget, comment) => {
     if (!localStorage.getItem("access_token")) {
       toast.error(t("login_to_submit_offer"));
       return;
     }
-    if (!budget || !comment.trim()) {
+    if (!Number.isFinite(Number(budget)) || Number(budget) <= 0 || !comment.trim()) {
       toast.error(t("provide_budget_and_comment"));
       return;
     }
     if (
       offerForm.applyDiscount &&
-      (!offerForm.discount || offerForm.discount <= 0)
+      (!offerForm.discount || offerForm.discount <= 0 || offerForm.discount > 100)
     ) {
       toast.error(t("provide_valid_discount"));
       return;
@@ -210,12 +192,14 @@ const AdminHome = () => {
   };
 
   const openPopup = (plan, type = "view") => {
+    popupTriggerRef.current = document.activeElement;
     setSelectedPlan({ ...plan, offers: plan.offers || [] });
     setModalType(type);
     setIsPopupOpen(true);
   };
 
   const closePopup = () => {
+    if (isOfferSubmitting) return;
     setIsPopupOpen(false);
     setSelectedPlan(null);
     setModalType("view");
@@ -534,97 +518,21 @@ const AdminHome = () => {
       );
     } else if (modalType === "offer") {
       return (
-        <div className="p-4">
-          <div className="flex-1 w-full">
-            <p className="text-lg sm:text-xl font-medium text-gray-700 mb-2">
-              {t("place_your_offer")}
-            </p>
-            <div className="flex flex-col gap-3">
-              <input
-                type="number"
-                placeholder={t("enter_your_budget")}
-                value={offerBudget}
-                onChange={(e) => setOfferBudget(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
-              />
-              <textarea
-                placeholder={t("enter_your_comment")}
-                value={offerComment}
-                onChange={(e) => setOfferComment(e.target.value)}
-                className="w-full resize-none px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
-                rows="4"
-              />
-              <div className="mt-4">
-                <label className="block lg:text-md font-medium text-gray-700 mb-1">
-                  {t("upload_file_optional")}
-                </label>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent bg-white"
-                />
-                {selectedFile && (
-                  <p className="text-xs text-gray-600 mt-1">
-                    {t("selected")}: {selectedFile.name}
-                  </p>
-                )}
-              </div>
-              <div className="mt-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="applyDiscount"
-                    checked={offerForm.applyDiscount}
-                    onChange={handleOfferChange}
-                    className="h-4 w-4 text-[#DD9E2C] focus:ring-[#DD9E2C] border-gray-300 rounded"
-                  />
-                  <span className="ml-2 lg:text-md text-gray-700">
-                    {t("apply_additional_discount")}
-                  </span>
-                </label>
-                <p className="text-xs text-gray-500 mt-1">
-                  {t("discount_suggestion")}
-                </p>
-              </div>
-              <div className="mt-4 mb-2">
-                <label
-                  htmlFor="discount"
-                  className="block lg:text-md font-medium text-gray-700 mb-1"
-                >
-                  {t("discount")}
-                </label>
-                <input
-                  type="number"
-                  name="discount"
-                  value={offerForm.discount}
-                  onChange={handleOfferChange}
-                  placeholder={t("enter_discount_percentage")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-[#DD9E2C] transition"
-                  disabled={!offerForm.applyDiscount}
-                />
-              </div>
-              <button
-                onClick={() =>
-                  handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)
-                }
-                className={`px-3 py-2 font-medium rounded-md transition-colors flex items-center gap-3 justify-center ${
-                  isOfferSubmitting || !offerBudget || !offerComment.trim()
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#c88f2a] text-white hover:bg-[#ad751c]"
-                }`}
-                disabled={
-                  isOfferSubmitting || !offerBudget || !offerComment.trim()
-                }
-              >
-                <IoIosSend size={24} />
-                <span>
-                  {isOfferSubmitting ? t("submitting") : t("submit_offer")}
-                </span>
-              </button>
-            </div>
-          </div>
+        <div>
+          <AgencyOfferForm
+            budget={offerBudget}
+            onBudgetChange={setOfferBudget}
+            comment={offerComment}
+            onCommentChange={setOfferComment}
+            selectedFile={selectedFile}
+            onFileSelect={setSelectedFile}
+            offerForm={offerForm}
+            onOfferChange={handleOfferChange}
+            onSubmit={() => handleSubmitOffer(selectedPlan.id, offerBudget, offerComment)}
+            isSubmitting={isOfferSubmitting}
+          />
           {selectedPlan.offers && selectedPlan.offers.length > 0 && (
-            <div className="mt-6">
+            <div className="border-t border-[#edf0f2] px-4 py-6 sm:px-7">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">
                 {t("offers")}
               </h3>
@@ -662,7 +570,7 @@ const AdminHome = () => {
 
   return (
     <div className="agency-home min-w-0">
-      <Toaster />
+
       <section className="rounded-[26px] bg-[#172b43] px-6 py-8 text-white sm:px-9 sm:py-10">
         <div className="mb-5 h-1 w-11 rounded-full bg-[#d6a044]" />
         <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{t("welcome")}</h2>
@@ -700,45 +608,61 @@ const AdminHome = () => {
         </section>
 
         <aside className="space-y-5">
+          <section aria-labelledby="agency-important-notice" className="rounded-[22px] border-2 border-[#c94b43] bg-[#fff5f3] p-5 shadow-[0_10px_30px_rgba(169,53,44,0.10)] ring-4 ring-[#c94b43]/10">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fbe1dc] text-[#ac352e]"><TriangleAlert size={22} strokeWidth={2} aria-hidden="true" /></span>
+              <h3 id="agency-important-notice" className="text-base font-bold leading-6 text-[#9b2c26]">{t("important_notice_for_agencies")}</h3>
+            </div>
+            <p className="mt-4 text-sm font-bold leading-6 text-[#34485c]">{t("confirm_deal_mandatory")}</p>
+            <p className="mt-3 text-sm leading-6 text-[#536477]">{t("final_confirmation_client")}</p>
+            <p className="mt-4 border-t border-[#ebc5bf] pt-3 text-sm font-semibold leading-6 text-[#9b2c26]">{t("penalties_for_noncompliance")}</p>
+          </section>
           <div className="rounded-[22px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427]"><Heart size={19} aria-hidden="true" /></div>
             <h3 className="mt-4 text-base font-bold text-[#172b43]">{t("need_fast_response")}</h3>
             <NavLink to="/contact" className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-[#9b6b22] hover:underline">{t("click_here")}<ArrowUpRight size={16} aria-hidden="true" /></NavLink>
           </div>
-          <div className="rounded-[22px] border border-[#eadac0] bg-[#fffaf0] p-6">
-            <div className="flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#fff0d5] text-[#a36f1d]"><Info size={18} aria-hidden="true" /></span>
-              <h3 className="text-sm font-bold leading-6 text-[#172b43]">{t("important_notice_for_agencies")}</h3>
-            </div>
-            <p className="mt-4 text-sm font-semibold leading-6 text-[#34485c]">{t("confirm_deal_mandatory")}</p>
-            <p className="mt-3 text-sm leading-6 text-[#617082]">{t("final_confirmation_client")}</p>
-            <p className="mt-3 text-xs font-semibold leading-5 text-[#9d4635]">{t("penalties_for_noncompliance")}</p>
-          </div>
         </aside>
       </div>
 
-      {isPopupOpen && selectedPlan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/55 p-4">
-          <div
+      <Dialog.Root open={isPopupOpen} onOpenChange={(open) => { if (!open) closePopup(); }}>
+        {selectedPlan && <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-[#10243a]/60 backdrop-blur-sm" />
+          <Dialog.Content
             ref={popupRef}
-            className="agency-offer-modal max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)]"
+            aria-describedby={modalType === "offer" ? "agency-offer-description" : undefined}
+            onOpenAutoFocus={(event) => {
+              if (modalType === "offer") {
+                event.preventDefault();
+                popupRef.current?.querySelector("#agency-offer-budget")?.focus();
+              }
+            }}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              if (popupTriggerRef.current?.isConnected) popupTriggerRef.current.focus();
+            }}
+            onEscapeKeyDown={(event) => { if (isOfferSubmitting) event.preventDefault(); }}
+            onPointerDownOutside={(event) => { if (isOfferSubmitting) event.preventDefault(); }}
+            className={`agency-offer-modal fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[24px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)] focus:outline-none ${modalType === "offer" ? "max-w-[760px]" : "max-w-4xl"}`}
           >
-            <div className="flex items-center justify-between border-b border-[#e9e6e0] p-5 sm:px-7">
-              <h2 className="text-xl font-bold text-[#172b43]">
-                {modalType === "view" ? t("tour_details") : t("send_offer")}
-              </h2>
-              <button
-                onClick={closePopup}
-                aria-label={t("close")}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#617082] transition-colors hover:bg-[#f2f4f5]"
-              >
-                <X size={24} />
-              </button>
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-[#e9e6e0] bg-white px-4 py-5 sm:px-7 sm:py-6">
+              <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                {modalType === "offer" && <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff4dd] text-[#b98427] sm:h-12 sm:w-12 sm:rounded-2xl"><Send size={23} strokeWidth={1.8} aria-hidden="true" /></span>}
+                <div className="min-w-0">
+                  <Dialog.Title className="text-xl font-bold leading-tight tracking-tight text-[#172b43] sm:text-2xl">
+                    {modalType === "view" ? t("tour_details") : t("send_offer")}
+                  </Dialog.Title>
+                  {modalType === "offer" && <Dialog.Description id="agency-offer-description" className="mt-2 text-xs leading-5 text-[#617082] sm:text-sm">{t("agency_offer_intro")}</Dialog.Description>}
+                </div>
+              </div>
+              <Dialog.Close asChild>
+                <button type="button" disabled={isOfferSubmitting} aria-label={t("close")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#617082] transition-colors hover:bg-[#f2f4f5] focus-visible:outline-2 focus-visible:outline-[#bd8525] disabled:cursor-not-allowed disabled:opacity-50"><X size={21} aria-hidden="true" /></button>
+              </Dialog.Close>
             </div>
             {renderModalContent()}
-          </div>
-        </div>
-      )}
+          </Dialog.Content>
+        </Dialog.Portal>}
+      </Dialog.Root>
     </div>
   );
 };

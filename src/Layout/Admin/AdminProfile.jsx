@@ -91,7 +91,7 @@ export default function AdminProfile() {
           </div>
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#617082]">
             <span className="inline-flex items-center gap-1.5"><Star size={15} fill="#c88f2a" className="text-[#c88f2a]" aria-hidden="true" />{profile.rating || 0} ({profile.review_count || 0} {t("reviews")})</span>
-            {profile.vat_id && <span className="font-semibold">{t("vat_id")}: {profile.vat_id}</span>}
+            {profile.vat_id && <span className="font-semibold">{t("idno_label")}: {profile.vat_id}</span>}
           </div>
         </div>
       </section>

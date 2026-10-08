@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa6";
 import { MdOutlineNoMeals, MdVerifiedUser } from "react-icons/md";
 import { IoBed } from "react-icons/io5";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import PlanImage1 from "@/assets/img/plan-image-1.png";
 
@@ -52,7 +52,7 @@ function AdminDecline() {
 
   return (
     <div className="min-w-0 space-y-5">
-      <Toaster />
+
       {declineData.map((plan) => (
         <div
           key={plan.id}

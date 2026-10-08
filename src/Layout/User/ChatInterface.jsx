@@ -1,347 +1,103 @@
-"use client";
-
 import { useGetChatListQuery } from "@/redux/features/withAuth";
 import { useState, useEffect } from "react";
-import { IoMdSearch } from "react-icons/io";
-import { MdVerified } from "react-icons/md";
+import { Search, BadgeCheck, MessagesSquare, Inbox, Archive, ArrowRight, LoaderCircle } from "lucide-react";
 import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ChatAvatar from "./ChatAvatar";
 
 export default function ChatInterface() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const isUserArea = location.pathname.startsWith("/cont/");
-  const isDashboardArea = isUserArea || location.pathname.startsWith("/agentie/");
   const { id: urlChatId } = useParams();
-  const [selectedAgencyId, setSelectedAgencyId] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const [searchTerm, setSearchTerm] = useState("");
-  const [chatsList, setChatsList] = useState([]);
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem("activeChatTab") === "archived" ? "archived" : "inbox");
+  const { data: chatList, isLoading, isError, refetch } = useGetChatListQuery(undefined, { pollingInterval: 3000 });
 
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("activeChatTab") || "inbox";
-  });
-
-  const {
-    data: chatList,
-    isLoading: isChatListLoading,
-    refetch: refetchChatList,
-  } = useGetChatListQuery();
+  useEffect(() => { localStorage.setItem("activeChatTab", activeTab); }, [activeTab]);
 
   useEffect(() => {
-    localStorage.setItem("activeChatTab", activeTab);
-  }, [activeTab]);
-
-  useEffect(() => {
-    const timeout = setInterval(() => {
-      refetchChatList();
-    }, 3000);
-    return () => {
-      clearInterval(timeout);
-    };
-  }, [refetchChatList]);
-
-  // Update and sort chatsList when chatList data is fetched
-  useEffect(() => {
-    if (chatList && Array.isArray(chatList)) {
-      const sortedChats = [...chatList].sort((a, b) => {
-        const timeA = a.last_message_time
-          ? new Date(a.last_message_time)
-          : new Date(a.updated_at);
-        const timeB = b.last_message_time
-          ? new Date(b.last_message_time)
-          : new Date(b.updated_at);
-        if (!timeA || isNaN(timeA.getTime())) return 1;
-        if (!timeB || isNaN(timeB.getTime())) return -1;
-        return timeB - timeA;
-      });
-
-      const mappedChats = sortedChats.map((chat) => ({
-        id: chat.id?.toString() || "",
-        name: chat.other_participant_name || t("unknown_user"),
-        image:
-          chat.other_participant_image ||
-          "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png",
-        lastMessage: chat.last_message || null,
-        unreadCount: chat.unread_count || 0,
-        active: chat.active || false,
-        tourist_is_verified: chat.tourist_is_verified || false,
-        other_user_id: chat.other_user_id || null,
-        tour_plan_title: chat.tour_plan_title || t("no_tour_plan"),
-        tour_plan_id: chat.tour_plan_id || null,
-        is_archived: chat.is_archived || false,
-      }));
-
-      setChatsList(mappedChats);
+    if (urlChatId && Array.isArray(chatList) && !chatList.some(chat => String(chat.id) === urlChatId)) {
+      navigate(basePath, { replace: true });
     }
-  }, [chatList, isChatListLoading, t]);
+  }, [urlChatId, chatList, basePath, navigate]);
 
-  // Check for mobile layout
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  // Handle URL-based chat ID selection
-  useEffect(() => {
-    if (urlChatId) {
-      if (isChatListLoading || chatsList.length === 0) {
-        setSelectedAgencyId(urlChatId);
-        return;
-      }
-
-      const selectedChat = chatsList.find((chat) => chat.id === urlChatId);
-      if (selectedChat) {
-        setSelectedAgencyId(urlChatId);
-      } else if (!isChatListLoading) {
-        const basePath = location.pathname.includes("/agentie/")
-          ? "/agentie/mesaje"
-          : "/cont/mesaje";
-        navigate(basePath, { replace: true });
-        setSelectedAgencyId(null);
-      }
-    } else {
-      setSelectedAgencyId(null);
-    }
-  }, [urlChatId, chatsList, isChatListLoading, navigate, location.pathname]);
-
-  const handleAgencyClick = (agency) => {
-    if (!agency.id) return;
-    setSelectedAgencyId(agency.id);
-    const basePath = location.pathname.includes("/agentie/")
-      ? "/agentie/mesaje"
-      : "/cont/mesaje";
-    navigate(`${basePath}/${agency.id}`, { state: { agency } });
-  };
-
-  const isBaseRoute =
-    location.pathname === "/cont/mesaje" || location.pathname === "/agentie/mesaje";
-
-  // Filter agencies based on search term and active tab
-  const filteredAgencies = chatsList.filter(
-    (agency) =>
-      (agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        agency.tour_plan_title
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())) &&
-      (activeTab === "inbox" ? !agency.is_archived : agency.is_archived)
+  const chats = (Array.isArray(chatList) ? chatList : []).map(chat => ({
+    id: String(chat.id),
+    name: chat.other_participant_name || t("unknown_user"),
+    image: chat.other_participant_image || null,
+    lastMessage: chat.last_message || null,
+    unreadCount: chat.unread_count || 0,
+    active: chat.active || false,
+    tourist_is_verified: chat.tourist_is_verified || false,
+    other_user_id: chat.other_user_id || null,
+    tour_plan_title: chat.tour_plan_title || t("no_tour_plan"),
+    tour_plan_id: chat.tour_plan_id || null,
+    is_archived: chat.is_archived || false,
+    updatedAt: new Date(chat.last_message_time || chat.updated_at).getTime() || 0,
+  })).sort((a, b) => b.updatedAt - a.updatedAt);
+  const query = searchTerm.trim().toLocaleLowerCase();
+  const filteredChats = chats.filter(chat =>
+    (activeTab === "archived" ? chat.is_archived : !chat.is_archived) &&
+    `${chat.name} ${chat.tour_plan_title}`.toLocaleLowerCase().includes(query)
   );
+  const unreadTotal = chats.filter(chat => !chat.is_archived).reduce((sum, chat) => sum + chat.unreadCount, 0);
 
-  // Mobile Layout
-  if (isMobile) {
-    return (
-      <div className={isDashboardArea ? "user-chat-mobile flex h-[calc(100vh-120px)] min-h-[500px] flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white" : "h-screen flex flex-col"}>
-        <div className="p-4 border-b border-gray-300">
-          <h1 className="text-xl font-semibold mb-3">{t("messages")}</h1>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={t("search_chats_or_tour_plans")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gray-200 rounded-lg pl-10 pr-4 py-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-            />
-            <IoMdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          </div>
-          <div className="flex mt-2">
-            <button
-              onClick={() => setActiveTab("inbox")}
-              className={`flex-1 py-2 text-center hover:cursor-pointer ${activeTab === "inbox"
-                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
-                  : "bg-gray-200 text-gray-700"
-                } rounded-l-lg`}
-            >
-              {t("inbox")}
-            </button>
-            <button
-              onClick={() => setActiveTab("archived")}
-              className={`flex-1 py-2 text-center hover:cursor-pointer ${activeTab === "archived"
-                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
-                  : "bg-gray-200 text-gray-700"
-                } rounded-r-lg`}
-            >
-              {t("archived")}
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          {isChatListLoading ? (
-            <div className="p-4 text-center">{t("loading")}</div>
-          ) : filteredAgencies.length === 0 ? (
-            <div className="p-4 text-center">{t("no_chats_found")}</div>
-          ) : (
-            filteredAgencies.map((agency) => (
-              <div
-                key={agency.id}
-                onClick={() => handleAgencyClick(agency)}
-                className={`flex items-center px-4 py-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200 ${selectedAgencyId === agency.id ? "bg-gray-200" : ""
-                  }`}
-              >
-                <div className="relative mr-3">
-                  <img
-                    src={agency.image}
-                    alt={agency.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                    onError={(e) =>
-                    (e.target.src =
-                      "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")
-                    }
-                  />
-                  {agency.active && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center">
-                      <h3 className="font-semibold truncate">{agency.name}</h3>
-                      {agency.tourist_is_verified && (
-                        <MdVerified className="ml-1 w-4 h-4 text-[#C2851C]" />
-                      )}
-                    </div>
-                    {agency.unreadCount > 0 && (
-                      <span className="text-[12px] bg-[#DD9E2C] text-white px-2 py-1 rounded-full ml-2">
-                        {agency.unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 truncate">
-                    {agency.tour_plan_title}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {agency.lastMessage || t("no_messages_yet")}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-        {!isBaseRoute && (
-          <div className="fixed inset-0 bg-gray-900 z-50">
-            <Outlet />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Desktop Layout
   return (
-    <div className={isDashboardArea ? "user-chat-desktop" : "p-4"}>
-      <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        {t("messages")}
-      </h1>
-      <div className="flex" style={{ height: "80vh" }}>
-        <div className="w-1/4 rounded-l-lg bg-gray-50 dark:bg-[#1E232E] border-r border-gray-200 dark:border-gray-300 flex flex-col">
-          <div className="m-3 relative">
-            <input
-              type="text"
-              placeholder={t("search_chats_or_tour_plans")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="border border-gray-300 rounded-md w-full pl-10 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-            />
-            <IoMdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          </div>
-          <div className="flex m-3">
-            <button
-              onClick={() => setActiveTab("inbox")}
-              className={`flex-1 py-2 text-center hover:cursor-pointer ${activeTab === "inbox"
-                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
-                  : "bg-gray-200 text-gray-700"
-                } rounded-l-lg`}
-            >
-              {t("inbox")}
-            </button>
-            <button
-              onClick={() => setActiveTab("archived")}
-              className={`flex-1 py-2 text-center hover:cursor-pointer ${activeTab === "archived"
-                  ? (isDashboardArea ? "bg-[#172b43] text-white" : "bg-[#DD9E2C] text-white")
-                  : "bg-gray-200 text-gray-700"
-                } rounded-r-lg`}
-            >
-              {t("archived")}
-            </button>
-          </div>
-          <div className="overflow-y-auto flex-1">
-            {isChatListLoading ? (
-              <div className="p-4 text-center">{t("loading")}</div>
-            ) : filteredAgencies.length === 0 ? (
-              <div className="p-4 text-center">{t("no_chats_found")}</div>
-            ) : (
-              filteredAgencies.map((agency) => (
-                <div
-                  key={agency.id}
-                  onClick={() => handleAgencyClick(agency)}
-                  className={`flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252c3b] text-gray-700 dark:text-gray-200 transition-colors border-b border-gray-200 dark:border-gray-300 ${selectedAgencyId === agency.id
-                      ? "bg-blue-100 dark:bg-[#2F80A9]"
-                      : ""
-                    }`}
-                >
-                  <div className="relative mr-3">
-                    <img
-                      src={agency.image}
-                      alt={agency.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                      onError={(e) =>
-                      (e.target.src =
-                        "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png")
-                      }
-                    />
-                    {agency.active && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="flex items-center">
-                        <span className="font-medium text-[15px] truncate">
-                          {agency.name}
-                        </span>
-                        {agency.tourist_is_verified && (
-                          <MdVerified className="ml-1 w-4 h-4 text-[#C2851C]" />
-                        )}
-                        <span className="pl-1 font-semibold">
-                          ({agency.tour_plan_title})
-                        </span>
-                      </div>
-                      {agency.unreadCount > 0 && (
-                        <span className="text-[12px] bg-[#DD9E2C] text-white px-2 py-1 rounded-full ml-2">
-                          {agency.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                      {agency.lastMessage || t("no_messages_yet")}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+    <section className="messaging-page text-[#172b43]" aria-labelledby="messages-title">
+      <div className="mb-5 flex items-center gap-3 sm:mb-6">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#ecdfc8] bg-[#fbf5e9] text-[#b88424]"><MessagesSquare size={23} /></span>
+        <div className="min-w-0">
+          <h1 id="messages-title" className="text-2xl font-bold tracking-tight sm:text-[28px]">{t("messages")}</h1>
+          <p className="mt-1 text-sm leading-relaxed text-[#77818e]">{t("chat_page_intro")}</p>
         </div>
-        <div className="w-3/4 bg-white dark:bg-[#252c3b] rounded-r-lg">
-          {isBaseRoute ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                  {t("select_a_chat")}
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  {t("choose_an_agency")}
-                </p>
-              </div>
+      </div>
+      <div className="messaging-workspace flex overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_10px_35px_rgba(23,43,67,0.04)]">
+        <aside aria-label={t("conversations")} className={`${urlChatId ? "hidden md:flex" : "flex"} w-full min-w-0 flex-col border-[#eeeae3] md:w-[300px] md:shrink-0 md:border-r xl:w-[340px]`}>
+          <div className="border-b border-[#eeeae3] p-4 sm:p-5">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <h2 className="text-[15px] font-semibold">{t("conversations")}</h2>
+              {unreadTotal > 0 && <span className="rounded-full bg-[#fbf2df] px-2.5 py-1 text-xs font-semibold text-[#9b701f]" aria-label={t("chat_unread_count", { count: unreadTotal })}>{unreadTotal}</span>}
             </div>
-          ) : (
-            <Outlet />
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8c96a2]" size={17} />
+              <input type="search" aria-label={t("search_chats_or_tour_plans")} placeholder={t("chat_search_placeholder")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="chat-search h-11 w-full rounded-xl border border-[#e4e7eb] bg-[#fafbfc] pl-10 pr-3 text-sm outline-none transition focus:border-[#c88f2a] focus:ring-2 focus:ring-[#c88f2a]/15" />
+            </div>
+            <div className="mt-4 flex gap-1 rounded-xl bg-[#f5f4f1] p-1" aria-label={t("chat_filter")}>
+              {[["inbox", Inbox], ["archived", Archive]].map(([tab, Icon]) => (
+                <button key={tab} type="button" aria-pressed={activeTab === tab} onClick={() => setActiveTab(tab)} className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-[#c88f2a] ${activeTab === tab ? "bg-[#172b43] text-white shadow-sm" : "text-[#77818e] hover:bg-white"}`}>
+                  <Icon size={15} className="shrink-0" />{t(tab)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto p-2" aria-busy={isLoading}>
+            {isLoading ? <div role="status" className="flex items-center justify-center gap-2 p-8 text-sm text-[#77818e]"><LoaderCircle size={18} className="animate-spin" />{t("loading")}</div>
+              : isError ? <div role="alert" className="p-6 text-center text-sm text-[#77818e]"><p>{t("error_loading_chat")}</p><button type="button" className="mt-3 font-semibold text-[#9b701f] underline" onClick={refetch}>{t("chat_retry")}</button></div>
+              : filteredChats.length === 0 ? <div className="flex flex-col items-center gap-3 px-4 py-10 text-center text-sm text-[#77818e]"><MessagesSquare size={28} className="text-[#c8b38d]" /><p>{t("no_chats_found")}</p></div>
+              : filteredChats.map(chat => (
+                <button type="button" key={chat.id} onClick={() => navigate(`${basePath}/${chat.id}`, { state: { agency: chat } })} aria-current={urlChatId === chat.id ? "page" : undefined} className={`group mb-1 flex w-full items-start gap-3 rounded-2xl border p-3 text-left transition focus-visible:outline-2 focus-visible:outline-[#c88f2a] ${urlChatId === chat.id ? "border-[#ebd8b1] bg-[#fbf6ec]" : "border-transparent hover:bg-[#f8f7f4]"}`}>
+                  <ChatAvatar name={chat.name} image={chat.image} active={chat.active} />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5"><span className="truncate text-sm font-semibold">{chat.name}</span>{chat.tourist_is_verified && <BadgeCheck size={15} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}{chat.unreadCount > 0 && <span className="ml-auto shrink-0 rounded-full bg-[#dd9e2c] px-1.5 py-0.5 text-[11px] font-bold text-white" aria-label={t("chat_unread_count", { count: chat.unreadCount })}>{chat.unreadCount}</span>}</span>
+                    <span className="mt-1 block truncate text-xs font-medium text-[#a27b36]">{chat.tour_plan_title}</span>
+                    <span className="mt-1.5 block truncate text-xs leading-relaxed text-[#77818e]">{chat.lastMessage || t("no_messages_yet")}</span>
+                  </span>
+                </button>
+              ))}
+          </div>
+        </aside>
+        <div className={`${urlChatId ? "flex" : "hidden md:flex"} min-w-0 flex-1 flex-col bg-[#faf9f6]`}>
+          {urlChatId ? <Outlet /> : (
+            <div className="flex h-full flex-col items-center justify-center px-6 text-center">
+              <span className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-[30px] border border-[#e9dfcf] bg-white text-[#b88424] shadow-[0_8px_30px_rgba(23,43,67,0.04)]"><MessagesSquare size={38} strokeWidth={1.5} /><span className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-4 border-[#faf9f6] bg-[#172b43] text-white"><ArrowRight size={16} /></span></span>
+              <h2 className="max-w-sm text-xl font-semibold tracking-tight">{t("select_a_chat")}</h2>
+              <p className="mt-3 max-w-xs text-sm leading-6 text-[#77818e]">{t("chat_empty_description")}</p>
+            </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

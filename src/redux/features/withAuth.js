@@ -138,7 +138,7 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["AgencyProfile"],
+      invalidatesTags: ["AgencyProfile", "UserProfile"],
     }),
     // like
     likePost: builder.mutation({
@@ -347,7 +347,7 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["AgencyProfile"],
+      invalidatesTags: ["AgencyProfile", "UserProfile"],
     }),
 
     // archived functoin

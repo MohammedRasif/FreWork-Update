@@ -7,6 +7,7 @@ import LanguageToggleButton from "./LanguageToggleButton";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ClipboardList, LogOut, UserRound } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { getAgencyAccountPath } from "@/lib/agencyOnboarding";
 const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
@@ -90,21 +91,13 @@ const Navbar = () => {
   // };
   const handleDashboardClick = () => {
     const role = userData?.role;
-    const isAgencyVerified = userData?.agency_is_verified;
-    const isProfileComplete = userData?.is_profile_complete;
 
     let path = "/";
 
     if (role === "tourist") {
       path = "/cont";
     } else if (role === "agency") {
-      if (!isAgencyVerified) {
-        path = "/in-asteptare";
-      } else if (!isProfileComplete) {
-        path = "/agentie/modifica-profil";
-      } else {
-        path = "/agentie";
-      }
+      path = getAgencyAccountPath(userData);
     }
 
     setIsProfileOpen(false);

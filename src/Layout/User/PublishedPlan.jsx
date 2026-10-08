@@ -24,9 +24,8 @@ import {
 } from "@/redux/features/withAuth";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { Link, useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { X } from "lucide-react";
-import { ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { FaClock } from "react-icons/fa6";
 import i18n from "../../../i18n.js";
@@ -311,7 +310,7 @@ function PublishedPlan() {
 
   return (
     <div className="min-w-0">
-      <Toaster />
+
       <div className="flex flex-col">
         <div className="flex-1 flex flex-col gap-5">
           {publishedPlans.map((plan) => {
@@ -1088,7 +1087,7 @@ function PublishedPlan() {
           </div>
         </div>
       )}
-      <ToastContainer />
+
     </div>
   );
 }

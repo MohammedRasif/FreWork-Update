@@ -7,7 +7,7 @@ import {
   useGetTuristProfileQuery,
   useUpdateTuristProfileMutation,
 } from "@/redux/features/withAuth";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 
@@ -142,7 +142,6 @@ function UserEditProfile() {
 
   return (
     <div className="user-edit-profile mx-auto max-w-5xl">
-      <ToastContainer />
 
       <div className="mb-5">
         <NavLink

@@ -164,7 +164,7 @@ export const router = createBrowserRouter([
   { path: "/verificare-otp", element: <OTP_Verification /> },
   { path: "/resetare-parola", element: <ResetPassword /> },
   { path: "/succes", element: <SubscriptionSuccess /> },
-  { path: "/in-asteptare", element: <PendingForAdmin /> },
+  { path: "/in-asteptare", element: <PrivateRoute><PendingForAdmin /></PrivateRoute> },
   ...legacyPaths.map(([path, to]) => ({
     path,
     element: <LegacyRedirect to={to} />,

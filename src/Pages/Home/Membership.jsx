@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ArrowUpRight, Award, BadgeCheck, Building2, Compass, Heart, RotateCcw, Search, Star, X } from "lucide-react";
 import { useGetAllAgencyQuery, useGetTopAgencyQuery, useSearchAgencyQuery } from "@/redux/features/baseApi";
@@ -160,7 +160,7 @@ function Membership() {
         {topAgencies.length > 0 && <section className="pt-20"><div className="mb-7 h-1 w-12 rounded-full bg-[#d6a044]" /><h2 className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">{t("top_agencies")}</h2><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{topAgencies.map((agency) => <button key={agency.id} type="button" onClick={() => setSelectedAgency(agency)} className="flex min-w-0 items-center gap-4 rounded-[20px] border border-[#e9e6e0] bg-white p-5 text-left shadow-[0_10px_35px_rgba(23,43,67,0.04)] hover:border-[#d5ad63]"><AgencyLogo agency={agency} /><span className="min-w-0"><span className="block break-words font-bold text-[#172b43]">{agency.agency_name}</span><span className="mt-1 block text-sm text-[#718092]">{Number(agency.review_count) || 0} {t("reviews")}</span></span><ArrowUpRight size={17} className="ml-auto shrink-0 text-[#b98427]" aria-hidden="true" /></button>)}</div></section>}
       </div>
       {selectedAgency && <AgencyDialog agency={selectedAgency} onClose={() => setSelectedAgency(null)} />}
-      <ToastContainer position="top-right" autoClose={5000} />
+
     </main>
   );
 }

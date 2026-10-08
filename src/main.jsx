@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import "../i18n.js";
 import CookieBanner from "./components/CookieBanner";
 import DynamicTitle from "./routes/DynamicTitle.jsx";
+import NotificationToasts from "./components/NotificationToasts.jsx";
 
 const subscribeToRoute = (onChange) => router.subscribe(onChange);
 const getPathname = () => router.state.location.pathname;
@@ -21,6 +22,7 @@ function RouteMetadata() {
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
+      <NotificationToasts />
       <RouterProvider router={router} />
       <RouteMetadata />
       <CookieBanner />

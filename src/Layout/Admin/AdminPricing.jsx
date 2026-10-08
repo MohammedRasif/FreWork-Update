@@ -7,7 +7,7 @@ import {
   useShowSubscriptionDataQuery,
   useSubscriptionMutation,
 } from "@/redux/features/withAuth";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 
@@ -334,7 +334,6 @@ const AdminPricing = () => {
         )}
 
       </div>
-      <ToastContainer position="top-right" autoClose={5000} />
 
     </section>
   );

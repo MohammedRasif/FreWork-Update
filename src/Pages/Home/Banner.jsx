@@ -4,10 +4,17 @@ import img2 from "../../assets/img/mobileDeviceBackground.png";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import BannerSectionPopup from "./BannerSectionPupup";
-import { useTranslation } from "react-i18next";
-import { Check, LockKeyhole, Clock3, MapPin } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
+import { BadgeCheck, ClipboardList, Clock3, LockKeyhole, MapPin, MessagesSquare, UserRoundCheck } from "lucide-react";
 
 let isGoogleScriptLoaded = false;  
+
+const heroBenefits = [
+  { key: "feature_drivers", icon: BadgeCheck },
+  { key: "feature_booking", icon: ClipboardList },
+  { key: "feature_pricing", icon: MessagesSquare },
+  { key: "feature_vehicles", icon: UserRoundCheck },
+];
 
 const readPendingPlan = () => {
   try {
@@ -83,17 +90,13 @@ const Banner = () => {
   }, []);
 
   const getInitialStep = (pendingPlan) => {
-    // your existing function (unchanged)
     const fromLogin = location.state?.fromLogin || false;
     if (fromLogin && accessToken && pendingPlan) return 5;
     if (!pendingPlan) return 1;
-    const { locationFrom, locationTo, startingDate, endingDate, adults, children, budget, touristSpots, typeOfAccommodation, minimumHotelStars, mealPlan, travelType, destinationType, name, email, phoneNumber, confirmation } = pendingPlan;
+    const { locationFrom, locationTo, startingDate, endingDate, adults, children, budget, name, email, phoneNumber, confirmation } = pendingPlan;
     if (!locationFrom || !locationTo || !startingDate || !endingDate || (!adults && !children)) return 1;
-    if (!budget || !touristSpots) return 2;
-    if (!typeOfAccommodation || !minimumHotelStars || !mealPlan) return 3;
-    if (!travelType || !destinationType) return 4;
-    if (!name || !email || !phoneNumber || !confirmation) return 5;
-    return 5;
+    if (!budget) return 1;
+    return name && email && phoneNumber && confirmation ? 5 : 6;
   };
 
   useEffect(() => {
@@ -134,16 +137,22 @@ const handleButtonClick = () => {
               <span>{t("response_time")}</span>
             </div>
             <h1 className="mt-7 max-w-[680px] text-[clamp(2.4rem,4.5vw,4.1rem)] font-extrabold leading-[1.1] tracking-[-0.035em] text-balance text-white">
-              {t("banner_slogan")}
+              <Trans
+                i18nKey="banner_slogan"
+                components={{
+                  question: <span className="block" />,
+                  highlight: <span className="block text-[#e5ad42]" />,
+                }}
+              />
             </h1>
             <p className="mt-6 max-w-[565px] text-base leading-7 text-white/90 sm:text-xl sm:leading-8">
               {t("show_short_descriptionn")}
             </p>
             <div className="mt-9 grid max-w-[620px] gap-x-8 gap-y-4 sm:grid-cols-2">
-              {["feature_drivers", "feature_booking", "feature_pricing", "feature_vehicles"].map((key) => (
-                <div key={key} className="flex items-start gap-3 text-sm font-medium leading-6 text-white/95 sm:text-base">
-                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e5ad42] text-[#17273a]">
-                    <Check size={13} strokeWidth={3} aria-hidden="true" />
+              {heroBenefits.map(({ key, icon: Icon }) => (
+                <div key={key} className="flex min-w-0 items-center gap-3 text-sm font-medium leading-6 text-white/95 sm:text-base">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#f1e4c7] bg-[#fffdf7] text-[#172b43] shadow-[0_6px_18px_rgba(8,22,38,0.15)] sm:h-14 sm:w-14">
+                    <Icon size={28} strokeWidth={1.8} className="h-6 w-6 sm:h-7 sm:w-7 [&_path:last-child]:stroke-[#c88f2a] [&_rect]:stroke-[#c88f2a]" aria-hidden="true" />
                   </span>
                   <span>{t(key)}</span>
                 </div>

@@ -24,7 +24,7 @@ import {
   Users,
   UtensilsCrossed,
 } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 import { useTranslation } from "react-i18next";
 import { localizedContent } from "@/lib/localizedContent";
@@ -335,7 +335,7 @@ function SinglePost({ prid }) {
 
   return (
     <main className="tour-detail-page min-h-screen bg-[#faf9f6] pt-[72px] text-[#172b43] xl:pt-[82px]">
-      <Toaster />
+
       <header className="bg-[#172b43] px-5 pb-24 pt-10 text-white sm:px-8 sm:pb-28 sm:pt-14 lg:px-10">
         <div className="mx-auto max-w-7xl">
           <Link to="/cereri" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white/75 transition-colors hover:text-white">

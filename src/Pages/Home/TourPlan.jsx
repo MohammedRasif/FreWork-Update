@@ -17,7 +17,7 @@ import {
   useOfferBudgetMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
 
@@ -471,7 +471,7 @@ const TourPlanWithPopup = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6 pb-20">
-      <Toaster />
+
       <div className="px-2 sm:px-4 lg:px-6">
         <button
           className="md:hidden flex items-center gap-2 mb-4 bg-white px-4 py-2 rounded-md shadow-sm border border-gray-200"

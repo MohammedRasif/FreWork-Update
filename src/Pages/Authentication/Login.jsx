@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLogInMutation } from "@/redux/features/baseApi";
 import { useTranslation } from "react-i18next";
 import AuthLayout, { authInputClass } from "./AuthLayout";
+import { getAgencyAccountPath } from "@/lib/agencyOnboarding";
 
 function Login() {
   const { t } = useTranslation();
@@ -26,7 +27,11 @@ function Login() {
       localStorage.setItem("role", res?.profile_data?.role || "");
       localStorage.setItem("name", res?.profile_data?.name || res?.profile_data?.agency || "");
       localStorage.setItem("userEmail", data.email);
-      navigate(redirect, { replace: true });
+      const profile = res.profile_data;
+      localStorage.setItem("userType", profile?.role || "");
+      localStorage.setItem("agency_is_verified", String(Boolean(profile?.agency_is_verified)));
+      const needsAgencyOnboarding = profile?.role === "agency" && (!profile.agency_is_verified || !profile.is_profile_complete || profile.agency_is_rejected);
+      navigate(needsAgencyOnboarding ? getAgencyAccountPath(profile) : redirect, { replace: true });
     } catch (error) {
       const message = error?.data?.message;
       setErrorMessage(typeof message === "string" ? message : t("login_error"));

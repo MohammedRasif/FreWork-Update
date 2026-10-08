@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, ClipboardList, Lock, LogOut, Mail, Menu, MessageCircle, ShieldCheck, UserRound, X, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useChangePasswordMutation, useGetTuristProfileQuery } from "@/redux/features/withAuth";
 import AdminNotification from "../Admin/AdminNotification";
@@ -108,7 +108,7 @@ export default function UserDashboardLayout() {
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) setIsNotificationOpen(false);
+      if (notificationRef.current && !notificationRef.current.contains(event.target) && !event.target.closest?.("[data-notification-dialog]")) setIsNotificationOpen(false);
     };
     document.addEventListener("mousedown", closeOnOutsideClick);
     return () => document.removeEventListener("mousedown", closeOnOutsideClick);
@@ -156,7 +156,7 @@ export default function UserDashboardLayout() {
             <LanguageToggleButton className="hidden sm:inline-flex" />
             <div className="relative" ref={notificationRef}>
               <button type="button" onClick={() => setIsNotificationOpen((value) => !value)} aria-label={t("notifications")} aria-expanded={isNotificationOpen} className="relative flex h-10 w-10 items-center justify-center rounded-xl text-[#34485c] hover:bg-[#f7f3ec]"><Bell size={20} aria-hidden="true" />{unreadCount > 0 && <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c88f2a] px-1 text-[10px] font-bold text-white">{unreadCount}</span>}</button>
-              {isNotificationOpen && <div className="absolute right-0 top-12 z-50 max-h-[min(70vh,500px)] w-[min(88vw,440px)] overflow-y-auto rounded-[18px] border border-[#e9e6e0] bg-white shadow-[0_20px_55px_rgba(23,43,67,0.17)]"><AdminNotification /></div>}
+              {isNotificationOpen && <div className="fixed right-4 top-[84px] z-50 sm:absolute sm:right-0 sm:top-12 max-h-[min(70vh,500px)] w-[min(88vw,440px)] overflow-y-auto rounded-[18px] border border-[#e9e6e0] bg-white shadow-[0_20px_55px_rgba(23,43,67,0.17)]"><AdminNotification compact /></div>}
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild><button type="button" aria-label={t("settings")} className="flex h-10 items-center gap-1 rounded-xl px-2 text-[#34485c] hover:bg-[#f7f3ec]"><UserRound size={19} aria-hidden="true" /><ChevronDown size={15} aria-hidden="true" /></button></DropdownMenuTrigger>
@@ -182,7 +182,7 @@ export default function UserDashboardLayout() {
           </form>
         </div>
       </div>}
-      <ToastContainer position="top-right" autoClose={3000} />
+
     </div>
   );
 }

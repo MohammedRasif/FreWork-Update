@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { localizedContent } from "@/lib/localizedContent";
 import { getOfferCount, hasAcceptedOffer } from "@/lib/tourPlan";
 import { cn } from "@/lib/utils";
+import OfferAgencyLogos from "./OfferAgencyLogos";
 
 const formatDate = (value, language) => {
   if (!value) return "—";
@@ -30,6 +31,7 @@ const formatBudget = (value, language) => {
 const TourPlanCard = ({ tour, onDetails, onOffer, showOfferButton = false, offerDisabled, className }) => {
   const { t, i18n } = useTranslation();
   const offerCount = getOfferCount(tour);
+  const hasAgencyLogos = Array.isArray(tour.offers) && tour.offers.some((offer) => offer?.agency);
   const spots = Array.isArray(tour.tourist_spots)
     ? tour.tourist_spots.join(", ")
     : tour.tourist_spots;
@@ -54,9 +56,10 @@ const TourPlanCard = ({ tour, onDetails, onOffer, showOfferButton = false, offer
             {localizedContent(tour.destination_type, t)}
           </span>
         )}
-        <h3 className="absolute bottom-5 left-5 right-5 break-words text-2xl font-bold leading-tight text-white">
+        <h3 className={cn("absolute left-5 right-5 break-words text-2xl font-bold leading-tight text-white", hasAgencyLogos ? "bottom-20 line-clamp-2" : "bottom-5")}>
           {tour.location_to || t("destination")}
         </h3>
+        <OfferAgencyLogos offers={tour.offers} />
       </div>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">

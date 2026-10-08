@@ -15,13 +15,21 @@ import i18n from "../../../i18n.js";
 
 let isGoogleScriptLoaded = false;
 
+const BUDGET_MAX = 20000;
+const BUDGET_STEP = 100;
+const normalizeBudget = (value) => {
+  const amount = Number(value);
+  if (value === "" || value == null || !Number.isFinite(amount)) return "5000";
+  return String(Math.min(BUDGET_MAX, Math.max(0, Math.round(amount / BUDGET_STEP) * BUDGET_STEP)));
+};
+
 export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   const totalSteps = 6;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phoneNumber: "",
+    phoneNumber: "+373",
     locationFrom: "",
     locationTo: "",
     startingDate: "",
@@ -60,13 +68,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     reset,
     trigger,
   } = useForm({
-    defaultValues: { budget: "5000" },
+    defaultValues: { budget: "5000", phoneNumber: "+373" },
   });
   const locationFromRef = useRef(null);
   const locationToRef = useRef(null);
   const touristSpotsRef = useRef(null);
 
-  const uiStep = currentStep <= 4 ? 1 : currentStep === 5 ? 2 : 3;
+  const uiStep = currentStep <= 4 ? 1 : currentStep === 6 ? 2 : 3;
   const totalUiSteps = 3;
   const progressPercentage = (uiStep / totalUiSteps) * 100;
 
@@ -89,7 +97,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (state?.id) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
-      setValue("phoneNumber", state?.phone_number || "");
+      setValue("phoneNumber", state?.phone_number || "+373");
       setValue("locationTo", state?.location_to || "");
       setValue(
         "startingDate",
@@ -105,7 +113,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       );
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
-      setValue("budget", state?.budget || "5000");
+      setValue("budget", normalizeBudget(state?.budget));
       setValue("touristSpots", state?.tourist_spots || "");
       setValue("description", state?.description || "");
       setValue("destinationType", state?.destination_type || "");
@@ -131,13 +139,19 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             travel_type: "travelType",
             is_confirmed_request: "confirmation",
           }[key] || key;
-        updateFormData(mappedKey, value);
+        const restoredValue = mappedKey === "budget"
+          ? normalizeBudget(value)
+          : mappedKey === "phoneNumber" ? value || "+373" : value;
+        updateFormData(mappedKey, restoredValue);
       });
     } else if (pendingPlan) {
       const parsed = JSON.parse(pendingPlan);
       Object.entries(parsed).forEach(([key, value]) => {
-        setValue(key, value);
-        updateFormData(key, value);
+        const restoredValue = key === "budget"
+          ? normalizeBudget(value)
+          : key === "phoneNumber" ? value || "+373" : value;
+        setValue(key, restoredValue);
+        updateFormData(key, restoredValue);
       });
     }
   }, [state?.id, setValue]);
@@ -238,7 +252,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     }
     const result = await trigger(fieldsToValidate);
     if (!result) {
-      toast.error(t("fill_all_required"));
+      toast.error(t("fill_all_required"), { toastId: "request-required-fields" });
     }
     return result;
   };
@@ -265,7 +279,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       return;
     }
     if (!data.adults && !data.children) {
-      toast.error(t("at_least_one_person"));
+      toast.error(t("at_least_one_person"), { toastId: "request-travellers" });
       return;
     }
     const formDataToSend = new FormData();
@@ -315,23 +329,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       if (typeof window !== "undefined" && window.gtag) {
         window.gtag("event", "apertura_popup");
       }
-      toast.success(t("plan_submitted_success"), {
-        autoClose: 4000,
-        style: {
-          background: "linear-gradient(135deg, #FF6600, #e55600)",
-          color: "#ffffff",
-          borderRadius: "8px",
-          padding: "16px",
-          fontSize: "16px",
-          fontWeight: "500",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          maxWidth: "400px",
-        },
-        iconTheme: {
-          primary: "#ffffff",
-          secondary: "#FF6600",
-        },
-      });
+      toast.dismiss("request-required-fields");
+      toast.dismiss("request-travellers");
+      toast.success(t("plan_submitted_success"), { autoClose: 4000 });
 
       reset();
       setSelectedFile(null);
@@ -384,16 +384,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     const visibleFields = ["startingDate", "endingDate", "adults", "locationTo", "budget"];
     const result = await trigger(visibleFields);
     if (!result) {
-      toast.error(t("fill_all_required"));
+      toast.error(t("fill_all_required"), { toastId: "request-required-fields" });
       return;
     }
-    setCurrentStep(5);
+    setCurrentStep(6);
   };
 
-  const handleUiStep2Next = async () => {
+  const handleContactSubmit = async () => {
+    updateFormData("confirmation", true);
+    setValue("confirmation", true);
     const valid = await validateStep(5);
     if (!valid) return;
-    setCurrentStep(6);
+    handleSubmit((data) => onSubmit(data, "published"))();
   };
 
   const handleAddDetails = async () => {
@@ -401,7 +403,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     if (!step3Valid) return;
     const step4Valid = await validateStep(4);
     if (!step4Valid) return;
-    handleSubmit((data) => onSubmit(data, "published"))();
+    setCurrentStep(5);
   };
 
   const handleSkipDetails = () => {
@@ -411,7 +413,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     setValue("travelType", "");
     setValue("destinationType", "");
     setValue("description", "");
-    handleSubmit((data) => onSubmit(data, "published"))();
+    updateFormData("typeOfAccommodation", "");
+    updateFormData("minimumHotelStars", "");
+    updateFormData("mealPlan", "");
+    updateFormData("travelType", "");
+    updateFormData("destinationType", "");
+    updateFormData("description", "");
+    setCurrentStep(5);
   };
 
   const StarRating = ({ value, onChange }) => (
@@ -619,7 +627,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             {/* Budget Slider */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider">
+                <label htmlFor="request-budget" className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider">
                   {t("budget_label")}
                 </label>
                 <span className="text-base font-bold text-gray-800">
@@ -630,10 +638,11 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 {...register("budget", {
                   required: t("budget_required"),
                 })}
+                id="request-budget"
                 type="range"
                 min={0}
-                max={50000}
-                step={500}
+                max={BUDGET_MAX}
+                step={BUDGET_STEP}
                 value={formData.budget || 5000}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -643,7 +652,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 ref={budgetRef}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #DD9E2C ${((parseInt(formData.budget || 5000)) / 50000) * 100}%, #e5e7eb ${((parseInt(formData.budget || 5000)) / 50000) * 100}%)`,
+                  background: `linear-gradient(to right, #DD9E2C ${((parseInt(formData.budget || 5000)) / BUDGET_MAX) * 100}%, #e5e7eb ${((parseInt(formData.budget || 5000)) / BUDGET_MAX) * 100}%)`,
                 }}
               />
               {errors.budget && (
@@ -687,12 +696,13 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
           </div>
         )}
 
-        {uiStep === 2 && (
+        {uiStep === 3 && (
           <div className="space-y-4">
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setCurrentStep(1)}
+                onClick={() => setCurrentStep(6)}
+                aria-label={t("back")}
                 className="w-8 h-8 rounded-full border cursor-pointer border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 <FaArrowLeft />
@@ -750,21 +760,26 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 )}
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                <label htmlFor="request-phone" className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
                   {t("phone_label")}
                 </label>
                 <input
                   {...register("phoneNumber", {
                     required: t("phone_required"),
                     pattern: {
-                      value: /^[0-9]{10,15}$/,
+                      value: /^\+?[0-9]{10,15}$/,
                       message: t("invalid_phone"),
                     },
                   })}
+                  id="request-phone"
                   type="tel"
+                  autoComplete="tel"
                   placeholder={t("phone_number")}
                   defaultValue={formData.phoneNumber}
-                  onChange={(e) => updateFormData("phoneNumber", e.target.value)}
+                  onChange={(e) => {
+                    setValue("phoneNumber", e.target.value, { shouldDirty: true });
+                    updateFormData("phoneNumber", e.target.value);
+                  }}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
                 />
                 {errors.phoneNumber && (
@@ -785,25 +800,23 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             {/* Send Request button */}
             <button
               type="button"
-              onClick={async () => {
-                updateFormData("confirmation", true);
-                setValue("confirmation", true);
-                await handleUiStep2Next();
-              }}
-              className="w-full py-2.5 rounded-[7px] text-white cursor-pointer font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+              onClick={handleContactSubmit}
+              disabled={isSavingDraft || isPublishing}
+              className="w-full py-2.5 rounded-[7px] text-white cursor-pointer font-bold text-[16px] transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              {t("send_request")}
+              {isPublishing ? t("publishing") : t("send_request")}
             </button>
           </div>
         )}
 
-        {uiStep === 3 && (
+        {uiStep === 2 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => setCurrentStep(5)}
+                onClick={() => setCurrentStep(1)}
+                aria-label={t("back")}
                 className="w-8 h-8 rounded-full border cursor-pointer border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 <FaArrowLeft />
@@ -955,7 +968,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               className="w-full py-2.5 rounded-md text-white font-bold text-[16px] cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: "linear-gradient(90deg, #DD9E2C, #C2851C)" }}
             >
-              {isPublishing ? t("publishing") : t("add_details")}
+              {t("next_step")}
             </button>
 
             {/* Skip for now button */}

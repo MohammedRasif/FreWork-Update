@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ArrowDownRight, ArrowUpRight, BadgeCheck, Building2, Check, CircleAlert, Compass, HandCoins, RotateCcw, Users } from "lucide-react";
 import { useShowSubscriptionDataQuery, useSubscriptionMutation } from "@/redux/features/withAuth";
@@ -160,7 +160,7 @@ function Pricing() {
                   : visiblePlans.map((plan, index) => <ApplicationCard key={plan.price_id || index} plan={plan} onSelect={handleSelectPlan} isSubscribing={isSubscribing} t={t} />)}
         </section>
       </div>
-      <ToastContainer position="top-right" autoClose={5000} />
+
     </main>
   );
 }

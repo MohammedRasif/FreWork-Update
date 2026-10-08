@@ -6,7 +6,7 @@ import {
   useGiveReviewMutation,
 } from "@/redux/features/withAuth";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { FaArrowLeft, FaCheckCircle } from "react-icons/fa";
 import { FiSearch, FiStar, FiMapPin, FiUsers } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
@@ -109,7 +109,7 @@ const UserAccepte = () => {
 
   return (
     <div className="min-w-0">
-      <Toaster />
+
       <div className="mb-6 flex flex-col justify-between gap-4 border-b border-[#e9e6e0] pb-4 sm:flex-row sm:items-end">
         <div className="flex gap-4 sm:gap-8">
           <button
