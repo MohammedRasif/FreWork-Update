@@ -211,7 +211,35 @@ function PublishedPlan() {
       setOfferComment("");
     } catch (error) {
       console.error("Failed to submit offer:", error);
-      toast.error(error.data?.detail || t("failed_submit_offer"));
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        t("failed_submit_offer");
+      toast.error(errorMessage);
+
+      // Added by takmim: Handle profile incomplete vs offer limit error
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        setIsPopupOpen(false);
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
+        setIsPopupOpen(false);
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/pentru-agentii");
+        }, 1500);
+      }
     }
   };
 

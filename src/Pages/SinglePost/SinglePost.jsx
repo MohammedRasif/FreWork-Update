@@ -197,14 +197,22 @@ function SinglePost({ prid }) {
         t("failed_to_submit_offer");
       toast.error(errorMessage);
 
-      // Added by takmim: Show error toast & redirect to package page (/pentru-agentii) when offer limit is reached
-      if (
-        error?.status === 403 ||
-        error?.data?.status === 403 ||
+      // Modified by takmim: Handle profile incomplete vs offer limit error
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
         errorMessage?.toLowerCase().includes("limit") ||
         errorMessage?.toLowerCase().includes("premium") ||
-        errorMessage?.toLowerCase().includes("upgrade")
-      ) {
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        setIsPopupOpen(false);
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
         setIsPopupOpen(false);
         setTimeout(() => {
           navigate("/pentru-agentii");
@@ -298,6 +306,12 @@ function SinglePost({ prid }) {
       toast.info(
         t("agency_verification_pending"),
       );
+      return;
+    }
+    // Added by takmim: Redirect to complete profile if agency profile is not complete
+    if (userData?.role === "agency" && userData?.is_profile_complete === false) {
+      navigate("/agentie/modifica-profil");
+      toast.info(t("complete_profile_now"));
       return;
     }
     if (tour.status === "accepted") {

@@ -170,9 +170,34 @@ const AdminHome = () => {
       toast.success(t("offer_submitted_success"));
       navigate("/agentie/mesaje");
     } catch (error) {
-      toast.error(
-        error?.data?.error || error?.error || t("failed_to_submit_offer")
-      );
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        error?.error ||
+        t("failed_to_submit_offer");
+      toast.error(errorMessage);
+
+      // Added by takmim: Handle profile incomplete vs offer limit error in dashboard
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        closePopup();
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
+        closePopup();
+        setTimeout(() => {
+          navigate("/agentie/abonament");
+        }, 1500);
+      }
     } finally {
       setIsOfferSubmitting(false);
     }
