@@ -82,10 +82,12 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
     }
   };
 
+  // Modified by takmim: Pass slug for updatePlan and deletePlan
   const handlePublishToggle = async () => {
     try {
       const updatedPlan = await updatePlan({
-        id: plan.id,
+        id: plan.slug || plan.id,
+        slug: plan.slug,
         updates: {
           status: plan.status === "published" ? "draft" : "published",
         },
@@ -102,7 +104,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   const handleDelete = async () => {
     if (!confirm(t("confirm_delete_plan"))) return;
     try {
-      await deletePlan(plan.id).unwrap();
+      await deletePlan(plan.slug || plan.id).unwrap();
 
       setCreatedPlans((prevPlans) => prevPlans.filter((p) => p.id !== plan.id));
     } catch (error) {
@@ -197,14 +199,15 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                       ? t("unpublish_plan")
                       : t("publish_plan")}
                   </DropdownMenuItem>
-                  <Link
-                    to={"/cont/creeaza-cerere"}
-                    state={{ from: "edit", id: plan.id }}
-                  >
-                    <DropdownMenuItem>
+                  {/* Modified by takmim: Pass slug and id for reliable backend lookup */}
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to={`/cont/creeaza-cerere?slug=${plan.slug || ""}&id=${plan.id}`}
+                      state={{ from: "edit", id: plan.id, slug: plan.slug, plan }}
+                    >
                       <Edit size={20} className="mr-2" /> {t("edit")}
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={deleteLoading}
                     onClick={handleDelete}

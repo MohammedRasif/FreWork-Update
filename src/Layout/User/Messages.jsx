@@ -59,17 +59,28 @@ function Messages() {
   const [finalOfferResponse] = useFinalOfferResponseMutation();
   const [sentMessage] = useMessageSentMutation();
 
+  // Modified by takmim: Enable polling and window focus refetch for real-time message sync
   const {
     data: messagesData,
     isLoading: isMessagesLoading,
     error: messagesError,
-  } = useShowMessagesQuery(id);
+    refetch: refetchMessages,
+  } = useShowMessagesQuery(id, {
+    refetchOnMountOrArgChange: true,
+    pollingInterval: 2000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   const {
     data: chatList,
     isLoading: isChatListLoading,
     refetch: refetchChatList,
-  } = useGetChatListQuery();
+  } = useGetChatListQuery(undefined, {
+    pollingInterval: 3000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   const [rejectOffer] = useRejectOfferMutation();
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
@@ -176,77 +187,118 @@ function Messages() {
     setMenuOpen(false);
   }, [id]);
 
+  // Modified by takmim: Improved WebSocket handling with auto-reconnect and real-time state sync
   useEffect(() => {
-    const chat_url = chat_sockit(id);
-    wsRef.current = new WebSocket(chat_url);
+    if (!id) return;
+    let isMounted = true;
+    let reconnectTimeout = null;
 
-    wsRef.current.onmessage = (event) => {
+    const connectWebSocket = () => {
+      if (!isMounted) return;
       try {
-        const received = JSON.parse(event.data);
-        if (received.type !== "chat_message") return;
+        const chat_url = chat_sockit(id);
+        const ws = new WebSocket(chat_url);
+        wsRef.current = ws;
 
-        const inner = received.message || received;
-        let messageType = "text";
-        if (inner.file) messageType = "file";
-        else if (inner.message_type) messageType = inner.message_type;
-
-        const serverMessage = {
-          id: inner.id,
-          message_type: messageType,
-          text: inner.text || null,
-          data: null,
-          tour_plan_id: inner.tour_plan_id || null,
-          tour_plan_title: inner.tour_plan_title || null,
-          file: inner.file || inner.file_url || null,
-          isUser: String(inner.sender?.user_id) === userId,
-          timestamp: new Date(inner.timestamp),
-          is_read: inner.is_read,
-          status: "sent",
+        ws.onopen = () => {
+          // Connected
         };
 
-        setMessages((prev) => {
-          if (serverMessage.isUser) {
-            const matchingPending = Array.from(
-              pendingMessagesRef.current.values(),
-            ).find(
-              (pm) =>
-                pm.message_type === serverMessage.message_type &&
-                (pm.text === serverMessage.text ||
-                  (pm.text === null && serverMessage.text === null)) &&
-                Math.abs(
-                  pm.timestamp.getTime() - serverMessage.timestamp.getTime(),
-                ) < 10000,
-            );
+        ws.onmessage = (event) => {
+          try {
+            // Trigger instant REST refetches for rock-solid sync
+            refetchMessages?.();
+            refetchChatList?.();
 
-            if (matchingPending) {
-              return prev.map((msg) =>
-                msg.tempId === matchingPending.tempId
-                  ? {
-                      ...msg,
-                      id: serverMessage.id,
-                      status: "sent",
-                      tempId: undefined,
-                    }
-                  : msg,
+            const received = JSON.parse(event.data);
+            const inner = received.message || received.data || received;
+            if (!inner || typeof inner !== "object") return;
+
+            let messageType = "text";
+            if (inner.file || inner.file_url) messageType = "file";
+            else if (inner.message_type) messageType = inner.message_type;
+
+            const serverMessage = {
+              id: inner.id || Date.now(),
+              message_type: messageType,
+              text: inner.text || null,
+              data: inner.data || null,
+              tour_plan_id: inner.tour_plan_id || null,
+              tour_plan_title: inner.tour_plan_title || null,
+              file:
+                inner.file || inner.file_url
+                  ? (inner.file || inner.file_url).startsWith("http")
+                    ? inner.file || inner.file_url
+                    : `${FILE_BASE_URL}${inner.file || inner.file_url}`
+                  : null,
+              isUser: String(inner.sender?.user_id) === userId,
+              timestamp: inner.timestamp ? new Date(inner.timestamp) : new Date(),
+              is_read: inner.is_read || false,
+              status: "sent",
+            };
+
+            setMessages((prev) => {
+              if (serverMessage.isUser) {
+                const matchingPending = Array.from(
+                  pendingMessagesRef.current.values(),
+                ).find(
+                  (pm) =>
+                    pm.message_type === serverMessage.message_type &&
+                    (pm.text === serverMessage.text ||
+                      (pm.text === null && serverMessage.text === null)),
+                );
+
+                if (matchingPending) {
+                  return prev.map((msg) =>
+                    msg.tempId === matchingPending.tempId
+                      ? {
+                          ...msg,
+                          id: serverMessage.id,
+                          status: "sent",
+                          tempId: undefined,
+                        }
+                      : msg,
+                  );
+                }
+              }
+
+              const exists = prev.some((msg) => msg.id === serverMessage.id);
+              if (exists) return prev;
+              return [...prev, serverMessage].sort(
+                (a, b) => a.timestamp - b.timestamp,
               );
-            }
+            });
+          } catch (err) {
+            console.error("Error parsing WebSocket message:", err);
           }
+        };
 
-          const exists = prev.some((msg) => msg.id === serverMessage.id);
-          if (exists) return prev;
-          return [...prev, serverMessage].sort(
-            (a, b) => a.timestamp - b.timestamp,
-          );
-        });
+        ws.onerror = (err) => {
+          console.warn("WebSocket error:", err);
+        };
+
+        ws.onclose = () => {
+          if (!isMounted) return;
+          // Auto-reconnect after 2.5 seconds if connection drops or times out
+          reconnectTimeout = setTimeout(connectWebSocket, 2500);
+        };
       } catch (err) {
-        console.error("Error parsing WebSocket message:", err);
+        if (!isMounted) return;
+        reconnectTimeout = setTimeout(connectWebSocket, 3000);
       }
     };
 
+    connectWebSocket();
+
     return () => {
-      if (wsRef.current) wsRef.current.close();
+      isMounted = false;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, [id, userId]);
+  }, [id, userId, refetchMessages, refetchChatList]);
 
   useEffect(() => {
     if (
@@ -274,25 +326,58 @@ function Messages() {
         status: "sent",
       }));
       setMessages((prev) => {
-        const allMsgs = [...prev, ...formattedMessages];
+        // Keep in-flight sending messages
+        const sendingMsgs = prev.filter((m) => m.status === "sending");
+        const allMsgs = [...sendingMsgs, ...formattedMessages];
         const uniqueMsgs = allMsgs.reduce((acc, msg) => {
           if (!acc[msg.id]) acc[msg.id] = msg;
           return acc;
         }, {});
-        return Object.values(uniqueMsgs).sort(
+        const nextList = Object.values(uniqueMsgs).sort(
           (a, b) => a.timestamp - b.timestamp,
         );
+
+        // Avoid re-renders and scroll jumps when polling returns unchanged data
+        if (
+          prev.length === nextList.length &&
+          prev.every(
+            (p, idx) =>
+              p.id === nextList[idx].id &&
+              p.status === nextList[idx].status &&
+              p.is_read === nextList[idx].is_read
+          )
+        ) {
+          return prev;
+        }
+
+        return nextList;
       });
     }
   }, [messagesData, userId, id]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const lastMessageCountRef = useRef(0);
+  const isInitialLoadRef = useRef(true);
+
+  const scrollToBottom = (behavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (messages.length > 0) {
+      if (isInitialLoadRef.current) {
+        scrollToBottom("auto");
+        isInitialLoadRef.current = false;
+      } else if (messages.length > lastMessageCountRef.current) {
+        scrollToBottom("smooth");
+      }
+    }
+    lastMessageCountRef.current = messages.length;
+  }, [messages.length]);
+
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+    lastMessageCountRef.current = 0;
+  }, [id]);
 
   useEffect(() => {
     const input = inputRef.current;
@@ -370,6 +455,8 @@ function Messages() {
           ),
         );
         pendingMessagesRef.current.delete(tempId);
+        refetchMessages?.();
+        refetchChatList?.();
       } catch (error) {
         console.error("Failed to send file message:", error);
         toast.error(t("failed_send_file"));
@@ -442,6 +529,8 @@ function Messages() {
         ),
       );
       pendingMessagesRef.current.delete(tempId);
+      refetchMessages?.();
+      refetchChatList?.();
     } catch (error) {
       console.error("Failed to send text message:", error);
       toast.error(t("failed_send_text"));
@@ -463,6 +552,8 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: true },
       }).unwrap();
+      refetchMessages?.();
+      refetchChatList?.();
       toast.success(t("final_offer_accepted"));
     } catch (error) {
       console.error("Failed to accept final offer:", error);
@@ -479,6 +570,8 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: false },
       }).unwrap();
+      refetchMessages?.();
+      refetchChatList?.();
       toast.success(t("final_offer_declined"));
     } catch (error) {
       console.error("Failed to decline final offer:", error);
@@ -533,6 +626,8 @@ function Messages() {
       );
       if (message.file?.startsWith("blob:")) URL.revokeObjectURL(message.file);
       pendingMessagesRef.current.delete(tempId);
+      refetchMessages?.();
+      refetchChatList?.();
     } catch (error) {
       console.error("Failed to retry message:", error);
       toast.error(t("failed_retry_message"));
@@ -801,9 +896,27 @@ function Messages() {
       </div>
 
       {currentChat?.final_offer_sent === true && currentChat?.deal_status === false && (
-        <div className="flex shrink-0 flex-wrap gap-2 border-t border-[#eeeae3] bg-[#fbf6ec] px-4 py-3">
-          <button type="button" onClick={handleAcceptFinalOffer} disabled={isAccepting || isDeclining} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><CheckIcon size={16} className="shrink-0" />{isAccepting ? t("accepting") : t("accept_final_offer")}</button>
-          <button type="button" onClick={handleDeclineFinalOffer} disabled={isAccepting || isDeclining} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-3 py-2.5 text-sm font-semibold disabled:opacity-50"><XIcon size={16} className="shrink-0" />{isDeclining ? t("declining") : t("decline_final_offer")}</button>
+        <div className="shrink-0 border-t border-[#eeeae3] bg-[#fbf6ec] px-3 py-3 sm:px-4 sm:py-3.5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={handleAcceptFinalOffer}
+              disabled={isAccepting || isDeclining}
+              className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-[#122235] active:scale-[0.99] disabled:opacity-50"
+            >
+              <CheckIcon size={16} className="shrink-0 text-[#2dd4bf]" />
+              <span className="whitespace-nowrap">{isAccepting ? t("accepting") : t("accept_final_offer")}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDeclineFinalOffer}
+              disabled={isAccepting || isDeclining}
+              className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#172b43] shadow-sm transition hover:bg-[#faf7f0] active:scale-[0.99] disabled:opacity-50"
+            >
+              <XIcon size={16} className="shrink-0 text-[#b54a40]" />
+              <span className="whitespace-nowrap">{isDeclining ? t("declining") : t("decline_final_offer")}</span>
+            </button>
+          </div>
         </div>
       )}
 
