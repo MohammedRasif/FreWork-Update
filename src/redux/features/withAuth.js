@@ -389,7 +389,7 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["final_confrimation"],
+      invalidatesTags: ["final_confrimation", "Chat", "SentMessages", "Offer"],
     }),
 
     // Modified by takmim: Invalidate SentMessages and Chat so messages and chat list update immediately

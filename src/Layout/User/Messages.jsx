@@ -86,6 +86,8 @@ function Messages() {
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
+  const [isOfferAcceptedLocally, setIsOfferAcceptedLocally] = useState(false);
+  const [isOfferDeclinedLocally, setIsOfferDeclinedLocally] = useState(false);
 
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -185,6 +187,8 @@ function Messages() {
     pendingMessagesRef.current.clear();
     setNewMessage("");
     setMenuOpen(false);
+    setIsOfferAcceptedLocally(false);
+    setIsOfferDeclinedLocally(false);
   }, [id]);
 
   // Modified by takmim: Improved WebSocket handling with auto-reconnect and real-time state sync
@@ -552,6 +556,8 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: true },
       }).unwrap();
+      setIsOfferAcceptedLocally(true);
+      setIsOfferDeclinedLocally(false);
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_accepted"));
@@ -570,6 +576,8 @@ function Messages() {
         id: Number(id),
         data: { is_accepted: false },
       }).unwrap();
+      setIsOfferDeclinedLocally(true);
+      setIsOfferAcceptedLocally(false);
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_declined"));
@@ -804,7 +812,39 @@ function Messages() {
 
   const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
-  const canRejectOffer = currentChat?.is_active === true && localStorage.getItem("role") !== "agency";
+
+  const isDealAccepted =
+    isOfferAcceptedLocally ||
+    currentChat?.deal_status === true ||
+    currentChat?.final_offer_response === true ||
+    currentChat?.final_offer_response === "accepted" ||
+    currentChat?.offer_status === "accepted";
+
+  const isDealDeclined =
+    isOfferDeclinedLocally ||
+    (currentChat?.final_offer_response === false && currentChat?.deal_status !== true) ||
+    currentChat?.final_offer_response === "declined" ||
+    currentChat?.final_offer_response === "rejected" ||
+    currentChat?.offer_status === "declined" ||
+    currentChat?.offer_status === "rejected";
+
+  const isDealFinalized =
+    isDealAccepted ||
+    isDealDeclined ||
+    currentChat?.deal_status === true ||
+    (currentChat?.final_offer_response !== null &&
+      currentChat?.final_offer_response !== undefined &&
+      currentChat?.final_offer_response !== "");
+
+  // Modified by takmim: Hide reject offer options if the offer is already accepted or finalized
+  const canRejectOffer =
+    currentChat?.is_active === true &&
+    localStorage.getItem("role") !== "agency" &&
+    !isDealFinalized &&
+    !isDealAccepted &&
+    !isDealDeclined &&
+    !currentChat?.deal_status &&
+    !currentChat?.final_offer_response;
   const isLoading = isMessagesLoading || (isChatListLoading && !agency);
   const hasError = messagesError || (!agency && !isChatListLoading);
 
@@ -864,6 +904,10 @@ function Messages() {
                 catch { toast.error(t("failed_reject_offer")); return; }
                 try {
                   await finalOfferResponse({ id: Number(id), data: { is_accepted: false, reason: selectedRejectReason } }).unwrap();
+                  setIsOfferDeclinedLocally(true);
+                  setIsOfferAcceptedLocally(false);
+                  refetchMessages?.();
+                  refetchChatList?.();
                   toast.success(t("offer_rejected")); setIsRejectModalOpen(false);
                 } catch { toast.error(t("failed_final_offer_response")); }
               }}>{t("chat_send")}</button>
@@ -895,38 +939,50 @@ function Messages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {currentChat?.final_offer_sent === true && currentChat?.deal_status === false && (
+      {(currentChat?.final_offer_sent === true || isDealAccepted || isDealDeclined) && (
         <div className="shrink-0 border-t border-[#eeeae3] bg-[#fbf6ec] px-3 py-3 sm:px-4 sm:py-3.5">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={handleAcceptFinalOffer}
-              disabled={isAccepting || isDeclining}
-              className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-[#122235] active:scale-[0.99] disabled:opacity-50"
-            >
-              <CheckIcon size={16} className="shrink-0 text-[#2dd4bf]" />
-              <span className="whitespace-nowrap">{isAccepting ? t("accepting") : t("accept_final_offer")}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleDeclineFinalOffer}
-              disabled={isAccepting || isDeclining}
-              className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#172b43] shadow-sm transition hover:bg-[#faf7f0] active:scale-[0.99] disabled:opacity-50"
-            >
-              <XIcon size={16} className="shrink-0 text-[#b54a40]" />
-              <span className="whitespace-nowrap">{isDeclining ? t("declining") : t("decline_final_offer")}</span>
-            </button>
-          </div>
+          {isDealAccepted ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-2.5 text-xs font-semibold text-[#166534] shadow-sm sm:text-sm">
+              <CheckIcon size={16} className="shrink-0 text-[#16a34a]" />
+              <span className="whitespace-nowrap">{t("final_offer_accepted")}</span>
+            </div>
+          ) : isDealDeclined ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-2.5 text-xs font-semibold text-[#991b1b] shadow-sm sm:text-sm">
+              <XIcon size={16} className="shrink-0 text-[#dc2626]" />
+              <span className="whitespace-nowrap">{t("final_offer_declined")}</span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <button
+                type="button"
+                onClick={handleAcceptFinalOffer}
+                disabled={isAccepting || isDeclining}
+                className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-[#122235] active:scale-[0.99] disabled:opacity-50"
+              >
+                <CheckIcon size={16} className="shrink-0 text-[#2dd4bf]" />
+                <span className="whitespace-nowrap">{isAccepting ? t("accepting") : t("accept_final_offer")}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDeclineFinalOffer}
+                disabled={isAccepting || isDeclining}
+                className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#172b43] shadow-sm transition hover:bg-[#faf7f0] active:scale-[0.99] disabled:opacity-50"
+              >
+                <XIcon size={16} className="shrink-0 text-[#b54a40]" />
+                <span className="whitespace-nowrap">{isDeclining ? t("declining") : t("decline_final_offer")}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {currentChat?.is_active === true ? (
         <div className="shrink-0 border-t border-[#eeeae3] bg-white p-3 sm:p-4">
           <div className="flex items-end gap-2 rounded-2xl border border-[#e4e7eb] bg-[#fafbfc] p-2 transition focus-within:border-[#c88f2a] focus-within:ring-2 focus-within:ring-[#c88f2a]/10">
-            <button type="button" aria-label={t("attachment")} title={t("attachment")} className="chat-icon-button shrink-0" onClick={() => fileInputRef.current?.click()} disabled={!!currentChat?.final_offer_response}><PaperclipIcon size={20} /></button>
+            <button type="button" aria-label={t("attachment")} title={t("attachment")} className="chat-icon-button shrink-0" onClick={() => fileInputRef.current?.click()} disabled={!!currentChat?.final_offer_response || isDealFinalized}><PaperclipIcon size={20} /></button>
             <input type="file" aria-label={t("attachment")} ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleFileChange} />
-            <textarea rows={1} aria-label={t("type_message_or_select_file")} placeholder={t("type_message_or_select_file")} className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none" value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={handleKeyPress} ref={inputRef} disabled={!!currentChat?.final_offer_response} />
-            <button type="button" aria-label={t("chat_send")} title={t("chat_send")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]" onClick={handleSendMessage} disabled={!newMessage.trim() || isSending || !!currentChat?.final_offer_response}>{isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}</button>
+            <textarea rows={1} aria-label={t("type_message_or_select_file")} placeholder={t("type_message_or_select_file")} className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none" value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={handleKeyPress} ref={inputRef} disabled={!!currentChat?.final_offer_response || isDealFinalized} />
+            <button type="button" aria-label={t("chat_send")} title={t("chat_send")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]" onClick={handleSendMessage} disabled={!newMessage.trim() || isSending || !!currentChat?.final_offer_response || isDealFinalized}>{isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}</button>
           </div>
         </div>
       ) : (
