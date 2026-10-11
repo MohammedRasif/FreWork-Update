@@ -98,6 +98,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setValue("name", state?.name || "");
       setValue("email", state?.email || "");
       setValue("phoneNumber", state?.phone_number || "+373");
+      // Modified by takmim: Restore locationFrom and clean touristSpots
+      setValue("locationFrom", state?.location_from || "");
       setValue("locationTo", state?.location_to || "");
       setValue(
         "startingDate",
@@ -114,7 +116,12 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setValue("adults", state?.adult_count || 0);
       setValue("children", state?.child_count || 0);
       setValue("budget", normalizeBudget(state?.budget));
-      setValue("touristSpots", state?.tourist_spots || "");
+      setValue(
+        "touristSpots",
+        state?.tourist_spots && state?.tourist_spots !== "N/A"
+          ? state?.tourist_spots
+          : "",
+      );
       setValue("description", state?.description || "");
       setValue("destinationType", state?.destination_type || "");
       setValue("typeOfAccommodation", state?.type_of_accommodation || "");
@@ -126,6 +133,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         const mappedKey =
           {
             phone_number: "phoneNumber",
+            location_from: "locationFrom",
             location_to: "locationTo",
             start_date: "startingDate",
             end_date: "endingDate",
@@ -139,9 +147,14 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             travel_type: "travelType",
             is_confirmed_request: "confirmation",
           }[key] || key;
-        const restoredValue = mappedKey === "budget"
-          ? normalizeBudget(value)
-          : mappedKey === "phoneNumber" ? value || "+373" : value;
+        const restoredValue =
+          mappedKey === "budget"
+            ? normalizeBudget(value)
+            : mappedKey === "phoneNumber"
+            ? value || "+373"
+            : mappedKey === "touristSpots" && value === "N/A"
+            ? ""
+            : value;
         updateFormData(mappedKey, restoredValue);
       });
     } else if (pendingPlan) {
@@ -185,6 +198,18 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         return;
       }
 
+      if (locationFromRef.current) {
+        const fromAutocomplete = new window.google.maps.places.Autocomplete(
+          locationFromRef.current,
+        );
+        fromAutocomplete.addListener("place_changed", () => {
+          const place = fromAutocomplete.getPlace();
+          const locationValue = place.formatted_address || place.name;
+          setValue("locationFrom", locationValue, { shouldValidate: true });
+          updateFormData("locationFrom", locationValue);
+        });
+      }
+
       if (locationToRef.current) {
         const toAutocomplete = new window.google.maps.places.Autocomplete(
           locationToRef.current,
@@ -192,10 +217,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
         toAutocomplete.addListener("place_changed", () => {
           const place = toAutocomplete.getPlace();
           const locationValue = place.formatted_address || place.name;
-          setValue("locationTo", locationValue);
+          setValue("locationTo", locationValue, { shouldValidate: true });
           updateFormData("locationTo", locationValue);
-          setValue("locationFrom", locationValue);
-          updateFormData("locationFrom", locationValue);
         });
       }
     };
@@ -287,6 +310,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     formDataToSend.append("email", data.email);
     formDataToSend.append("phone_number", data.phoneNumber);
     formDataToSend.append("location_to", data.locationTo);
+    formDataToSend.append("location_from", data.locationFrom);
     formDataToSend.append("start_date", data.startingDate);
     formDataToSend.append("end_date", data.endingDate);
     formDataToSend.append("adult_count", data.adults || 0);
@@ -361,7 +385,9 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
     closeForm();
   };
 
-  const { ref: fromFormRef, ...fromRest } = register("locationFrom");
+  const { ref: fromFormRef, ...fromRest } = register("locationFrom", {
+    required: t("location_from_required"),
+  });
 
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: t("location_to_required"),
@@ -372,16 +398,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       setValue("children", 0);
       updateFormData("children", 0);
     }
-    if (!formData.locationFrom && formData.locationTo) {
-      setValue("locationFrom", formData.locationTo);
-      updateFormData("locationFrom", formData.locationTo);
-    }
-    if (!formData.touristSpots) {
-      setValue("touristSpots", "N/A");
-      updateFormData("touristSpots", "N/A");
-    }
 
-    const visibleFields = ["startingDate", "endingDate", "adults", "locationTo", "budget"];
+    const visibleFields = ["locationFrom", "locationTo", "startingDate", "endingDate", "adults", "budget"];
     const result = await trigger(visibleFields);
     if (!result) {
       toast.error(t("fill_all_required"), { toastId: "request-required-fields" });
@@ -452,7 +470,8 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
   );
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+    // Modified by takmim: Removed transition-all duration-300 to prevent animation clash / white flicker
+    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
       {/* ── Progress Header ─────────────────────────────────────────────── */}
       <div className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between mb-1">
@@ -479,45 +498,67 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
             </div>
 
             <div className="space-y-4">
-              {/* Where To (locationTo) */}
-              <div>
-                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
-                  {t("where_to")}
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black">
-                    <FaLocationDot />
-                  </span>
-                  <input
-                    {...toRest}
-                    type="text"
-                    placeholder={t("destination_placeholder")}
-                    defaultValue={formData.locationTo}
-                    onChange={(e) => {
-                      updateFormData("locationTo", e.target.value);
-                      setValue("locationTo", e.target.value);
-                    }}
-                    ref={(e) => {
-                      toFormRef(e);
-                      locationToRef.current = e;
-                    }}
-                    className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Departure From (locationFrom) - REQUIRED */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                    {t("departure_from")} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                      <FaLocationDot />
+                    </span>
+                    <input
+                      {...fromRest}
+                      type="text"
+                      placeholder={t("departure_from")}
+                      defaultValue={formData.locationFrom}
+                      onChange={(e) => {
+                        updateFormData("locationFrom", e.target.value);
+                        setValue("locationFrom", e.target.value, { shouldValidate: true });
+                      }}
+                      ref={(e) => {
+                        fromFormRef(e);
+                        locationFromRef.current = e;
+                      }}
+                      className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+                    />
+                  </div>
+                  {errors.locationFrom && (
+                    <span className="text-red-500 text-xs mt-1">{errors.locationFrom.message}</span>
+                  )}
                 </div>
-                {errors.locationTo && (
-                  <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>
-                )}
-              </div>
 
-              {/* Hidden locationFrom */}
-              <input
-                {...fromRest}
-                type="hidden"
-                ref={(e) => {
-                  fromFormRef(e);
-                  locationFromRef.current = e;
-                }}
-              />
+                {/* Where To (locationTo) - REQUIRED */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider mb-1">
+                    {t("where_to")} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                      <FaLocationDot />
+                    </span>
+                    <input
+                      {...toRest}
+                      type="text"
+                      placeholder={t("destination_placeholder")}
+                      defaultValue={formData.locationTo}
+                      onChange={(e) => {
+                        updateFormData("locationTo", e.target.value);
+                        setValue("locationTo", e.target.value, { shouldValidate: true });
+                      }}
+                      ref={(e) => {
+                        toFormRef(e);
+                        locationToRef.current = e;
+                      }}
+                      className="w-full pl-9 pr-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+                    />
+                  </div>
+                  {errors.locationTo && (
+                    <span className="text-red-500 text-xs mt-1">{errors.locationTo.message}</span>
+                  )}
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Start Date */}
@@ -660,12 +701,31 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
               )}
             </div>
 
-            {/* Hidden touristSpots */}
-            <input
-              {...register("touristSpots")}
-              type="hidden"
-              ref={(e) => { touristSpotsRef.current = e; }}
-            />
+            {/* Places to visit (touristSpots) - OPTIONAL */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[10px] font-bold text-gray-800 uppercase tracking-wider">
+                  {t("points_of_travel")}
+                </label>
+                <span className="text-[11px] text-gray-500 font-normal">
+                  ({t("optional")})
+                </span>
+              </div>
+              <input
+                {...register("touristSpots")}
+                type="text"
+                placeholder={t("enter_here")}
+                defaultValue={formData.touristSpots || ""}
+                onChange={(e) => {
+                  updateFormData("touristSpots", e.target.value);
+                  setValue("touristSpots", e.target.value);
+                }}
+                ref={(e) => {
+                  touristSpotsRef.current = e;
+                }}
+                className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
+              />
+            </div>
 
             {/* Budget warning popup */}
             {showBudgetMessage && (

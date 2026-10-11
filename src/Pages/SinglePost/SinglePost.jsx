@@ -353,16 +353,29 @@ function SinglePost({ prid }) {
     "half-board": "half_board",
     "full-board": "full_board",
   }[tour.meal_plan];
-  const spots = Array.isArray(tour.tourist_spots)
+  // Modified by takmim: Hide tourist_spots if empty or N/A
+  const rawSpots = Array.isArray(tour.tourist_spots)
     ? tour.tourist_spots.join(", ")
-    : tour.tourist_spots?.split(",").map((spot) => spot.trim()).join(", ");
+    : tour.tourist_spots;
+  const cleanSpots =
+    rawSpots &&
+    rawSpots !== "N/A" &&
+    rawSpots !== "none" &&
+    String(rawSpots).trim() !== ""
+      ? String(rawSpots)
+          .split(",")
+          .map((spot) => spot.trim())
+          .filter(Boolean)
+          .join(", ")
+      : null;
+
   const stars = Math.min(5, Math.max(0, Number(tour.minimum_star_hotel) || 0));
   const detailItems = [
     { icon: CalendarDays, label: t("date"), value: `${formatDate(tour.start_date)} – ${formatDate(tour.end_date)}` },
     { icon: Clock3, label: t("duration"), value: Number.isFinite(Number(tour.duration)) && tour.duration !== null && tour.duration !== undefined ? new Intl.NumberFormat(locale, { style: "unit", unit: "day", unitDisplay: "long" }).format(Number(tour.duration)) : t("na") },
     { icon: Users, label: t("total"), value: `${tour.total_members ?? t("na")} ${Number(tour.total_members) === 1 ? t("person") : t("people")}` },
-    { icon: MapPin, label: t("departure_from"), value: tour.location_from || t("na") },
-    { icon: Compass, label: t("points_of_travel"), value: spots || t("none") },
+    { icon: MapPin, label: t("departure_from"), value: tour.location_from || "—" },
+    ...(cleanSpots ? [{ icon: Compass, label: t("points_of_travel"), value: cleanSpots }] : []),
     { icon: UtensilsCrossed, label: t("meal_plan"), value: meal ? t(meal) : t("na") },
     { icon: BedDouble, label: t("type_of_accommodation"), value: accommodation ? t(accommodation) : t("na"), stars },
   ];

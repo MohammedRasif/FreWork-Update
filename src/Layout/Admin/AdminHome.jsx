@@ -389,16 +389,8 @@ const AdminHome = () => {
                           </span>
                         </span>
                       </p>
-                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
-                        <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
-                        <span>
-                          <span className="font-bold">
-                            {t("points_of_travel")}:
-                          </span>{" "}
-                          {selectedPlan.tourist_spots || t("none")}
-                        </span>
-                      </p> */}
-                      {/* <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                      {/* Modified by takmim: Show departure_from */}
+                      <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <FaLocationArrow className="w-6 h-5 text-gray-900" />
                         <span>
                           <span className="font-bold">
@@ -406,7 +398,22 @@ const AdminHome = () => {
                           </span>{" "}
                           {selectedPlan.location_from || t("na")}
                         </span>
-                      </p> */}
+                      </p>
+                      {/* Modified by takmim: Show points_of_travel only if provided and not N/A */}
+                      {selectedPlan.tourist_spots &&
+                        selectedPlan.tourist_spots !== "N/A" &&
+                        selectedPlan.tourist_spots !== "none" &&
+                        selectedPlan.tourist_spots.trim() !== "" && (
+                          <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
+                            <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
+                            <span>
+                              <span className="font-bold">
+                                {t("points_of_travel")}:
+                              </span>{" "}
+                              {selectedPlan.tourist_spots}
+                            </span>
+                          </p>
+                        )}
                       <p className="text-md text-gray-900 flex items-center gap-2 pb-2">
                         <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
                         <span>
@@ -503,32 +510,32 @@ const AdminHome = () => {
                   {selectedPlan.description}
                 </p>
               </div>
-              <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                  {t("interested_travel_points")}:
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {selectedPlan.tourist_spots ? (
-                    selectedPlan.tourist_spots
-                      .split(",")
-                      .map((location, index) => (
-                        <span
-                          key={index}
-                          className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                        >
-                          {location.trim()}
-                          {index <
-                            selectedPlan.tourist_spots.split(",").length - 1 &&
-                            ", "}
-                        </span>
-                      ))
-                  ) : (
-                    <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                      {t("none")}
-                    </span>
-                  )}
-                </div>
-              </div>
+              {/* Modified by takmim: Hide travel points section completely if empty or N/A */}
+              {selectedPlan.tourist_spots &&
+                selectedPlan.tourist_spots !== "N/A" &&
+                selectedPlan.tourist_spots !== "none" &&
+                selectedPlan.tourist_spots.trim() !== "" && (
+                  <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                    <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
+                      {t("interested_travel_points")}:
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedPlan.tourist_spots
+                        .split(",")
+                        .map((location, index) => (
+                          <span
+                            key={index}
+                            className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                          >
+                            {location.trim()}
+                            {index <
+                              selectedPlan.tourist_spots.split(",").length - 1 &&
+                              ", "}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                )}
               <div className="mb-4 relative">
                 <img
                   src={selectedPlan.spot_picture_url || PlanImage1}

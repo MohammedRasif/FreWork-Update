@@ -61,6 +61,12 @@ const CreatePlan = () => {
       setValue("typeOfAccommodation", oldData.type_of_accommodation || "");
       setValue("minimum_star_hotel", oldData.minimum_star_hotel || "");
       setValue("mealPlan", oldData.meal_plan || "");
+      setValue(
+        "touristSpots",
+        oldData.tourist_spots && oldData.tourist_spots !== "N/A"
+          ? oldData.tourist_spots
+          : ""
+      );
       setValue("confirmation", !!oldData.is_confirmed_request);
     }
     setIsPopupOpened(true);
@@ -139,6 +145,7 @@ const CreatePlan = () => {
     formData.append("type_of_accommodation", data.typeOfAccommodation);
     formData.append("minimum_star_hotel", data.minimumHotelStars);
     formData.append("meal_plan", data.mealPlan);
+    formData.append("tourist_spots", data.touristSpots || "");
     formData.append("status", status);
     formData.append(
       "is_confirmed_request",
@@ -400,6 +407,22 @@ const CreatePlan = () => {
                   {errors.startingDate.message}
                 </p>
               )}
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[16px] font-medium text-gray-700">
+                  {t("points_of_travel")}
+                </label>
+                <span className="text-xs text-gray-500">
+                  ({t("optional")})
+                </span>
+              </div>
+              <input
+                type="text"
+                placeholder={t("enter_here")}
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
+                {...register("touristSpots")}
+              />
             </div>
           </div>
 

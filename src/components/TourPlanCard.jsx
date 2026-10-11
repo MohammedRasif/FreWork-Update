@@ -32,9 +32,17 @@ const TourPlanCard = ({ tour, onDetails, onOffer, showOfferButton = false, offer
   const { t, i18n } = useTranslation();
   const offerCount = getOfferCount(tour);
   const hasAgencyLogos = Array.isArray(tour.offers) && tour.offers.some((offer) => offer?.agency);
-  const spots = Array.isArray(tour.tourist_spots)
+  // Modified by takmim: Clean tourist_spots to hide if empty or N/A
+  const rawSpots = Array.isArray(tour.tourist_spots)
     ? tour.tourist_spots.join(", ")
     : tour.tourist_spots;
+  const spots =
+    rawSpots &&
+    rawSpots !== "N/A" &&
+    rawSpots !== "none" &&
+    String(rawSpots).trim() !== ""
+      ? String(rawSpots)
+      : null;
 
   return (
     <article className={cn("flex min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_12px_36px_rgba(23,43,67,0.06)]", className)}>

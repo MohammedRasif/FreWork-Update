@@ -238,17 +238,24 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                     <div className="flex  justify-between">
                       <div>
                         <div>
-                          <p className="text-md text-gray-600 flex items-center gap-2">
-                            <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
-                            <span>
-                              <span className="font-medium">
-                                {t("points_of_travel")}:
-                              </span>{" "}
-                              {plan.tourist_spots || t("none")}
-                            </span>
-                          </p>
+                          {/* Modified by takmim: Show points_of_travel only if present and not N/A */}
+                          {plan.tourist_spots &&
+                            plan.tourist_spots !== "N/A" &&
+                            plan.tourist_spots !== "none" &&
+                            plan.tourist_spots.trim() !== "" && (
+                              <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                                <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
+                                <span>
+                                  <span className="font-medium">
+                                    {t("points_of_travel")}:
+                                  </span>{" "}
+                                  {plan.tourist_spots}
+                                </span>
+                              </p>
+                            )}
 
-                          {/* <p className="text-md text-gray-600 flex items-center gap-2">
+                          {/* Modified by takmim: Show departure_from */}
+                          <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                             <FaLocationArrow className="w-6 h-5 text-gray-900" />
                             <span>
                               <span className="font-medium">
@@ -256,7 +263,7 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                               </span>{" "}
                               {plan.location_from || t("na")}
                             </span>
-                          </p> */}
+                          </p>
 
                           <p className="text-md text-gray-600 flex items-center gap-2">
                             <MdOutlineNoMeals className="w-6 h-5 text-gray-900" />
@@ -330,12 +337,18 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                         <p className="text-sm text-[#70798F] mb-2 py-5">
                           {plan.description}
                         </p>
-                        <p className="text-sm text-[#70798F]">
-                          {t("interested_tourist_points")}:{" "}
-                          <span className="text-[#343E4B] font-medium">
-                            {plan.tourist_spots || t("na")}
-                          </span>
-                        </p>
+                        {/* Modified by takmim: Hide interested_tourist_points if empty or N/A */}
+                        {plan.tourist_spots &&
+                          plan.tourist_spots !== "N/A" &&
+                          plan.tourist_spots !== "none" &&
+                          plan.tourist_spots.trim() !== "" && (
+                            <p className="text-sm text-[#70798F]">
+                              {t("interested_tourist_points")}:{" "}
+                              <span className="text-[#343E4B] font-medium">
+                                {plan.tourist_spots}
+                              </span>
+                            </p>
+                          )}
                       </div>
                       <div>
                         <span className="text-black text-xl font-medium">
