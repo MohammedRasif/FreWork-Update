@@ -147,8 +147,10 @@ function SinglePost({ prid }) {
         formData.append("file", selectedFile);
       }
 
+      // Modified by takmim: Use real tour ID instead of slug to prevent 404 error
+      const tourId = postData?.id || post?.id || finalId;
       const response = await offerBudgetToBack({
-        id: finalId,
+        id: tourId,
         data: formData,
       }).unwrap();
 
@@ -189,7 +191,25 @@ function SinglePost({ prid }) {
       toast.success(t("offer_submitted_success"));
     } catch (error) {
       console.error("Failed to submit offer:", error);
-      toast.error(error.data?.error || t("failed_to_submit_offer"));
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        t("failed_to_submit_offer");
+      toast.error(errorMessage);
+
+      // Added by takmim: Show error toast & redirect to package page (/pentru-agentii) when offer limit is reached
+      if (
+        error?.status === 403 ||
+        error?.data?.status === 403 ||
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade")
+      ) {
+        setIsPopupOpen(false);
+        setTimeout(() => {
+          navigate("/pentru-agentii");
+        }, 1500);
+      }
     } finally {
       setIsOfferSubmitting(false);
     }
