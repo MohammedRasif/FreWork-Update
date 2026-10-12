@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import img from "../../assets/img/background.png";
 import img2 from "../../assets/img/mobileDeviceBackground.png";
 import { useState, useEffect, useRef } from "react";
@@ -199,16 +199,34 @@ const handleButtonClick = () => {
         </div>
       )}
 
-      {isPopupOpen && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-xl">
-            <BannerSectionPopup 
-              closeForm={closePopup} 
-              initialStep={getInitialStep(readPendingPlan())}
+      {/* Modified by takmim: Smooth modal open without white flash/flicker */}
+      <AnimatePresence>
+        {isPopupOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-[#0f1f33]/70 backdrop-blur-sm"
+              onClick={closePopup}
             />
-          </motion.div>
-        </motion.div>
-      )}
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0, y: 8 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="relative z-10 w-full max-w-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <BannerSectionPopup 
+                closeForm={closePopup} 
+                initialStep={getInitialStep(readPendingPlan())}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

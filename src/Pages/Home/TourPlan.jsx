@@ -618,32 +618,32 @@ const TourPlanWithPopup = () => {
                           </p>
                         </div>
 
-                        <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                          <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
-                            {t("interested_travel_points")}:
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            {tour.tourist_spots ? (
-                              tour.tourist_spots
-                                .split(",")
-                                .map((location, index) => (
-                                  <span
-                                    key={index}
-                                    className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                                  >
-                                    {location.trim()}
-                                    {index <
-                                      tour.tourist_spots.split(",").length -
-                                        1 && ", "}
-                                  </span>
-                                ))
-                            ) : (
-                              <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                                {t("none")}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        {/* Modified by takmim: Hide interested_travel_points if empty or N/A */}
+                        {tour.tourist_spots &&
+                          tour.tourist_spots !== "N/A" &&
+                          tour.tourist_spots !== "none" &&
+                          tour.tourist_spots.trim() !== "" && (
+                            <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                              <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-700">
+                                {t("interested_travel_points")}:
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {tour.tourist_spots
+                                  .split(",")
+                                  .map((location, index) => (
+                                    <span
+                                      key={index}
+                                      className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                                    >
+                                      {location.trim()}
+                                      {index <
+                                        tour.tourist_spots.split(",").length -
+                                          1 && ", "}
+                                    </span>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
 
                         <div className="mb-4">
                           <img
@@ -1055,32 +1055,32 @@ const TourPlanWithPopup = () => {
                           )}
                       </p>
                     </div>
-                    <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                      <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                        {t("interested_travel_points")}:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedTour.tourist_spots ? (
-                          selectedTour.tourist_spots
-                            .split(",")
-                            .map((location, index) => (
-                              <span
-                                key={index}
-                                className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                              >
-                                {location.trim()}
-                                {index <
-                                  selectedTour.tourist_spots.split(",").length -
-                                    1 && ", "}
-                              </span>
-                            ))
-                        ) : (
-                          <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                            {t("none")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    {/* Modified by takmim: Hide interested_travel_points if empty or N/A */}
+                    {selectedTour.tourist_spots &&
+                      selectedTour.tourist_spots !== "N/A" &&
+                      selectedTour.tourist_spots !== "none" &&
+                      selectedTour.tourist_spots.trim() !== "" && (
+                        <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                          <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
+                            {t("interested_travel_points")}:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedTour.tourist_spots
+                              .split(",")
+                              .map((location, index) => (
+                                <span
+                                  key={index}
+                                  className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                                >
+                                  {location.trim()}
+                                  {index <
+                                    selectedTour.tourist_spots.split(",").length -
+                                      1 && ", "}
+                                </span>
+                              ))}
+                          </div>
+                        </div>
+                      )}
                     <div className="mb-4">
                       <img
                         src={

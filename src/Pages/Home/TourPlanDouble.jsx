@@ -116,6 +116,12 @@ const TourPlanDouble = () => {
       navigate("/in-asteptare");
       return;
     }
+    // Added by takmim: Redirect to complete profile if agency profile is not complete
+    if (userData?.role === "agency" && userData?.is_profile_complete === false) {
+      toast.info(t("complete_profile_now"));
+      navigate("/agentie/modifica-profil");
+      return;
+    }
     if (hasAcceptedOffer(tour) || getOfferCount(tour) >= 3) {
       toast(hasAcceptedOffer(tour) ? t("accepted_offer") : t("offer_limit_reached"));
       return;
@@ -172,7 +178,33 @@ const TourPlanDouble = () => {
       toast.success(t("offer_submitted_success"));
       return response;
     } catch (error) {
-      toast.error(error?.data?.error || error?.data?.detail || t("failed_to_submit_offer"));
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        t("failed_to_submit_offer");
+      toast.error(errorMessage);
+
+      // Modified by takmim: Handle profile incomplete vs offer limit error
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/pentru-agentii");
+        }, 1500);
+      }
       throw error;
     }
   };

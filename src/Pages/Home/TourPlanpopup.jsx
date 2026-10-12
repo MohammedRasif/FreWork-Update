@@ -32,8 +32,10 @@ const TourPlanPopup = ({
     setIsOfferSubmitting(true);
 
     try {
+      // Modified by takmim: Safeguard tour ID extraction
+      const tourId = tour?.id || tour?._id;
       await handleSubmitOffer(
-        tour.id,
+        tourId,
         offerForm.budget,
         offerForm.comment,
         offerForm,

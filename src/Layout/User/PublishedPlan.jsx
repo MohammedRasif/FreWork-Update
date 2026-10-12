@@ -211,7 +211,35 @@ function PublishedPlan() {
       setOfferComment("");
     } catch (error) {
       console.error("Failed to submit offer:", error);
-      toast.error(error.data?.detail || t("failed_submit_offer"));
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        t("failed_submit_offer");
+      toast.error(errorMessage);
+
+      // Added by takmim: Handle profile incomplete vs offer limit error
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        setIsPopupOpen(false);
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
+        setIsPopupOpen(false);
+        setSelectedTour(null);
+        setTimeout(() => {
+          navigate("/pentru-agentii");
+        }, 1500);
+      }
     }
   };
 
@@ -402,30 +430,30 @@ function PublishedPlan() {
                         {plan.description}
                       </p>
                     </div>
-                    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                      <p className="text-xs sm:text-sm font-medium text-gray-700">
-                        {t("interested_travel_points")}:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {plan.tourist_spots ? (
-                          plan.tourist_spots.split(",").map((spot, index) => (
-                            <span
-                              key={index}
-                              className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                            >
-                              {spot.trim()}
-                              {index <
-                                plan.tourist_spots.split(",").length - 1 &&
-                                ", "}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-xs sm:text-sm text-gray-500">
-                            {t("none_specified")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    {/* Modified by takmim: Hide interested_travel_points if empty or N/A */}
+                    {plan.tourist_spots &&
+                      plan.tourist_spots !== "N/A" &&
+                      plan.tourist_spots !== "none" &&
+                      plan.tourist_spots.trim() !== "" && (
+                        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                          <p className="text-xs sm:text-sm font-medium text-gray-700">
+                            {t("interested_travel_points")}:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {plan.tourist_spots.split(",").map((spot, index) => (
+                              <span
+                                key={index}
+                                className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                              >
+                                {spot.trim()}
+                                {index <
+                                  plan.tourist_spots.split(",").length - 1 &&
+                                  ", "}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                   </div>
                   <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
                     <div className="relative overflow-hidden rounded-[16px] bg-[#f4eee4]">
@@ -629,32 +657,32 @@ function PublishedPlan() {
                         {selectedTour.description}
                       </p>
                     </div>
-                    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                      <p className="text-xs sm:text-sm font-medium text-gray-600">
-                        {t("interested_travel_points")}:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedTour.tourist_spots ? (
-                          selectedTour.tourist_spots
-                            .split(",")
-                            .map((location, index) => (
-                              <span
-                                key={index}
-                                className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                              >
-                                {location.trim()}
-                                {index <
-                                  selectedTour.tourist_spots.split(",").length -
-                                  1 && ", "}
-                              </span>
-                            ))
-                        ) : (
-                          <span className="text-xs sm:text-sm text-gray-600">
-                            {t("none")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    {/* Modified by takmim: Hide interested_travel_points if empty or N/A */}
+                    {selectedTour.tourist_spots &&
+                      selectedTour.tourist_spots !== "N/A" &&
+                      selectedTour.tourist_spots !== "none" &&
+                      selectedTour.tourist_spots.trim() !== "" && (
+                        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                          <p className="text-xs sm:text-sm font-medium text-gray-600">
+                            {t("interested_travel_points")}:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedTour.tourist_spots
+                              .split(",")
+                              .map((location, index) => (
+                                <span
+                                  key={index}
+                                  className="text-xs sm:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                                >
+                                  {location.trim()}
+                                  {index <
+                                    selectedTour.tourist_spots.split(",").length -
+                                      1 && ", "}
+                                </span>
+                              ))}
+                          </div>
+                        </div>
+                      )}
                     <div className="mb-4">
                       <img
                         src={

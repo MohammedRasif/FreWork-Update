@@ -5,6 +5,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   useCreatePlanOneMutation,
   useGetOneDetailQuery,
+  useGetPlansQuery,
   useUpdatePlanMutation,
 } from "@/redux/features/withAuth";
 import { toast } from "react-toastify";
@@ -21,8 +22,31 @@ const CreatePlan = () => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [createPlan] = useCreatePlanOneMutation();
   const [update] = useUpdatePlanMutation();
-  const { state } = useLocation();
+  const location = useLocation();
+  const state = location.state;
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const editSlug = state?.slug || state?.plan?.slug || searchParams.get("slug");
+  const editId = state?.id || state?.plan?.id || searchParams.get("id");
+
+  // Modified by takmim: Fetch user plans to resolve slug when only id is provided
+  const { data: userPlans } = useGetPlansQuery();
+  const matchedPlan = userPlans?.find(
+    (p) =>
+      (editId && String(p.id) === String(editId)) ||
+      (editSlug && p.slug === editSlug) ||
+      p.slug === editId
+  );
+
+  // Modified by takmim: Backend API /tour-plans/<lookup>/ requires slug for lookup
+  const targetSlug =
+    editSlug ||
+    state?.plan?.slug ||
+    matchedPlan?.slug ||
+    (isNaN(Number(editId)) ? editId : null);
+
+  const isEditMode = Boolean(targetSlug || editId || state?.from === "edit");
+
   const {
     register,
     handleSubmit,
@@ -37,34 +61,104 @@ const CreatePlan = () => {
   const [showBudgetMessage, setShowBudgetMessage] = useState(false);
   const [isPopupOpened, setIsPopupOpened] = useState(false);
 
+  // Modified by takmim: Fetch plan details by targetSlug from API
   const { data: oldData, isLoading: isFetching } = useGetOneDetailQuery(
-    state?.id,
-    { skip: !state?.id }
+    targetSlug,
+    { skip: !targetSlug }
   );
 
+  // Modified by takmim: Extract plan data from API response or passed state/matchedPlan
+  const planData =
+    (oldData && (oldData.data || oldData)) || state?.plan || matchedPlan;
+
+  // Modified by takmim: Helper to convert date to YYYY-MM-DD avoiding UTC timezone shifts
+  const formatToDateInput = (val) => {
+    if (!val) return "";
+    if (typeof val === "string" && /^\d{4}-\d{2}-\d{2}/.test(val)) {
+      return val.substring(0, 10);
+    }
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Modified by takmim: Auto-fill all travel plan form fields when editing
   useEffect(() => {
-    if (state?.id && oldData) {
-      setValue("name", oldData.name || "");
-      setValue("email", oldData.email || "");
-      setValue("phoneNumber", oldData.phone_number || "");
-      setValue("locationFrom", oldData.location_from || "");
-      setValue("locationTo", oldData.location_to || "");
-      setValue(
-        "startingDate",
-        oldData.start_date
-          ? new Date(oldData.start_date).toISOString().split("T")[0]
-          : ""
+    if (planData) {
+      const formattedDate = formatToDateInput(
+        planData.start_date || planData.startingDate
       );
-      setValue("budget", oldData.budget || "");
-      setValue("description", oldData.description || "");
-      setValue("travelType", oldData.travel_type || "");
-      setValue("typeOfAccommodation", oldData.type_of_accommodation || "");
-      setValue("minimum_star_hotel", oldData.minimum_star_hotel || "");
-      setValue("mealPlan", oldData.meal_plan || "");
-      setValue("confirmation", !!oldData.is_confirmed_request);
+      const cleanTouristSpots =
+        planData.tourist_spots &&
+        planData.tourist_spots !== "N/A" &&
+        planData.tourist_spots !== "none"
+          ? planData.tourist_spots
+          : planData.touristSpots &&
+            planData.touristSpots !== "N/A" &&
+            planData.touristSpots !== "none"
+          ? planData.touristSpots
+          : "";
+      const stars = String(
+        planData.minimum_star_hotel || planData.minimumHotelStars || ""
+      );
+
+      const formValues = {
+        name:
+          planData.name ||
+          planData.user?.name ||
+          localStorage.getItem("name") ||
+          "",
+        email:
+          planData.email ||
+          planData.user?.email ||
+          localStorage.getItem("email") ||
+          "",
+        phoneNumber:
+          planData.phone_number ||
+          planData.phoneNumber ||
+          planData.user?.phone_number ||
+          "",
+        locationFrom: planData.location_from || planData.locationFrom || "",
+        locationTo: planData.location_to || planData.locationTo || "",
+        startingDate: formattedDate,
+        budget:
+          planData.budget !== undefined && planData.budget !== null
+            ? planData.budget
+            : "",
+        description: planData.description || "",
+        travelType: planData.travel_type || planData.travelType || "",
+        typeOfAccommodation:
+          planData.type_of_accommodation || planData.typeOfAccommodation || "",
+        minimumHotelStars: stars,
+        mealPlan: planData.meal_plan || planData.mealPlan || "",
+        touristSpots: cleanTouristSpots,
+        confirmation: Boolean(
+          planData.is_confirmed_request ?? planData.confirmation ?? true
+        ),
+      };
+
+      reset(formValues);
+
+      // Explicitly set each field to ensure react-hook-form tracking
+      Object.entries(formValues).forEach(([key, val]) => {
+        setValue(key, val);
+      });
+
+      if (locationFromRef.current && formValues.locationFrom) {
+        locationFromRef.current.value = formValues.locationFrom;
+      }
+      if (locationToRef.current && formValues.locationTo) {
+        locationToRef.current.value = formValues.locationTo;
+      }
+      if (budgetRef.current && formValues.budget !== "") {
+        budgetRef.current.value = formValues.budget;
+      }
     }
     setIsPopupOpened(true);
-  }, [state?.id, oldData, setValue]);
+  }, [planData, reset, setValue]);
 
   useEffect(() => {
     const initAutocomplete = () => {
@@ -135,15 +229,30 @@ const CreatePlan = () => {
     formData.append("start_date", data.startingDate);
     formData.append("budget", data.budget);
     formData.append("description", data.description);
-    formData.append("travel_type", data.travelType);
+    formData.append("travel_type", data.travelType || planData?.travel_type || "solo");
     formData.append("type_of_accommodation", data.typeOfAccommodation);
     formData.append("minimum_star_hotel", data.minimumHotelStars);
     formData.append("meal_plan", data.mealPlan);
+    formData.append("tourist_spots", data.touristSpots || "");
     formData.append("status", status);
     formData.append(
       "is_confirmed_request",
       data.confirmation ? "true" : "false"
     );
+
+    // Modified by takmim: Preserve additional plan fields when editing
+    if (planData?.end_date) {
+      formData.append("end_date", planData.end_date);
+    }
+    if (planData?.adult_count !== undefined && planData?.adult_count !== null) {
+      formData.append("adult_count", planData.adult_count);
+    }
+    if (planData?.child_count !== undefined && planData?.child_count !== null) {
+      formData.append("child_count", planData.child_count);
+    }
+    if (planData?.destination_type) {
+      formData.append("destination_type", planData.destination_type);
+    }
 
     if (selectedFile) {
       formData.append("spot_picture", selectedFile);
@@ -157,9 +266,16 @@ const CreatePlan = () => {
       }
 
       let response;
-      if (state?.id) {
+      if (isEditMode) {
+        const lookup =
+          targetSlug ||
+          editSlug ||
+          planData?.slug ||
+          matchedPlan?.slug ||
+          editId;
         response = await update({
-          id: state.id,
+          id: lookup,
+          slug: lookup,
           updates: formData,
         }).unwrap();
       } else {
@@ -172,7 +288,13 @@ const CreatePlan = () => {
       setSelectedFile(null);
       navigate("/cont");
     } catch (error) {
-      toast.error(t("error_creating_plan", { action: state?.id ? t("updating") : t("creating") }));
+      console.error("Error updating plan:", error);
+      const errorMsg =
+        error?.data?.error ||
+        error?.data?.detail ||
+        (typeof error?.data === "string" ? error.data : null) ||
+        t("error_creating_plan", { action: isEditMode ? t("updating") : t("creating") });
+      toast.error(errorMsg);
     } finally {
       if (status === "draft") {
         setIsSavingDraft(false);
@@ -197,7 +319,7 @@ const CreatePlan = () => {
     setShowBudgetMessage(false);
   };
 
-  if (isFetching && state?.id) {
+  if (isFetching && targetSlug && !planData) {
     return <FullScreenInfinityLoader />;
   }
 
@@ -206,6 +328,13 @@ const CreatePlan = () => {
   });
   const { ref: toFormRef, ...toRest } = register("locationTo", {
     required: t("location_to_required"),
+  });
+  // Modified by takmim: Register budget with form ref preserved alongside budgetRef
+  const { ref: budgetFormRef, ...budgetRest } = register("budget", {
+    required: t("budget_required"),
+    min: { value: 0, message: t("budget_cannot_be_negative") },
+    validate: (value) =>
+      (value !== null && value !== "") || t("budget_required"),
   });
 
   return (
@@ -223,7 +352,7 @@ const CreatePlan = () => {
 
         <div className="mb-6 h-1 w-10 rounded-full bg-[#d6a044]" />
         <h1 className="mb-7 text-2xl font-bold tracking-tight text-[#172b43] sm:text-3xl">
-          {state?.id ? t("edit_tour_plan") : t("create_tour_plan")}
+          {isEditMode ? t("edit_tour_plan") : t("create_tour_plan")}
         </h1>
 
         <form className="space-y-6 rounded-[22px] border border-[#e9e6e0] bg-white p-5 shadow-[0_10px_35px_rgba(23,43,67,0.05)] sm:p-8">
@@ -302,7 +431,7 @@ const CreatePlan = () => {
                     required: t("accommodation_required"),
                   })}
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     {t("select_accommodation")}
                   </option>
                   <option value="hotel">{t("hotel")}</option>
@@ -325,7 +454,7 @@ const CreatePlan = () => {
                   className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                   {...register("minimumHotelStars")}
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     {t("select_star_rating")}
                   </option>
                   <option value="1">{t("1_star")}</option>
@@ -401,6 +530,22 @@ const CreatePlan = () => {
                 </p>
               )}
             </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[16px] font-medium text-gray-700">
+                  {t("points_of_travel")}
+                </label>
+                <span className="text-xs text-gray-500">
+                  ({t("optional")})
+                </span>
+              </div>
+              <input
+                type="text"
+                placeholder={t("enter_here")}
+                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
+                {...register("touristSpots")}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -413,16 +558,16 @@ const CreatePlan = () => {
                   {t("budget_message")}
                 </p>
               )}
+              {/* Modified by takmim: Attach both budgetFormRef and budgetRef */}
               <input
                 type="number"
                 placeholder="EUR"
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
-                {...register("budget", {
-                  required: t("budget_required"),
-                  min: { value: 0, message: t("budget_cannot_be_negative") },
-                  validate: (value) =>
-                    (value !== null && value !== "") || t("budget_required"),
-                })}
+                {...budgetRest}
+                ref={(e) => {
+                  budgetFormRef(e);
+                  budgetRef.current = e;
+                }}
                 onChange={(e) => {
                   const value = e.target.value;
                   setValue("budget", value === "" ? null : Number(value), {
@@ -430,7 +575,6 @@ const CreatePlan = () => {
                   });
                 }}
                 onClick={handleBudgetClick}
-                ref={budgetRef}
               />
               {errors.budget && (
                 <p className="text-red-500 text-[14px] mt-1">
@@ -446,7 +590,7 @@ const CreatePlan = () => {
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("mealPlan", { required: t("meal_plan_required") })}
               >
-                <option value="" disabled selected>
+                <option value="" disabled>
                   {t("select_meal_plan")}
                 </option>
                 <option value="none">{t("no_meals")}</option>
@@ -501,11 +645,15 @@ const CreatePlan = () => {
           <div className="flex items-center justify-center gap-4 mt-8 pt-6">
             <button
               type="button"
-              onClick={handleSubmit((data) => onSubmit(data, "published"))}
+              onClick={handleSubmit((data) => onSubmit(data, planData?.status || "published"))}
               className="min-h-12 rounded-xl bg-[#c88f2a] px-8 py-3 font-bold text-white transition-colors hover:bg-[#ad751c]"
               disabled={isSavingDraft || isPublishing}
             >
-              {isPublishing ? t("publishing") : t("publish_now")}
+              {isPublishing
+                ? t("publishing")
+                : isEditMode
+                ? t("save_changes") || t("edit")
+                : t("publish_now")}
             </button>
           </div>
         </form>

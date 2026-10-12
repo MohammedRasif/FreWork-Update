@@ -147,8 +147,10 @@ function SinglePost({ prid }) {
         formData.append("file", selectedFile);
       }
 
+      // Modified by takmim: Use real tour ID instead of slug to prevent 404 error
+      const tourId = postData?.id || post?.id || finalId;
       const response = await offerBudgetToBack({
-        id: finalId,
+        id: tourId,
         data: formData,
       }).unwrap();
 
@@ -189,7 +191,33 @@ function SinglePost({ prid }) {
       toast.success(t("offer_submitted_success"));
     } catch (error) {
       console.error("Failed to submit offer:", error);
-      toast.error(error.data?.error || t("failed_to_submit_offer"));
+      const errorMessage =
+        error?.data?.error ||
+        error?.data?.detail ||
+        t("failed_to_submit_offer");
+      toast.error(errorMessage);
+
+      // Modified by takmim: Handle profile incomplete vs offer limit error
+      const isProfileIncomplete =
+        errorMessage?.toLowerCase().includes("profile") ||
+        errorMessage?.toLowerCase().includes("profil");
+
+      const isLimitError =
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("premium") ||
+        errorMessage?.toLowerCase().includes("upgrade");
+
+      if (isProfileIncomplete) {
+        setIsPopupOpen(false);
+        setTimeout(() => {
+          navigate("/agentie/modifica-profil");
+        }, 1500);
+      } else if (isLimitError) {
+        setIsPopupOpen(false);
+        setTimeout(() => {
+          navigate("/pentru-agentii");
+        }, 1500);
+      }
     } finally {
       setIsOfferSubmitting(false);
     }
@@ -280,6 +308,12 @@ function SinglePost({ prid }) {
       );
       return;
     }
+    // Added by takmim: Redirect to complete profile if agency profile is not complete
+    if (userData?.role === "agency" && userData?.is_profile_complete === false) {
+      navigate("/agentie/modifica-profil");
+      toast.info(t("complete_profile_now"));
+      return;
+    }
     if (tour.status === "accepted") {
       toast.info(t("offer_accepted"));
       return;
@@ -319,16 +353,29 @@ function SinglePost({ prid }) {
     "half-board": "half_board",
     "full-board": "full_board",
   }[tour.meal_plan];
-  const spots = Array.isArray(tour.tourist_spots)
+  // Modified by takmim: Hide tourist_spots if empty or N/A
+  const rawSpots = Array.isArray(tour.tourist_spots)
     ? tour.tourist_spots.join(", ")
-    : tour.tourist_spots?.split(",").map((spot) => spot.trim()).join(", ");
+    : tour.tourist_spots;
+  const cleanSpots =
+    rawSpots &&
+    rawSpots !== "N/A" &&
+    rawSpots !== "none" &&
+    String(rawSpots).trim() !== ""
+      ? String(rawSpots)
+          .split(",")
+          .map((spot) => spot.trim())
+          .filter(Boolean)
+          .join(", ")
+      : null;
+
   const stars = Math.min(5, Math.max(0, Number(tour.minimum_star_hotel) || 0));
   const detailItems = [
     { icon: CalendarDays, label: t("date"), value: `${formatDate(tour.start_date)} – ${formatDate(tour.end_date)}` },
     { icon: Clock3, label: t("duration"), value: Number.isFinite(Number(tour.duration)) && tour.duration !== null && tour.duration !== undefined ? new Intl.NumberFormat(locale, { style: "unit", unit: "day", unitDisplay: "long" }).format(Number(tour.duration)) : t("na") },
     { icon: Users, label: t("total"), value: `${tour.total_members ?? t("na")} ${Number(tour.total_members) === 1 ? t("person") : t("people")}` },
-    { icon: MapPin, label: t("departure_from"), value: tour.location_from || t("na") },
-    { icon: Compass, label: t("points_of_travel"), value: spots || t("none") },
+    { icon: MapPin, label: t("departure_from"), value: tour.location_from || "—" },
+    ...(cleanSpots ? [{ icon: Compass, label: t("points_of_travel"), value: cleanSpots }] : []),
     { icon: UtensilsCrossed, label: t("meal_plan"), value: meal ? t(meal) : t("na") },
     { icon: BedDouble, label: t("type_of_accommodation"), value: accommodation ? t(accommodation) : t("na"), stars },
   ];

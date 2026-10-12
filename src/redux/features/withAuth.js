@@ -101,25 +101,30 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: ["createPlanOne"],
     }),
+    // Modified by takmim: Support lookup by slug or id, and invalidate TourPlan cache on plan edit
     updatePlan: builder.mutation({
-      query: (data) => ({
-        url: `/tour-plans/${data.id}/`,
-        method: "PATCH",
-        body: data.updates,
-        formData: true,
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "updatePlan", id },
+      query: (data) => {
+        const lookup = data.slug || data.id;
+        return {
+          url: `/tour-plans/${lookup}/`,
+          method: "PATCH",
+          body: data.updates,
+        };
+      },
+      invalidatesTags: (result, error, data) => [
+        { type: "updatePlan", id: data?.slug || data?.id },
+        { type: "TourPlan", id: data?.slug || data?.id },
         "updatePlan",
+        "TourPlan",
       ],
     }),
     deletePlan: builder.mutation({
-      query: (id) => ({
-        url: `/tour-plans/${id}/`,
+      query: (identifier) => ({
+        url: `/tour-plans/${identifier}/`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [
-        { type: "TourPlan", id },
+      invalidatesTags: (result, error, identifier) => [
+        { type: "TourPlan", id: identifier },
         "TourPlan",
       ],
     }),
@@ -384,16 +389,21 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["final_confrimation"],
+      invalidatesTags: ["final_confrimation", "Chat", "SentMessages", "Offer"],
     }),
 
+    // Modified by takmim: Invalidate SentMessages and Chat so messages and chat list update immediately
     messageSent: builder.mutation({
       query: ({ id, data }) => ({
         url: `chat/conversations/${id}/message/`,
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["SentMessage"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "SentMessages", id },
+        "SentMessages",
+        "Chat",
+      ],
     }),
 
     declineOffer: builder.query({
@@ -409,9 +419,13 @@ export const sqQuery = createApi({
       invalidatesTags: ["TourPlan", "declineOffer"],
     }),
 
+    // Modified by takmim: Provide tag with id so specific chat cache invalidates correctly
     showMessages: builder.query({
       query: (id) => `chat/conversations/${id}/messages/`,
-      providesTags: ["SentMessages"],
+      providesTags: (result, error, id) => [
+        { type: "SentMessages", id },
+        "SentMessages",
+      ],
     }),
     //show blog post
     showBlogPost: builder.query({

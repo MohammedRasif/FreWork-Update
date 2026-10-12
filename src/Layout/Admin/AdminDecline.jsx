@@ -66,15 +66,21 @@ function AdminDecline() {
                 </h2>
                 <div className="text-xs sm:text-sm lg:text-sm text-gray-600">
                   <div>
-                    <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
-                      <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
-                      <span>
-                        <span className="font-medium">
-                          {t("points_of_travel")}:
-                        </span>{" "}
-                        {plan.tour_plan.tourist_spots || t("none")}
-                      </span>
-                    </p>
+                    {/* Modified by takmim: Hide points_of_travel if empty or N/A */}
+                    {plan.tour_plan.tourist_spots &&
+                      plan.tour_plan.tourist_spots !== "N/A" &&
+                      plan.tour_plan.tourist_spots !== "none" &&
+                      plan.tour_plan.tourist_spots.trim() !== "" && (
+                        <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
+                          <FaLocationDot className="w-6 h-5 text-gray-900 size-4" />
+                          <span>
+                            <span className="font-medium">
+                              {t("points_of_travel")}:
+                            </span>{" "}
+                            {plan.tour_plan.tourist_spots}
+                          </span>
+                        </p>
+                      )}
                     <p className="text-md text-gray-600 flex items-center gap-2 pb-2">
                       <FaLocationArrow className="w-6 h-5 text-gray-900" />
                       <span>
@@ -178,32 +184,32 @@ function AdminDecline() {
                 {plan.tour_plan.description}
               </p>
             </div>
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-              <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
-                {t("interested_travel_points")}:
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {plan.tour_plan.tourist_spots ? (
-                  plan.tour_plan.tourist_spots
-                    .split(",")
-                    .map((location, index) => (
-                      <span
-                        key={index}
-                        className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
-                      >
-                        {location.trim()}
-                        {index <
-                          plan.tour_plan.tourist_spots.split(",").length - 1 &&
-                          ", "}
-                      </span>
-                    ))
-                ) : (
-                  <span className="text-xs sm:text-sm lg:text-sm text-gray-600">
-                    {t("none")}
-                  </span>
-                )}
-              </div>
-            </div>
+            {/* Modified by takmim: Hide interested_travel_points if empty or N/A */}
+            {plan.tour_plan.tourist_spots &&
+              plan.tour_plan.tourist_spots !== "N/A" &&
+              plan.tour_plan.tourist_spots !== "none" &&
+              plan.tour_plan.tourist_spots.trim() !== "" && (
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                  <p className="text-xs sm:text-sm lg:text-sm font-medium text-gray-600">
+                    {t("interested_travel_points")}:
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {plan.tour_plan.tourist_spots
+                      .split(",")
+                      .map((location, index) => (
+                        <span
+                          key={index}
+                          className="text-xs sm:text-sm lg:text-sm font-medium text-[#DD9E2C] hover:underline cursor-pointer"
+                        >
+                          {location.trim()}
+                          {index <
+                            plan.tour_plan.tourist_spots.split(",").length - 1 &&
+                            ", "}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              )}
             <div className="relative mb-4 overflow-hidden rounded-[16px] bg-[#f4eee4]">
               <img
                 src={plan.tour_plan.spot_picture_url || PlanImage1}
