@@ -115,6 +115,7 @@ export const router = createBrowserRouter([
   {
     path: "/agentie",
     element: <PrivateRoute><AdminDashboardLayout /></PrivateRoute>,
+    errorElement: <Navigate to="/agentie" replace />,
     children: [
       { index: true, element: <AdminHome /> },
       { path: "dashboard", element: <AdminHome /> },
@@ -138,6 +139,7 @@ export const router = createBrowserRouter([
   {
     path: "/cont",
     element: <PrivateRoute><UserDashboardLayout /></PrivateRoute>,
+    errorElement: <Navigate to="/cont" replace />,
     children: [
       { index: true, element: <HomeLayout><CreatedPlan /></HomeLayout> },
       { path: "dashboard", element: <HomeLayout><CreatedPlan /></HomeLayout> },
