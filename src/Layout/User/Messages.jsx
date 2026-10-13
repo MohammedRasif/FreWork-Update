@@ -218,6 +218,37 @@ function Messages() {
             const inner = received.message || received.data || received;
             if (!inner || typeof inner !== "object") return;
 
+            if (
+              inner.is_accepted === true ||
+              inner.deal_status === true ||
+              inner.type === "offer_accepted" ||
+              inner.message_type === "offer_accepted" ||
+              inner.message_type === "final_offer_accepted"
+            ) {
+              setIsOfferAcceptedLocally(true);
+              setIsOfferDeclinedLocally(false);
+              if (id) {
+                localStorage.setItem(`deal_accepted_${id}`, "true");
+                localStorage.removeItem(`deal_declined_${id}`);
+              }
+            } else if (
+              inner.is_accepted === false ||
+              inner.deal_status === "declined" ||
+              inner.deal_status === "rejected" ||
+              inner.type === "offer_declined" ||
+              inner.type === "offer_rejected" ||
+              inner.message_type === "offer_declined" ||
+              inner.message_type === "offer_rejected" ||
+              inner.message_type === "final_offer_declined"
+            ) {
+              setIsOfferDeclinedLocally(true);
+              setIsOfferAcceptedLocally(false);
+              if (id) {
+                localStorage.setItem(`deal_declined_${id}`, "true");
+                localStorage.removeItem(`deal_accepted_${id}`);
+              }
+            }
+
             let messageType = "text";
             if (inner.file || inner.file_url) messageType = "file";
             else if (inner.message_type) messageType = inner.message_type;
@@ -391,9 +422,11 @@ function Messages() {
   }, [newMessage, isMessagesLoading, agency]);
 
   const handleFileChange = async (e) => {
+    if (isDealDeclined) return;
     const file = e.target.files[0];
     if (file) {
-      if (!selectedDropdown && !agency?.tour_plan_id) {
+      const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
+      if (!activePlanId) {
         alert(t("select_tour_plan_first"));
         if (fileInputRef.current) fileInputRef.current.value = "";
         return;
@@ -402,7 +435,7 @@ function Messages() {
       const tempId = uuidv4();
       const messageId = uuidv4();
       const tourPlan = dropdownOptions.find(
-        (opt) => opt.value === selectedDropdown,
+        (opt) => opt.value === (selectedDropdown || activePlanId),
       );
 
       const filePreviewUrl = URL.createObjectURL(file);
@@ -413,8 +446,8 @@ function Messages() {
         message_type: "file",
         text: null,
         data: null,
-        tour_plan_id: selectedDropdown,
-        tour_plan_title: tourPlan?.label || null,
+        tour_plan_id: activePlanId,
+        tour_plan_title: tourPlan?.label || currentChat?.tour_plan_title || null,
         file: filePreviewUrl,
         localFileName: localFileName,
         originalFile: file,
@@ -479,8 +512,10 @@ function Messages() {
   };
 
   const handleSendMessage = async () => {
+    if (isDealDeclined) return;
     if (newMessage.trim() === "" || isSending) return;
-    if (!selectedDropdown && !agency?.tour_plan_id) {
+    const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
+    if (!activePlanId) {
       alert(t("select_tour_plan_first"));
       return;
     }
@@ -491,7 +526,7 @@ function Messages() {
     const tempId = uuidv4();
     const messageId = uuidv4();
     const tourPlan = dropdownOptions.find(
-      (opt) => opt.value === selectedDropdown,
+      (opt) => opt.value === (selectedDropdown || activePlanId),
     );
 
     const localMessage = {
@@ -499,8 +534,8 @@ function Messages() {
       message_type: "text",
       text: messageText,
       data: null,
-      tour_plan_id: selectedDropdown,
-      tour_plan_title: tourPlan?.label || null,
+      tour_plan_id: activePlanId,
+      tour_plan_title: tourPlan?.label || currentChat?.tour_plan_title || null,
       file: null,
       isUser: true,
       timestamp: new Date(),
@@ -558,6 +593,10 @@ function Messages() {
       }).unwrap();
       setIsOfferAcceptedLocally(true);
       setIsOfferDeclinedLocally(false);
+      if (id) {
+        localStorage.setItem(`deal_accepted_${id}`, "true");
+        localStorage.removeItem(`deal_declined_${id}`);
+      }
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_accepted"));
@@ -578,6 +617,10 @@ function Messages() {
       }).unwrap();
       setIsOfferDeclinedLocally(true);
       setIsOfferAcceptedLocally(false);
+      if (id) {
+        localStorage.setItem(`deal_declined_${id}`, "true");
+        localStorage.removeItem(`deal_accepted_${id}`);
+      }
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_declined"));
@@ -590,6 +633,7 @@ function Messages() {
   };
 
   const handleKeyPress = (e) => {
+    if (isDealDeclined) return;
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSendMessage();
@@ -807,44 +851,137 @@ function Messages() {
         </>
       );
     }
+
+    if (message.message_type === "final_offer_sent") {
+      return (
+        <p className="font-semibold text-[#b88424]">
+          {message.text || t("final_offer_sent")}
+        </p>
+      );
+    }
+
     return <p>{t("unknown_content")}</p>;
   };
 
   const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
 
+  const isAgencyRoute = location.pathname.startsWith("/agentie/");
+  const isTouristRoute = location.pathname.startsWith("/cont/");
+
+  const isAgencyRole =
+    isAgencyRoute ||
+    (!isTouristRoute && localStorage.getItem("role") === "agency");
+
   const isDealAccepted =
     isOfferAcceptedLocally ||
+    (id ? localStorage.getItem(`deal_accepted_${id}`) === "true" : false) ||
     currentChat?.deal_status === true ||
+    currentChat?.deal_status === "true" ||
+    currentChat?.deal_status === "accepted" ||
+    currentChat?.deal_status === "confirmed" ||
+    currentChat?.deal_status === "completed" ||
+    currentChat?.deal_status === 1 ||
     currentChat?.final_offer_response === true ||
+    currentChat?.final_offer_response === "true" ||
     currentChat?.final_offer_response === "accepted" ||
-    currentChat?.offer_status === "accepted";
+    currentChat?.final_offer_response === "Accepted" ||
+    currentChat?.offer_status === "accepted" ||
+    currentChat?.offer_status === "Accepted" ||
+    currentChat?.offer_status === "approved" ||
+    currentChat?.offer_status === "Approved" ||
+    currentChat?.offer_status === true ||
+    currentChat?.is_accepted === true ||
+    currentChat?.is_accepted === "true" ||
+    currentChat?.status === "accepted" ||
+    messagesData?.deal_status === true ||
+    messagesData?.deal_status === "accepted" ||
+    messagesData?.is_accepted === true ||
+    messages.some(
+      (m) =>
+        m.message_type === "offer_accepted" ||
+        m.message_type === "final_offer_accepted" ||
+        (m.message_type === "final_offer_sent" && m.data?.is_accepted === true)
+    );
 
+  // An offer is declined when explicitly rejected or marked declined in backend
   const isDealDeclined =
-    isOfferDeclinedLocally ||
-    (currentChat?.final_offer_response === false && currentChat?.deal_status !== true) ||
-    currentChat?.final_offer_response === "declined" ||
-    currentChat?.final_offer_response === "rejected" ||
-    currentChat?.offer_status === "declined" ||
-    currentChat?.offer_status === "rejected";
+    !isDealAccepted &&
+    !isOfferAcceptedLocally &&
+    (id ? localStorage.getItem(`deal_accepted_${id}`) !== "true" : true) &&
+    (isOfferDeclinedLocally ||
+      (id ? localStorage.getItem(`deal_declined_${id}`) === "true" : false) ||
+      currentChat?.final_offer_response === "declined" ||
+      currentChat?.final_offer_response === "rejected" ||
+      currentChat?.final_offer_response === "refused" ||
+      (currentChat?.final_offer_response === false &&
+        currentChat?.final_offer_response !== null &&
+        currentChat?.final_offer_response !== undefined) ||
+      currentChat?.offer_status === "declined" ||
+      currentChat?.offer_status === "rejected" ||
+      currentChat?.offer_status === "refused" ||
+      currentChat?.deal_status === "declined" ||
+      currentChat?.deal_status === "rejected" ||
+      currentChat?.deal_status === "refused" ||
+      currentChat?.status === "declined" ||
+      currentChat?.status === "rejected" ||
+      currentChat?.status === "refused" ||
+      messagesData?.deal_status === "declined" ||
+      messagesData?.deal_status === "rejected" ||
+      messagesData?.deal_status === false ||
+      messagesData?.final_offer_response === "declined" ||
+      messagesData?.final_offer_response === "rejected" ||
+      (messagesData?.final_offer_response === false &&
+        messagesData?.final_offer_response !== null &&
+        messagesData?.final_offer_response !== undefined) ||
+      messages.some(
+        (m) =>
+          m.message_type === "offer_declined" ||
+          m.message_type === "offer_rejected" ||
+          m.message_type === "final_offer_declined" ||
+          (m.message_type === "final_offer_sent" && m.data?.is_accepted === false)
+      ));
 
-  const isDealFinalized =
-    isDealAccepted ||
-    isDealDeclined ||
-    currentChat?.deal_status === true ||
-    (currentChat?.final_offer_response !== null &&
-      currentChat?.final_offer_response !== undefined &&
-      currentChat?.final_offer_response !== "");
+  const isDealFinalized = isDealAccepted || isDealDeclined;
+
+  const isFinalOfferSent =
+    currentChat?.final_offer_sent === true ||
+    currentChat?.final_offer_sent === "true" ||
+    currentChat?.final_offer_sent === 1 ||
+    currentChat?.final_offer_sent === "sent" ||
+    messagesData?.final_offer_sent === true ||
+    messagesData?.final_offer_sent === "true" ||
+    messagesData?.conversation?.final_offer_sent === true ||
+    messages.some(
+      (m) =>
+        m.message_type === "final_offer_sent" ||
+        m.message_type === "final_offer" ||
+        m.message_type === "offer"
+    ) ||
+    currentChat?.is_final === true ||
+    currentChat?.has_final_offer === true ||
+    (currentChat?.offer_id &&
+      localStorage.getItem(`final_offer_sent_offer_${currentChat.offer_id}`) ===
+        "true") ||
+    (id && localStorage.getItem(`final_offer_sent_${id}`) === "true") ||
+    (currentChat?.deal_status === false && currentChat?.deal_status !== null);
+
+  // Active chat state: When accepted, messaging is continuous and active
+  const isChatActive =
+    !isDealDeclined &&
+    (isDealAccepted ||
+      currentChat?.is_active === true ||
+      currentChat?.active === true ||
+      (currentChat?.is_active !== false && currentChat?.active !== false));
 
   // Modified by takmim: Hide reject offer options if the offer is already accepted or finalized
   const canRejectOffer =
-    currentChat?.is_active === true &&
-    localStorage.getItem("role") !== "agency" &&
+    !isAgencyRoute &&
     !isDealFinalized &&
     !isDealAccepted &&
     !isDealDeclined &&
     !currentChat?.deal_status &&
-    !currentChat?.final_offer_response;
+    (currentChat?.is_active !== false && currentChat?.active !== false);
   const isLoading = isMessagesLoading || (isChatListLoading && !agency);
   const hasError = messagesError || (!agency && !isChatListLoading);
 
@@ -906,6 +1043,10 @@ function Messages() {
                   await finalOfferResponse({ id: Number(id), data: { is_accepted: false, reason: selectedRejectReason } }).unwrap();
                   setIsOfferDeclinedLocally(true);
                   setIsOfferAcceptedLocally(false);
+                  if (id) {
+                    localStorage.setItem(`deal_declined_${id}`, "true");
+                    localStorage.removeItem(`deal_accepted_${id}`);
+                  }
                   refetchMessages?.();
                   refetchChatList?.();
                   toast.success(t("offer_rejected")); setIsRejectModalOpen(false);
@@ -939,7 +1080,7 @@ function Messages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {(currentChat?.final_offer_sent === true || isDealAccepted || isDealDeclined) && (
+      {(isFinalOfferSent || isDealAccepted || isDealDeclined) && (
         <div className="shrink-0 border-t border-[#eeeae3] bg-[#fbf6ec] px-3 py-3 sm:px-4 sm:py-3.5">
           {isDealAccepted ? (
             <div className="flex items-center justify-center gap-2 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-2.5 text-xs font-semibold text-[#166534] shadow-sm sm:text-sm">
@@ -950,6 +1091,11 @@ function Messages() {
             <div className="flex items-center justify-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-2.5 text-xs font-semibold text-[#991b1b] shadow-sm sm:text-sm">
               <XIcon size={16} className="shrink-0 text-[#dc2626]" />
               <span className="whitespace-nowrap">{t("final_offer_declined")}</span>
+            </div>
+          ) : isAgencyRoute ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#ebd8b1] bg-[#fbf6ec] px-4 py-2.5 text-xs font-semibold text-[#9b701f] shadow-sm sm:text-sm">
+              <ClockIcon size={16} className="shrink-0 text-[#b88424]" />
+              <span className="whitespace-nowrap">{t("final_offer_sent")}</span>
             </div>
           ) : (
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -976,17 +1122,54 @@ function Messages() {
         </div>
       )}
 
-      {currentChat?.is_active === true ? (
+      {isChatActive ? (
         <div className="shrink-0 border-t border-[#eeeae3] bg-white p-3 sm:p-4">
           <div className="flex items-end gap-2 rounded-2xl border border-[#e4e7eb] bg-[#fafbfc] p-2 transition focus-within:border-[#c88f2a] focus-within:ring-2 focus-within:ring-[#c88f2a]/10">
-            <button type="button" aria-label={t("attachment")} title={t("attachment")} className="chat-icon-button shrink-0" onClick={() => fileInputRef.current?.click()} disabled={!!currentChat?.final_offer_response || isDealFinalized}><PaperclipIcon size={20} /></button>
-            <input type="file" aria-label={t("attachment")} ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleFileChange} />
-            <textarea rows={1} aria-label={t("type_message_or_select_file")} placeholder={t("type_message_or_select_file")} className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none" value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={handleKeyPress} ref={inputRef} disabled={!!currentChat?.final_offer_response || isDealFinalized} />
-            <button type="button" aria-label={t("chat_send")} title={t("chat_send")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]" onClick={handleSendMessage} disabled={!newMessage.trim() || isSending || !!currentChat?.final_offer_response || isDealFinalized}>{isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}</button>
+            <button
+              type="button"
+              aria-label={t("attachment")}
+              title={t("attachment")}
+              className="chat-icon-button shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isDealDeclined}
+            >
+              <PaperclipIcon size={20} />
+            </button>
+            <input
+              type="file"
+              aria-label={t("attachment")}
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
+            <textarea
+              rows={1}
+              aria-label={t("type_message_or_select_file")}
+              placeholder={t("type_message_or_select_file")}
+              className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none"
+              value={newMessage}
+              onChange={e => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              ref={inputRef}
+              disabled={isDealDeclined}
+            />
+            <button
+              type="button"
+              aria-label={t("chat_send")}
+              title={t("chat_send")}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]"
+              onClick={handleSendMessage}
+              disabled={!newMessage.trim() || isSending || isDealDeclined}
+            >
+              {isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}
+            </button>
           </div>
         </div>
       ) : (
-        <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">{t("conversation_inactive_message")}</div>
+        <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">
+          {isDealDeclined ? t("final_offer_declined") : t("conversation_inactive_message")}
+        </div>
       )}
     </div>
   );

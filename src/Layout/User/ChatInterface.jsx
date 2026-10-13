@@ -17,11 +17,15 @@ export default function ChatInterface() {
 
   useEffect(() => { localStorage.setItem("activeChatTab", activeTab); }, [activeTab]);
 
+  // Modified by takmim: Don't redirect if navigated directly with matching chat agency state
   useEffect(() => {
+    if (location.state?.agency && String(location.state.agency.id) === String(urlChatId)) {
+      return;
+    }
     if (urlChatId && Array.isArray(chatList) && !chatList.some(chat => String(chat.id) === urlChatId)) {
       navigate(basePath, { replace: true });
     }
-  }, [urlChatId, chatList, basePath, navigate]);
+  }, [urlChatId, chatList, basePath, navigate, location.state]);
 
   const chats = (Array.isArray(chatList) ? chatList : []).map(chat => ({
     id: String(chat.id),
@@ -37,6 +41,30 @@ export default function ChatInterface() {
     is_archived: chat.is_archived || false,
     updatedAt: new Date(chat.last_message_time || chat.updated_at).getTime() || 0,
   })).sort((a, b) => b.updatedAt - a.updatedAt);
+
+  // Modified by takmim: Prepend active chat from navigation state if not yet present in chatList
+  if (
+    location.state?.agency &&
+    urlChatId &&
+    String(location.state.agency.id) === String(urlChatId) &&
+    !chats.some((c) => c.id === String(urlChatId))
+  ) {
+    chats.unshift({
+      id: String(urlChatId),
+      name: location.state.agency.name || t("unknown_user"),
+      image: location.state.agency.image || null,
+      lastMessage: null,
+      unreadCount: 0,
+      active: true,
+      tourist_is_verified: false,
+      other_user_id: location.state.agency.other_user_id || null,
+      tour_plan_title: location.state.agency.tour_plan_title || t("no_tour_plan"),
+      tour_plan_id: location.state.agency.tour_plan_id || null,
+      is_archived: false,
+      updatedAt: Date.now(),
+    });
+  }
+
   const query = searchTerm.trim().toLocaleLowerCase();
   const filteredChats = chats.filter(chat =>
     (activeTab === "archived" ? chat.is_archived : !chat.is_archived) &&
