@@ -160,36 +160,11 @@ const CreatePlan = () => {
     setIsPopupOpened(true);
   }, [planData, reset, setValue]);
 
+  // Modified by takmim: Robust Google Maps Places Autocomplete matching Banner.jsx
   useEffect(() => {
-    const initAutocomplete = () => {
-      if (!window.google || !window.google.maps || !window.google.maps.places) {
-        return;
-      }
+    let isMounted = true;
 
-      if (locationFromRef.current) {
-        const fromAutocomplete = new window.google.maps.places.Autocomplete(
-          locationFromRef.current
-        );
-        fromAutocomplete.addListener("place_changed", () => {
-          const place = fromAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          setValue("locationFrom", locationValue);
-        });
-      }
-
-      if (locationToRef.current) {
-        const toAutocomplete = new window.google.maps.places.Autocomplete(
-          locationToRef.current
-        );
-        toAutocomplete.addListener("place_changed", () => {
-          const place = toAutocomplete.getPlace();
-          const locationValue = place.formatted_address || place.name;
-          setValue("locationTo", locationValue);
-        });
-      }
-    };
-
-    // Modified by takmim: Suppress blocking error dialog and support configurable API key
+    // Suppress blocking error dialog and support configurable API key
     if (typeof window !== "undefined" && !window.gm_authFailure) {
       window.gm_authFailure = () => {
         console.warn(
@@ -205,20 +180,85 @@ const CreatePlan = () => {
     if (!isGoogleScriptLoaded && !window.google) {
       isGoogleScriptLoaded = true;
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
-      script.onload = () => {
-        setTimeout(initAutocomplete, 100);
-      };
-      script.onerror = () => {
-        isGoogleScriptLoaded = false;
-      };
       document.head.appendChild(script);
-    } else if (window.google) {
-      setTimeout(initAutocomplete, 100);
     }
-  }, [setValue, t]);
+
+    const initAutocomplete = () => {
+      if (!isMounted || !window.google?.maps?.places) return false;
+
+      let fromDone = false;
+      let toDone = false;
+
+      if (locationFromRef.current) {
+        if (!locationFromRef.current._hasGoogleAutocomplete) {
+          const fromAutocomplete = new window.google.maps.places.Autocomplete(
+            locationFromRef.current,
+            { types: ["(cities)"] }
+          );
+          locationFromRef.current._hasGoogleAutocomplete = true;
+          fromAutocomplete.addListener("place_changed", () => {
+            const place = fromAutocomplete.getPlace();
+            const locationValue =
+              place.formatted_address ||
+              place.name ||
+              locationFromRef.current?.value ||
+              "";
+            if (locationValue) {
+              setValue("locationFrom", locationValue, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }
+          });
+        }
+        fromDone = true;
+      }
+
+      if (locationToRef.current) {
+        if (!locationToRef.current._hasGoogleAutocomplete) {
+          const toAutocomplete = new window.google.maps.places.Autocomplete(
+            locationToRef.current,
+            { types: ["(cities)"] }
+          );
+          locationToRef.current._hasGoogleAutocomplete = true;
+          toAutocomplete.addListener("place_changed", () => {
+            const place = toAutocomplete.getPlace();
+            const locationValue =
+              place.formatted_address ||
+              place.name ||
+              locationToRef.current?.value ||
+              "";
+            if (locationValue) {
+              setValue("locationTo", locationValue, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }
+          });
+        }
+        toDone = true;
+      }
+
+      return fromDone && toDone;
+    };
+
+    // Retry checking until Google Places and DOM input elements are both ready
+    const interval = setInterval(() => {
+      if (initAutocomplete()) {
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [setValue, isFetching, planData]);
 
   useEffect(() => {
     const handleFocusChange = (e) => {
