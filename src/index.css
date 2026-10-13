@@ -737,3 +737,13 @@ body:has(:is(.home-page, .contact-page, .tour-plans-page, .accepted-offers-page,
 @media (prefers-reduced-motion: reduce) {
   .site-notifications .Toastify--animate { animation-duration: 0.01ms; }
 }
+
+/* Modified by takmim: Prevent Google Maps error icons from repeating across input fields */
+.gm-err-autocomplete,
+input.gm-err-autocomplete {
+  background-image: none !important;
+}
+
+.pac-container {
+  z-index: 10000 !important;
+}

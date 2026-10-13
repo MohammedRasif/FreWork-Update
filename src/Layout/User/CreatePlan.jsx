@@ -189,10 +189,23 @@ const CreatePlan = () => {
       }
     };
 
+    // Modified by takmim: Suppress blocking error dialog and support configurable API key
+    if (typeof window !== "undefined" && !window.gm_authFailure) {
+      window.gm_authFailure = () => {
+        console.warn(
+          "Google Maps Places API authentication error: Check API key, billing, or referrers in Google Cloud Console."
+        );
+      };
+    }
+
+    const googleMapsApiKey =
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
+      "AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc";
+
     if (!isGoogleScriptLoaded && !window.google) {
       isGoogleScriptLoaded = true;
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBIVSr8DMIg5U5P_oRIDt1j_Q32ceDQddc&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
