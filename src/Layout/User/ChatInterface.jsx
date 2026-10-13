@@ -33,7 +33,7 @@ export default function ChatInterface() {
     image: chat.other_participant_image || null,
     lastMessage: chat.last_message || null,
     unreadCount: chat.unread_count || 0,
-    active: chat.active || false,
+    active: chat.active !== undefined ? chat.active : (chat.is_active !== undefined ? chat.is_active : true),
     tourist_is_verified: chat.tourist_is_verified || false,
     other_user_id: chat.other_user_id || null,
     tour_plan_title: chat.tour_plan_title || t("no_tour_plan"),
