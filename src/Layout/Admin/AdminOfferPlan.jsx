@@ -4,14 +4,16 @@ import { MdVerified } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
 import { useState, useEffect, useRef } from "react";
-import { Heart, MessageCircle, Share2, ThumbsUp } from "lucide-react";
+import { Heart, MessageCircle, Share2, ThumbsUp, LoaderCircle } from "lucide-react";
 import {
   useDeleteOfferPlanMutation,
   useFinalOfferSentMutation,
   useGetOfferedPlanQuery,
   useLikePostMutation,
+  useGetChatListQuery,
+  useInviteToChatMutation,
 } from "@/redux/features/withAuth";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import i18n from "../../../i18n.js";
@@ -20,6 +22,7 @@ import PlanImage1 from "@/assets/img/plan-image-1.png";
 
 function AdminOfferPlan() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Offered Plans");
   const [offerBudgets, setOfferBudgets] = useState({});
   const [isLiked, setIsLiked] = useState({});
@@ -28,10 +31,150 @@ function AdminOfferPlan() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
   const [isConfirming, setIsConfirming] = useState({});
+  const [isStartingChat, setIsStartingChat] = useState({});
   const dropdownRefs = useRef({});
   const { data: offeredPlans, isLoading, isError } = useGetOfferedPlanQuery();
+  const { data: chatList, refetch: refetchChatList } = useGetChatListQuery(undefined, {
+    pollingInterval: 3000,
+  });
   const [deleteOfferPlan] = useDeleteOfferPlanMutation();
   const [finalOfferSent] = useFinalOfferSentMutation();
+  const [inviteToChat] = useInviteToChatMutation();
+
+  // Modified by takmim: Direct navigation to specific conversation for tour plan/tourist
+  const handleStartConversation = async (tourPlan, offer) => {
+    if (!tourPlan) return;
+
+    // 1. Check existing conversations in chatList
+    let targetChat = null;
+    if (Array.isArray(chatList) && chatList.length > 0) {
+      if (offer?.room_id) {
+        targetChat = chatList.find((c) => String(c.id) === String(offer.room_id));
+      }
+      if (!targetChat && offer?.id) {
+        targetChat = chatList.find((c) => String(c.offer_id) === String(offer.id));
+      }
+      if (!targetChat && tourPlan?.id) {
+        targetChat = chatList.find((c) => String(c.tour_plan_id) === String(tourPlan.id));
+      }
+    }
+
+    if (targetChat) {
+      navigate(`/agentie/mesaje/${targetChat.id}`, {
+        state: {
+          agency: {
+            id: String(targetChat.id),
+            name: targetChat.other_participant_name || t("unknown_user"),
+            image: targetChat.other_participant_image || null,
+            other_user_id: targetChat.other_user_id || null,
+            tour_plan_id: targetChat.tour_plan_id || tourPlan.id,
+            tour_plan_title: targetChat.tour_plan_title || tourPlan.location_to || t("no_tour_plan"),
+            is_archived: targetChat.is_archived || false,
+          },
+        },
+      });
+      return;
+    }
+
+    // 2. If offer?.room_id exists and is valid, navigate with matching state
+    if (offer?.room_id && offer.room_id !== "undefined" && offer.room_id !== "null") {
+      navigate(`/agentie/mesaje/${offer.room_id}`, {
+        state: {
+          agency: {
+            id: String(offer.room_id),
+            name: t("unknown_user"),
+            image: null,
+            tour_plan_id: tourPlan.id,
+            tour_plan_title: tourPlan.location_to || t("no_tour_plan"),
+            is_archived: false,
+          },
+        },
+      });
+      return;
+    }
+
+    // 3. Initiate conversation with tourist if not found
+    const touristId =
+      tourPlan?.user?.id ||
+      tourPlan?.user_id ||
+      tourPlan?.tourist_id ||
+      tourPlan?.tourist?.id ||
+      (typeof tourPlan?.user === "number" ||
+      (typeof tourPlan?.user === "string" && !tourPlan?.user.includes("@") && !isNaN(Number(tourPlan.user)))
+        ? Number(tourPlan.user)
+        : null) ||
+      offer?.tourist_id ||
+      offer?.user_id ||
+      offer?.tourist?.id;
+
+    const offerKey = offer?.id || tourPlan.id;
+    setIsStartingChat((prev) => ({ ...prev, [offerKey]: true }));
+
+    try {
+      const payload = {
+        tour_plan_id: Number(tourPlan.id),
+      };
+      if (touristId) {
+        payload.other_user_id = touristId;
+      }
+      if (offer?.id) {
+        payload.offer_id = offer.id;
+      }
+
+      const res = await inviteToChat(payload).unwrap();
+      const newChatId = res?.id || res?.conversation_id || res?.room_id || res?.chat_id;
+
+      if (refetchChatList) {
+        refetchChatList();
+      }
+
+      if (newChatId) {
+        navigate(`/agentie/mesaje/${newChatId}`, {
+          state: {
+            agency: {
+              id: String(newChatId),
+              name: tourPlan.user?.name || t("unknown_user"),
+              image: null,
+              other_user_id: touristId || null,
+              tour_plan_id: tourPlan.id,
+              tour_plan_title: tourPlan.location_to || t("no_tour_plan"),
+              is_archived: false,
+            },
+          },
+        });
+      } else {
+        navigate("/agentie/mesaje");
+      }
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+      try {
+        const refreshed = await refetchChatList();
+        const found = (refreshed?.data || []).find(
+          (c) => String(c.tour_plan_id) === String(tourPlan.id) || String(c.offer_id) === String(offer?.id)
+        );
+        if (found) {
+          navigate(`/agentie/mesaje/${found.id}`, {
+            state: {
+              agency: {
+                id: String(found.id),
+                name: found.other_participant_name || t("unknown_user"),
+                image: found.other_participant_image || null,
+                other_user_id: found.other_user_id || touristId || null,
+                tour_plan_id: found.tour_plan_id || tourPlan.id,
+                tour_plan_title: found.tour_plan_title || tourPlan.location_to || t("no_tour_plan"),
+                is_archived: found.is_archived || false,
+              },
+            },
+          });
+          return;
+        }
+      } catch (_) {}
+
+      toast.error(error?.data?.detail || error?.data?.error || t("failed_to_initiate_chat"));
+    } finally {
+      setIsStartingChat((prev) => ({ ...prev, [offerKey]: false }));
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -75,6 +218,10 @@ function AdminOfferPlan() {
       setIsConfirming((prev) => ({ ...prev, [selectedOfferId]: true }));
 
       await finalOfferSent(selectedOfferId).unwrap();
+      if (selectedOfferId) {
+        localStorage.setItem(`final_offer_sent_offer_${selectedOfferId}`, "true");
+      }
+      refetchChatList?.();
 
       toast.success(t("final_offer_sent_success"));
     } catch (error) {
@@ -242,11 +389,21 @@ function AdminOfferPlan() {
                             €{offer.offered_budget}
                           </span>
                           <div className="flex flex-wrap gap-2">
-                            <NavLink to={`/agentie/mesaje/${offer?.room_id}`}>
-                              <button className="min-h-10 rounded-xl border border-[#d8dfe5] bg-white px-4 text-sm font-bold text-[#172b43] transition-colors hover:bg-[#f7f3ec]">
-                                {t("start_conversation")}
-                              </button>
-                            </NavLink>
+                            <button
+                              type="button"
+                              onClick={() => handleStartConversation(tourPlan, offer)}
+                              disabled={isStartingChat[offer?.id || tourPlan.id]}
+                              className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#d8dfe5] bg-white px-4 text-sm font-bold text-[#172b43] transition-colors hover:bg-[#f7f3ec] disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {isStartingChat[offer?.id || tourPlan.id] ? (
+                                <>
+                                  <LoaderCircle size={16} className="animate-spin text-[#c88f2a]" />
+                                  <span>{t("loading")}</span>
+                                </>
+                              ) : (
+                                t("start_conversation")
+                              )}
+                            </button>
                             {!offer.is_final && (
                               <button
                                 onClick={() => handleConfirmDeal(offer.id)}

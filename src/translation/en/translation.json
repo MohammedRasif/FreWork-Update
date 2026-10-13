@@ -559,7 +559,7 @@
   "failed_send_text": "Failed to send text message",
   "final_offer_accepted": "Final offer accepted successfully",
   "failed_accept_offer": "Failed to accept final offer",
-  "final_offer_declined": "Final offer declined successfully",
+  "final_offer_declined": "Your offer has been declined",
   "failed_decline_offer": "Failed to decline final offer",
   "failed_retry_message": "Failed to retry message",
   "select_agency_and_plan": "Please select an agency and tour plan first",

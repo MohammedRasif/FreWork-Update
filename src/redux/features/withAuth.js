@@ -379,7 +379,7 @@ export const sqQuery = createApi({
         url: `final-offer/${id}/`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Offer"],
+      invalidatesTags: ["Offer", "Chat", "SentMessages"],
     }),
 
     // final offer response

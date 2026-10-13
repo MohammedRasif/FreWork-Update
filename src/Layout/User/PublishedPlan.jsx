@@ -561,9 +561,23 @@ function PublishedPlan() {
                               >
                                 {t("response")}
                               </button> */}
-                              <Link to={`/cont/mesaje/${offer.room_id}`}>
+                              <Link
+                                to={offer.room_id ? `/cont/mesaje/${offer.room_id}` : "/cont/mesaje"}
+                                state={
+                                  offer.room_id
+                                    ? {
+                                        agency: {
+                                          id: String(offer.room_id),
+                                          name: offer.agency?.agency_name || t("unknown_user"),
+                                          image: offer.agency?.logo_url || null,
+                                          tour_plan_id: plan.id,
+                                          tour_plan_title: plan.location_to || t("no_tour_plan"),
+                                        },
+                                      }
+                                    : undefined
+                                }
+                              >
                                 <button
-
                                   className="min-h-10 cursor-pointer rounded-xl bg-[#c88f2a] px-4 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
                                 >
                                   {t("response")}
