@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ArrowDownRight, ArrowUpRight, BadgeCheck, Building2, Check, CircleAlert, Compass, HandCoins, RotateCcw, Users } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, BadgeCheck, Building2, Check, CircleAlert, Compass, HandCoins, LoaderCircle, RotateCcw, Users } from "lucide-react";
 import { useShowSubscriptionDataQuery, useSubscriptionMutation } from "@/redux/features/withAuth";
 import { localizedContent } from "@/lib/localizedContent";
 
@@ -22,7 +22,7 @@ function PlanFeatures({ features, t }) {
   );
 }
 
-function ApplicationCard({ plan, onSelect, isSubscribing, t }) {
+function ApplicationCard({ plan, onSelect, isSubscribing, isAnySubscribing, t }) {
   return (
     <article className="overflow-hidden rounded-[26px] border border-[#e9e6e0] bg-white shadow-[0_16px_48px_rgba(23,43,67,0.07)] lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       <div className="relative flex flex-col justify-between overflow-hidden bg-[#213b55] p-7 text-white sm:p-10 lg:min-h-[540px] lg:p-12">
@@ -50,7 +50,8 @@ function ApplicationCard({ plan, onSelect, isSubscribing, t }) {
           </div>
         )}
         <div className="mt-auto pt-8">
-          <button type="button" onClick={() => onSelect(plan)} disabled={isSubscribing} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#c88f2a] px-5 py-3 text-center font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-wait disabled:opacity-60">
+          <button type="button" onClick={() => onSelect(plan)} disabled={isAnySubscribing} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#c88f2a] px-5 py-3 text-center font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-wait disabled:opacity-60">
+            {isSubscribing && <LoaderCircle size={18} className="animate-spin" />}
             {isSubscribing ? t("subscribing") : localizedContent(plan.cta?.label, t) || t("select")} <ArrowUpRight size={18} aria-hidden="true" />
           </button>
           {plan.cta?.subLabel && <p className="mt-3 text-center text-sm leading-6 text-[#718092]">{localizedContent(plan.cta.subLabel, t)}</p>}
@@ -60,7 +61,7 @@ function ApplicationCard({ plan, onSelect, isSubscribing, t }) {
   );
 }
 
-function SubscriptionCard({ plan, onSelect, isSubscribing, featured, t }) {
+function SubscriptionCard({ plan, onSelect, isSubscribing, isAnySubscribing, featured, t }) {
   return (
     <article className={`flex min-w-0 flex-col overflow-hidden rounded-[24px] border bg-white shadow-[0_12px_36px_rgba(23,43,67,0.06)] ${featured ? "border-[#d5ad63]" : "border-[#e9e6e0]"}`}>
       <div className={`h-1.5 ${featured ? "bg-[#c88f2a]" : "bg-[#213b55]"}`} />
@@ -75,7 +76,8 @@ function SubscriptionCard({ plan, onSelect, isSubscribing, featured, t }) {
         <PlanFeatures features={plan.features} t={t} />
         {plan.warningBox && <div className="mt-6 rounded-xl border border-[#f0e3c7] bg-[#fffbf2] p-4 text-sm leading-6 text-[#526274]"><strong className="block text-[#273b50]">{localizedContent(plan.warningBox.title, t)}</strong>{localizedContent(plan.warningBox.text, t)}</div>}
         <div className="mt-auto pt-8">
-          <button type="button" onClick={() => onSelect(plan)} disabled={isSubscribing} className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-center font-bold transition-colors disabled:cursor-wait disabled:opacity-60 ${featured ? "bg-[#c88f2a] text-white hover:bg-[#ad751c]" : "bg-[#213b55] text-white hover:bg-[#172b43]"}`}>
+          <button type="button" onClick={() => onSelect(plan)} disabled={isAnySubscribing} className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-center font-bold transition-colors disabled:cursor-wait disabled:opacity-60 ${featured ? "bg-[#c88f2a] text-white hover:bg-[#ad751c]" : "bg-[#213b55] text-white hover:bg-[#172b43]"}`}>
+            {isSubscribing && <LoaderCircle size={18} className="animate-spin" />}
             {isSubscribing ? t("subscribing") : plan.cta?.label ? localizedContent(plan.cta.label, t) : t("select")} <ArrowUpRight size={18} aria-hidden="true" />
           </button>
           {plan.cta?.subLabel && <p className="mt-3 text-center text-sm leading-6 text-[#718092]">{localizedContent(plan.cta.subLabel, t)}</p>}
@@ -92,6 +94,7 @@ function Pricing() {
   const accessToken = localStorage.getItem("access_token");
   const { data, isLoading, isFetching, isError, refetch } = useShowSubscriptionDataQuery(language, { refetchOnMountOrArgChange: true });
   const [subscription, { isLoading: isSubscribing }] = useSubscriptionMutation();
+  const [subscribingPlanKey, setSubscribingPlanKey] = useState(null);
   const allPlans = Array.isArray(data?.plans) ? data.plans : [];
   const visiblePlans = allPlans.filter((plan) => accessToken ? plan.cta?.action !== "apply_partner" : plan.cta?.action === "apply_partner");
   const loading = isLoading || isFetching;
@@ -110,12 +113,16 @@ function Pricing() {
       navigate("/autentificare", { state: { from: "/pentru-agentii" } });
       return;
     }
+    const planKey = plan.price_id || plan.id || plan.name;
     try {
+      setSubscribingPlanKey(planKey);
       const response = await subscription({ price_id: plan.price_id }).unwrap();
       if (response?.checkout_url) window.location.href = response.checkout_url;
       else toast.success(t("subscription_success"));
     } catch (error) {
       toast.error(error?.data?.detail || t("failed_to_process_subscription"));
+    } finally {
+      setSubscribingPlanKey(null);
     }
   };
 
@@ -156,8 +163,33 @@ function Pricing() {
           {loading ? <div className={`grid gap-6 ${accessToken ? "lg:grid-cols-2" : ""}`}>{Array.from({ length: accessToken ? 2 : 1 }, (_, index) => <div key={index} className="h-[490px] animate-pulse rounded-[26px] bg-[#e8ecee]" />)}</div>
             : isError ? <div className="flex min-h-[340px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center"><Compass size={48} strokeWidth={1.5} className="text-[#b98427]" aria-hidden="true" /><h3 className="mt-5 text-xl font-bold">{t("error_loading_plans")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{t("something_went_wrong_try_again")}</p><button type="button" onClick={refetch} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#c88f2a] px-5 font-bold text-white hover:bg-[#ad751c]"><RotateCcw size={17} aria-hidden="true" /> {t("try_again")}</button></div>
               : visiblePlans.length === 0 ? <div className="flex min-h-[340px] flex-col items-center justify-center rounded-[24px] border border-[#e9e6e0] bg-white px-6 py-12 text-center"><Compass size={48} strokeWidth={1.5} className="text-[#b98427]" aria-hidden="true" /><h3 className="mt-5 text-xl font-bold">{t("agency_no_plans")}</h3><p className="mt-3 max-w-md leading-7 text-[#617082]">{accessToken ? t("contact_support_subscription") : t("please_register_or_wait")}</p><button type="button" onClick={refetch} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#d8e0e6] px-5 font-bold text-[#243b50] hover:bg-[#f1f5f7]"><RotateCcw size={17} aria-hidden="true" /> {t("refresh")}</button></div>
-                : accessToken ? <div className="grid gap-6 lg:grid-cols-2">{visiblePlans.map((plan, index) => <SubscriptionCard key={plan.price_id || index} plan={plan} featured={index === 0} onSelect={handleSelectPlan} isSubscribing={isSubscribing} t={t} />)}</div>
-                  : visiblePlans.map((plan, index) => <ApplicationCard key={plan.price_id || index} plan={plan} onSelect={handleSelectPlan} isSubscribing={isSubscribing} t={t} />)}
+                : accessToken ? <div className="grid gap-6 lg:grid-cols-2">{visiblePlans.map((plan, index) => {
+                  const planKey = plan.price_id || plan.id || plan.name || index;
+                  return (
+                    <SubscriptionCard
+                      key={plan.price_id || index}
+                      plan={plan}
+                      featured={index === 0}
+                      onSelect={handleSelectPlan}
+                      isSubscribing={isSubscribing && subscribingPlanKey === planKey}
+                      isAnySubscribing={isSubscribing}
+                      t={t}
+                    />
+                  );
+                })}</div>
+                  : visiblePlans.map((plan, index) => {
+                    const planKey = plan.price_id || plan.id || plan.name || index;
+                    return (
+                      <ApplicationCard
+                        key={plan.price_id || index}
+                        plan={plan}
+                        onSelect={handleSelectPlan}
+                        isSubscribing={isSubscribing && subscribingPlanKey === planKey}
+                        isAnySubscribing={isSubscribing}
+                        t={t}
+                      />
+                    );
+                  })}
         </section>
       </div>
 

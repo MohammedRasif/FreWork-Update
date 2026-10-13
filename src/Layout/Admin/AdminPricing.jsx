@@ -2,6 +2,7 @@ import { localizedContent } from "@/lib/localizedContent";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
+import { LoaderCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   useShowSubscriptionDataQuery,
@@ -65,6 +66,7 @@ const AdminPricing = () => {
 
   const isSingleCardView = visiblePlans.length === 1;
   const isLoadingState = isLoading || isFetching;
+  const [subscribingPlanKey, setSubscribingPlanKey] = useState(null);
 
   const getPrimaryColor = (plan) => (plan?.isSpecial ? "#DD9E2C" : "#C2851C");
 
@@ -86,7 +88,9 @@ const AdminPricing = () => {
       return;
     }
 
+    const planKey = plan.price_id || plan.id || plan.name;
     try {
+      setSubscribingPlanKey(planKey);
       const response = await subscription({
         price_id: plan.price_id,
       }).unwrap();
@@ -96,7 +100,10 @@ const AdminPricing = () => {
       } else {
         toast.success(t("subscription_success"));
       }
-    } catch (err) { }
+    } catch (err) {
+    } finally {
+      setSubscribingPlanKey(null);
+    }
   };
   const PricingSkeleton = ({ count = 1 }) => (
     <>
@@ -299,34 +306,41 @@ const AdminPricing = () => {
                       <p>{localizedContent(plan.warningBox.text, t)}</p>
                     </div>
                   )}
-                  {plan?.cta ? (
-                    <div className="mb-4">
+                  {(() => {
+                    const planKey = plan.price_id || plan.id || plan.name;
+                    const isThisPlanLoading = isSubscribing && subscribingPlanKey === planKey;
+
+                    return plan?.cta ? (
+                      <div className="mb-4">
+                        <button
+                          className={`
+                            mb-2 mt-5 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-wait disabled:opacity-60
+                          `}
+                          onClick={() => handleSelectPlan(plan)}
+                          disabled={isSubscribing}
+                        >
+                          {isThisPlanLoading && <LoaderCircle size={18} className="animate-spin" />}
+                          {isThisPlanLoading ? t("subscribing") : localizedContent(plan.cta.label, t)}
+                        </button>
+                        {plan.cta.subLabel && (
+                          <p className="text-slate-500 text-center text-[14px] mt-1">
+                            {localizedContent(plan.cta.subLabel, t)}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
                       <button
                         className={`
-                          mb-2 mt-5 min-h-12 w-full cursor-pointer rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c]
+                          mb-4 mt-5 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-wait disabled:opacity-60
                         `}
                         onClick={() => handleSelectPlan(plan)}
                         disabled={isSubscribing}
                       >
-                        {isSubscribing ? t("subscribing") : localizedContent(plan.cta.label, t)}
+                        {isThisPlanLoading && <LoaderCircle size={18} className="animate-spin" />}
+                        {isThisPlanLoading ? t("subscribing") : t("select")}
                       </button>
-                      {plan.cta.subLabel && (
-                        <p className="text-slate-500 text-center text-[14px] mt-1">
-                          {localizedContent(plan.cta.subLabel, t)}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      className={`
-                        mb-4 mt-5 min-h-12 w-full cursor-pointer rounded-xl bg-[#c88f2a] py-3 text-base font-bold text-white transition-colors hover:bg-[#ad751c]
-                      `}
-                      onClick={() => handleSelectPlan(plan)}
-                      disabled={isSubscribing}
-                    >
-                      {isSubscribing ? t("subscribing") : t("select")}
-                    </button>
-                  )}
+                    );
+                  })()}
                 </div>
               </div>
             ))}

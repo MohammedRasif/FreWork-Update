@@ -189,6 +189,18 @@ function Messages() {
     setMenuOpen(false);
     setIsOfferAcceptedLocally(false);
     setIsOfferDeclinedLocally(false);
+    // Purge any stale client-only deal flags from localStorage
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (
+          key.startsWith("deal_accepted_") ||
+          key.startsWith("deal_declined_") ||
+          key.startsWith("final_offer_sent_")
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch {}
   }, [id]);
 
   // Modified by takmim: Improved WebSocket handling with auto-reconnect and real-time state sync
@@ -227,10 +239,6 @@ function Messages() {
             ) {
               setIsOfferAcceptedLocally(true);
               setIsOfferDeclinedLocally(false);
-              if (id) {
-                localStorage.setItem(`deal_accepted_${id}`, "true");
-                localStorage.removeItem(`deal_declined_${id}`);
-              }
             } else if (
               inner.is_accepted === false ||
               inner.deal_status === "declined" ||
@@ -243,10 +251,6 @@ function Messages() {
             ) {
               setIsOfferDeclinedLocally(true);
               setIsOfferAcceptedLocally(false);
-              if (id) {
-                localStorage.setItem(`deal_declined_${id}`, "true");
-                localStorage.removeItem(`deal_accepted_${id}`);
-              }
             }
 
             let messageType = "text";
@@ -593,10 +597,6 @@ function Messages() {
       }).unwrap();
       setIsOfferAcceptedLocally(true);
       setIsOfferDeclinedLocally(false);
-      if (id) {
-        localStorage.setItem(`deal_accepted_${id}`, "true");
-        localStorage.removeItem(`deal_declined_${id}`);
-      }
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_accepted"));
@@ -617,10 +617,6 @@ function Messages() {
       }).unwrap();
       setIsOfferDeclinedLocally(true);
       setIsOfferAcceptedLocally(false);
-      if (id) {
-        localStorage.setItem(`deal_declined_${id}`, "true");
-        localStorage.removeItem(`deal_accepted_${id}`);
-      }
       refetchMessages?.();
       refetchChatList?.();
       toast.success(t("final_offer_declined"));
@@ -852,10 +848,36 @@ function Messages() {
       );
     }
 
-    if (message.message_type === "final_offer_sent") {
+    if (
+      message.message_type === "final_offer_sent" ||
+      message.message_type === "offer"
+    ) {
       return (
         <p className="font-semibold text-[#b88424]">
           {message.text || t("final_offer_sent")}
+        </p>
+      );
+    }
+
+    if (
+      message.message_type === "final_offer_accepted" ||
+      message.message_type === "offer_accepted"
+    ) {
+      return (
+        <p className="font-semibold text-[#166534]">
+          {message.text || t("final_offer_accepted")}
+        </p>
+      );
+    }
+
+    if (
+      message.message_type === "final_offer_declined" ||
+      message.message_type === "offer_declined" ||
+      message.message_type === "offer_rejected"
+    ) {
+      return (
+        <p className="font-semibold text-[#b54a40]">
+          {message.text || t("final_offer_declined")}
         </p>
       );
     }
@@ -875,7 +897,6 @@ function Messages() {
 
   const isDealAccepted =
     isOfferAcceptedLocally ||
-    (id ? localStorage.getItem(`deal_accepted_${id}`) === "true" : false) ||
     currentChat?.deal_status === true ||
     currentChat?.deal_status === "true" ||
     currentChat?.deal_status === "accepted" ||
@@ -895,28 +916,44 @@ function Messages() {
     currentChat?.is_accepted === "true" ||
     currentChat?.status === "accepted" ||
     messagesData?.deal_status === true ||
+    messagesData?.deal_status === "true" ||
     messagesData?.deal_status === "accepted" ||
+    messagesData?.deal_status === "confirmed" ||
+    messagesData?.deal_status === "completed" ||
+    messagesData?.deal_status === 1 ||
+    messagesData?.conversation?.deal_status === true ||
+    messagesData?.conversation?.deal_status === "true" ||
+    messagesData?.conversation?.deal_status === "accepted" ||
+    messagesData?.conversation?.deal_status === "confirmed" ||
+    messagesData?.conversation?.deal_status === "completed" ||
+    messagesData?.conversation?.deal_status === 1 ||
     messagesData?.is_accepted === true ||
+    messagesData?.is_accepted === "true" ||
+    messagesData?.conversation?.is_accepted === true ||
+    messagesData?.conversation?.is_accepted === "true" ||
+    messagesData?.final_offer_response === true ||
+    messagesData?.final_offer_response === "true" ||
+    messagesData?.final_offer_response === "accepted" ||
+    messagesData?.conversation?.final_offer_response === true ||
+    messagesData?.conversation?.final_offer_response === "true" ||
+    messagesData?.conversation?.final_offer_response === "accepted" ||
+    messagesData?.conversation?.offer_status === "accepted" ||
+    messagesData?.conversation?.status === "accepted" ||
     messages.some(
       (m) =>
         m.message_type === "offer_accepted" ||
         m.message_type === "final_offer_accepted" ||
-        (m.message_type === "final_offer_sent" && m.data?.is_accepted === true)
+        (m.message_type === "final_offer_sent" && (m.data?.is_accepted === true || m.is_accepted === true))
     );
 
   // An offer is declined when explicitly rejected or marked declined in backend
   const isDealDeclined =
     !isDealAccepted &&
     !isOfferAcceptedLocally &&
-    (id ? localStorage.getItem(`deal_accepted_${id}`) !== "true" : true) &&
     (isOfferDeclinedLocally ||
-      (id ? localStorage.getItem(`deal_declined_${id}`) === "true" : false) ||
       currentChat?.final_offer_response === "declined" ||
       currentChat?.final_offer_response === "rejected" ||
       currentChat?.final_offer_response === "refused" ||
-      (currentChat?.final_offer_response === false &&
-        currentChat?.final_offer_response !== null &&
-        currentChat?.final_offer_response !== undefined) ||
       currentChat?.offer_status === "declined" ||
       currentChat?.offer_status === "rejected" ||
       currentChat?.offer_status === "refused" ||
@@ -928,51 +965,54 @@ function Messages() {
       currentChat?.status === "refused" ||
       messagesData?.deal_status === "declined" ||
       messagesData?.deal_status === "rejected" ||
-      messagesData?.deal_status === false ||
+      messagesData?.deal_status === "refused" ||
+      messagesData?.conversation?.deal_status === "declined" ||
+      messagesData?.conversation?.deal_status === "rejected" ||
+      messagesData?.conversation?.deal_status === "refused" ||
       messagesData?.final_offer_response === "declined" ||
       messagesData?.final_offer_response === "rejected" ||
-      (messagesData?.final_offer_response === false &&
-        messagesData?.final_offer_response !== null &&
-        messagesData?.final_offer_response !== undefined) ||
+      messagesData?.final_offer_response === "refused" ||
+      messagesData?.conversation?.final_offer_response === "declined" ||
+      messagesData?.conversation?.final_offer_response === "rejected" ||
+      messagesData?.conversation?.final_offer_response === "refused" ||
+      messagesData?.conversation?.offer_status === "declined" ||
+      messagesData?.conversation?.offer_status === "rejected" ||
+      messagesData?.conversation?.status === "declined" ||
+      messagesData?.conversation?.status === "rejected" ||
       messages.some(
         (m) =>
           m.message_type === "offer_declined" ||
           m.message_type === "offer_rejected" ||
           m.message_type === "final_offer_declined" ||
-          (m.message_type === "final_offer_sent" && m.data?.is_accepted === false)
+          (m.message_type === "final_offer_sent" && (m.data?.is_accepted === false || m.is_accepted === false))
       ));
 
   const isDealFinalized = isDealAccepted || isDealDeclined;
 
   const isFinalOfferSent =
-    currentChat?.final_offer_sent === true ||
-    currentChat?.final_offer_sent === "true" ||
-    currentChat?.final_offer_sent === 1 ||
-    currentChat?.final_offer_sent === "sent" ||
-    messagesData?.final_offer_sent === true ||
-    messagesData?.final_offer_sent === "true" ||
-    messagesData?.conversation?.final_offer_sent === true ||
-    messages.some(
-      (m) =>
-        m.message_type === "final_offer_sent" ||
-        m.message_type === "final_offer" ||
-        m.message_type === "offer"
-    ) ||
-    currentChat?.is_final === true ||
-    currentChat?.has_final_offer === true ||
-    (currentChat?.offer_id &&
-      localStorage.getItem(`final_offer_sent_offer_${currentChat.offer_id}`) ===
-        "true") ||
-    (id && localStorage.getItem(`final_offer_sent_${id}`) === "true") ||
-    (currentChat?.deal_status === false && currentChat?.deal_status !== null);
+    !isDealFinalized &&
+    (currentChat?.final_offer_sent === true ||
+      currentChat?.final_offer_sent === "true" ||
+      currentChat?.final_offer_sent === 1 ||
+      currentChat?.final_offer_sent === "sent" ||
+      messagesData?.final_offer_sent === true ||
+      messagesData?.final_offer_sent === "true" ||
+      messagesData?.conversation?.final_offer_sent === true ||
+      messages.some(
+        (m) =>
+          m.message_type === "final_offer_sent" ||
+          m.message_type === "final_offer" ||
+          m.message_type === "offer"
+      ) ||
+      currentChat?.is_final === true ||
+      currentChat?.has_final_offer === true);
 
-  // Active chat state: When accepted, messaging is continuous and active
+  // Active chat state: Chat is active unless explicitly declined or archived
   const isChatActive =
     !isDealDeclined &&
-    (isDealAccepted ||
-      currentChat?.is_active === true ||
-      currentChat?.active === true ||
-      (currentChat?.is_active !== false && currentChat?.active !== false));
+    !isConversationArchived &&
+    currentChat?.is_active !== false &&
+    messagesData?.conversation?.is_active !== false;
 
   // Modified by takmim: Hide reject offer options if the offer is already accepted or finalized
   const canRejectOffer =
@@ -1043,10 +1083,6 @@ function Messages() {
                   await finalOfferResponse({ id: Number(id), data: { is_accepted: false, reason: selectedRejectReason } }).unwrap();
                   setIsOfferDeclinedLocally(true);
                   setIsOfferAcceptedLocally(false);
-                  if (id) {
-                    localStorage.setItem(`deal_declined_${id}`, "true");
-                    localStorage.removeItem(`deal_accepted_${id}`);
-                  }
                   refetchMessages?.();
                   refetchChatList?.();
                   toast.success(t("offer_rejected")); setIsRejectModalOpen(false);
@@ -1060,7 +1096,18 @@ function Messages() {
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-5 sm:px-6 sm:py-6" aria-label={t("messages")}>
         {messages.length === 0 && <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-[#77818e]"><MessagesSquare size={30} className="text-[#c8b38d]" />{t("no_messages")}</div>}
         {messages.map(message => {
-          if (!message.text && !message.file && message.message_type !== "start_conversation" && message.message_type !== "final_offer_sent") return null;
+          if (
+            !message.text &&
+            !message.file &&
+            message.message_type !== "start_conversation" &&
+            message.message_type !== "final_offer_sent" &&
+            message.message_type !== "offer" &&
+            message.message_type !== "final_offer_accepted" &&
+            message.message_type !== "offer_accepted" &&
+            message.message_type !== "final_offer_declined" &&
+            message.message_type !== "offer_declined" &&
+            message.message_type !== "offer_rejected"
+          ) return null;
           if (message.message_type === "start_conversation") return <div key={message.id || message.tempId} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
           return (
             <div key={message.id || message.tempId} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
@@ -1168,7 +1215,16 @@ function Messages() {
         </div>
       ) : (
         <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">
-          {isDealDeclined ? t("final_offer_declined") : t("conversation_inactive_message")}
+          {isDealDeclined ? (
+            <span className="inline-flex items-center justify-center gap-1.5 font-medium text-[#b54a40]">
+              <XIcon size={15} className="shrink-0" />
+              {t("final_offer_declined")}
+            </span>
+          ) : isConversationArchived ? (
+            <span>{t("conversation_archived")}</span>
+          ) : (
+            <span>{t("conversation_inactive_message")}</span>
+          )}
         </div>
       )}
     </div>
