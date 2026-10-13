@@ -187,7 +187,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
       if (!isGoogleScriptLoaded && !window.google) {
         isGoogleScriptLoaded = true;
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&loading=async`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = () => {
