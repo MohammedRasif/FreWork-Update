@@ -10,21 +10,19 @@ import { debounce } from "lodash";
 import FullScreenInfinityLoader from "@/lib/Loading";
 import { useNavigate } from "react-router-dom";
 import {
-  useAcceptOfferMutation,
   useGetTourPlanPublicQuery,
-  useInviteToChatMutation,
   useLikePostMutation,
   useOfferBudgetMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { getOfferConversationPath } from "@/lib/chatOffers";
 
-
-const token = localStorage.getItem("access_token");
-const currentUserId = localStorage.getItem("user_id");
 
 const TourPlanWithPopup = () => {
+  const token = localStorage.getItem("access_token");
+  const currentUserId = localStorage.getItem("user_id");
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
   const [isLiked, setIsLiked] = useState({});
@@ -110,8 +108,6 @@ const TourPlanWithPopup = () => {
   const [interact, { isLoading: isInteractLoading }] = useLikePostMutation();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
-  const [acceptOffer, { isLoading: isAcceptLoading }] =
-    useAcceptOfferMutation();
   const { data: userData, isLoading } = useShowUserInpormationQuery();
 
   // Initialize tours and like/share status
@@ -419,27 +415,14 @@ const TourPlanWithPopup = () => {
     }
   };
 
-  const acceptOfferHandler = async (offerId, tourId) => {
+  const acceptOfferHandler = (offerId, tourId) => {
     if (!token) {
       navigate("/autentificare");
       toast.error(t("login_to_accept_offer"));
       return;
     }
-
-    try {
-      await acceptOffer(offerId).unwrap();
-      setTours((prevTours) => prevTours.filter((tour) => tour.id !== tourId));
-
-      if (selectedTour && selectedTour.id === tourId) {
-        setIsPopupOpen(false);
-        setSelectedTour(null);
-      }
-
-      toast.success(t("offer_accepted_success"));
-    } catch (error) {
-      console.error("Failed to accept offer:", error);
-      toast.error(error.data?.detail || t("failed_to_accept_offer"));
-    }
+    const offer = tours.find((tour) => tour.id === tourId)?.offers?.find((item) => item.id === offerId);
+    navigate(getOfferConversationPath(offer, localStorage.getItem("role")));
   };
 
   const getInteractionCounts = (tour) => {
@@ -453,20 +436,8 @@ const TourPlanWithPopup = () => {
   };
 
   const displayTours = tours;
-  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
-    useInviteToChatMutation();
-
-  const handleMessage = async (data) => {
-    const role = localStorage.getItem("role");
-    console.log(data);
-    if (role) {
-      try {
-        await invite(data);
-        navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
-      } catch (error) {
-        console.log(error, "invite to message");
-      }
-    }
+  const handleMessage = (offer) => {
+    navigate(getOfferConversationPath(offer, localStorage.getItem("role")));
   };
 
   return (
@@ -814,9 +785,7 @@ const TourPlanWithPopup = () => {
                                           } else {
                                             const userId = tour.user; // Use tour.user instead of tourPlanPublic[0]?.user
                                             if (userId) {
-                                              handleMessage({
-                                                other_user_id: userId,
-                                              });
+                                              handleMessage(offer);
                                             } else {
                                               console.error(
                                                 "User ID not found in tour"
@@ -843,14 +812,9 @@ const TourPlanWithPopup = () => {
                                               tour.id
                                             )
                                           }
-                                          disabled={isAcceptLoading}
-                                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                            isAcceptLoading
-                                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                              : "bg-[#DD9E2C] text-white hover:bg-[#C2851C]"
-                                          }`}
+                                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors bg-[#DD9E2C] text-white hover:bg-[#C2851C]`}
                                         >
-                                          {t("accept")}
+                                          {t("chat_offer_review_in_chat")}
                                         </button>
                                       )}
                                     </div>
@@ -1251,9 +1215,7 @@ const TourPlanWithPopup = () => {
                                         } else {
                                           const userId = selectedTour.user;
                                           if (userId) {
-                                            handleMessage({
-                                              other_user_id: userId,
-                                            });
+                                            handleMessage(offer);
                                           } else {
                                             console.error(
                                               "User ID not found in selectedTour"
@@ -1280,14 +1242,9 @@ const TourPlanWithPopup = () => {
                                             selectedTour.id
                                           )
                                         }
-                                        disabled={isAcceptLoading}
-                                        className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                                          isAcceptLoading
-                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                            : "bg-[#3776E2] text-white hover:bg-blue-700"
-                                        }`}
+                                        className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors bg-[#3776E2] text-white hover:bg-blue-700`}
                                       >
-                                        {t("accept")}
+                                        {t("chat_offer_review_in_chat")}
                                       </button>
                                     )}
                                   </div>
