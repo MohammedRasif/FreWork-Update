@@ -37,6 +37,14 @@ import ChatAvatar from "./ChatAvatar";
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
 
+const getSenderId = (sender) => {
+  if (!sender) return null;
+  if (typeof sender === "object") {
+    return sender.user_id ?? sender.id ?? sender.sender_id ?? null;
+  }
+  return sender;
+};
+
 function Messages() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
@@ -257,6 +265,12 @@ function Messages() {
             if (inner.file || inner.file_url) messageType = "file";
             else if (inner.message_type) messageType = inner.message_type;
 
+            const senderId =
+              getSenderId(inner.sender) ??
+              inner.sender_id ??
+              inner.user_id;
+            const isUser = String(senderId) === String(userId);
+
             const serverMessage = {
               id: inner.id || Date.now(),
               message_type: messageType,
@@ -270,13 +284,17 @@ function Messages() {
                     ? inner.file || inner.file_url
                     : `${FILE_BASE_URL}${inner.file || inner.file_url}`
                   : null,
-              isUser: String(inner.sender?.user_id) === userId,
+              isUser,
               timestamp: inner.timestamp ? new Date(inner.timestamp) : new Date(),
               is_read: inner.is_read || false,
               status: "sent",
             };
 
             setMessages((prev) => {
+              if (prev.some((msg) => msg.id === serverMessage.id)) {
+                return prev;
+              }
+
               if (serverMessage.isUser) {
                 const matchingPending = Array.from(
                   pendingMessagesRef.current.values(),
@@ -288,6 +306,7 @@ function Messages() {
                 );
 
                 if (matchingPending) {
+                  pendingMessagesRef.current.delete(matchingPending.tempId);
                   return prev.map((msg) =>
                     msg.tempId === matchingPending.tempId
                       ? {
@@ -299,10 +318,32 @@ function Messages() {
                       : msg,
                   );
                 }
+
+                const pendingInPrev = prev.find(
+                  (m) =>
+                    m.status === "sending" &&
+                    m.message_type === serverMessage.message_type &&
+                    (m.text === serverMessage.text ||
+                      (m.text === null && serverMessage.text === null)),
+                );
+                if (pendingInPrev) {
+                  if (pendingInPrev.tempId) {
+                    pendingMessagesRef.current.delete(pendingInPrev.tempId);
+                  }
+                  return prev.map((msg) =>
+                    (pendingInPrev.tempId && msg.tempId === pendingInPrev.tempId) ||
+                    msg.id === pendingInPrev.id
+                      ? {
+                          ...msg,
+                          id: serverMessage.id,
+                          status: "sent",
+                          tempId: undefined,
+                        }
+                      : msg,
+                  );
+                }
               }
 
-              const exists = prev.some((msg) => msg.id === serverMessage.id);
-              if (exists) return prev;
               return [...prev, serverMessage].sort(
                 (a, b) => a.timestamp - b.timestamp,
               );
@@ -345,31 +386,65 @@ function Messages() {
       Array.isArray(messagesData.messages) &&
       userId
     ) {
-      const formattedMessages = messagesData.messages.map((msg) => ({
-        id: msg.id,
-        message_type:
-          msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
-        text: msg.text || null,
-        data: msg.data || null,
-        tour_plan_id: msg.tour_plan_id || null,
-        tour_plan_title: msg.tour_plan_title || null,
-        file:
-          msg.file || msg.file_url
-            ? (msg.file || msg.file_url).startsWith("http")
-              ? msg.file || msg.file_url
-              : `${FILE_BASE_URL}${msg.file || msg.file_url}`
-            : null,
-        isUser: String(msg.sender?.user_id) === userId,
-        timestamp: new Date(msg.timestamp),
-        is_read: msg.is_read,
-        status: "sent",
-      }));
+      const formattedMessages = messagesData.messages.map((msg) => {
+        const senderId =
+          getSenderId(msg.sender) ??
+          msg.sender_id ??
+          msg.user_id;
+        return {
+          id: msg.id,
+          message_type:
+            msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
+          text: msg.text || null,
+          data: msg.data || null,
+          tour_plan_id: msg.tour_plan_id || null,
+          tour_plan_title: msg.tour_plan_title || null,
+          file:
+            msg.file || msg.file_url
+              ? (msg.file || msg.file_url).startsWith("http")
+                ? msg.file || msg.file_url
+                : `${FILE_BASE_URL}${msg.file || msg.file_url}`
+              : null,
+          isUser: String(senderId) === String(userId),
+          timestamp: new Date(msg.timestamp),
+          is_read: msg.is_read,
+          status: "sent",
+        };
+      });
+
       setMessages((prev) => {
-        // Keep in-flight sending messages
-        const sendingMsgs = prev.filter((m) => m.status === "sending");
-        const allMsgs = [...sendingMsgs, ...formattedMessages];
+        // Keep only truly unmatched in-flight sending messages
+        const unmatchedSending = prev.filter((pendingMsg) => {
+          if (pendingMsg.status !== "sending") return false;
+          const alreadyInServer = formattedMessages.some((serverMsg) => {
+            if (serverMsg.id === pendingMsg.id) return true;
+            if (!serverMsg.isUser) return false;
+            if (
+              pendingMsg.text &&
+              serverMsg.text === pendingMsg.text &&
+              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
+            ) {
+              return true;
+            }
+            if (
+              pendingMsg.message_type === "file" &&
+              serverMsg.message_type === "file" &&
+              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
+            ) {
+              return true;
+            }
+            return false;
+          });
+          if (alreadyInServer && pendingMsg.tempId) {
+            pendingMessagesRef.current.delete(pendingMsg.tempId);
+          }
+          return !alreadyInServer;
+        });
+
+        const allMsgs = [...formattedMessages, ...unmatchedSending];
         const uniqueMsgs = allMsgs.reduce((acc, msg) => {
-          if (!acc[msg.id]) acc[msg.id] = msg;
+          const key = msg.tempId ? `temp_${msg.tempId}` : `id_${msg.id}`;
+          if (!acc[key]) acc[key] = msg;
           return acc;
         }, {});
         const nextList = Object.values(uniqueMsgs).sort(
@@ -381,9 +456,9 @@ function Messages() {
           prev.length === nextList.length &&
           prev.every(
             (p, idx) =>
-              p.id === nextList[idx].id &&
+              (p.id === nextList[idx].id || (p.tempId && p.tempId === nextList[idx].tempId)) &&
               p.status === nextList[idx].status &&
-              p.is_read === nextList[idx].is_read
+              p.is_read === nextList[idx].is_read,
           )
         ) {
           return prev;
@@ -476,12 +551,18 @@ function Messages() {
 
         if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
 
-        setMessages((prev) =>
-          prev.map((msg) =>
+        const serverId = response.id;
+        setMessages((prev) => {
+          const alreadyHasServerMsg =
+            serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+          if (alreadyHasServerMsg) {
+            return prev.filter((m) => m.tempId !== tempId);
+          }
+          return prev.map((msg) =>
             msg.tempId === tempId
               ? {
                   ...msg,
-                  id: response.id || msg.id,
+                  id: serverId || msg.id,
                   file: response.file
                     ? response.file.startsWith("http")
                       ? response.file
@@ -493,8 +574,8 @@ function Messages() {
                   localFileName: undefined,
                 }
               : msg,
-          ),
-        );
+          );
+        });
         pendingMessagesRef.current.delete(tempId);
         refetchMessages?.();
         refetchChatList?.();
@@ -559,18 +640,24 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      setMessages((prev) =>
-        prev.map((msg) =>
+      const serverId = response.id;
+      setMessages((prev) => {
+        const alreadyHasServerMsg =
+          serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+        if (alreadyHasServerMsg) {
+          return prev.filter((m) => m.tempId !== tempId);
+        }
+        return prev.map((msg) =>
           msg.tempId === tempId
             ? {
                 ...msg,
-                id: response.id || msg.id,
+                id: serverId || msg.id,
                 status: "sent",
                 tempId: undefined,
               }
             : msg,
-        ),
-      );
+        );
+      });
       pendingMessagesRef.current.delete(tempId);
       refetchMessages?.();
       refetchChatList?.();
@@ -655,12 +742,18 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      setMessages((prev) =>
-        prev.map((msg) =>
+      const serverId = response.id;
+      setMessages((prev) => {
+        const alreadyHasServerMsg =
+          serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+        if (alreadyHasServerMsg) {
+          return prev.filter((m) => m.tempId !== tempId);
+        }
+        return prev.map((msg) =>
           msg.tempId === tempId
             ? {
                 ...msg,
-                id: response.id || msg.id,
+                id: serverId || msg.id,
                 file: response.file
                   ? response.file.startsWith("http")
                     ? response.file
@@ -670,8 +763,8 @@ function Messages() {
                 tempId: undefined,
               }
             : msg,
-        ),
-      );
+        );
+      });
       if (message.file?.startsWith("blob:")) URL.revokeObjectURL(message.file);
       pendingMessagesRef.current.delete(tempId);
       refetchMessages?.();
@@ -725,18 +818,24 @@ function Messages() {
           other_user_id: agency.other_user_id,
         }).unwrap();
 
-        setMessages((prev) =>
-          prev.map((msg) =>
+        const serverId = res.id;
+        setMessages((prev) => {
+          const alreadyHasServerMsg =
+            serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+          if (alreadyHasServerMsg) {
+            return prev.filter((m) => m.tempId !== tempId);
+          }
+          return prev.map((msg) =>
             msg.tempId === tempId
               ? {
                   ...msg,
-                  id: res.id || msg.id,
+                  id: serverId || msg.id,
                   status: "sent",
                   tempId: undefined,
                 }
               : msg,
-          ),
-        );
+          );
+        });
         pendingMessagesRef.current.delete(tempId);
       } catch (err) {
         console.error("Failed to send start conversation:", err);
@@ -1108,9 +1207,9 @@ function Messages() {
             message.message_type !== "offer_declined" &&
             message.message_type !== "offer_rejected"
           ) return null;
-          if (message.message_type === "start_conversation") return <div key={message.id || message.tempId} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
+          if (message.message_type === "start_conversation") return <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
           return (
-            <div key={message.id || message.tempId} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
+            <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
               {!message.isUser && <ChatAvatar name={agency.name} image={agency.image} className="h-7 w-7 !rounded-xl text-[10px]" />}
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[78%] ${message.isUser ? "rounded-br-sm bg-[#172b43] text-white" : "rounded-bl-sm border border-[#ece7df] bg-white text-[#34485c]"}`}>
                 {renderMessageContent(message)}
