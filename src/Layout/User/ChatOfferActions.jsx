@@ -17,7 +17,7 @@ export default function ChatOfferActions({ workflow }) {
   const amount = w.offer?.offered_budget;
   const price = amount !== null && amount !== undefined && Number.isFinite(Number(amount))
     ? new Intl.NumberFormat(i18n.language === "ru" ? "ru-RU" : "ro-RO", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(Number(amount)) : "—";
-  const contacts = w.status === "accepted" && w.isAgency && (w.offer?.status === "accepted") ? w.offer.tour_plan || w.plan : null;
+  const contacts = w.status === "accepted" && w.isAgency ? (w.offer?.tour_plan || w.plan) : null;
   const summary = <div className="rounded-xl border border-[#e9e6e0] bg-[#faf9f6] p-4 text-sm">
     <div className="flex flex-wrap items-start justify-between gap-2"><p className="min-w-0 break-words font-semibold">{w.plan?.location_to}</p><p className="font-bold text-[#9b701f]">{price}</p></div>
     <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs leading-5 text-[#617082]">

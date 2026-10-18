@@ -1,10 +1,22 @@
 export const getAcceptedChatOffer = (offers, chat, userId) => {
-  if (chat?.tour_plan_id == null || userId == null) return undefined;
-  return (Array.isArray(offers) ? offers : []).find((offer) =>
-    offer.status === "accepted" &&
-    String(offer.agency?.user) === String(userId) &&
-    String(offer.tour_plan?.id) === String(chat?.tour_plan_id),
-  );
+  if (!chat || userId == null) return undefined;
+  const tourPlanId = chat.tour_plan_id ?? chat.tour_plan?.id ?? chat.plan_id;
+  const chatId = chat.id;
+  return (Array.isArray(offers) ? offers : []).find((offer) => {
+    if (offer.status !== "accepted") return false;
+    const isAgencyMatch =
+      String(offer.agency?.user ?? offer.agency?.user_id ?? offer.agency?.id) === String(userId) ||
+      String(offer.agency) === String(userId);
+    if (!isAgencyMatch) return false;
+
+    if (tourPlanId != null && offer.tour_plan?.id != null) {
+      if (String(offer.tour_plan.id) === String(tourPlanId)) return true;
+    }
+    if (chatId != null && offer.room_id != null) {
+      if (String(offer.room_id) === String(chatId)) return true;
+    }
+    return false;
+  });
 };
 
 export const getOfferConversationPath = (offer, role) => {
