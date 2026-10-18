@@ -11,14 +11,13 @@ import {
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import {
-  useAcceptOfferMutation,
   useGetTourPlanPublicQuery,
-  useInviteToChatMutation,
   useOfferBudgetMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import TourPlanCard from "@/components/TourPlanCard";
 import { getOfferCount, hasAcceptedOffer } from "@/lib/tourPlan";
+import { getOfferConversationPath } from "@/lib/chatOffers";
 import TourPlanPopup from "./TourPlanpopup";
 
 const emptyFilters = {
@@ -47,8 +46,6 @@ const TourPlanDouble = () => {
 
   const { data, isLoading: isTourLoading, isError, refetch } = useGetTourPlanPublicQuery();
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] = useOfferBudgetMutation();
-  const [acceptOffer, { isLoading: isAcceptLoading }] = useAcceptOfferMutation();
-  const [invite] = useInviteToChatMutation();
   const { data: userData } = useShowUserInpormationQuery(undefined, { skip: !token });
 
   useEffect(() => {
@@ -209,38 +206,14 @@ const TourPlanDouble = () => {
     }
   };
 
-  const acceptOfferHandler = async (offerId, tourId) => {
+  const acceptOfferHandler = (offerId, tourId) => {
     if (!token) {
       toast.error(t("login_to_accept_offer"));
       navigate("/autentificare");
       return;
     }
-    try {
-      await acceptOffer(offerId).unwrap();
-      const accept = (tour) => tour.id === tourId
-        ? { ...tour, offers: (tour.offers || []).map((offer) => offer.id === offerId ? { ...offer, status: "accepted" } : offer) }
-        : tour;
-      setTours((current) => current.map(accept));
-      setSelectedTour((current) => current ? accept(current) : null);
-      toast.success(t("offer_accepted_success"));
-    } catch (error) {
-      toast.error(error?.data?.detail || t("failed_to_accept_offer"));
-    }
-  };
-
-  const handleMessage = async (payload) => {
-    if (!token) {
-      toast.error(t("login_to_send_message"));
-      navigate("/autentificare");
-      return;
-    }
-    try {
-      await invite(payload).unwrap();
-      toast.success(t("chat_initiated_success"));
-      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
-    } catch (error) {
-      toast.error(error?.data?.detail || t("failed_to_initiate_chat"));
-    }
+    const offer = tours.find((tour) => tour.id === tourId)?.offers?.find((item) => item.id === offerId);
+    navigate(getOfferConversationPath(offer, role));
   };
 
   return (
@@ -386,9 +359,7 @@ const TourPlanDouble = () => {
         <TourPlanPopup
           tour={selectedTour}
           onClose={() => setSelectedTour(null)}
-          handleMessage={handleMessage}
           handleAcceptOffer={acceptOfferHandler}
-          isAcceptLoading={isAcceptLoading}
           userData={userData}
           tourPlanPublicUser={tourPlanPublicUser}
           handleSubmitOffer={handleSubmitOffer}

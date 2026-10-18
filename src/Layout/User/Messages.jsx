@@ -3,7 +3,6 @@ import {
   SendIcon,
   ClockIcon,
   CheckIcon,
-  XIcon,
   PaperclipIcon,
   ArrowLeft,
   MoreVertical,
@@ -18,24 +17,23 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   useArchivedUserMutation,
-  useFinalOfferResponseMutation,
   useGetChatListQuery,
   useGetPlansQuery,
   useInviteToChatMutation,
   useMessageSentMutation,
-  useRejectOfferMutation,
   useShowMessagesQuery,
 } from "@/redux/features/withAuth";
 import { chat_sockit } from "@/assets/Socketurl";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import * as Dialog from "@radix-ui/react-dialog";
 import ChatAvatar from "./ChatAvatar";
-
+import ChatOfferActions from "./ChatOfferActions";
+import useChatOfferWorkflow from "@/hooks/useChatOfferWorkflow";
+import { getAcceptedChatOffer, getChatParticipantName } from "@/lib/chatOffers";
 
 const FILE_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://cool-haupia-b694eb.netlify.app";
+  import.meta.env.VITE_API_BASE_URL || "https://api.treioferte.md";
 
 const getSenderId = (sender) => {
   if (!sender) return null;
@@ -57,13 +55,11 @@ const parseMessageTimestamp = (ts) => {
     const trimmed = ts.trim();
     if (!trimmed) return new Date();
 
-    // If it's already an ISO string with Z or timezone offset (e.g. 2026-10-18T10:30:00Z or +03:00)
     if (trimmed.endsWith("Z") || /[+-]\d{2}(:\d{2})?$/.test(trimmed)) {
       const parsed = new Date(trimmed);
       if (!isNaN(parsed.getTime())) return parsed;
     }
 
-    // Time-only string (e.g. "14:30" or "14:30:00")
     if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(trimmed)) {
       const parts = trimmed.split(":");
       const now = new Date();
@@ -71,8 +67,6 @@ const parseMessageTimestamp = (ts) => {
       return now;
     }
 
-    // Date-time string without timezone indicator (e.g. "2026-10-18 10:30:00" or "2026-10-18T10:30:00")
-    // Database timestamps without explicit timezone indicator are UTC; append Z to convert to local browser time
     if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
       const isoUtc = trimmed.replace(" ", "T") + "Z";
       const parsedUtc = new Date(isoUtc);
@@ -122,10 +116,8 @@ function Messages() {
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
   const [archivedUser] = useArchivedUserMutation();
-  const [finalOfferResponse] = useFinalOfferResponseMutation();
   const [sentMessage] = useMessageSentMutation();
 
-  // Modified by takmim: Enable polling and window focus refetch for real-time message sync
   const {
     data: messagesData,
     isLoading: isMessagesLoading,
@@ -148,42 +140,14 @@ function Messages() {
     refetchOnReconnect: true,
   });
 
-  const [rejectOffer] = useRejectOfferMutation();
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
-  const [isAccepting, setIsAccepting] = useState(false);
-  const [isDeclining, setIsDeclining] = useState(false);
-  const [isOfferAcceptedLocally, setIsOfferAcceptedLocally] = useState(false);
-  const [isOfferDeclinedLocally, setIsOfferDeclinedLocally] = useState(false);
+  const currentChat = Array.isArray(chatList) ? chatList.find((chat) => String(chat.id) === id) : null;
+  const workflow = useChatOfferWorkflow({ chat: currentChat, chatId: id, planId: currentChat?.tour_plan_id || agency?.tour_plan_id, messages });
 
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
-  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-  const [selectedRejectReason, setSelectedRejectReason] = useState("");
-
-  const rejectReasons = [
-  { 
-    labelKey: "reject_reason_price_too_high",   // translation key
-    value: "Prezzo troppo alto"                 // backend-এ যাবে (italian fixed)
-  },
-  { 
-    labelKey: "reject_reason_offer_unclear",
-    value: "Offerta poco chiara"
-  },
-  { 
-    labelKey: "reject_reason_destination_unsuitable",
-    value: "Destinazione inadatta"
-  },
-  { 
-    labelKey: "reject_reason_only_evaluation",
-    value: "Solo valutazione"
-  },
-  { 
-    labelKey: "reject_reason_chose_another",
-    value: "Ho scelto un'altra proposta"
-  },
-];
 
   useEffect(() => {
     if (!agency && id && chatList && !isChatListLoading) {
@@ -216,7 +180,6 @@ function Messages() {
     id,
     chatList,
     isChatListLoading,
-    navigate,
     navigate,
     location.pathname,
     t,
@@ -253,73 +216,31 @@ function Messages() {
     pendingMessagesRef.current.clear();
     setNewMessage("");
     setMenuOpen(false);
-    setIsOfferAcceptedLocally(false);
-    setIsOfferDeclinedLocally(false);
-    // Purge any stale client-only deal flags from localStorage
-    try {
-      Object.keys(localStorage).forEach((key) => {
-        if (
-          key.startsWith("deal_accepted_") ||
-          key.startsWith("deal_declined_") ||
-          key.startsWith("final_offer_sent_")
-        ) {
-          localStorage.removeItem(key);
-        }
-      });
-    } catch {}
   }, [id]);
 
-  // Modified by takmim: Improved WebSocket handling with auto-reconnect and real-time state sync
   useEffect(() => {
     if (!id) return;
     let isMounted = true;
-    let reconnectTimeout = null;
-
+    let reconnectTimeout;
     const connectWebSocket = () => {
       if (!isMounted) return;
       try {
-        const chat_url = chat_sockit(id);
-        const ws = new WebSocket(chat_url);
+        const ws = new WebSocket(chat_sockit(id));
         wsRef.current = ws;
 
         ws.onopen = () => {
-          // Connected
           wsReconnectAttemptsRef.current = 0;
         };
 
         ws.onmessage = (event) => {
+          if (!isMounted) return;
           try {
-            // Trigger instant REST refetches for rock-solid sync
-            refetchMessages?.();
-            refetchChatList?.();
-
             const received = JSON.parse(event.data);
+            refetchMessages();
+            refetchChatList();
+            if (received.type !== "chat_message") return;
+
             const inner = received.message || received.data || received;
-            if (!inner || typeof inner !== "object") return;
-
-            if (
-              inner.is_accepted === true ||
-              inner.deal_status === true ||
-              inner.type === "offer_accepted" ||
-              inner.message_type === "offer_accepted" ||
-              inner.message_type === "final_offer_accepted"
-            ) {
-              setIsOfferAcceptedLocally(true);
-              setIsOfferDeclinedLocally(false);
-            } else if (
-              inner.is_accepted === false ||
-              inner.deal_status === "declined" ||
-              inner.deal_status === "rejected" ||
-              inner.type === "offer_declined" ||
-              inner.type === "offer_rejected" ||
-              inner.message_type === "offer_declined" ||
-              inner.message_type === "offer_rejected" ||
-              inner.message_type === "final_offer_declined"
-            ) {
-              setIsOfferDeclinedLocally(true);
-              setIsOfferAcceptedLocally(false);
-            }
-
             let messageType = "text";
             if (inner.file || inner.file_url) messageType = "file";
             else if (inner.message_type) messageType = inner.message_type;
@@ -331,7 +252,7 @@ function Messages() {
             const isUser = String(senderId) === String(userId);
 
             const serverMessage = {
-              id: inner.id || Date.now(),
+              id: inner.id,
               message_type: messageType,
               text: inner.text || null,
               data: inner.data || null,
@@ -343,6 +264,7 @@ function Messages() {
                     ? inner.file || inner.file_url
                     : `${FILE_BASE_URL}${inner.file || inner.file_url}`
                   : null,
+              senderUserId: inner.sender?.user_id,
               isUser,
               timestamp: parseMessageTimestamp(inner.timestamp),
               is_read: inner.is_read || false,
@@ -371,6 +293,8 @@ function Messages() {
                       ? {
                           ...msg,
                           id: serverMessage.id,
+                          file: serverMessage.file || msg.file,
+                          senderUserId: serverMessage.senderUserId,
                           status: "sent",
                           tempId: undefined,
                         }
@@ -395,6 +319,8 @@ function Messages() {
                       ? {
                           ...msg,
                           id: serverMessage.id,
+                          file: serverMessage.file || msg.file,
+                          senderUserId: serverMessage.senderUserId,
                           status: "sent",
                           tempId: undefined,
                         }
@@ -412,13 +338,10 @@ function Messages() {
           }
         };
 
-        ws.onerror = (err) => {
-          console.warn("WebSocket error:", err);
-        };
+        ws.onerror = (err) => console.warn("WebSocket error:", err);
 
         ws.onclose = () => {
           if (!isMounted) return;
-          // Graceful backoff for reconnect (2.5s -> 3.75s -> 5.6s -> max 15s)
           wsReconnectAttemptsRef.current = Math.min((wsReconnectAttemptsRef.current || 0) + 1, 5);
           const delay = Math.min(2500 * Math.pow(1.5, wsReconnectAttemptsRef.current - 1), 15000);
           reconnectTimeout = setTimeout(connectWebSocket, delay);
@@ -433,11 +356,9 @@ function Messages() {
 
     return () => {
       isMounted = false;
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+      clearTimeout(reconnectTimeout);
+      wsRef.current?.close();
+      wsRef.current = null;
     };
   }, [id, userId, refetchMessages, refetchChatList]);
 
@@ -466,6 +387,7 @@ function Messages() {
                 ? msg.file || msg.file_url
                 : `${FILE_BASE_URL}${msg.file || msg.file_url}`
               : null,
+          senderUserId: msg.sender?.user_id,
           isUser: String(senderId) === String(userId),
           timestamp: parseMessageTimestamp(msg.timestamp),
           is_read: msg.is_read,
@@ -512,7 +434,6 @@ function Messages() {
           (a, b) => a.timestamp - b.timestamp,
         );
 
-        // Avoid re-renders and scroll jumps when polling returns unchanged data
         if (
           prev.length === nextList.length &&
           prev.every(
@@ -562,10 +483,10 @@ function Messages() {
   }, [newMessage, isMessagesLoading, agency]);
 
   const handleFileChange = async (e) => {
-    if (isDealDeclined) return;
+    if (!isChatActive) return;
     const file = e.target.files[0];
+    const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
     if (file) {
-      const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
       if (!activePlanId) {
         alert(t("select_tour_plan_first"));
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -575,7 +496,7 @@ function Messages() {
       const tempId = uuidv4();
       const messageId = uuidv4();
       const tourPlan = dropdownOptions.find(
-        (opt) => opt.value === (selectedDropdown || activePlanId),
+        (opt) => String(opt.value) === String(activePlanId),
       );
 
       const filePreviewUrl = URL.createObjectURL(file);
@@ -638,8 +559,8 @@ function Messages() {
           );
         });
         pendingMessagesRef.current.delete(tempId);
-        refetchMessages?.();
-        refetchChatList?.();
+        refetchMessages();
+        refetchChatList();
       } catch (error) {
         console.error("Failed to send file message:", error);
         toast.error(t("failed_send_file"));
@@ -658,8 +579,7 @@ function Messages() {
   };
 
   const handleSendMessage = async () => {
-    if (isDealDeclined) return;
-    if (newMessage.trim() === "" || isSending) return;
+    if (!isChatActive || newMessage.trim() === "" || isSending) return;
     const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
     if (!activePlanId) {
       alert(t("select_tour_plan_first"));
@@ -672,7 +592,7 @@ function Messages() {
     const tempId = uuidv4();
     const messageId = uuidv4();
     const tourPlan = dropdownOptions.find(
-      (opt) => opt.value === (selectedDropdown || activePlanId),
+      (opt) => String(opt.value) === String(activePlanId),
     );
 
     const localMessage = {
@@ -720,8 +640,8 @@ function Messages() {
         );
       });
       pendingMessagesRef.current.delete(tempId);
-      refetchMessages?.();
-      refetchChatList?.();
+      refetchMessages();
+      refetchChatList();
     } catch (error) {
       console.error("Failed to send text message:", error);
       toast.error(t("failed_send_text"));
@@ -736,48 +656,7 @@ function Messages() {
     inputRef.current?.focus();
   };
 
-  const handleAcceptFinalOffer = async () => {
-    setIsAccepting(true);
-    try {
-      await finalOfferResponse({
-        id: Number(id),
-        data: { is_accepted: true },
-      }).unwrap();
-      setIsOfferAcceptedLocally(true);
-      setIsOfferDeclinedLocally(false);
-      refetchMessages?.();
-      refetchChatList?.();
-      toast.success(t("final_offer_accepted"));
-    } catch (error) {
-      console.error("Failed to accept final offer:", error);
-      toast.error(t("failed_accept_offer"));
-    } finally {
-      setIsAccepting(false);
-    }
-  };
-
-  const handleDeclineFinalOffer = async () => {
-    setIsDeclining(true);
-    try {
-      await finalOfferResponse({
-        id: Number(id),
-        data: { is_accepted: false },
-      }).unwrap();
-      setIsOfferDeclinedLocally(true);
-      setIsOfferAcceptedLocally(false);
-      refetchMessages?.();
-      refetchChatList?.();
-      toast.success(t("final_offer_declined"));
-    } catch (error) {
-      console.error("Failed to decline final offer:", error);
-      toast.error(t("failed_decline_offer"));
-    } finally {
-      setIsDeclining(false);
-    }
-  };
-
   const handleKeyPress = (e) => {
-    if (isDealDeclined) return;
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSendMessage();
@@ -828,8 +707,8 @@ function Messages() {
       });
       if (message.file?.startsWith("blob:")) URL.revokeObjectURL(message.file);
       pendingMessagesRef.current.delete(tempId);
-      refetchMessages?.();
-      refetchChatList?.();
+      refetchMessages();
+      refetchChatList();
     } catch (error) {
       console.error("Failed to retry message:", error);
       toast.error(t("failed_retry_message"));
@@ -850,7 +729,7 @@ function Messages() {
     setSelectedDropdown(selectedId);
     if (selectedId) {
       try {
-        const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
+        const tourPlan = dropdownOptions.find((opt) => String(opt.value) === String(selectedId));
         const messageId = uuidv4();
         const tempId = uuidv4();
         const messageText = t("conversation_started", {
@@ -930,7 +809,6 @@ function Messages() {
       return;
     }
     navigate(`/cereri/${agency.tour_plan_id}`);
-
   };
 
   const handleArchiveConversation = async () => {
@@ -1007,7 +885,6 @@ function Messages() {
         </>
       );
     }
-
     if (
       message.message_type === "final_offer_sent" ||
       message.message_type === "offer"
@@ -1046,142 +923,10 @@ function Messages() {
   };
 
   const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
-  const currentChat = chatList?.find((chat) => chat.id?.toString() === id);
-
-  const isAgencyRoute = location.pathname.startsWith("/agentie/");
-  const isTouristRoute = location.pathname.startsWith("/cont/");
-
-  const isAgencyRole =
-    isAgencyRoute ||
-    (!isTouristRoute && localStorage.getItem("role") === "agency");
-
-  const isDealAccepted =
-    isOfferAcceptedLocally ||
-    currentChat?.deal_status === true ||
-    currentChat?.deal_status === "true" ||
-    currentChat?.deal_status === "accepted" ||
-    currentChat?.deal_status === "confirmed" ||
-    currentChat?.deal_status === "completed" ||
-    currentChat?.deal_status === 1 ||
-    currentChat?.final_offer_response === true ||
-    currentChat?.final_offer_response === "true" ||
-    currentChat?.final_offer_response === "accepted" ||
-    currentChat?.final_offer_response === "Accepted" ||
-    currentChat?.offer_status === "accepted" ||
-    currentChat?.offer_status === "Accepted" ||
-    currentChat?.offer_status === "approved" ||
-    currentChat?.offer_status === "Approved" ||
-    currentChat?.offer_status === true ||
-    currentChat?.is_accepted === true ||
-    currentChat?.is_accepted === "true" ||
-    currentChat?.status === "accepted" ||
-    messagesData?.deal_status === true ||
-    messagesData?.deal_status === "true" ||
-    messagesData?.deal_status === "accepted" ||
-    messagesData?.deal_status === "confirmed" ||
-    messagesData?.deal_status === "completed" ||
-    messagesData?.deal_status === 1 ||
-    messagesData?.conversation?.deal_status === true ||
-    messagesData?.conversation?.deal_status === "true" ||
-    messagesData?.conversation?.deal_status === "accepted" ||
-    messagesData?.conversation?.deal_status === "confirmed" ||
-    messagesData?.conversation?.deal_status === "completed" ||
-    messagesData?.conversation?.deal_status === 1 ||
-    messagesData?.is_accepted === true ||
-    messagesData?.is_accepted === "true" ||
-    messagesData?.conversation?.is_accepted === true ||
-    messagesData?.conversation?.is_accepted === "true" ||
-    messagesData?.final_offer_response === true ||
-    messagesData?.final_offer_response === "true" ||
-    messagesData?.final_offer_response === "accepted" ||
-    messagesData?.conversation?.final_offer_response === true ||
-    messagesData?.conversation?.final_offer_response === "true" ||
-    messagesData?.conversation?.final_offer_response === "accepted" ||
-    messagesData?.conversation?.offer_status === "accepted" ||
-    messagesData?.conversation?.status === "accepted" ||
-    messages.some(
-      (m) =>
-        m.message_type === "offer_accepted" ||
-        m.message_type === "final_offer_accepted" ||
-        (m.message_type === "final_offer_sent" && (m.data?.is_accepted === true || m.is_accepted === true))
-    );
-
-  // An offer is declined when explicitly rejected or marked declined in backend
-  const isDealDeclined =
-    !isDealAccepted &&
-    !isOfferAcceptedLocally &&
-    (isOfferDeclinedLocally ||
-      currentChat?.final_offer_response === "declined" ||
-      currentChat?.final_offer_response === "rejected" ||
-      currentChat?.final_offer_response === "refused" ||
-      currentChat?.offer_status === "declined" ||
-      currentChat?.offer_status === "rejected" ||
-      currentChat?.offer_status === "refused" ||
-      currentChat?.deal_status === "declined" ||
-      currentChat?.deal_status === "rejected" ||
-      currentChat?.deal_status === "refused" ||
-      currentChat?.status === "declined" ||
-      currentChat?.status === "rejected" ||
-      currentChat?.status === "refused" ||
-      messagesData?.deal_status === "declined" ||
-      messagesData?.deal_status === "rejected" ||
-      messagesData?.deal_status === "refused" ||
-      messagesData?.conversation?.deal_status === "declined" ||
-      messagesData?.conversation?.deal_status === "rejected" ||
-      messagesData?.conversation?.deal_status === "refused" ||
-      messagesData?.final_offer_response === "declined" ||
-      messagesData?.final_offer_response === "rejected" ||
-      messagesData?.final_offer_response === "refused" ||
-      messagesData?.conversation?.final_offer_response === "declined" ||
-      messagesData?.conversation?.final_offer_response === "rejected" ||
-      messagesData?.conversation?.final_offer_response === "refused" ||
-      messagesData?.conversation?.offer_status === "declined" ||
-      messagesData?.conversation?.offer_status === "rejected" ||
-      messagesData?.conversation?.status === "declined" ||
-      messagesData?.conversation?.status === "rejected" ||
-      messages.some(
-        (m) =>
-          m.message_type === "offer_declined" ||
-          m.message_type === "offer_rejected" ||
-          m.message_type === "final_offer_declined" ||
-          (m.message_type === "final_offer_sent" && (m.data?.is_accepted === false || m.is_accepted === false))
-      ));
-
-  const isDealFinalized = isDealAccepted || isDealDeclined;
-
-  const isFinalOfferSent =
-    !isDealFinalized &&
-    (currentChat?.final_offer_sent === true ||
-      currentChat?.final_offer_sent === "true" ||
-      currentChat?.final_offer_sent === 1 ||
-      currentChat?.final_offer_sent === "sent" ||
-      messagesData?.final_offer_sent === true ||
-      messagesData?.final_offer_sent === "true" ||
-      messagesData?.conversation?.final_offer_sent === true ||
-      messages.some(
-        (m) =>
-          m.message_type === "final_offer_sent" ||
-          m.message_type === "final_offer" ||
-          m.message_type === "offer"
-      ) ||
-      currentChat?.is_final === true ||
-      currentChat?.has_final_offer === true);
-
-  // Active chat state: Chat is active unless explicitly declined or archived
-  const isChatActive =
-    !isDealDeclined &&
-    !isConversationArchived &&
-    currentChat?.is_active !== false &&
-    messagesData?.conversation?.is_active !== false;
-
-  // Modified by takmim: Hide reject offer options if the offer is already accepted or finalized
-  const canRejectOffer =
-    !isAgencyRoute &&
-    !isDealFinalized &&
-    !isDealAccepted &&
-    !isDealDeclined &&
-    !currentChat?.deal_status &&
-    (currentChat?.is_active !== false && currentChat?.active !== false);
+  const canRejectOffer = workflow.canDecide;
+  const isChatActive = workflow.status !== "rejected" && !isConversationArchived && currentChat?.is_active !== false && messagesData?.conversation?.is_active !== false;
+  const participantName = workflow.isAgency ? getChatParticipantName(currentChat, workflow.role, workflow.acceptedOffers, userId, t) : agency?.name;
+  const participantImage = workflow.isAgency && !getAcceptedChatOffer(workflow.acceptedOffers, currentChat, userId) ? null : agency?.image;
   const isLoading = isMessagesLoading || (isChatListLoading && !agency);
   const hasError = messagesError || (!agency && !isChatListLoading);
 
@@ -1200,14 +945,14 @@ function Messages() {
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-3 border-b border-[#eeeae3] bg-white px-3 py-4 sm:px-5">
         <div className="order-1 flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button type="button" onClick={() => navigate(basePath)} aria-label={t("chat_back")} className="chat-icon-button md:hidden"><ArrowLeft size={20} /></button>
-          <ChatAvatar name={agency.name} image={agency.image} active={currentChat?.active} className="h-10 w-10" />
+          <ChatAvatar name={participantName} image={participantImage} active={currentChat?.active} className="h-10 w-10" />
           <div className="min-w-0">
-            <h2 className="flex items-center gap-1.5 text-sm font-semibold sm:text-base"><span className="truncate">{agency.name}</span>{currentChat?.tourist_is_verified && <BadgeCheck size={16} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}</h2>
-            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency.tour_plan_title}</p>
+            <h2 className="flex items-center gap-1.5 text-sm font-semibold sm:text-base"><span className="truncate">{participantName}</span>{currentChat?.tourist_is_verified && <BadgeCheck size={16} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}</h2>
+            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency?.tour_plan_title || currentChat?.tour_plan_title}</p>
           </div>
         </div>
         {canRejectOffer && (
-          <button type="button" onClick={() => { setMenuOpen(false); setIsRejectModalOpen(true); }} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
+          <button type="button" onClick={workflow.openRejectModal} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
             <XIcon size={16} className="shrink-0" aria-hidden="true" />{t("reject_offer")}
           </button>
         )}
@@ -1217,41 +962,11 @@ function Messages() {
             <div id="chat-actions" onKeyDown={e => { if (e.key === "Escape") setMenuOpen(false); }} className="absolute right-0 top-full z-20 mt-2 w-56 rounded-2xl border border-[#e9e6e0] bg-white p-1.5 shadow-xl">
               <button type="button" className="chat-menu-item" onClick={handleViewDetails}><FileText size={17} className="shrink-0 text-[#b88424]" />{t("view_tour_details")}</button>
               <button type="button" className="chat-menu-item" onClick={handleArchiveConversation}>{isConversationArchived ? <ArchiveRestore size={17} className="shrink-0 text-[#b88424]" /> : <Archive size={17} className="shrink-0 text-[#b88424]" />}{isConversationArchived ? t("unarchive_conversation") : t("archive_conversation")}</button>
-              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={() => { setMenuOpen(false); setIsRejectModalOpen(true); }}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
+              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={workflow.openRejectModal}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
             </div>
           )}
         </div>
       </header>
-
-      <Dialog.Root open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[80] bg-[#172b43]/45 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-[81] max-h-[90dvh] w-[calc(100%-32px)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[24px] border border-[#e9e6e0] bg-white p-6 text-[#172b43] shadow-2xl">
-            <Dialog.Title className="pr-8 text-xl font-semibold">{t("reject_reason_title")}</Dialog.Title>
-            <Dialog.Description className="sr-only">{t("reject_offer")}</Dialog.Description>
-            <Dialog.Close className="chat-icon-button absolute right-4 top-4" aria-label={t("close")}><XIcon size={18} /></Dialog.Close>
-            <div className="mt-5 space-y-2">
-              {rejectReasons.map(reason => <label key={reason.value} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 text-sm ${selectedRejectReason === reason.value ? "border-[#d9b571] bg-[#fbf6ec]" : "border-[#e9e6e0]"}`}><input type="radio" name="reject_reason" value={reason.value} checked={selectedRejectReason === reason.value} onChange={() => setSelectedRejectReason(reason.value)} className="shrink-0 accent-[#b88424]" /><span>{t(reason.labelKey)}</span></label>)}
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <Dialog.Close className="rounded-xl border border-[#e9e6e0] px-4 py-2.5 text-sm font-semibold">{t("cancel")}</Dialog.Close>
-              <button type="button" disabled={!selectedRejectReason} className="rounded-xl bg-[#dd9e2c] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50" onClick={async () => {
-                if (!selectedRejectReason) return;
-                try { await rejectOffer({ id: currentChat.offer_id, data: { reason: selectedRejectReason } }).unwrap(); }
-                catch { toast.error(t("failed_reject_offer")); return; }
-                try {
-                  await finalOfferResponse({ id: Number(id), data: { is_accepted: false, reason: selectedRejectReason } }).unwrap();
-                  setIsOfferDeclinedLocally(true);
-                  setIsOfferAcceptedLocally(false);
-                  refetchMessages?.();
-                  refetchChatList?.();
-                  toast.success(t("offer_rejected")); setIsRejectModalOpen(false);
-                } catch { toast.error(t("failed_final_offer_response")); }
-              }}>{t("chat_send")}</button>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
 
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-3 py-5 sm:px-6 sm:py-6" aria-label={t("messages")}>
         {messages.length === 0 && <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-[#77818e]"><MessagesSquare size={30} className="text-[#c8b38d]" />{t("no_messages")}</div>}
@@ -1271,7 +986,7 @@ function Messages() {
           if (message.message_type === "start_conversation") return <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
           return (
             <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
-              {!message.isUser && <ChatAvatar name={agency.name} image={agency.image} className="h-7 w-7 !rounded-xl text-[10px]" />}
+              {!message.isUser && <ChatAvatar name={participantName} image={participantImage} className="h-7 w-7 !rounded-xl text-[10px]" />}
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[78%] ${message.isUser ? "rounded-br-sm bg-[#172b43] text-white" : "rounded-bl-sm border border-[#ece7df] bg-white text-[#34485c]"}`}>
                 {renderMessageContent(message)}
                 <div className={`mt-1.5 flex items-center justify-end gap-1.5 ${message.isUser ? "text-[#b9c5d2]" : "text-[#99a0a9]"}`}>
@@ -1287,105 +1002,19 @@ function Messages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {(isFinalOfferSent || isDealAccepted || isDealDeclined) && (
-        <div className="shrink-0 border-t border-[#eeeae3] bg-[#fbf6ec] px-3 py-3 sm:px-4 sm:py-3.5">
-          {isDealAccepted ? (
-            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-2.5 text-xs font-semibold text-[#166534] shadow-sm sm:text-sm">
-              <CheckIcon size={16} className="shrink-0 text-[#16a34a]" />
-              <span className="whitespace-nowrap">{t("final_offer_accepted")}</span>
-            </div>
-          ) : isDealDeclined ? (
-            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-2.5 text-xs font-semibold text-[#991b1b] shadow-sm sm:text-sm">
-              <XIcon size={16} className="shrink-0 text-[#dc2626]" />
-              <span className="whitespace-nowrap">{t("final_offer_declined")}</span>
-            </div>
-          ) : isAgencyRoute ? (
-            <div className="flex items-center justify-center gap-2 rounded-xl border border-[#ebd8b1] bg-[#fbf6ec] px-4 py-2.5 text-xs font-semibold text-[#9b701f] shadow-sm sm:text-sm">
-              <ClockIcon size={16} className="shrink-0 text-[#b88424]" />
-              <span className="whitespace-nowrap">{t("final_offer_sent")}</span>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                onClick={handleAcceptFinalOffer}
-                disabled={isAccepting || isDeclining}
-                className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-[#122235] active:scale-[0.99] disabled:opacity-50"
-              >
-                <CheckIcon size={16} className="shrink-0 text-[#2dd4bf]" />
-                <span className="whitespace-nowrap">{isAccepting ? t("accepting") : t("accept_final_offer")}</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleDeclineFinalOffer}
-                disabled={isAccepting || isDeclining}
-                className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#172b43] shadow-sm transition hover:bg-[#faf7f0] active:scale-[0.99] disabled:opacity-50"
-              >
-                <XIcon size={16} className="shrink-0 text-[#b54a40]" />
-                <span className="whitespace-nowrap">{isDeclining ? t("declining") : t("decline_final_offer")}</span>
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      <ChatOfferActions workflow={workflow} />
 
       {isChatActive ? (
         <div className="shrink-0 border-t border-[#eeeae3] bg-white p-3 sm:p-4">
           <div className="flex items-end gap-2 rounded-2xl border border-[#e4e7eb] bg-[#fafbfc] p-2 transition focus-within:border-[#c88f2a] focus-within:ring-2 focus-within:ring-[#c88f2a]/10">
-            <button
-              type="button"
-              aria-label={t("attachment")}
-              title={t("attachment")}
-              className="chat-icon-button shrink-0"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isDealDeclined}
-            >
-              <PaperclipIcon size={20} />
-            </button>
-            <input
-              type="file"
-              aria-label={t("attachment")}
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*,.pdf,.doc,.docx"
-              onChange={handleFileChange}
-            />
-            <textarea
-              rows={1}
-              aria-label={t("type_message_or_select_file")}
-              placeholder={t("type_message_or_select_file")}
-              className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none"
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyPress}
-              ref={inputRef}
-              disabled={isDealDeclined}
-            />
-            <button
-              type="button"
-              aria-label={t("chat_send")}
-              title={t("chat_send")}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]"
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim() || isSending || isDealDeclined}
-            >
-              {isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}
-            </button>
+            <button type="button" aria-label={t("attachment")} title={t("attachment")} className="chat-icon-button shrink-0" onClick={() => fileInputRef.current?.click()} disabled={!isChatActive}><PaperclipIcon size={20} /></button>
+            <input type="file" aria-label={t("attachment")} ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleFileChange} />
+            <textarea rows={1} aria-label={t("type_message_or_select_file")} placeholder={t("type_message_or_select_file")} className="chat-composer min-h-10 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-sm leading-5 outline-none" value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={handleKeyPress} ref={inputRef} disabled={!isChatActive} />
+            <button type="button" aria-label={t("chat_send")} title={t("chat_send")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#dd9e2c] text-white transition hover:bg-[#c68a22] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c88f2a] disabled:bg-[#eeebe5] disabled:text-[#b5b1a9]" onClick={handleSendMessage} disabled={!newMessage.trim() || isSending || !isChatActive}>{isSending ? <LoaderCircle size={18} className="animate-spin" /> : <SendIcon size={18} />}</button>
           </div>
         </div>
       ) : (
-        <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">
-          {isDealDeclined ? (
-            <span className="inline-flex items-center justify-center gap-1.5 font-medium text-[#b54a40]">
-              <XIcon size={15} className="shrink-0" />
-              {t("final_offer_declined")}
-            </span>
-          ) : isConversationArchived ? (
-            <span>{t("conversation_archived")}</span>
-          ) : (
-            <span>{t("conversation_inactive_message")}</span>
-          )}
-        </div>
+        <div className="shrink-0 border-t border-[#eeeae3] bg-white px-4 py-4 text-center text-xs leading-5 text-[#77818e]">{t(workflow.status === "rejected" ? "final_offer_declined" : isConversationArchived ? "conversation_archived" : "conversation_inactive_message")}</div>
       )}
     </div>
   );

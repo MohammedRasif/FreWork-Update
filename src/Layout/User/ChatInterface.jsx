@@ -1,9 +1,10 @@
-import { useGetChatListQuery } from "@/redux/features/withAuth";
+import { useGetChatListQuery, useGetAllacceptedOfferQuery } from "@/redux/features/withAuth";
 import { useState, useEffect } from "react";
 import { Search, BadgeCheck, MessagesSquare, Inbox, Archive, ArrowRight, LoaderCircle } from "lucide-react";
 import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ChatAvatar from "./ChatAvatar";
+import { getAcceptedChatOffer, getChatParticipantName } from "@/lib/chatOffers";
 
 export default function ChatInterface() {
   const { t } = useTranslation();
@@ -14,6 +15,9 @@ export default function ChatInterface() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem("activeChatTab") === "archived" ? "archived" : "inbox");
   const { data: chatList, isLoading, isError, refetch } = useGetChatListQuery(undefined, { pollingInterval: 3000 });
+  const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("user_id");
+  const { data: acceptedOffers } = useGetAllacceptedOfferQuery(undefined, { skip: role !== "agency", pollingInterval: 3000 });
 
   useEffect(() => { localStorage.setItem("activeChatTab", activeTab); }, [activeTab]);
 
@@ -29,8 +33,8 @@ export default function ChatInterface() {
 
   const chats = (Array.isArray(chatList) ? chatList : []).map(chat => ({
     id: String(chat.id),
-    name: chat.other_participant_name || t("unknown_user"),
-    image: chat.other_participant_image || null,
+    name: getChatParticipantName(chat, role, acceptedOffers, userId, t),
+    image: role === "agency" && !getAcceptedChatOffer(acceptedOffers, chat, userId) ? null : chat.other_participant_image || null,
     lastMessage: chat.last_message || null,
     unreadCount: chat.unread_count || 0,
     active: chat.active !== undefined ? chat.active : (chat.is_active !== undefined ? chat.is_active : true),
@@ -51,8 +55,8 @@ export default function ChatInterface() {
   ) {
     chats.unshift({
       id: String(urlChatId),
-      name: location.state.agency.name || t("unknown_user"),
-      image: location.state.agency.image || null,
+      name: role === "agency" ? getChatParticipantName({ ...location.state.agency, other_participant_name: location.state.agency.name }, role, acceptedOffers, userId, t) : location.state.agency.name || t("unknown_user"),
+      image: role === "agency" && !getAcceptedChatOffer(acceptedOffers, location.state.agency, userId) ? null : location.state.agency.image || null,
       lastMessage: null,
       unreadCount: 0,
       active: true,

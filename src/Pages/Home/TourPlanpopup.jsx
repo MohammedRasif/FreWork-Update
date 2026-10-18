@@ -6,9 +6,7 @@ import { useTranslation } from "react-i18next";
 const TourPlanPopup = ({
   tour,
   onClose,
-  handleMessage,
   handleAcceptOffer,
-  isAcceptLoading,
   userData,
   tourPlanPublicUser,
   handleSubmitOffer,
@@ -253,14 +251,9 @@ const TourPlanPopup = ({
                       {tour.user === userData?.user_id && (
                         <button
                           onClick={() => handleAcceptOffer(offer.id, tour.id)}
-                          disabled={isAcceptLoading}
-                          className={`px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md transition-colors ${
-                            isAcceptLoading
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-[#c88f2a] text-white hover:bg-[#ad751c]"
-                          }`}
+                          className="px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-md rounded-md bg-[#c88f2a] text-white transition-colors hover:bg-[#ad751c]"
                         >
-                          {t("accept")}
+                          {t("chat_offer_review_in_chat")}
                         </button>
                       )}
                     </div>

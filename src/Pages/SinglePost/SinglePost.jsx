@@ -1,8 +1,6 @@
 import {
   useGetOneDetailQuery,
   useOfferBudgetMutation,
-  useAcceptOfferMutation,
-  useInviteToChatMutation,
   useShowUserInpormationQuery,
 } from "@/redux/features/withAuth";
 import { useEffect, useState } from "react";
@@ -28,6 +26,7 @@ import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 import { useTranslation } from "react-i18next";
 import { localizedContent } from "@/lib/localizedContent";
+import { getOfferConversationPath } from "@/lib/chatOffers";
 
 function SinglePost({ prid }) {
   const navigate = useNavigate();
@@ -61,9 +60,6 @@ function SinglePost({ prid }) {
     useShowUserInpormationQuery(undefined, { skip: !localStorage.getItem("access_token") });
   const [offerBudgetToBack, { isLoading: isOfferBudgetLoading }] =
     useOfferBudgetMutation();
-  const [acceptOffer, { isLoading: isAcceptLoading }] =
-    useAcceptOfferMutation();
-  const [invite, { isLoading: isInviteLoading }] = useInviteToChatMutation();
   const [isOfferSubmitting, setIsOfferSubmitting] = useState(false);
 
   useEffect(() => {
@@ -223,46 +219,13 @@ function SinglePost({ prid }) {
     }
   };
 
-  const acceptOfferHandler = async (offerId) => {
-    if (!token) {
-      navigate("/autentificare");
-      toast.error(t("login_to_accept_offer"));
-      return;
-    }
-    try {
-      await acceptOffer(offerId).unwrap();
-      navigate(-1);
-      toast.success(t("offer_accepted_success"));
-    } catch (error) {
-      console.error("Failed to accept offer:", error);
-      toast.error(error.data?.detail || t("failed_to_accept_offer"));
-    }
-  };
-
-  const handleMessage = async (otherUserId) => {
+  const handleMessage = (offer) => {
     if (!token) {
       navigate("/autentificare");
       toast.error(t("login_to_send_message"));
       return;
     }
-    if (!otherUserId) {
-      toast.error(t("recipient_id_not_found"));
-      return;
-    }
-    if (String(otherUserId) === String(currentUserId)) {
-      toast.error(
-        t("cannot_message_yourself"),
-      );
-      return;
-    }
-    try {
-      await invite({ other_user_id: otherUserId }).unwrap();
-      toast.success(t("chat_initiated_success"));
-      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
-    } catch (error) {
-      console.error("Failed to initiate chat:", error);
-      toast.error(error.data?.detail || t("failed_to_initiate_chat"));
-    }
+    navigate(getOfferConversationPath(offer, role));
   };
 
   if (!isLocalStorageLoaded || isUserLoading || isPostLoading || (!postError && !postData.id)) {
@@ -496,7 +459,7 @@ function SinglePost({ prid }) {
             <div className="space-y-3">
               {tour.offers.filter((offer) => offer?.agency?.user && (userData.user_id === offer.agency.user || userData.user_id === tour.user)).slice(0, expandedOffers ? undefined : 3).map((offer) => <div key={offer.id} className="rounded-xl border border-[#e9e6e0] p-4">
                 <div className="flex items-start gap-3"><img src={offer.agency?.logo_url || "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1738133725/56832_cdztsw.png"} alt={`${offer.agency?.agency_name || t("unknown_agency")} logo`} className="h-10 w-10 shrink-0 rounded-full object-contain" /><div className="min-w-0 flex-1"><p className="font-semibold text-[#172b43]">{offer.agency?.agency_name || t("unknown_agency")}</p><p className="mt-1 break-words text-sm text-[#617082]">{offer.message}</p>{offer.file_name && <p className="mt-1 text-xs text-[#617082]">{t("file")}: {offer.file_name}</p>}{offer.apply_discount && Number(offer.discount) > 0 && <p className="mt-1 text-xs font-semibold text-[#397055]">{t("discount")}: {offer.discount}% {t("off")}</p>}</div></div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#edf0f2] pt-3"><strong className="text-lg text-[#172b43]">{formatBudget(offer.offered_budget)}</strong><div className="flex flex-wrap gap-2"><button type="button" onClick={() => handleMessage(offer.agency?.user)} disabled={isInviteLoading || isOfferBudgetLoading || isAcceptLoading || !offer.agency?.user} className="rounded-lg border border-[#d8e0e6] px-3 py-2 text-sm font-bold text-[#243b50] hover:bg-[#f1f5f7] disabled:opacity-50">{isInviteLoading ? t("sending") + "..." : t("message")}</button>{String(tour.user) === String(currentUserId) && <button type="button" onClick={() => acceptOfferHandler(offer.id)} disabled={isAcceptLoading} className="rounded-lg bg-[#c88f2a] px-3 py-2 text-sm font-bold text-white hover:bg-[#ad751c] disabled:opacity-50">{t("accept")}</button>}</div></div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#edf0f2] pt-3"><strong className="text-lg text-[#172b43]">{formatBudget(offer.offered_budget)}</strong><div className="flex flex-wrap gap-2"><button type="button" onClick={() => handleMessage(offer)} disabled={isOfferBudgetLoading || !offer.agency?.user} className="rounded-lg border border-[#d8e0e6] px-3 py-2 text-sm font-bold text-[#243b50] hover:bg-[#f1f5f7] disabled:opacity-50">{t("message")}</button>{String(tour.user) === String(currentUserId) && <button type="button" onClick={() => handleMessage(offer)} className="rounded-lg bg-[#c88f2a] px-3 py-2 text-sm font-bold text-white hover:bg-[#ad751c] disabled:opacity-50">{t("chat_offer_review_in_chat")}</button>}</div></div>
               </div>)}
               {tour.offers.length > 3 && <button type="button" onClick={() => setExpandedOffers(!expandedOffers)} className="text-sm font-semibold text-[#9b6b22] hover:underline">{expandedOffers ? t("see_less") : t("see_more")}</button>}
             </div>

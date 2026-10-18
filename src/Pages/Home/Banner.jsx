@@ -16,6 +16,22 @@ const heroBenefits = [
   { key: "feature_vehicles", icon: UserRoundCheck },
 ];
 
+const HeroBenefits = ({ mobile = false }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={mobile ? "mx-auto mt-7 grid max-w-7xl grid-cols-2 gap-x-4 gap-y-4 px-5 text-[#172b43] sm:hidden" : "mt-9 hidden max-w-[620px] gap-x-8 gap-y-4 sm:grid sm:grid-cols-2"}>
+      {heroBenefits.map(({ key, icon: Icon }) => (
+        <div key={key} className={`flex min-w-0 items-center ${mobile ? "gap-2 text-xs font-medium leading-5" : "gap-3 text-base font-medium leading-6 text-white/95"}`}>
+          <span className={`flex shrink-0 items-center justify-center rounded-full border border-[#f1e4c7] bg-[#fffdf7] text-[#172b43] shadow-[0_6px_18px_rgba(8,22,38,0.15)] ${mobile ? "h-10 w-10" : "h-14 w-14"}`}>
+            <Icon size={28} strokeWidth={1.8} className={`${mobile ? "h-5 w-5" : "h-7 w-7"} [&_path:last-child]:stroke-[#c88f2a] [&_rect]:stroke-[#c88f2a]`} aria-hidden="true" />
+          </span>
+          <span className="min-w-0 break-words">{t(key)}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const readPendingPlan = () => {
   try {
     const saved = localStorage.getItem("pendingPlan");
@@ -143,13 +159,13 @@ const handleButtonClick = () => {
         </picture>
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#101f32]/95 via-[#14263c]/80 to-[#14263c]/15" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#101f32]/75 via-transparent to-transparent" />
-        <div className={`relative mx-auto max-w-7xl px-5 pt-20 sm:px-8 sm:pt-24 lg:px-10 lg:pt-28 ${showCreateRequestButton ? "pb-36 sm:pb-40" : "pb-24"}`}>
+        <div className={`relative mx-auto max-w-7xl px-5 pt-7 sm:px-8 sm:pt-24 lg:px-10 lg:pt-28 ${showCreateRequestButton ? "pb-16 sm:pb-40" : "pb-8 sm:pb-24"}`}>
           <div className="max-w-[690px]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold tracking-wide text-white backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm">
               <Clock3 size={16} aria-hidden="true" />
               <span>{t("response_time")}</span>
             </div>
-            <h1 className="mt-7 max-w-[680px] text-[clamp(2.4rem,4.5vw,4.1rem)] font-extrabold leading-[1.1] tracking-[-0.035em] text-balance text-white">
+            <h1 className="mt-5 max-w-[680px] text-[clamp(1.75rem,7.8vw,2.15rem)] font-extrabold leading-[1.12] tracking-[-0.035em] text-balance text-white sm:mt-7 sm:text-[clamp(2.4rem,4.5vw,4.1rem)] sm:leading-[1.1]">
               <Trans
                 i18nKey="banner_slogan"
                 components={{
@@ -158,32 +174,23 @@ const handleButtonClick = () => {
                 }}
               />
             </h1>
-            <p className="mt-6 max-w-[565px] text-base leading-7 text-white/90 sm:text-xl sm:leading-8">
+            <p className="mt-4 max-w-[565px] text-[15px] leading-[22px] text-white/90 sm:mt-6 sm:text-xl sm:leading-8">
               {t("show_short_descriptionn")}
             </p>
-            <div className="mt-9 grid max-w-[620px] gap-x-8 gap-y-4 sm:grid-cols-2">
-              {heroBenefits.map(({ key, icon: Icon }) => (
-                <div key={key} className="flex min-w-0 items-center gap-3 text-sm font-medium leading-6 text-white/95 sm:text-base">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#f1e4c7] bg-[#fffdf7] text-[#172b43] shadow-[0_6px_18px_rgba(8,22,38,0.15)] sm:h-14 sm:w-14">
-                    <Icon size={28} strokeWidth={1.8} className="h-6 w-6 sm:h-7 sm:w-7 [&_path:last-child]:stroke-[#c88f2a] [&_rect]:stroke-[#c88f2a]" aria-hidden="true" />
-                  </span>
-                  <span>{t(key)}</span>
-                </div>
-              ))}
-            </div>
+            <HeroBenefits />
           </div>
         </div>
       </section>
 
       {showCreateRequestButton && (
-        <div className="relative z-10 mx-auto -mt-20 max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="rounded-[24px] border border-[#eee7dc] bg-white p-5 shadow-[0_18px_55px_rgba(18,36,58,0.14)] sm:p-7 lg:p-8">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-7">
+        <div className="relative z-10 mx-auto -mt-12 max-w-7xl px-5 sm:-mt-20 sm:px-8 lg:px-10">
+          <div className="rounded-[24px] border border-[#eee7dc] bg-white p-4 shadow-[0_18px_55px_rgba(18,36,58,0.14)] sm:p-7 lg:p-8">
+            <div className="grid gap-3 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-7">
               <div className="min-w-0">
-                <label htmlFor="home-destination" className="mb-3 block text-sm font-bold uppercase tracking-[0.11em] text-[#24364b]">
+                <label htmlFor="home-destination" className="mb-2 block text-xs font-bold uppercase tracking-[0.11em] text-[#24364b] sm:mb-3 sm:text-sm">
                   {t("create_request")}
                 </label>
-                <div className="flex h-[58px] items-center gap-3 rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 transition-colors focus-within:border-[#bd8525] focus-within:ring-2 focus-within:ring-[#e5ad42]/20">
+                <div className="flex h-12 items-center gap-3 rounded-xl border border-[#dce2e8] bg-[#fafbfc] px-4 transition-colors focus-within:border-[#bd8525] focus-within:ring-2 focus-within:ring-[#e5ad42]/20 sm:h-[58px]">
                   <MapPin size={20} className="shrink-0 text-[#c18a2c]" aria-hidden="true" />
                   <input
                     id="home-destination"
@@ -199,18 +206,20 @@ const handleButtonClick = () => {
               <button
                 type="button"
                 onClick={handleButtonClick}
-                className="h-[58px] w-full rounded-xl bg-[#c88f2a] px-8 text-base font-bold text-white shadow-[0_8px_20px_rgba(173,116,20,0.24)] transition-colors hover:bg-[#ad751c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9e6c20] lg:w-auto"
+                className="h-12 w-full rounded-xl bg-[#c88f2a] px-5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(173,116,20,0.24)] transition-colors hover:bg-[#ad751c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9e6c20] sm:h-[58px] sm:px-8 sm:text-base lg:w-auto"
               >
                 {t("create_request")}
               </button>
             </div>
-            <div className="mt-4 flex flex-col gap-2 text-xs font-medium leading-5 text-[#657184] sm:flex-row sm:gap-7 sm:text-sm">
+            <div className="mt-3 flex flex-col gap-1.5 text-xs font-medium leading-5 text-[#657184] sm:mt-4 sm:flex-row sm:gap-7 sm:text-sm">
               <span className="flex items-start gap-2"><Clock3 size={15} className="mt-0.5 shrink-0 text-[#b98328]" aria-hidden="true" />{t("time_info")}</span>
               <span className="flex items-start gap-2"><LockKeyhole size={15} className="mt-0.5 shrink-0 text-[#b98328]" aria-hidden="true" />{t("privacy_info")}</span>
             </div>
           </div>
         </div>
       )}
+
+      <HeroBenefits mobile />
 
       {/* Modified by takmim: Smooth modal open without white flash/flicker */}
       <AnimatePresence>

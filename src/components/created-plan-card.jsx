@@ -27,7 +27,6 @@ import {
 import { Overlay } from "@radix-ui/react-dialog";
 import {
   useDeletePlanMutation,
-  useInviteToChatMutation,
   useUpdatePlanMutation,
 } from "@/redux/features/withAuth";
 import { Link, useNavigate } from "react-router-dom";
@@ -46,40 +45,24 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n.js";
 import { localizedContent } from "@/lib/localizedContent";
+import { getOfferConversationPath } from "@/lib/chatOffers";
 
 
 export default function CreatedPlanCard({ plan, setCreatedPlans }) {
   const { t } = useTranslation();
   const [updatePlan, { isLoading: updateLoading }] = useUpdatePlanMutation();
   const [deletePlan, { isLoading: deleteLoading }] = useDeletePlanMutation();
-  const [invite, { isLoading: isInviteLoading, isError: isInviteError }] =
-    useInviteToChatMutation();
   const navigate = useNavigate();
   const token = localStorage.getItem("access_token");
   const role = localStorage.getItem("role");
   const currentUserId = parseInt(localStorage.getItem("user_id"));
 
-  const handleMessage = async (offer) => {
+  const handleMessage = (offer) => {
     if (!token) {
       navigate("/autentificare");
       return;
     }
-
-    const otherUserId = offer?.agency?.user;
-
-    if (!otherUserId) {
-      toast.error(t("recipient_id_not_found"));
-      return;
-    }
-
-    try {
-      await invite({ other_user_id: otherUserId });
-      toast.success(t("chat_invitation_sent"));
-      navigate(role === "tourist" ? "/cont/mesaje" : "/agentie/mesaje");
-    } catch (error) {
-      console.error("Invite error:", error);
-      toast.error(t("failed_to_send_chat"));
-    }
+    navigate(getOfferConversationPath(offer, role));
   };
 
   // Modified by takmim: Pass slug for updatePlan and deletePlan
@@ -408,7 +391,6 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                             <button
                               onClick={() => handleMessage(offer)}
                               className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-[#DD9E2C] to-[#C2851C] cursor-pointer text-white rounded-full hover:bg-[#C2851C] transition"
-                              disabled={isInviteLoading}
                             >
                               <MessageSquare size={16} /> {t("message")}
                             </button>

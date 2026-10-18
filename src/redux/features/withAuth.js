@@ -379,7 +379,7 @@ export const sqQuery = createApi({
         url: `final-offer/${id}/`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Offer", "Chat", "SentMessages"],
+      invalidatesTags: ["Offer", "Chat", "TourPlan", "SentMessages"],
     }),
 
     // final offer response
@@ -389,7 +389,7 @@ export const sqQuery = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["final_confrimation", "Chat", "SentMessages", "Offer"],
+      invalidatesTags: ["final_confrimation", "Chat", "Offer", "TourPlan", "AcceptedOffer", "SentMessages"],
     }),
 
     // Modified by takmim: Invalidate SentMessages and Chat so messages and chat list update immediately
@@ -401,6 +401,7 @@ export const sqQuery = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "SentMessages", id },
+        "SentMessage",
         "SentMessages",
         "Chat",
       ],

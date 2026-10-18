@@ -49,6 +49,7 @@ export default function TourPlanDetails({ id, closeModal }) {
 
   const offer =
     tourData.offers && tourData.offers.length > 0 ? tourData.offers[0] : null;
+  const canViewContacts = localStorage.getItem("role") !== "agency" || tourData.offers?.some((item) => item.status === "accepted" && String(item.agency?.user) === localStorage.getItem("user_id"));
 
   return (
     <div className="w-full mx-auto sm:p-6">
@@ -80,7 +81,7 @@ export default function TourPlanDetails({ id, closeModal }) {
             {t("tour_to")} {tourData.location_to}
           </h2>
           <p className="text-sm text-gray-500 mb-4">
-            {t("posted_by")} {t("user")} {tourData.name} ·{" "}
+            {t("posted_by")} {canViewContacts ? tourData.name || t("user") : t("chat_private_traveller")} ·{" "}
             {new Date(
               tourData.offers?.[0]?.tour_plan?.created_at || Date.now()
             ).toLocaleDateString(i18n.language === "ro" ? "ro-RO" : "ru-RU")}
@@ -126,17 +127,17 @@ export default function TourPlanDetails({ id, closeModal }) {
                   <strong>{t("description")}:</strong>{" "}
                   {tourData.description || t("no_description")}
                 </p>
-                <p className="pt-5">
+                {canViewContacts && <p className="pt-5">
                   <strong>{t("email") || t("email_address_label")}:</strong>{" "}
                   {tourData.email || t("not_provided")}
-                </p>
+                </p>}
               </div>
-              <div className="flex items-center justify-between">
+              {canViewContacts && <div className="flex items-center justify-between">
                 <p>
                   <strong>{t("phone")}:</strong>{" "}
                   {tourData.phone_number || t("not_provided")}
                 </p>
-              </div>
+              </div>}
             </div>
           </div>
 
