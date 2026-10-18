@@ -144,7 +144,9 @@ function Messages() {
 
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const currentChat = Array.isArray(chatList) ? chatList.find((chat) => String(chat.id) === id) : null;
-  const workflow = useChatOfferWorkflow({ chat: currentChat, chatId: id, planId: currentChat?.tour_plan_id || agency?.tour_plan_id, messages });
+  const effectiveChat = currentChat || (agency && String(agency.id) === String(id) ? agency : null);
+  const effectivePlanId = effectiveChat?.tour_plan_id || effectiveChat?.plan_id || effectiveChat?.tour_plan?.id || agency?.tour_plan_id || null;
+  const workflow = useChatOfferWorkflow({ chat: effectiveChat, chatId: id, planId: effectivePlanId, messages });
 
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
