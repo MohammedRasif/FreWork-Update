@@ -254,7 +254,7 @@ function Messages() {
             const serverMessage = {
               id: inner.id,
               message_type: messageType,
-              text: inner.text || null,
+              text: inner.text ?? inner.content ?? inner.message ?? null,
               data: inner.data || null,
               tour_plan_id: inner.tour_plan_id || null,
               tour_plan_title: inner.tour_plan_title || null,
@@ -377,7 +377,7 @@ function Messages() {
           id: msg.id,
           message_type:
             msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
-          text: msg.text || null,
+          text: msg.text ?? msg.content ?? msg.message ?? null,
           data: msg.data || null,
           tour_plan_id: msg.tour_plan_id || null,
           tour_plan_title: msg.tour_plan_title || null,
@@ -396,42 +396,64 @@ function Messages() {
       });
 
       setMessages((prev) => {
-        // Keep only truly unmatched in-flight sending messages
-        const unmatchedSending = prev.filter((pendingMsg) => {
-          if (pendingMsg.status !== "sending") return false;
-          const alreadyInServer = formattedMessages.some((serverMsg) => {
-            if (serverMsg.id === pendingMsg.id) return true;
-            if (!serverMsg.isUser) return false;
-            if (
-              pendingMsg.text &&
-              serverMsg.text === pendingMsg.text &&
-              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
-            ) {
-              return true;
-            }
-            if (
-              pendingMsg.message_type === "file" &&
-              serverMsg.message_type === "file" &&
-              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
-            ) {
-              return true;
-            }
-            return false;
-          });
-          if (alreadyInServer && pendingMsg.tempId) {
-            pendingMessagesRef.current.delete(pendingMsg.tempId);
-          }
-          return !alreadyInServer;
+        const messageMap = new Map();
+
+        // 1. First, preserve EVERY message already in prev (sent, incoming, or sending)
+        // so no message on screen is ever wiped out by a delayed or partial poll
+        prev.forEach((msg) => {
+          const key = msg.tempId
+            ? `temp_${msg.tempId}`
+            : (msg.id != null ? `id_${msg.id}` : `uuid_${msg.uuid || Math.random()}`);
+          messageMap.set(key, msg);
         });
 
-        const allMsgs = [...formattedMessages, ...unmatchedSending];
-        const uniqueMsgs = allMsgs.reduce((acc, msg) => {
-          const key = msg.tempId ? `temp_${msg.tempId}` : `id_${msg.id}`;
-          if (!acc[key]) acc[key] = msg;
-          return acc;
-        }, {});
-        const nextList = Object.values(uniqueMsgs).sort(
-          (a, b) => a.timestamp - b.timestamp,
+        // 2. Reconcile with incoming server messages
+        formattedMessages.forEach((serverMsg) => {
+          const serverKey = serverMsg.id != null ? `id_${serverMsg.id}` : null;
+
+          // Find if this server message matches an existing pending message
+          let matchedKey = null;
+          for (const [key, localMsg] of messageMap.entries()) {
+            if (serverKey && key === serverKey) {
+              matchedKey = key;
+              break;
+            }
+            if (
+              localMsg.status === "sending" &&
+              localMsg.isUser &&
+              serverMsg.isUser &&
+              ((localMsg.text && localMsg.text === serverMsg.text) ||
+                (localMsg.message_type === "file" && serverMsg.message_type === "file")) &&
+              Math.abs(new Date(serverMsg.timestamp) - new Date(localMsg.timestamp)) < 120000
+            ) {
+              matchedKey = key;
+              if (localMsg.tempId) {
+                pendingMessagesRef.current.delete(localMsg.tempId);
+              }
+              break;
+            }
+          }
+
+          if (matchedKey) {
+            const existingMsg = messageMap.get(matchedKey);
+            if (matchedKey !== serverKey && serverKey) {
+              messageMap.delete(matchedKey);
+            }
+            const finalKey = serverKey || matchedKey;
+            messageMap.set(finalKey, {
+              ...existingMsg,
+              ...serverMsg,
+              status: "sent",
+              tempId: undefined,
+            });
+          } else {
+            const finalKey = serverKey || `srv_${serverMsg.timestamp}_${Math.random()}`;
+            messageMap.set(finalKey, serverMsg);
+          }
+        });
+
+        const nextList = Array.from(messageMap.values()).sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
         );
 
         if (
@@ -533,7 +555,7 @@ function Messages() {
 
         if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
 
-        const serverId = response.id;
+        const serverId = response?.id || response?.data?.id || response?.message?.id;
         setMessages((prev) => {
           const alreadyHasServerMsg =
             serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
@@ -621,7 +643,7 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      const serverId = response.id;
+      const serverId = response?.id || response?.data?.id || response?.message?.id;
       setMessages((prev) => {
         const alreadyHasServerMsg =
           serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
@@ -682,7 +704,7 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      const serverId = response.id;
+      const serverId = response?.id || response?.data?.id || response?.message?.id;
       setMessages((prev) => {
         const alreadyHasServerMsg =
           serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
