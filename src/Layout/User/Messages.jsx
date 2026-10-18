@@ -45,6 +45,63 @@ const getSenderId = (sender) => {
   return sender;
 };
 
+const parseMessageTimestamp = (ts) => {
+  if (!ts) return new Date();
+  if (ts instanceof Date) {
+    return isNaN(ts.getTime()) ? new Date() : ts;
+  }
+  if (typeof ts === "number") {
+    return new Date(ts < 1e11 ? ts * 1000 : ts);
+  }
+  if (typeof ts === "string") {
+    const trimmed = ts.trim();
+    if (!trimmed) return new Date();
+
+    // If it's already an ISO string with Z or timezone offset (e.g. 2026-10-18T10:30:00Z or +03:00)
+    if (trimmed.endsWith("Z") || /[+-]\d{2}(:\d{2})?$/.test(trimmed)) {
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+
+    // Time-only string (e.g. "14:30" or "14:30:00")
+    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+      const parts = trimmed.split(":");
+      const now = new Date();
+      now.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+      return now;
+    }
+
+    // Date-time string without timezone indicator (e.g. "2026-10-18 10:30:00" or "2026-10-18T10:30:00")
+    // Database timestamps without explicit timezone indicator are UTC; append Z to convert to local browser time
+    if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+      const isoUtc = trimmed.replace(" ", "T") + "Z";
+      const parsedUtc = new Date(isoUtc);
+      if (!isNaN(parsedUtc.getTime())) return parsedUtc;
+    }
+
+    const fallback = new Date(trimmed);
+    if (!isNaN(fallback.getTime())) return fallback;
+  }
+  return new Date();
+};
+
+const formatMessageTime = (timestamp, language = "ro") => {
+  const date = parseMessageTimestamp(timestamp);
+  const localeMap = {
+    ro: "ro-RO",
+    ru: "ru-RU",
+    ita: "it-IT",
+    it: "it-IT",
+    en: "en-GB",
+  };
+  const locale = localeMap[language] || "ro-RO";
+  return date.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
 function Messages() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
@@ -60,6 +117,7 @@ function Messages() {
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
+  const wsReconnectAttemptsRef = useRef(0);
 
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
@@ -226,6 +284,7 @@ function Messages() {
 
         ws.onopen = () => {
           // Connected
+          wsReconnectAttemptsRef.current = 0;
         };
 
         ws.onmessage = (event) => {
@@ -285,7 +344,7 @@ function Messages() {
                     : `${FILE_BASE_URL}${inner.file || inner.file_url}`
                   : null,
               isUser,
-              timestamp: inner.timestamp ? new Date(inner.timestamp) : new Date(),
+              timestamp: parseMessageTimestamp(inner.timestamp),
               is_read: inner.is_read || false,
               status: "sent",
             };
@@ -359,12 +418,14 @@ function Messages() {
 
         ws.onclose = () => {
           if (!isMounted) return;
-          // Auto-reconnect after 2.5 seconds if connection drops or times out
-          reconnectTimeout = setTimeout(connectWebSocket, 2500);
+          // Graceful backoff for reconnect (2.5s -> 3.75s -> 5.6s -> max 15s)
+          wsReconnectAttemptsRef.current = Math.min((wsReconnectAttemptsRef.current || 0) + 1, 5);
+          const delay = Math.min(2500 * Math.pow(1.5, wsReconnectAttemptsRef.current - 1), 15000);
+          reconnectTimeout = setTimeout(connectWebSocket, delay);
         };
       } catch (err) {
         if (!isMounted) return;
-        reconnectTimeout = setTimeout(connectWebSocket, 3000);
+        reconnectTimeout = setTimeout(connectWebSocket, 4000);
       }
     };
 
@@ -406,7 +467,7 @@ function Messages() {
                 : `${FILE_BASE_URL}${msg.file || msg.file_url}`
               : null,
           isUser: String(senderId) === String(userId),
-          timestamp: new Date(msg.timestamp),
+          timestamp: parseMessageTimestamp(msg.timestamp),
           is_read: msg.is_read,
           status: "sent",
         };
@@ -1214,7 +1275,7 @@ function Messages() {
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[78%] ${message.isUser ? "rounded-br-sm bg-[#172b43] text-white" : "rounded-bl-sm border border-[#ece7df] bg-white text-[#34485c]"}`}>
                 {renderMessageContent(message)}
                 <div className={`mt-1.5 flex items-center justify-end gap-1.5 ${message.isUser ? "text-[#b9c5d2]" : "text-[#99a0a9]"}`}>
-                  <time className="text-[10px] leading-4">{message.timestamp.toLocaleTimeString(i18n.language === "ro" ? "ro-RO" : "ru-RU", { hour: "2-digit", minute: "2-digit" })}</time>
+                  <time className="text-[10px] leading-4">{formatMessageTime(message.timestamp, i18n.language)}</time>
                   {message.isUser && message.status === "sending" && <ClockIcon size={12} aria-label={t("chat_sending")} />}
                   {message.isUser && message.status === "sent" && <CheckIcon size={13} className="text-[#e3b965]" aria-label={t("sent")} />}
                   {message.isUser && message.status === "failed" && <button type="button" onClick={() => handleRetryMessage(message.tempId)} aria-label={t("chat_retry")} className="rounded p-1 text-[#f3a49b] focus-visible:outline-2"><RotateCcw size={14} /></button>}
