@@ -1043,5 +1043,28 @@
       "question": "I am an agency: how can I enter the marketplace?",
       "answer": "Entry is selective and occurs only upon application. We do not accept everyone, but only those who demonstrate high service standards. If you are a serious professional and want to access manually verified leads, send your request in the dedicated area. We will evaluate your profile within 48 hours."
     }
-  ]
+  ],
+  "chat_private_traveller": "Traveler",
+  "chat_offer_actions": "Final offer in conversation",
+  "chat_offer_loading": "Checking offer status…",
+  "chat_offer_load_error": "Could not load the offer. Please try again.",
+  "chat_offer_final_title": "Final offer",
+  "chat_offer_send_final": "Send final offer",
+  "chat_offer_send_description": "Confirm that the offer below is the one agreed with the client. They will be able to accept or decline it in this conversation.",
+  "chat_offer_accept_description": "Review the offer and confirm consent to share your contact details with {{agency}}.",
+  "chat_offer_decline_description": "Confirm declining the offer. Your contact details will not be shared with this agency.",
+  "chat_offer_contact_consent": "I agree that the agency {{agency}} will receive my name, phone number, and email address upon accepting this offer.",
+  "chat_offer_confirm_accept": "Accept and confirm agreement",
+  "chat_offer_confirm_decline": "Decline offer",
+  "chat_offer_waiting_client": "Final offer has been sent. Waiting for client response.",
+  "chat_offer_status_accepted": "Offer accepted",
+  "chat_offer_status_rejected": "Offer declined",
+  "chat_offer_status_closed": "The customer chose another offer",
+  "chat_offer_shared_contacts": "Client contact details",
+  "chat_offer_accepted_notice": "The final offer has been accepted. I confirm agreement to share my name, phone number, and email address with the agency {{agency}}.",
+  "chat_offer_rejected_notice": "The final offer has been declined.",
+  "chat_offer_reason": "Reason",
+  "chat_offer_optional_reason": "Decline reason (optional)",
+  "chat_offer_notice_pending": "The offer response was saved, but the confirmation message could not be sent to chat. Resend the message only.",
+  "chat_offer_notice_failed": "Could not send the confirmation message. The offer response remains saved."
 }

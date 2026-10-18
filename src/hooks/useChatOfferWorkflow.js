@@ -33,7 +33,9 @@ export default function useChatOfferWorkflow({ chat, chatId, planId, messages })
   const { data: planData, currentData: currentPlan, isLoading, isError, refetch } = useGetOneDetailQuery(validPlanId, { skip: !validPlanId, pollingInterval: 3000, refetchOnMountOrArgChange: true });
   const { data: acceptedOffers, refetch: refetchAccepted } = useGetAllacceptedOfferQuery(undefined, { skip: !isAgency, pollingInterval: 3000 });
   const accepted = getAcceptedChatOffer(acceptedOffers, chat, userId);
-  const activePlan = currentPlan ?? (planData && validPlanId != null && String(planData.id) === String(validPlanId) ? planData : null);
+  const rawPlan = planData?.data || planData;
+  const currentRawPlan = currentPlan?.data || currentPlan;
+  const activePlan = currentRawPlan || (rawPlan && validPlanId != null && (String(rawPlan.id) === String(validPlanId) || String(rawPlan.slug) === String(validPlanId)) ? rawPlan : null) || rawPlan || null;
   const plan = activePlan || accepted?.tour_plan || null;
   const agencyId = isAgency ? userId : chat?.other_user_id;
   const offer = accepted || (Array.isArray(plan?.offers) ? plan.offers : []).find((item) => {
@@ -61,11 +63,25 @@ export default function useChatOfferWorkflow({ chat, chatId, planId, messages })
   }, [storageKey]);
 
   const messageStatus = getOfferNoticeStatus(messages, plan?.user);
+  const isPlanAcceptedByAnother =
+    !accepted &&
+    offer?.status !== "accepted" &&
+    Boolean(
+      plan?.status === "accepted" ||
+      plan?.plan_status === "accepted" ||
+      (Array.isArray(plan?.offers) &&
+        plan.offers.some(
+          (o) =>
+            o.status === "accepted" &&
+            String(o.agency?.user ?? o.agency?.user_id ?? o.agency?.id ?? o.agency) !== String(userId),
+        ))
+    );
+
   let serverStatus = null;
   if (offer?.status === "accepted" || accepted) serverStatus = "accepted";
+  else if (isPlanAcceptedByAnother) serverStatus = "closed";
   else if (offer?.status === "rejected") serverStatus = "rejected";
-  else if (activePlan && validPlanId != null && String(activePlan.id) === String(validPlanId) && activePlan.status === "accepted") serverStatus = "closed";
-  else if (!isAgency && activePlan && !offer && !isError && chat?.deal_status === true) serverStatus = "rejected";
+  else if (!isAgency && plan && !offer && !isError && chat?.deal_status === true) serverStatus = "rejected";
   else if (!offer && messageStatus) serverStatus = messageStatus;
   const status = localResult || serverStatus;
   const isFinal = Boolean(offer?.is_final || (!isAgency && chat?.final_offer_sent) || sentLocally);

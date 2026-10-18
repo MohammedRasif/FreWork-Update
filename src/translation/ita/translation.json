@@ -1017,5 +1017,28 @@
       "question": "Sono un'agenzia: come posso entrare nel marketplace?",
       "answer": "L'ingresso è selettivo e avviene solo su candidatura. Non accettiamo tutti, ma solo chi dimostra standard di servizio elevati. Se sei un professionista serio e vuoi accedere a lead verificati manualmente, invia la tua richiesta nell'area dedicata. Valuteremo il tuo profilo entro 48 ore."
     }
-  ]
+  ],
+  "chat_private_traveller": "Viaggiatore",
+  "chat_offer_actions": "Offerta finale nella conversazione",
+  "chat_offer_loading": "Verifica dello stato dell'offerta…",
+  "chat_offer_load_error": "Impossibile caricare l'offerta. Riprova.",
+  "chat_offer_final_title": "Offerta finale",
+  "chat_offer_send_final": "Invia offerta finale",
+  "chat_offer_send_description": "Conferma che l'offerta sottostante è quella concordata con il cliente. Potrà accettarla o rifiutarla in questa conversazione.",
+  "chat_offer_accept_description": "Controlla l'offerta e conferma il consenso per la trasmissione dei tuoi dati di contatto all'agenzia {{agency}}.",
+  "chat_offer_decline_description": "Conferma il rifiuto dell'offerta. I tuoi dati di contatto non saranno mostrati a questa agenzia.",
+  "chat_offer_contact_consent": "Acconsento a trasmettere il mio nome, numero di telefono e indirizzo email all'agenzia {{agency}} dopo aver accettato questa offerta.",
+  "chat_offer_confirm_accept": "Accetta e conferma accordo",
+  "chat_offer_confirm_decline": "Rifiuta offerta",
+  "chat_offer_waiting_client": "L'offerta finale è stata inviata. In attesa della risposta del cliente.",
+  "chat_offer_status_accepted": "Offerta accettata",
+  "chat_offer_status_rejected": "Offerta rifiutata",
+  "chat_offer_status_closed": "Il cliente ha scelto un'altra proposta",
+  "chat_offer_shared_contacts": "Dati di contatto del cliente",
+  "chat_offer_accepted_notice": "L'offerta finale è stata accettata. Confermo l'accordo per la trasmissione del mio nome, numero di telefono e indirizzo email all'agenzia {{agency}}.",
+  "chat_offer_rejected_notice": "L'offerta finale è stata rifiutata.",
+  "chat_offer_reason": "Motivo",
+  "chat_offer_optional_reason": "Motivo del rifiuto (opzionale)",
+  "chat_offer_notice_pending": "La risposta all'offerta è stata salvata, mas il messaggio di conferma non è stato inviato in chat. Reinvia solo il messaggio.",
+  "chat_offer_notice_failed": "Impossibile inviare il messaggio di conferma. La risposta all'offerta rimane salvata."
 }
