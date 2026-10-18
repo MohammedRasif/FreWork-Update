@@ -1,10 +1,12 @@
-import { CalendarDays, Check, Clock3, LoaderCircle, LockKeyhole, Send, Users, X } from "lucide-react";
+import { useState } from "react";
+import { CalendarDays, Check, ChevronDown, Clock3, LoaderCircle, LockKeyhole, Send, Users, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { offerRejectReasons } from "@/lib/chatOffers";
 
 export default function ChatOfferActions({ workflow }) {
   const { t, i18n } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(true);
   const w = workflow;
   if (w.role !== "agency" && w.role !== "tourist") return null;
 
@@ -29,10 +31,37 @@ export default function ChatOfferActions({ workflow }) {
       {w.isLoading && !w.status ? <p role="status" className="flex items-center gap-2 text-xs text-[#77818e]"><LoaderCircle size={15} className="animate-spin" />{t("chat_offer_loading")}</p>
         : w.isError && !w.status ? <div role="alert" className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#b54a40]"><p>{t("chat_offer_load_error")}</p><button type="button" onClick={w.refetch} className="font-semibold underline underline-offset-4">{t("chat_retry")}</button></div>
           : w.status ? <>
-            <p role="status" className={`flex items-center gap-2 text-sm font-semibold ${w.status === "accepted" ? "text-[#397055]" : "text-[#77818e]"}`}>{w.status === "accepted" ? <Check size={17} aria-hidden="true" /> : <X size={17} aria-hidden="true" />}{t(`chat_offer_status_${w.status}`)}</p>
-            {contacts && <dl className="mt-3 grid gap-2 rounded-xl border border-[#e9e6e0] bg-white p-3 text-xs leading-5" aria-label={t("chat_offer_shared_contacts")}>
-              {[["name", contacts.name], ["phone", contacts.phone_number], ["email", contacts.email]].map(([key, value]) => <div key={key} className="min-w-0"><dt className="font-semibold text-[#617082]">{t(key)}</dt><dd className="break-words [overflow-wrap:anywhere] text-[#172b43]">{value || t("not_provided")}</dd></div>)}
-            </dl>}
+            <div className="flex items-center justify-between">
+              <p role="status" className={`flex items-center gap-2 text-sm font-semibold ${w.status === "accepted" ? "text-[#397055]" : "text-[#77818e]"}`}>
+                {w.status === "accepted" ? <Check size={17} aria-hidden="true" /> : <X size={17} aria-hidden="true" />}
+                {t(`chat_offer_status_${w.status}`)}
+              </p>
+              {contacts && (
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded((prev) => !prev)}
+                  aria-expanded={isExpanded}
+                  className="rounded-lg p-1 text-[#617082] transition hover:bg-[#f3eedf] hover:text-[#172b43] focus-visible:outline-2 focus-visible:outline-[#c88f2a]"
+                  aria-label={isExpanded ? t("collapse") || "Collapse" : t("expand") || "Expand"}
+                >
+                  <ChevronDown
+                    size={18}
+                    className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+            </div>
+            {contacts && isExpanded && (
+              <dl className="mt-3 grid gap-2 rounded-xl border border-[#e9e6e0] bg-white p-3 text-xs leading-5" aria-label={t("chat_offer_shared_contacts")}>
+                {[["name", contacts.name], ["phone", contacts.phone_number], ["email", contacts.email]].map(([key, value]) => (
+                  <div key={key} className="min-w-0">
+                    <dt className="font-semibold text-[#617082]">{t(key)}</dt>
+                    <dd className="break-words [overflow-wrap:anywhere] text-[#172b43]">{value || t("not_provided")}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </> : <>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-[#9b701f]"><span>{t("chat_offer_final_title")}</span><span>{price}</span></div>
             {w.isAgency ? w.canSend ? <button type="button" onClick={() => w.openDialog("send")} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white"><Send size={16} aria-hidden="true" />{t("chat_offer_send_final")}</button>
