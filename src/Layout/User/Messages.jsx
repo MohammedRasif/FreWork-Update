@@ -3,7 +3,6 @@ import {
   SendIcon,
   ClockIcon,
   CheckIcon,
-  XIcon,
   PaperclipIcon,
   ArrowLeft,
   MoreVertical,
@@ -33,9 +32,69 @@ import ChatOfferActions from "./ChatOfferActions";
 import useChatOfferWorkflow from "@/hooks/useChatOfferWorkflow";
 import { getAcceptedChatOffer, getChatParticipantName } from "@/lib/chatOffers";
 
-
 const FILE_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://api.treioferte.md";
+
+const getSenderId = (sender) => {
+  if (!sender) return null;
+  if (typeof sender === "object") {
+    return sender.user_id ?? sender.id ?? sender.sender_id ?? null;
+  }
+  return sender;
+};
+
+const parseMessageTimestamp = (ts) => {
+  if (!ts) return new Date();
+  if (ts instanceof Date) {
+    return isNaN(ts.getTime()) ? new Date() : ts;
+  }
+  if (typeof ts === "number") {
+    return new Date(ts < 1e11 ? ts * 1000 : ts);
+  }
+  if (typeof ts === "string") {
+    const trimmed = ts.trim();
+    if (!trimmed) return new Date();
+
+    if (trimmed.endsWith("Z") || /[+-]\d{2}(:\d{2})?$/.test(trimmed)) {
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+
+    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+      const parts = trimmed.split(":");
+      const now = new Date();
+      now.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+      return now;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+      const isoUtc = trimmed.replace(" ", "T") + "Z";
+      const parsedUtc = new Date(isoUtc);
+      if (!isNaN(parsedUtc.getTime())) return parsedUtc;
+    }
+
+    const fallback = new Date(trimmed);
+    if (!isNaN(fallback.getTime())) return fallback;
+  }
+  return new Date();
+};
+
+const formatMessageTime = (timestamp, language = "ro") => {
+  const date = parseMessageTimestamp(timestamp);
+  const localeMap = {
+    ro: "ro-RO",
+    ru: "ru-RU",
+    ita: "it-IT",
+    it: "it-IT",
+    en: "en-GB",
+  };
+  const locale = localeMap[language] || "ro-RO";
+  return date.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
 
 function Messages() {
   const { t, i18n } = useTranslation();
@@ -52,6 +111,7 @@ function Messages() {
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
+  const wsReconnectAttemptsRef = useRef(0);
 
   const pendingMessagesRef = useRef(new Map());
   const [inviteToChat] = useInviteToChatMutation();
@@ -88,6 +148,7 @@ function Messages() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isConversationArchived, setIsConversationArchived] = useState(false);
+
   useEffect(() => {
     if (!agency && id && chatList && !isChatListLoading) {
       const currentChat = chatList.find((chat) => chat.id?.toString() === id);
@@ -166,6 +227,11 @@ function Messages() {
       try {
         const ws = new WebSocket(chat_sockit(id));
         wsRef.current = ws;
+
+        ws.onopen = () => {
+          wsReconnectAttemptsRef.current = 0;
+        };
+
         ws.onmessage = (event) => {
           if (!isMounted) return;
           try {
@@ -179,6 +245,12 @@ function Messages() {
             if (inner.file || inner.file_url) messageType = "file";
             else if (inner.message_type) messageType = inner.message_type;
 
+            const senderId =
+              getSenderId(inner.sender) ??
+              inner.sender_id ??
+              inner.user_id;
+            const isUser = String(senderId) === String(userId);
+
             const serverMessage = {
               id: inner.id,
               message_type: messageType,
@@ -186,17 +258,24 @@ function Messages() {
               data: inner.data || null,
               tour_plan_id: inner.tour_plan_id || null,
               tour_plan_title: inner.tour_plan_title || null,
-              file: inner.file || inner.file_url
-                ? new URL(inner.file || inner.file_url, FILE_BASE_URL).href
-                : null,
+              file:
+                inner.file || inner.file_url
+                  ? (inner.file || inner.file_url).startsWith("http")
+                    ? inner.file || inner.file_url
+                    : `${FILE_BASE_URL}${inner.file || inner.file_url}`
+                  : null,
               senderUserId: inner.sender?.user_id,
-              isUser: String(inner.sender?.user_id) === userId,
-              timestamp: inner.timestamp ? new Date(inner.timestamp) : new Date(),
-              is_read: inner.is_read,
+              isUser,
+              timestamp: parseMessageTimestamp(inner.timestamp),
+              is_read: inner.is_read || false,
               status: "sent",
             };
 
             setMessages((prev) => {
+              if (prev.some((msg) => msg.id === serverMessage.id)) {
+                return prev;
+              }
+
               if (serverMessage.isUser) {
                 const matchingPending = Array.from(
                   pendingMessagesRef.current.values(),
@@ -204,13 +283,11 @@ function Messages() {
                   (pm) =>
                     pm.message_type === serverMessage.message_type &&
                     (pm.text === serverMessage.text ||
-                      (pm.text === null && serverMessage.text === null)) &&
-                    Math.abs(
-                      pm.timestamp.getTime() - serverMessage.timestamp.getTime(),
-                    ) < 10000,
+                      (pm.text === null && serverMessage.text === null)),
                 );
 
                 if (matchingPending) {
+                  pendingMessagesRef.current.delete(matchingPending.tempId);
                   return prev.map((msg) =>
                     msg.tempId === matchingPending.tempId
                       ? {
@@ -219,15 +296,39 @@ function Messages() {
                           file: serverMessage.file || msg.file,
                           senderUserId: serverMessage.senderUserId,
                           status: "sent",
-                          // Keep the request marker until HTTP resolves, so the server URL replaces the preview reliably.
+                          tempId: undefined,
+                        }
+                      : msg,
+                  );
+                }
+
+                const pendingInPrev = prev.find(
+                  (m) =>
+                    m.status === "sending" &&
+                    m.message_type === serverMessage.message_type &&
+                    (m.text === serverMessage.text ||
+                      (m.text === null && serverMessage.text === null)),
+                );
+                if (pendingInPrev) {
+                  if (pendingInPrev.tempId) {
+                    pendingMessagesRef.current.delete(pendingInPrev.tempId);
+                  }
+                  return prev.map((msg) =>
+                    (pendingInPrev.tempId && msg.tempId === pendingInPrev.tempId) ||
+                    msg.id === pendingInPrev.id
+                      ? {
+                          ...msg,
+                          id: serverMessage.id,
+                          file: serverMessage.file || msg.file,
+                          senderUserId: serverMessage.senderUserId,
+                          status: "sent",
+                          tempId: undefined,
                         }
                       : msg,
                   );
                 }
               }
 
-              const exists = prev.some((msg) => msg.id === serverMessage.id);
-              if (exists) return prev;
               return [...prev, serverMessage].sort(
                 (a, b) => a.timestamp - b.timestamp,
               );
@@ -236,15 +337,23 @@ function Messages() {
             console.error("Error parsing WebSocket message:", err);
           }
         };
+
         ws.onerror = (err) => console.warn("WebSocket error:", err);
+
         ws.onclose = () => {
-          if (isMounted) reconnectTimeout = setTimeout(connectWebSocket, 2500);
+          if (!isMounted) return;
+          wsReconnectAttemptsRef.current = Math.min((wsReconnectAttemptsRef.current || 0) + 1, 5);
+          const delay = Math.min(2500 * Math.pow(1.5, wsReconnectAttemptsRef.current - 1), 15000);
+          reconnectTimeout = setTimeout(connectWebSocket, delay);
         };
-      } catch {
-        if (isMounted) reconnectTimeout = setTimeout(connectWebSocket, 3000);
+      } catch (err) {
+        if (!isMounted) return;
+        reconnectTimeout = setTimeout(connectWebSocket, 4000);
       }
     };
+
     connectWebSocket();
+
     return () => {
       isMounted = false;
       clearTimeout(reconnectTimeout);
@@ -259,33 +368,85 @@ function Messages() {
       Array.isArray(messagesData.messages) &&
       userId
     ) {
-      const formattedMessages = messagesData.messages.map((msg) => ({
-        id: msg.id,
-        message_type:
-          msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
-        text: msg.text || null,
-        data: msg.data || null,
-        tour_plan_id: msg.tour_plan_id || null,
-        tour_plan_title: msg.tour_plan_title || null,
-        file:
-          msg.file || msg.file_url
-            ? (msg.file || msg.file_url).startsWith("http")
-              ? msg.file || msg.file_url
-              : `${FILE_BASE_URL}${msg.file || msg.file_url}`
-            : null,
-        senderUserId: msg.sender?.user_id,
-        isUser: String(msg.sender?.user_id) === userId,
-        timestamp: new Date(msg.timestamp),
-        is_read: msg.is_read,
-        status: "sent",
-      }));
+      const formattedMessages = messagesData.messages.map((msg) => {
+        const senderId =
+          getSenderId(msg.sender) ??
+          msg.sender_id ??
+          msg.user_id;
+        return {
+          id: msg.id,
+          message_type:
+            msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
+          text: msg.text || null,
+          data: msg.data || null,
+          tour_plan_id: msg.tour_plan_id || null,
+          tour_plan_title: msg.tour_plan_title || null,
+          file:
+            msg.file || msg.file_url
+              ? (msg.file || msg.file_url).startsWith("http")
+                ? msg.file || msg.file_url
+                : `${FILE_BASE_URL}${msg.file || msg.file_url}`
+              : null,
+          senderUserId: msg.sender?.user_id,
+          isUser: String(senderId) === String(userId),
+          timestamp: parseMessageTimestamp(msg.timestamp),
+          is_read: msg.is_read,
+          status: "sent",
+        };
+      });
+
       setMessages((prev) => {
-        const uniqueMsgs = new Map(prev.map((message) => [message.id, message]));
-        for (const message of formattedMessages) {
-          const existing = uniqueMsgs.get(message.id);
-          uniqueMsgs.set(message.id, { ...existing, ...message, ...(existing?.tempId ? { tempId: existing.tempId } : {}) });
+        // Keep only truly unmatched in-flight sending messages
+        const unmatchedSending = prev.filter((pendingMsg) => {
+          if (pendingMsg.status !== "sending") return false;
+          const alreadyInServer = formattedMessages.some((serverMsg) => {
+            if (serverMsg.id === pendingMsg.id) return true;
+            if (!serverMsg.isUser) return false;
+            if (
+              pendingMsg.text &&
+              serverMsg.text === pendingMsg.text &&
+              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
+            ) {
+              return true;
+            }
+            if (
+              pendingMsg.message_type === "file" &&
+              serverMsg.message_type === "file" &&
+              Math.abs(new Date(serverMsg.timestamp) - new Date(pendingMsg.timestamp)) < 60000
+            ) {
+              return true;
+            }
+            return false;
+          });
+          if (alreadyInServer && pendingMsg.tempId) {
+            pendingMessagesRef.current.delete(pendingMsg.tempId);
+          }
+          return !alreadyInServer;
+        });
+
+        const allMsgs = [...formattedMessages, ...unmatchedSending];
+        const uniqueMsgs = allMsgs.reduce((acc, msg) => {
+          const key = msg.tempId ? `temp_${msg.tempId}` : `id_${msg.id}`;
+          if (!acc[key]) acc[key] = msg;
+          return acc;
+        }, {});
+        const nextList = Object.values(uniqueMsgs).sort(
+          (a, b) => a.timestamp - b.timestamp,
+        );
+
+        if (
+          prev.length === nextList.length &&
+          prev.every(
+            (p, idx) =>
+              (p.id === nextList[idx].id || (p.tempId && p.tempId === nextList[idx].tempId)) &&
+              p.status === nextList[idx].status &&
+              p.is_read === nextList[idx].is_read,
+          )
+        ) {
+          return prev;
         }
-        return [...uniqueMsgs.values()].sort((a, b) => a.timestamp - b.timestamp);
+
+        return nextList;
       });
     }
   }, [messagesData, userId, id]);
@@ -372,12 +533,18 @@ function Messages() {
 
         if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
 
-        setMessages((prev) =>
-          prev.map((msg) =>
+        const serverId = response.id;
+        setMessages((prev) => {
+          const alreadyHasServerMsg =
+            serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+          if (alreadyHasServerMsg) {
+            return prev.filter((m) => m.tempId !== tempId);
+          }
+          return prev.map((msg) =>
             msg.tempId === tempId
               ? {
                   ...msg,
-                  id: response.id || msg.id,
+                  id: serverId || msg.id,
                   file: response.file
                     ? response.file.startsWith("http")
                       ? response.file
@@ -389,8 +556,8 @@ function Messages() {
                   localFileName: undefined,
                 }
               : msg,
-          ),
-        );
+          );
+        });
         pendingMessagesRef.current.delete(tempId);
         refetchMessages();
         refetchChatList();
@@ -454,18 +621,24 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      setMessages((prev) =>
-        prev.map((msg) =>
+      const serverId = response.id;
+      setMessages((prev) => {
+        const alreadyHasServerMsg =
+          serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+        if (alreadyHasServerMsg) {
+          return prev.filter((m) => m.tempId !== tempId);
+        }
+        return prev.map((msg) =>
           msg.tempId === tempId
             ? {
                 ...msg,
-                id: response.id || msg.id,
+                id: serverId || msg.id,
                 status: "sent",
                 tempId: undefined,
               }
             : msg,
-        ),
-      );
+        );
+      });
       pendingMessagesRef.current.delete(tempId);
       refetchMessages();
       refetchChatList();
@@ -509,12 +682,18 @@ function Messages() {
         id: Number(id),
         data: formData,
       }).unwrap();
-      setMessages((prev) =>
-        prev.map((msg) =>
+      const serverId = response.id;
+      setMessages((prev) => {
+        const alreadyHasServerMsg =
+          serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+        if (alreadyHasServerMsg) {
+          return prev.filter((m) => m.tempId !== tempId);
+        }
+        return prev.map((msg) =>
           msg.tempId === tempId
             ? {
                 ...msg,
-                id: response.id || msg.id,
+                id: serverId || msg.id,
                 file: response.file
                   ? response.file.startsWith("http")
                     ? response.file
@@ -524,8 +703,8 @@ function Messages() {
                 tempId: undefined,
               }
             : msg,
-        ),
-      );
+        );
+      });
       if (message.file?.startsWith("blob:")) URL.revokeObjectURL(message.file);
       pendingMessagesRef.current.delete(tempId);
       refetchMessages();
@@ -550,7 +729,7 @@ function Messages() {
     setSelectedDropdown(selectedId);
     if (selectedId) {
       try {
-        const tourPlan = dropdownOptions.find((opt) => opt.value == selectedId);
+        const tourPlan = dropdownOptions.find((opt) => String(opt.value) === String(selectedId));
         const messageId = uuidv4();
         const tempId = uuidv4();
         const messageText = t("conversation_started", {
@@ -563,7 +742,7 @@ function Messages() {
           text: messageText,
           data: new Date(),
           tour_plan_id: selectedId,
-          tour_plan_title: tourPlan?.label || currentChat?.tour_plan_title || null,
+          tour_plan_title: tourPlan?.label || null,
           file: null,
           isUser: true,
           timestamp: new Date(),
@@ -579,18 +758,24 @@ function Messages() {
           other_user_id: agency.other_user_id,
         }).unwrap();
 
-        setMessages((prev) =>
-          prev.map((msg) =>
+        const serverId = res.id;
+        setMessages((prev) => {
+          const alreadyHasServerMsg =
+            serverId && prev.some((m) => m.id === serverId && m.tempId !== tempId);
+          if (alreadyHasServerMsg) {
+            return prev.filter((m) => m.tempId !== tempId);
+          }
+          return prev.map((msg) =>
             msg.tempId === tempId
               ? {
                   ...msg,
-                  id: res.id || msg.id,
+                  id: serverId || msg.id,
                   status: "sent",
                   tempId: undefined,
                 }
               : msg,
-          ),
-        );
+          );
+        });
         pendingMessagesRef.current.delete(tempId);
       } catch (err) {
         console.error("Failed to send start conversation:", err);
@@ -624,7 +809,6 @@ function Messages() {
       return;
     }
     navigate(`/cereri/${agency.tour_plan_id}`);
-
   };
 
   const handleArchiveConversation = async () => {
@@ -764,11 +948,11 @@ function Messages() {
           <ChatAvatar name={participantName} image={participantImage} active={currentChat?.active} className="h-10 w-10" />
           <div className="min-w-0">
             <h2 className="flex items-center gap-1.5 text-sm font-semibold sm:text-base"><span className="truncate">{participantName}</span>{currentChat?.tourist_is_verified && <BadgeCheck size={16} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}</h2>
-            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency.tour_plan_title}</p>
+            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency?.tour_plan_title || currentChat?.tour_plan_title}</p>
           </div>
         </div>
         {canRejectOffer && (
-          <button type="button" onClick={() => { setMenuOpen(false); workflow.openDialog("decline"); }} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
+          <button type="button" onClick={workflow.openRejectModal} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
             <XIcon size={16} className="shrink-0" aria-hidden="true" />{t("reject_offer")}
           </button>
         )}
@@ -778,7 +962,7 @@ function Messages() {
             <div id="chat-actions" onKeyDown={e => { if (e.key === "Escape") setMenuOpen(false); }} className="absolute right-0 top-full z-20 mt-2 w-56 rounded-2xl border border-[#e9e6e0] bg-white p-1.5 shadow-xl">
               <button type="button" className="chat-menu-item" onClick={handleViewDetails}><FileText size={17} className="shrink-0 text-[#b88424]" />{t("view_tour_details")}</button>
               <button type="button" className="chat-menu-item" onClick={handleArchiveConversation}>{isConversationArchived ? <ArchiveRestore size={17} className="shrink-0 text-[#b88424]" /> : <Archive size={17} className="shrink-0 text-[#b88424]" />}{isConversationArchived ? t("unarchive_conversation") : t("archive_conversation")}</button>
-              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={() => { setMenuOpen(false); workflow.openDialog("decline"); }}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
+              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={workflow.openRejectModal}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
             </div>
           )}
         </div>
@@ -799,14 +983,14 @@ function Messages() {
             message.message_type !== "offer_declined" &&
             message.message_type !== "offer_rejected"
           ) return null;
-          if (message.message_type === "start_conversation") return <div key={message.id || message.tempId} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
+          if (message.message_type === "start_conversation") return <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className="flex justify-center"><span className="max-w-sm rounded-xl border border-[#e7e1d6] bg-[#f4f0e8] px-4 py-2 text-center text-xs leading-5 text-[#8d7a59]">{message.text}</span></div>;
           return (
-            <div key={message.id || message.tempId} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
+            <div key={message.tempId ? `pending_${message.tempId}` : `msg_${message.id}`} className={`flex items-end gap-2 ${message.isUser ? "justify-end" : "justify-start"}`}>
               {!message.isUser && <ChatAvatar name={participantName} image={participantImage} className="h-7 w-7 !rounded-xl text-[10px]" />}
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 sm:max-w-[78%] ${message.isUser ? "rounded-br-sm bg-[#172b43] text-white" : "rounded-bl-sm border border-[#ece7df] bg-white text-[#34485c]"}`}>
                 {renderMessageContent(message)}
                 <div className={`mt-1.5 flex items-center justify-end gap-1.5 ${message.isUser ? "text-[#b9c5d2]" : "text-[#99a0a9]"}`}>
-                  <time className="text-[10px] leading-4">{message.timestamp.toLocaleTimeString(i18n.language === "ro" ? "ro-RO" : "ru-RU", { hour: "2-digit", minute: "2-digit" })}</time>
+                  <time className="text-[10px] leading-4">{formatMessageTime(message.timestamp, i18n.language)}</time>
                   {message.isUser && message.status === "sending" && <ClockIcon size={12} aria-label={t("chat_sending")} />}
                   {message.isUser && message.status === "sent" && <CheckIcon size={13} className="text-[#e3b965]" aria-label={t("sent")} />}
                   {message.isUser && message.status === "failed" && <button type="button" onClick={() => handleRetryMessage(message.tempId)} aria-label={t("chat_retry")} className="rounded p-1 text-[#f3a49b] focus-visible:outline-2"><RotateCcw size={14} /></button>}
