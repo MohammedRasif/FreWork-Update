@@ -34,7 +34,7 @@ export default function ChatInterface() {
   const chats = (Array.isArray(chatList) ? chatList : []).map(chat => ({
     id: String(chat.id),
     name: getChatParticipantName(chat, role, acceptedOffers, userId, t),
-    image: role === "agency" && !getAcceptedChatOffer(acceptedOffers, chat, userId) ? null : chat.other_participant_image || null,
+    image: chat.other_participant_image || null,
     lastMessage: chat.last_message || null,
     unreadCount: chat.unread_count || 0,
     active: chat.active !== undefined ? chat.active : (chat.is_active !== undefined ? chat.is_active : true),
@@ -56,7 +56,7 @@ export default function ChatInterface() {
     chats.unshift({
       id: String(urlChatId),
       name: role === "agency" ? getChatParticipantName({ ...location.state.agency, other_participant_name: location.state.agency.name }, role, acceptedOffers, userId, t) : location.state.agency.name || t("unknown_user"),
-      image: role === "agency" && !getAcceptedChatOffer(acceptedOffers, location.state.agency, userId) ? null : location.state.agency.image || null,
+      image: location.state.agency.image || location.state.agency.other_participant_image || null,
       lastMessage: null,
       unreadCount: 0,
       active: true,

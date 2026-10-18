@@ -926,7 +926,7 @@ function Messages() {
   const canRejectOffer = workflow.canDecide;
   const isChatActive = workflow.status !== "rejected" && !isConversationArchived && currentChat?.is_active !== false && messagesData?.conversation?.is_active !== false;
   const participantName = workflow.isAgency ? getChatParticipantName(currentChat, workflow.role, workflow.acceptedOffers, userId, t) : agency?.name;
-  const participantImage = workflow.isAgency && !getAcceptedChatOffer(workflow.acceptedOffers, currentChat, userId) ? null : agency?.image;
+  const participantImage = agency?.image || currentChat?.other_participant_image || null;
   const isLoading = isMessagesLoading || (isChatListLoading && !agency);
   const hasError = messagesError || (!agency && !isChatListLoading);
 
