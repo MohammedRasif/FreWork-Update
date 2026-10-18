@@ -120,7 +120,9 @@ function Messages() {
 
   const {
     data: messagesData,
+    currentData: currentMessagesData,
     isLoading: isMessagesLoading,
+    isFetching: isMessagesFetching,
     error: messagesError,
     refetch: refetchMessages,
   } = useShowMessagesQuery(id, {
@@ -253,6 +255,7 @@ function Messages() {
 
             const serverMessage = {
               id: inner.id,
+              conversationId: String(id),
               message_type: messageType,
               text: inner.text ?? inner.content ?? inner.message ?? null,
               data: inner.data || null,
@@ -364,17 +367,18 @@ function Messages() {
 
   useEffect(() => {
     if (
-      messagesData?.messages &&
-      Array.isArray(messagesData.messages) &&
+      currentMessagesData?.messages &&
+      Array.isArray(currentMessagesData.messages) &&
       userId
     ) {
-      const formattedMessages = messagesData.messages.map((msg) => {
+      const formattedMessages = currentMessagesData.messages.map((msg) => {
         const senderId =
           getSenderId(msg.sender) ??
           msg.sender_id ??
           msg.user_id;
         return {
           id: msg.id,
+          conversationId: String(id),
           message_type:
             msg.message_type || (msg.file || msg.file_url ? "file" : "text"),
           text: msg.text ?? msg.content ?? msg.message ?? null,
@@ -398,9 +402,11 @@ function Messages() {
       setMessages((prev) => {
         const messageMap = new Map();
 
-        // 1. First, preserve EVERY message already in prev (sent, incoming, or sending)
-        // so no message on screen is ever wiped out by a delayed or partial poll
+        // 1. Only preserve messages that belong to the current conversation id
         prev.forEach((msg) => {
+          if (msg.conversationId && String(msg.conversationId) !== String(id)) {
+            return;
+          }
           const key = msg.tempId
             ? `temp_${msg.tempId}`
             : (msg.id != null ? `id_${msg.id}` : `uuid_${msg.uuid || Math.random()}`);
@@ -443,12 +449,13 @@ function Messages() {
             messageMap.set(finalKey, {
               ...existingMsg,
               ...serverMsg,
+              conversationId: String(id),
               status: "sent",
               tempId: undefined,
             });
           } else {
             const finalKey = serverKey || `srv_${serverMsg.timestamp}_${Math.random()}`;
-            messageMap.set(finalKey, serverMsg);
+            messageMap.set(finalKey, { ...serverMsg, conversationId: String(id) });
           }
         });
 
@@ -471,7 +478,7 @@ function Messages() {
         return nextList;
       });
     }
-  }, [messagesData, userId, id]);
+  }, [currentMessagesData, userId, id]);
 
   const lastMessageCountRef = useRef(0);
   const isInitialLoadRef = useRef(true);
@@ -526,6 +533,7 @@ function Messages() {
 
       const localMessage = {
         id: messageId,
+        conversationId: String(id),
         message_type: "file",
         text: null,
         data: null,
@@ -619,6 +627,7 @@ function Messages() {
 
     const localMessage = {
       id: messageId,
+      conversationId: String(id),
       message_type: "text",
       text: messageText,
       data: null,
@@ -946,10 +955,11 @@ function Messages() {
 
   const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const canRejectOffer = workflow.canDecide;
-  const isChatActive = workflow.status !== "rejected" && !isConversationArchived && currentChat?.is_active !== false && messagesData?.conversation?.is_active !== false;
+  const isChatActive = workflow.status !== "rejected" && !isConversationArchived && currentChat?.is_active !== false && (currentMessagesData?.conversation?.is_active ?? messagesData?.conversation?.is_active) !== false;
   const participantName = workflow.isAgency ? getChatParticipantName(currentChat, workflow.role, workflow.acceptedOffers, userId, t) : agency?.name;
   const participantImage = agency?.image || currentChat?.other_participant_image || null;
-  const isLoading = isMessagesLoading || (isChatListLoading && !agency);
+  const isChatSwitching = !currentMessagesData && (isMessagesLoading || isMessagesFetching);
+  const isLoading = isChatSwitching || (isChatListLoading && !agency);
   const hasError = messagesError || (!agency && !isChatListLoading);
 
   if (isLoading || hasError) {
