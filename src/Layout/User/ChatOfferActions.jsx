@@ -66,9 +66,9 @@ export default function ChatOfferActions({ workflow }) {
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-[#9b701f]"><span>{t("chat_offer_final_title")}</span><span>{price}</span></div>
             {w.isAgency ? w.canSend ? <button type="button" onClick={() => w.openDialog("send")} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white"><Send size={16} aria-hidden="true" />{t("chat_offer_send_final")}</button>
               : <p role="status" className="flex items-center gap-2 text-xs leading-5 text-[#617082]"><Clock3 size={15} className="shrink-0" aria-hidden="true" />{t("chat_offer_waiting_client")}</p>
-              : w.canDecide && <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => w.openDialog("accept")} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white"><Check size={16} className="shrink-0" />{t("accept_final_offer")}</button>
-                <button type="button" onClick={() => w.openDialog("decline")} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-3 py-2.5 text-sm font-semibold"><X size={16} className="shrink-0" />{t("decline_final_offer")}</button>
+              : w.canDecide && <div className="flex flex-col sm:flex-row gap-2">
+                <button type="button" onClick={() => w.openDialog("accept")} className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl bg-[#172b43] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#223d5d]"><Check size={16} className="shrink-0" />{t("accept_final_offer")}</button>
+                <button type="button" onClick={() => w.openDialog("decline")} className="flex w-full sm:flex-1 items-center justify-center gap-2 rounded-xl border border-[#dcd3c2] bg-white px-3 py-2.5 text-sm font-semibold text-[#172b43] transition-colors hover:bg-[#fbf9f5]"><X size={16} className="shrink-0" />{t("decline_final_offer")}</button>
               </div>}
           </>}
       {w.notice && <div role="alert" className="mt-3 rounded-xl border border-[#eddbc0] bg-white p-3 text-xs leading-5 text-[#617082]"><p>{t("chat_offer_notice_pending")}</p><button type="button" onClick={w.retryNotice} disabled={w.busy} className="mt-1 font-semibold text-[#9b701f] underline underline-offset-4 disabled:opacity-50">{w.busy ? t("chat_sending") : t("chat_retry")}</button></div>}
