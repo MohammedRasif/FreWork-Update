@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   SendIcon,
   ClockIcon,
@@ -13,6 +13,7 @@ import {
   LoaderCircle,
   BadgeCheck,
   RotateCcw,
+  X,
 } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
@@ -144,8 +145,20 @@ function Messages() {
 
   const { data: plansData, isLoading: plansLoading } = useGetPlansQuery();
   const currentChat = Array.isArray(chatList) ? chatList.find((chat) => String(chat.id) === id) : null;
-  const effectiveChat = currentChat || (agency && String(agency.id) === String(id) ? agency : null);
-  const effectivePlanId = effectiveChat?.tour_plan_id || effectiveChat?.plan_id || effectiveChat?.tour_plan?.id || agency?.tour_plan_id || null;
+  const effectiveAgency = useMemo(() => {
+    return agency || (currentChat ? {
+      id: String(currentChat.id || id),
+      name: currentChat.other_participant_name || t("unknown_user"),
+      image: currentChat.other_participant_image || null,
+      other_user_id: currentChat.other_user_id || null,
+      tour_plan_id: currentChat.tour_plan_id || null,
+      tour_plan_title: currentChat.tour_plan_title || t("no_tour_plan"),
+      is_archived: currentChat.is_archived || false,
+    } : null);
+  }, [agency, currentChat, id, t]);
+
+  const effectiveChat = currentChat || (effectiveAgency && String(effectiveAgency.id) === String(id) ? effectiveAgency : null);
+  const effectivePlanId = effectiveChat?.tour_plan_id || effectiveChat?.plan_id || effectiveChat?.tour_plan?.id || effectiveAgency?.tour_plan_id || null;
   const workflow = useChatOfferWorkflow({ chat: effectiveChat, chatId: id, planId: effectivePlanId, messages });
 
   const menuRef = useRef(null);
@@ -154,52 +167,17 @@ function Messages() {
   const [isConversationArchived, setIsConversationArchived] = useState(false);
 
   useEffect(() => {
-    if (!agency && id && chatList && !isChatListLoading) {
-      const currentChat = chatList.find((chat) => chat.id?.toString() === id);
-      if (currentChat) {
-        const basePath = location.pathname.includes("/agentie/")
-          ? "/agentie/mesaje"
-          : "/cont/mesaje";
-
-        const agencyData = {
-          id: currentChat.id?.toString() || "",
-          name: currentChat.other_participant_name || t("unknown_user"),
-          image:
-            currentChat.other_participant_image ||
-            null,
-          other_user_id: currentChat.other_user_id || null,
-          tour_plan_id: currentChat.tour_plan_id || null,
-          tour_plan_title: currentChat.tour_plan_title || t("no_tour_plan"),
-          is_archived: currentChat.is_archived || false,
-        };
-
-        navigate(`${basePath}/${id}`, {
-          state: { agency: agencyData },
-          replace: true,
-        });
-      }
-    }
-  }, [
-    agency,
-    id,
-    chatList,
-    isChatListLoading,
-    navigate,
-    location.pathname,
-    t,
-  ]);
-
-  useEffect(() => {
-    if (agency?.tour_plan_id && plansData) {
+    const activeAgencyPlanId = effectiveAgency?.tour_plan_id || currentChat?.tour_plan_id;
+    if (activeAgencyPlanId && plansData) {
       const selectedPlan = plansData.find(
         (plan) =>
-          plan.id === agency.tour_plan_id && plan.status === "published",
+          plan.id === activeAgencyPlanId && plan.status === "published",
       );
       if (selectedPlan) {
-        setSelectedDropdown(agency.tour_plan_id.toString());
+        setSelectedDropdown(activeAgencyPlanId.toString());
       }
     }
-  }, [agency, plansData]);
+  }, [effectiveAgency, currentChat, plansData]);
 
   useEffect(() => {
     if (chatList && Array.isArray(chatList)) {
@@ -222,6 +200,11 @@ function Messages() {
     setMenuOpen(false);
   }, [id]);
 
+  const refetchMessagesRef = useRef(refetchMessages);
+  refetchMessagesRef.current = refetchMessages;
+  const refetchChatListRef = useRef(refetchChatList);
+  refetchChatListRef.current = refetchChatList;
+
   useEffect(() => {
     if (!id) return;
     let isMounted = true;
@@ -240,8 +223,8 @@ function Messages() {
           if (!isMounted) return;
           try {
             const received = JSON.parse(event.data);
-            refetchMessages();
-            refetchChatList();
+            refetchMessagesRef.current?.();
+            refetchChatListRef.current?.();
             if (received.type !== "chat_message") return;
 
             const inner = received.message || received.data || received;
@@ -343,10 +326,15 @@ function Messages() {
           }
         };
 
-        ws.onerror = (err) => console.warn("WebSocket error:", err);
-
-        ws.onclose = () => {
+        ws.onerror = (err) => {
           if (!isMounted) return;
+          if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) return;
+          console.warn("WebSocket error:", err);
+        };
+
+        ws.onclose = (event) => {
+          if (!isMounted) return;
+          if (event.code === 1000) return;
           wsReconnectAttemptsRef.current = Math.min((wsReconnectAttemptsRef.current || 0) + 1, 5);
           const delay = Math.min(2500 * Math.pow(1.5, wsReconnectAttemptsRef.current - 1), 15000);
           reconnectTimeout = setTimeout(connectWebSocket, delay);
@@ -362,10 +350,32 @@ function Messages() {
     return () => {
       isMounted = false;
       clearTimeout(reconnectTimeout);
-      wsRef.current?.close();
-      wsRef.current = null;
+      const ws = wsRef.current;
+      if (ws) {
+        ws.onopen = null;
+        ws.onmessage = null;
+        ws.onerror = null;
+        ws.onclose = null;
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close(1000, "Component unmounted");
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          ws.onopen = () => {
+            try {
+              ws.close(1000, "Component unmounted after connect");
+            } catch (_) {}
+          };
+          setTimeout(() => {
+            if (ws.readyState === WebSocket.CONNECTING) {
+              try {
+                ws.close();
+              } catch (_) {}
+            }
+          }, 2500);
+        }
+        wsRef.current = null;
+      }
     };
-  }, [id, userId, refetchMessages, refetchChatList]);
+  }, [id, userId]);
 
   useEffect(() => {
     if (
@@ -511,12 +521,12 @@ function Messages() {
     if (!input) return;
     input.style.height = "auto";
     input.style.height = `${Math.min(120, Math.max(40, input.scrollHeight))}px`;
-  }, [newMessage, isMessagesLoading, agency]);
+  }, [newMessage, isMessagesLoading, effectiveAgency]);
 
   const handleFileChange = async (e) => {
     if (!isChatActive) return;
     const file = e.target.files[0];
-    const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
+    const activePlanId = selectedDropdown || effectiveAgency?.tour_plan_id || currentChat?.tour_plan_id;
     if (file) {
       if (!activePlanId) {
         alert(t("select_tour_plan_first"));
@@ -612,7 +622,7 @@ function Messages() {
 
   const handleSendMessage = async () => {
     if (!isChatActive || newMessage.trim() === "" || isSending) return;
-    const activePlanId = selectedDropdown || agency?.tour_plan_id || currentChat?.tour_plan_id;
+    const activePlanId = selectedDropdown || effectiveAgency?.tour_plan_id || currentChat?.tour_plan_id;
     if (!activePlanId) {
       alert(t("select_tour_plan_first"));
       return;
@@ -755,7 +765,8 @@ function Messages() {
 
   const handleDropdownChange = async (e) => {
     const selectedId = e.target.value;
-    if (!agency?.other_user_id) {
+    const targetUserId = effectiveAgency?.other_user_id || currentChat?.other_user_id;
+    if (!targetUserId) {
       alert(t("select_agency_and_plan"));
       return;
     }
@@ -788,7 +799,7 @@ function Messages() {
 
         const res = await inviteToChat({
           tour_plan_id: Number(selectedId),
-          other_user_id: agency.other_user_id,
+          other_user_id: targetUserId,
         }).unwrap();
 
         const serverId = res.id;
@@ -837,11 +848,12 @@ function Messages() {
   }, [menuOpen]);
 
   const handleViewDetails = () => {
-    if (!agency?.tour_plan_id) {
+    const planId = effectiveAgency?.tour_plan_id || currentChat?.tour_plan_id;
+    if (!planId) {
       alert(t("no_tour_plan_provided"));
       return;
     }
-    navigate(`/cereri/${agency.tour_plan_id}`);
+    navigate(`/cereri/${planId}`);
   };
 
   const handleArchiveConversation = async () => {
@@ -958,11 +970,13 @@ function Messages() {
   const basePath = location.pathname.startsWith("/agentie/") ? "/agentie/mesaje" : "/cont/mesaje";
   const canRejectOffer = workflow.canDecide;
   const isChatActive = workflow.status !== "rejected" && !isConversationArchived && currentChat?.is_active !== false && (currentMessagesData?.conversation?.is_active ?? messagesData?.conversation?.is_active) !== false;
-  const participantName = workflow.isAgency ? getChatParticipantName(currentChat, workflow.role, workflow.acceptedOffers, userId, t) : agency?.name;
-  const participantImage = agency?.image || currentChat?.other_participant_image || null;
+  const participantName = workflow.isAgency
+    ? getChatParticipantName(currentChat, workflow.role, workflow.acceptedOffers, userId, t)
+    : (effectiveAgency?.name || currentChat?.other_participant_name || t("unknown_user"));
+  const participantImage = effectiveAgency?.image || currentChat?.other_participant_image || null;
   const isChatSwitching = !currentMessagesData && (isMessagesLoading || isMessagesFetching);
-  const isLoading = isChatSwitching || (isChatListLoading && !agency);
-  const hasError = messagesError || (!agency && !isChatListLoading);
+  const isLoading = isChatSwitching || (isChatListLoading && !effectiveAgency && !currentChat);
+  const hasError = messagesError || (!effectiveAgency && !currentChat && !isChatListLoading);
 
   if (isLoading || hasError) {
     return (
@@ -982,12 +996,12 @@ function Messages() {
           <ChatAvatar name={participantName} image={participantImage} active={currentChat?.active} className="h-10 w-10" />
           <div className="min-w-0">
             <h2 className="flex items-center gap-1.5 text-sm font-semibold sm:text-base"><span className="truncate">{participantName}</span>{currentChat?.tourist_is_verified && <BadgeCheck size={16} className="shrink-0 text-[#b88424]" aria-label={t("chat_verified")} />}</h2>
-            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{agency?.tour_plan_title || currentChat?.tour_plan_title}</p>
+            <p className="mt-0.5 truncate text-xs text-[#9b701f]">{effectiveAgency?.tour_plan_title || currentChat?.tour_plan_title}</p>
           </div>
         </div>
         {canRejectOffer && (
-          <button type="button" onClick={workflow.openRejectModal} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
-            <XIcon size={16} className="shrink-0" aria-hidden="true" />{t("reject_offer")}
+          <button type="button" onClick={() => workflow.openDialog?.("decline")} className="order-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#efd2cc] bg-[#fff6f3] px-3 py-2.5 text-xs font-semibold text-[#b54a40] transition hover:border-[#d8a29a] hover:bg-[#fff0ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b54a40] xl:order-2 xl:w-auto">
+            <X size={16} className="shrink-0" aria-hidden="true" />{t("reject_offer")}
           </button>
         )}
         <div className="relative order-2 shrink-0 xl:order-3" ref={menuRef}>
@@ -996,7 +1010,7 @@ function Messages() {
             <div id="chat-actions" onKeyDown={e => { if (e.key === "Escape") setMenuOpen(false); }} className="absolute right-0 top-full z-20 mt-2 w-56 rounded-2xl border border-[#e9e6e0] bg-white p-1.5 shadow-xl">
               <button type="button" className="chat-menu-item" onClick={handleViewDetails}><FileText size={17} className="shrink-0 text-[#b88424]" />{t("view_tour_details")}</button>
               <button type="button" className="chat-menu-item" onClick={handleArchiveConversation}>{isConversationArchived ? <ArchiveRestore size={17} className="shrink-0 text-[#b88424]" /> : <Archive size={17} className="shrink-0 text-[#b88424]" />}{isConversationArchived ? t("unarchive_conversation") : t("archive_conversation")}</button>
-              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={workflow.openRejectModal}><XIcon size={17} className="shrink-0" />{t("reject_offer")}</button>}
+              {canRejectOffer && <button type="button" className="chat-menu-item text-[#b54a40]" onClick={() => workflow.openDialog?.("decline")}><X size={17} className="shrink-0" />{t("reject_offer")}</button>}
             </div>
           )}
         </div>
