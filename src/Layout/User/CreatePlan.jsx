@@ -461,9 +461,16 @@ const CreatePlan = () => {
                 className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#DD9E2C]"
                 {...register("phoneNumber", {
                   required: t("phone_required"),
-                  pattern: {
-                    value: /^[0-9]{10,15}$/,
-                    message: t("invalid_phone"),
+                  validate: (value) => {
+                    if (!value || !value.trim()) return t("phone_required");
+                    if (!/^[+]?[0-9\s\-().]+$/.test(value)) {
+                      return t("invalid_phone");
+                    }
+                    const digits = value.replace(/\D/g, "");
+                    if (digits.length < 7 || digits.length > 15) {
+                      return t("invalid_phone");
+                    }
+                    return true;
                   },
                 })}
               />

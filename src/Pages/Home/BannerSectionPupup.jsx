@@ -423,10 +423,16 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
   const handleContactSubmit = async () => {
     updateFormData("confirmation", true);
-    setValue("confirmation", true);
+    setValue("confirmation", true, { shouldValidate: true });
     const valid = await validateStep(5);
     if (!valid) return;
-    handleSubmit((data) => onSubmit(data, "published"))();
+    handleSubmit(
+      (data) => onSubmit(data, "published"),
+      (formErrors) => {
+        console.error("Form validation errors:", formErrors);
+        toast.error(t("fill_all_required"), { toastId: "request-required-fields" });
+      }
+    )();
   };
 
   const handleAddDetails = async () => {
@@ -586,7 +592,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                       })}
                       type="date"
                       defaultValue={formData.startingDate}
-                      onChange={(e) => updateFormData("startingDate", e.target.value)}
+                      onChange={(e) => {
+                        setValue("startingDate", e.target.value, { shouldDirty: true, shouldValidate: true });
+                        updateFormData("startingDate", e.target.value);
+                      }}
                       className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"
                     />
                   </div>
@@ -607,7 +616,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                       })}
                       type="date"
                       defaultValue={formData.endingDate}
-                      onChange={(e) => updateFormData("endingDate", e.target.value)}
+                      onChange={(e) => {
+                        setValue("endingDate", e.target.value, { shouldDirty: true, shouldValidate: true });
+                        updateFormData("endingDate", e.target.value);
+                      }}
                       className="date-input w-full pl-3 pr-2 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-0 focus:border-transparent text-sm transition-all duration-200"
                     />
                   </div>
@@ -800,7 +812,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 type="text"
                 placeholder={t("full_name")}
                 defaultValue={formData.name}
-                onChange={(e) => updateFormData("name", e.target.value)}
+                onChange={(e) => {
+                  setValue("name", e.target.value, { shouldDirty: true, shouldValidate: true });
+                  updateFormData("name", e.target.value);
+                }}
                 className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
               />
               {errors.name && (
@@ -825,7 +840,10 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   type="email"
                   placeholder="email@example.com"
                   defaultValue={formData.email}
-                  onChange={(e) => updateFormData("email", e.target.value)}
+                  onChange={(e) => {
+                    setValue("email", e.target.value, { shouldDirty: true, shouldValidate: true });
+                    updateFormData("email", e.target.value);
+                  }}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
                 />
                 {errors.email && (
@@ -839,9 +857,17 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                 <input
                   {...register("phoneNumber", {
                     required: t("phone_required"),
-                    pattern: {
-                      value: /^\+?[0-9]{10,15}$/,
-                      message: t("invalid_phone"),
+                    validate: (value) => {
+                      if (!value || !value.trim()) return t("phone_required");
+                      // Allow +, digits, spaces, hyphens, parentheses, and dots
+                      if (!/^[+]?[0-9\s\-().]+$/.test(value)) {
+                        return t("invalid_phone");
+                      }
+                      const digits = value.replace(/\D/g, "");
+                      if (digits.length < 7 || digits.length > 15) {
+                        return t("invalid_phone");
+                      }
+                      return true;
                     },
                   })}
                   id="request-phone"
@@ -850,7 +876,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
                   placeholder={t("phone_number")}
                   defaultValue={formData.phoneNumber}
                   onChange={(e) => {
-                    setValue("phoneNumber", e.target.value, { shouldDirty: true });
+                    setValue("phoneNumber", e.target.value, { shouldDirty: true, shouldValidate: true });
                     updateFormData("phoneNumber", e.target.value);
                   }}
                   className="w-full px-3 py-2.5 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#DD9E2C] focus:border-transparent text-sm transition-all duration-200"
