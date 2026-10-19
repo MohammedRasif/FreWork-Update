@@ -1,4 +1,40 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+const fetchTourPlanDetail = async (arg, fetchWithBQ) => {
+  if (!arg) return { error: { status: 400, data: "Missing plan identifier" } };
+  const strArg = String(arg).trim();
+  const isNumeric = /^\d+$/.test(strArg);
+  if (isNumeric) {
+    try {
+      const searchRes = await fetchWithBQ(`/public/tour-plans/?id=${encodeURIComponent(strArg)}`);
+      if (searchRes.data && Array.isArray(searchRes.data) && searchRes.data.length > 0) {
+        const found = searchRes.data[0];
+        if (found.slug) {
+          const detailRes = await fetchWithBQ(`/tour-plans/${encodeURIComponent(found.slug)}/`);
+          if (detailRes.data) {
+            return { data: detailRes.data };
+          }
+        }
+        return { data: found };
+      }
+    } catch {
+      /* Fall back to direct lookup */
+    }
+  }
+  const res = await fetchWithBQ(`/tour-plans/${encodeURIComponent(strArg)}/`);
+  if (res.error && isNumeric) {
+    try {
+      const searchRes = await fetchWithBQ(`/public/tour-plans/?id=${encodeURIComponent(strArg)}`);
+      if (searchRes.data && Array.isArray(searchRes.data) && searchRes.data.length > 0) {
+        return { data: searchRes.data[0] };
+      }
+    } catch {
+      /* ignore fallback errors */
+    }
+  }
+  return res;
+};
+
 export const sqQuery = createApi({
   reducerPath: "sqQuery",
   baseQuery: fetchBaseQuery({
@@ -129,7 +165,8 @@ export const sqQuery = createApi({
       ],
     }),
     getOneDetail: builder.query({
-      query: (id) => `/tour-plans/${id}/`,
+      queryFn: (arg, _queryApi, _extraOptions, fetchWithBQ) =>
+        fetchTourPlanDetail(arg, fetchWithBQ),
       providesTags: (result, error, id) => [{ type: "TourPlan", id }],
     }),
     // agency profile
@@ -203,7 +240,8 @@ export const sqQuery = createApi({
       providesTags: ["Offer"],
     }),
     getOneTourPlan: builder.query({
-      query: (id) => `/tour-plans/${id}/`,
+      queryFn: (arg, _queryApi, _extraOptions, fetchWithBQ) =>
+        fetchTourPlanDetail(arg, fetchWithBQ),
       providesTags: (result, error, id) => [{ type: "TourPlan", id }],
     }),
     // notifications

@@ -103,7 +103,16 @@ export default function UserDashboardLayout() {
         if (data.unread_count !== undefined) setUnreadCount(Number(data.unread_count) || 0);
       } catch { /* Ignore malformed notification counts. */ }
     };
-    return () => socket.close();
+    return () => {
+      socket.onmessage = null;
+      socket.onerror = null;
+      socket.onclose = null;
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.onopen = () => socket.close();
+      }
+    };
   }, []);
 
   useEffect(() => {
