@@ -10,7 +10,7 @@ export default function AdminAcceptPlan() {
   const { t } = useTranslation();
   const { data: toursData, isLoading, isError } = useGetAllacceptedOfferQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTourId, setSelectedTourId] = useState(null);
+  const [selectedTour, setSelectedTour] = useState(null);
   const [expanded, setExpanded] = useState({});
 
   const formatDateRange = (startDate, endDate) => {
@@ -27,14 +27,14 @@ export default function AdminAcceptPlan() {
     return `${start} - ${end}`;
   };
 
-  const openModal = (tourId) => {
-    setSelectedTourId(tourId);
+  const openModal = (tour) => {
+    setSelectedTour(tour);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedTourId(null);
+    setSelectedTour(null);
   };
 
   if (isLoading) {
@@ -106,7 +106,7 @@ export default function AdminAcceptPlan() {
 
                 <div className="mt-auto border-t border-[#f0eee9] pt-4">
                   <button
-                    onClick={() => openModal(tour.tour_plan.id)}
+                    onClick={() => openModal(tour)}
                     className="min-h-10 rounded-xl bg-[#c88f2a] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ad751c]"
                   >
                     {t("view")}
@@ -118,16 +118,21 @@ export default function AdminAcceptPlan() {
         })}
       </div>
 
-      {isModalOpen && selectedTourId && (
+      {isModalOpen && selectedTour && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/55 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#10243a]/60 p-3 sm:p-4 backdrop-blur-sm"
           onClick={closeModal}
         >
           <div
-            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-[22px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)]"
+            className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[24px] border border-[#e9e6e0] bg-white shadow-[0_24px_70px_rgba(16,36,58,0.25)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <TourPlanDetails closeModal={closeModal} id={selectedTourId} />
+            <TourPlanDetails
+              closeModal={closeModal}
+              id={selectedTour.tour_plan?.slug || selectedTour.tour_plan?.id}
+              initialData={selectedTour.tour_plan}
+              offer={selectedTour}
+            />
           </div>
         </div>
       )}
