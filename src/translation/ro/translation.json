@@ -280,6 +280,8 @@
   "failed_to_initiate_chat": "Nu s-a putut iniția conversația",
   "conversation_inactive_message": "❌ Oferta ta a fost refuzată.",
   "send_offer": "Trimite oferta",
+  "request_detail_agency_offer_title": "Ești o agenție de turism?",
+  "request_detail_agency_offer_intro": "Acest client caută o vacanță. Trimite-i o ofertă personalizată și câștigă un client nou!",
   "close": "Închide",
   "place_your_offer": "Trimite oferta ta",
   "agency_offer_intro": "Completează detaliile ofertei tale pentru acest client.",

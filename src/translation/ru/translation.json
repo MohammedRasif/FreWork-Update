@@ -280,6 +280,8 @@
   "failed_to_initiate_chat": "Не удалось начать чат",
   "conversation_inactive_message": "❌ Ваше предложение отклонено.",
   "send_offer": "Отправить предложение",
+  "request_detail_agency_offer_title": "Вы турагентство?",
+  "request_detail_agency_offer_intro": "Этот клиент ищет варианты отдыха. Отправьте ему персональное предложение и привлеките нового клиента!",
   "close": "Закрыть",
   "place_your_offer": "Сделайте предложение",
   "agency_offer_intro": "Заполните детали вашего предложения для этого клиента.",

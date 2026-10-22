@@ -412,9 +412,15 @@ function SinglePost({ prid }) {
               <span className="rounded-full bg-[#f4e5c8] px-3 py-1 font-bold text-[#875f1d]">{offerCount} / 3</span>
             </div>
             {isAccepted && <div className="mt-5 flex items-center gap-2 rounded-xl bg-[#edf6f1] px-4 py-3 text-sm font-semibold text-[#397055]"><CheckCircle2 size={18} aria-hidden="true" />{t("accepted_offer")}</div>}
-            {showSentOfferButton && !isAccepted && <button type="button" onClick={handleSentOfferClick} disabled={hasMaxOffers} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#c88f2a] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-not-allowed disabled:bg-[#e6e9eb] disabled:text-[#778390]">
-              <Send size={17} aria-hidden="true" />{hasMaxOffers ? t("offers_completed") : t("send_offer")}
-            </button>}
+            {showSentOfferButton && !isAccepted && <div className="mt-5 space-y-3">
+              <div className="rounded-xl border border-[#ecdfc8] bg-[#fbf5e9] px-4 py-4 text-sm font-medium leading-6 text-[#536477]">
+                <strong className="mb-1 block text-base font-bold text-[#172b43]">{t("request_detail_agency_offer_title")}</strong>
+                <p>{t("request_detail_agency_offer_intro")}</p>
+              </div>
+              <button type="button" onClick={handleSentOfferClick} disabled={hasMaxOffers} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#c88f2a] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#ad751c] disabled:cursor-not-allowed disabled:bg-[#e6e9eb] disabled:text-[#778390]">
+                <Send size={17} className="shrink-0" aria-hidden="true" /><span className="min-w-0 leading-5">{hasMaxOffers ? t("offers_completed") : t("send_offer")}</span>
+              </button>
+            </div>}
           </div>
 
           {tour.offers?.length > 0 && <div className="rounded-[24px] border border-[#e9e6e0] bg-white p-6 shadow-[0_10px_35px_rgba(23,43,67,0.04)] sm:p-7">
