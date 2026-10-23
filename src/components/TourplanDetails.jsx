@@ -12,6 +12,7 @@ import {
   FileText,
   ExternalLink,
   Compass,
+  Star,
 } from "lucide-react";
 import { FaLocationArrow, FaLocationDot, FaEuroSign } from "react-icons/fa6";
 import { FaCheckCircle } from "react-icons/fa";
@@ -396,8 +397,10 @@ export default function TourPlanDetails({ id, closeModal, initialData, offer: pr
               <p className="text-sm font-bold text-[#172b43]">
                 {localizedContent(tourData.type_of_accommodation, t) || t("na")}
                 {tourData.minimum_star_hotel && tourData.minimum_star_hotel !== "N/A" && (
-                  <span className="block text-xs text-[#c88f2a] mt-0.5">
-                    {"⭐".repeat(Number(tourData.minimum_star_hotel) || 0)}
+                  <span className="block text-xs text-[#c88f2a] mt-0.5" role="img" aria-label={`${t("hotel_stars")}: ${tourData.minimum_star_hotel}`}>
+                    {Array.from({ length: Math.min(5, Math.max(0, Number(tourData.minimum_star_hotel) || 0)) }, (_, index) => (
+                      <Star key={index} size={14} fill="currentColor" className="mr-0.5 inline-block" aria-hidden="true" />
+                    ))}
                   </span>
                 )}
               </p>

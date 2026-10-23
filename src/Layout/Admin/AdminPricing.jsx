@@ -2,7 +2,7 @@ import { localizedContent } from "@/lib/localizedContent";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { IoCheckmarkCircleSharp, IoCheckmarkDoneSharp } from "react-icons/io5";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   useShowSubscriptionDataQuery,
@@ -300,7 +300,7 @@ const AdminPricing = () => {
                   {plan?.warningBox && (
                     <div className="rounded-xl border border-[#eadac0] bg-[#fffaf0] p-4 text-sm font-semibold text-[#34485c]">
                       <p className="flex items-center gap-1">
-                        <span>⚠️</span>
+                        <TriangleAlert size={17} className="shrink-0 text-[#b88424]" aria-hidden="true" />
                         <span>{localizedContent(plan.warningBox.title, t)}</span>
                       </p>
                       <p>{localizedContent(plan.warningBox.text, t)}</p>

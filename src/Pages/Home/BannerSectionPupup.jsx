@@ -924,7 +924,7 @@ export default function BannerSectionPopup({ closeForm, initialStep = 1 }) {
 
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                {t("improve_offers")} <span style={{ color: "#DD9E2C" }}>✨</span>
+                {t("improve_offers")}
               </h2>
             </div>
 

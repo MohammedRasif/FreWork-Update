@@ -171,11 +171,12 @@ const handleButtonClick = () => {
                 components={{
                   question: <span className="block" />,
                   highlight: <span className="block text-[#e5ad42]" />,
+                  plain: <span className="text-white" />,
                 }}
               />
             </h1>
             <p className="mt-4 max-w-[565px] text-[15px] leading-[22px] text-white/90 sm:mt-6 sm:text-xl sm:leading-8">
-              {t("show_short_descriptionn")}
+              <Trans i18nKey="show_short_descriptionn" components={{ br: <br />, mobilebr: <br className="sm:hidden" />, desktopbr: <br className="hidden sm:block" />, strong: <strong className="font-bold" /> }} />
             </p>
             <HeroBenefits />
           </div>

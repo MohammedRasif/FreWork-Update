@@ -289,7 +289,11 @@ export default function CreatedPlanCard({ plan, setCreatedPlans }) {
                             </p>
                             <p className="text-md text-gray-600 flex items-center gap-2">
                               {plan.minimum_star_hotel
-                                ? "⭐".repeat(Number(plan.minimum_star_hotel))
+                                ? <span className="inline-flex gap-1" role="img" aria-label={`${t("hotel_stars")}: ${plan.minimum_star_hotel}`}>
+                                    {Array.from({ length: Math.min(5, Math.max(0, Number(plan.minimum_star_hotel) || 0)) }, (_, index) => (
+                                      <FaStar key={index} className="h-4 w-4 text-[#c88f2a]" aria-hidden="true" />
+                                    ))}
+                                  </span>
                                 : t("na")}
                             </p>
                           </div>

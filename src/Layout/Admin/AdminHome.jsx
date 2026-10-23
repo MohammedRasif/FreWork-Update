@@ -88,7 +88,7 @@ const AdminHome = () => {
       );
     const isOwnPlan = plan.user === currentUserEmail;
 
-    // ✅ Condition 2: plan_status === "accepted" হলে hide করো
+    // Condition 2: plan_status === "accepted" হলে hide করো
     const isAccepted = plan.plan_status === "accepted";
 
     return matchesSearch && matchesFilter && !hasUserOffered && !isOwnPlan && !isAccepted;
@@ -318,7 +318,7 @@ const AdminHome = () => {
                           {t("view")}
                         </button>
 
-                        {/* ✅ Send Offer button — condition চেক করে দেখাচ্ছি */}
+                        {/* Send Offer button — condition চেক করে দেখাচ্ছি */}
                         {hideOfferButton ? (
                           <span className="text-xs text-gray-500 italic">
                             {alreadyOffered
@@ -447,9 +447,11 @@ const AdminHome = () => {
                         </span>
                         <p className="text-md text-gray-600 flex items-center gap-2">
                           {selectedPlan.minimum_star_hotel
-                            ? "⭐".repeat(
-                                Number(selectedPlan.minimum_star_hotel)
-                              )
+                            ? <span className="inline-flex gap-1" role="img" aria-label={`${t("hotel_stars")}: ${selectedPlan.minimum_star_hotel}`}>
+                                {Array.from({ length: Math.min(5, Math.max(0, Number(selectedPlan.minimum_star_hotel) || 0)) }, (_, index) => (
+                                  <FaStar key={index} className="h-4 w-4 text-[#c88f2a]" aria-hidden="true" />
+                                ))}
+                              </span>
                             : t("na")}
                         </p>
                       </p>
